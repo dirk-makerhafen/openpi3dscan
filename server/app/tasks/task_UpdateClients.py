@@ -38,9 +38,9 @@ class Task_UpdateClients(Observable):
             self.set_status("idle")
             return
 
-        with ThreadPool(15) as p:
+        with ThreadPool(30) as p:
             r = p.map_async(lambda device: device._deploy(), devices)
-            for i in range(20):
+            for i in range(120):
                 self.percent_done = int((100 / ld) * len([c for c in devices if c.status == "installing"]))
                 self.set_status("deploying")
                 if self.percent_done > 95:

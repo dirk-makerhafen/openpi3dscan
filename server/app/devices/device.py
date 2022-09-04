@@ -103,7 +103,11 @@ class Device(Observable):
                     self.name = "P%s" % self.device_id
         self.notify_observers()
 
+
     def deploy(self):
+        self.task_queue.put(self._deploy)
+
+    def _deploy(self):
         self._set_status("installing")
         client_dir = os.path.join(SCRIPT_DIR, "..","..","..","client")
         self._ssh_exec('scp -r %s "%s" %s@%s:/home/%s/' % (SSH_OPTIONS, client_dir, self.username, self.ip, self.username), 60)

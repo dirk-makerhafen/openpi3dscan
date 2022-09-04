@@ -59,9 +59,6 @@ class DevicesView(PyHtmlView):
     def shutdown(self):
         DevicesInstance().shutdown()
 
-    def update(self):
-        DevicesInstance().deploy()
-
     def sync(self):
         DevicesInstance().cameras.sync_shotlists()
 

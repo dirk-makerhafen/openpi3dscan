@@ -4,7 +4,7 @@ from pyhtmlgui import Observable
 import glob
 import os
 devicesInstance = None
-VERSION = "2022.09.03-23.23"
+VERSION = "2022.09.04-07.00"
 
 class Settings_FirmwareImage(Observable):
     def __init__(self, parent):

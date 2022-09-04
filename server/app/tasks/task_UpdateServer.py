@@ -42,10 +42,10 @@ class Task_UpdateServer(Observable):
             if os.path.exists("/opt/openpi3dscan/server/install.py"):
                 installed_version = 0
                 try:
-                    installed_version = open("/opt/openpi3dscan/server/install.py","r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()
+                    installed_version = open("/opt/openpi3dscan/server/settings.py","r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()
                 except Exception as e:
                     print(e)
-                new_version = open("/home/pi/openpi3dscan/server/install.py","r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()
+                new_version = open("/home/pi/openpi3dscan/server/settings.py","r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()
                 if installed_version == new_version:
                     self.set_status("up to date")
                     time.sleep(5)

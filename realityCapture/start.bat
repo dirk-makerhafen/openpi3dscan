@@ -1,0 +1,2 @@
+process.exe
+IF %ERRORLEVEL% NEQ 0 PAUSE

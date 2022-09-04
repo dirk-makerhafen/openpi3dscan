@@ -1,0 +1,7 @@
+bottle
+requests
+picamera
+pillow
+Adafruit-PCA9685
+numpy==1.13.3
+paste

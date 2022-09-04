@@ -1,0 +1,6 @@
+bottle
+requests
+pyhtmlgui>=2.7
+bottle-websocket
+whichcraft
+zipstream-ng

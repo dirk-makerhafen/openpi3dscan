@@ -39,7 +39,7 @@ class Task_UpdateServer(Observable):
             self.set_status("download failed")
             time.sleep(10)
         else:
-            if os.path.exists("/opt/openpi3dscan/server/install.py"):
+            if os.path.exists("/opt/openpi3dscan/server/settings.py"):
                 installed_version = 0
                 try:
                     installed_version = open("/opt/openpi3dscan/server/settings.py","r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()

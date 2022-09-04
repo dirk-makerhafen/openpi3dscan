@@ -409,14 +409,25 @@ class SettingsView(PyHtmlView):
                     <div class="list-group mb-5 shadow">
                         <div class="list-group-item">
                             <div class="row align-items-center">
-                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Update Server</div>
+                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Openpi3dscan</div>
                             </div>
                         </div>
                         <div class="list-group-item">
                             <div class="row align-items-center">
                                 <div class="col-md-10">
-                                    <strong class="mb-0">re</strong>
-                                    <p class="text-muted mb-0">Sof </p>
+                                    <strong class="mb-0">Version</strong>
+                                    <p class="text-muted mb-0">Current server version</p>
+                                </div>
+                                <div class="col-auto">
+                                    {{pyview.subject.VERSION}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-10">
+                                    <strong class="mb-0">Online Updates</strong>
+                                    <p class="text-muted mb-0">Check for updates and install if available. Server will reboot after updates are installed.</p>
                                 </div>
                                 <div class="col-auto">
                                     {{pyview.updateServerView.render()}}

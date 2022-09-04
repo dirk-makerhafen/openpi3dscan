@@ -2,7 +2,6 @@ import os
 import glob
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-VERSION = "2022.09.03-23.23"
 
 def shell(cmd):
     print(cmd)

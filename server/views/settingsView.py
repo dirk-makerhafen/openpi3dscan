@@ -153,7 +153,7 @@ class FirmwareSettingsView(PyHtmlView):
                 <div class="list-group mb-5 shadow">
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Firmware</div>
+                            <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Legacy Firmware</div>
                         </div>
                     </div>
                     

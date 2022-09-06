@@ -403,7 +403,7 @@ class SettingsView(PyHtmlView):
             </div>
         </div>
     
-        <div class="ServerUpdte">
+        <div class="ServerUpdate">
             <div class="row justify-content-center" style="width:100%">
                 <div class="col-md-12">
                     <div class="list-group mb-5 shadow">
@@ -419,7 +419,7 @@ class SettingsView(PyHtmlView):
                                     <p class="text-muted mb-0">Current server version</p>
                                 </div>
                                 <div class="col-auto">
-                                    {{pyview.subject.VERSION}}
+                                    {{pyview.subject.settings.VERSION}}
                                 </div>
                             </div>
                         </div>
@@ -438,6 +438,50 @@ class SettingsView(PyHtmlView):
                 </div>   
             </div>
         </div>    
+
+    
+        <div class="Storage">
+            <div class="row justify-content-center" style="width:100%">
+                <div class="col-md-12">
+                    <div class="list-group mb-5 shadow">
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Storage</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <strong class="mb-0">USB-Disks</strong>
+                                    <p class="text-muted mb-0">List of connected USB Disks</p>
+                                </div>
+                                <div class="col-md-6">
+                                   <table style="width:100%;text-align:center">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center">Name</th>
+                                            <th style="text-align:center">Type</th>
+                                            <th style="text-align:center">Disk Size</th>
+                                            <th style="text-align:center">Disk Free</th>
+                                        </tr>
+                                    </thead>                                
+                                        {% for disk in pyview.subject.usbDisks.disks %}
+                                            <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
+                                                <td>{{disk.LABEL}}</td>
+                                                <td>{{disk.FSTYPE}}</td>
+                                                <td>{{disk.disk_total}}</td>
+                                                <td>{{disk.disk_free}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </div>
+        </div>    
+    
     
     
     
@@ -448,7 +492,8 @@ class SettingsView(PyHtmlView):
 
     def __init__(self, subject, parent):
         super().__init__(subject, parent)
-        self.sequenceSettingsSpeedView = SequenceSettingsView(self.subject.sequenceSettingsSpeed, self)
-        self.cameraSettingsView = CameraSettingsView(self.subject.cameraSettings, self)
-        self.firmwareSettingsView = FirmwareSettingsView(self.subject.firmwareSettings, self)
+
+        self.sequenceSettingsSpeedView = SequenceSettingsView(self.subject.settings.sequenceSettingsSpeed, self)
+        self.cameraSettingsView = CameraSettingsView(self.subject.settings.cameraSettings, self)
+        self.firmwareSettingsView = FirmwareSettingsView(self.subject.settings.firmwareSettings, self)
         self.updateServerView = TaskUpdateServerView(TaskUpdateServerInstance(), self)

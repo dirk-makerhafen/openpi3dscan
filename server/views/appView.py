@@ -25,7 +25,7 @@ class AppView(PyHtmlView):
         self.devices = DevicesView(subject=subject.devices, parent=self)
         self.liveView = LiveView(subject=subject, parent=self)
         self.shotView = ShotView(subject=subject, parent=self)
-        self.settings = SettingsView(self.subject.settings, self)
+        self.settings = SettingsView(self.subject, self)
         self.current_view = self.devices
 
     def show_devicesView(self):

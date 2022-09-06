@@ -204,6 +204,7 @@ class Shot(Observable):
         self.status = "Sync"
         self.notify_observers()
         tasks = []
+        existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
         for device in [d for d in self.devices if d.status == "online"]:
             for image_mode in [ "normal", "preview" ]:
                 for image_type in [ "normal", "projection" ]:
@@ -212,7 +213,7 @@ class Shot(Observable):
                     else:
                         folder_name = "preview_images"
                     img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device.device_id)
-                    if not os.path.exists(img_path):
+                    if img_path not in existing_images:
                         tasks.append([device, [self.shot_id, image_type, image_mode]])
         if len(tasks) > 0:
             random.shuffle(tasks)
@@ -222,11 +223,12 @@ class Shot(Observable):
             self.count_number_of_files()
             self.save()
 
+        existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
         for i in range(101,213):
             for image_type in ["normal", "projection"]:
                 img_path = os.path.join(self.path, "images", image_type, "%s.jpg" % i)
                 preview_path = os.path.join(self.path, "preview_images", image_type, "%s.jpg" % i)
-                if not os.path.exists(preview_path) and  os.path.exists(img_path) :
+                if not preview_path in existing_images and img_path in existing_images:
                     try:
                         print("creating preview image")
                         img = Image.open(img_path)
@@ -383,16 +385,8 @@ class Shots:
         self.path = "/shots/"
         self.cache = {}
         self.devices = devices
-        self._load_local()
         self.deleted_shot_ids = []
         self.load()
-
-    def _load_local(self):
-        for path in glob.glob("/shots/*"):
-            if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images")) :
-                shot_id = path.split("/")[-1]
-                self.shots.append(Shot(shot_id))
-        self.shots.sort()
 
     def create(self, shot_id, name):
         s = Shot(shot_id)
@@ -476,6 +470,13 @@ class Shots:
                 self.deleted_shot_ids = data["deleted_shot_ids"]
         except:
             pass
+
+        for path in glob.glob("/shots/*"):
+            if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images")) :
+                shot_id = path.split("/")[-1]
+                self.shots.append(Shot(shot_id))
+        self.shots.sort()
+
 
 
 _shotsInstance = None

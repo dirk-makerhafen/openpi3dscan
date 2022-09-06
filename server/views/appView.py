@@ -13,10 +13,22 @@ from .sidebar.sidebarView import SidebarView
 class AppView(PyHtmlView):
     DOM_ELEMENT_CLASS = "AppView container"
     TEMPLATE_STR = '''
-        <div class="row" >
-            {{ pyview.sidebar.render() }}
-            {{ pyview.current_view.render()}}
-        </div>
+        {% if pyview.subject.status == "active"%}
+            <div class="row" >
+                {{ pyview.sidebar.render() }}
+                {{ pyview.current_view.render()}}
+            </div>
+        {% else %}
+            <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
+            {% if  pyview.subject.status == "reboot"%}
+                Reboot in progress, this may take 1-2 minutes
+            {% endif %}
+            {% if  pyview.subject.status == "shutdown"%}
+                System Shutdown
+            {% endif %}
+                
+            </div>
+        {% endif %}
     '''
 
     def __init__(self, subject: App, parent):

@@ -63,6 +63,7 @@ class WirelessSettingsView(PyHtmlView):
                                     {% if pyview.subject.status == "connecting" %}Connecting, please wait..{% endif %}
                                     {% if pyview.subject.status == "configure" %}Configuring network..{% endif %}
                                     {% if pyview.subject.status == "connected" %}Connected<br>IP: {{pyview.subject.ip}}{% endif %}
+                                    {% if pyview.subject.status == "checking" %}Checking Status{% endif %}
                                 </div>
                             </div>
                         </div>                                  
@@ -99,7 +100,50 @@ class TaskUpdateServerView(PyHtmlView):
         {% endif %}
     '''
 
-
+class UsbStorageView(PyHtmlView):
+    TEMPLATE_STR = '''
+        <div class="Storage">
+            <div class="row justify-content-center" style="width:100%">
+                <div class="col-md-12">
+                    <div class="list-group mb-5 shadow">
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Storage</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <strong class="mb-0">USB-Disks</strong>
+                                    <p class="text-muted mb-0">List of connected USB Disks</p>
+                                </div>
+                                <div class="col-md-6">
+                                   <table style="width:100%;text-align:center">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:center">Name</th>
+                                            <th style="text-align:center">Type</th>
+                                            <th style="text-align:center">Disk Size</th>
+                                            <th style="text-align:center">Disk Free</th>
+                                        </tr>
+                                    </thead>                                
+                                        {% for disk in pyview.subject.disks %}
+                                            <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
+                                                <td>{{disk.LABEL}}</td>
+                                                <td>{{disk.FSTYPE}}</td>
+                                                <td>{{disk.disk_total}}</td>
+                                                <td>{{disk.disk_free}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </div>
+        </div>   
+    '''
 
 class FirmwareSettingsView(PyHtmlView):
     DOM_ELEMENT_CLASS = "FirmwareSettingsView"
@@ -432,17 +476,8 @@ class CameraSettingsView(PyHtmlView):
         gains[1] = float(value)
         self.subject.awb_gains = gains
 
-class SettingsView(PyHtmlView):
+class RealityCaptureView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="main">
-        {{pyview.cameraSettingsView.render()}}
-    
-        {{pyview.sequenceSettingsSpeedView.render()}}  
-    
-        {{pyview.firmwareSettingsView.render()}}  
-          
-        {{pyview.wirelessSettingsView.render()}}  
-          
         <div class="RealityCapture">
             <div class="row justify-content-center" style="width:100%">
                 <div class="col-md-12">
@@ -470,8 +505,74 @@ class SettingsView(PyHtmlView):
                 </div>   
             </div>
         </div>
+    '''
+
+class RebootShutdownView(PyHtmlView):
+    TEMPLATE_STR = '''
+        <div class="SystemRestart">
+            <div class="row justify-content-center" style="width:100%">
+                <div class="col-md-12">
+                    <div class="list-group mb-5 shadow">
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Shutdown/Reboot Server</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-10">
+                                    <strong class="mb-0">Reboot</strong>
+                                    <p class="text-muted mb-0">Reboot server, this will take 1-2 minutes</p>
+                                </div>
+                                <div class="col-auto">
+                                    {% if pyview.subject.status == "active"%}
+                                        <button class="btn " style="margin-right:5px" onclick='pyview.subject.reboot()'> Reboot </button>
+                                    {% else %}
+                                        <p>{{pyview.subject.status}} active</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-10">
+                                    <strong class="mb-0">Shutdown</strong>
+                                    <p class="text-muted mb-0">Shutdown Server</p>
+                                </div>
+                                <div class="col-auto">
+                                    {% if pyview.subject.status == "active" %}
+                                        <button class="btn " style="margin-right:5px" onclick='pyview.subject.shutdown();'> Shutdown </button>
+                                     {% else %}
+                                        <p>{{pyview.subject.status}} active</p>
+                                    {% endif %}
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </div>
+        </div>    
+
+   
+    '''
+
+
+class SettingsView(PyHtmlView):
+    TEMPLATE_STR = '''
+    <div class="main">
     
-        <div class="ServerUpdate">
+        {{pyview.cameraSettingsView.render()}}
+    
+        {{pyview.sequenceSettingsSpeedView.render()}}  
+    
+        {{pyview.firmwareSettingsView.render()}}  
+          
+        {{pyview.wirelessSettingsView.render()}}  
+        
+        {{pyview.realityCaptureView.render()}}  
+          
+        <div class="System">
             <div class="row justify-content-center" style="width:100%">
                 <div class="col-md-12">
                     <div class="list-group mb-5 shadow">
@@ -507,53 +608,9 @@ class SettingsView(PyHtmlView):
             </div>
         </div>    
 
-    
-        <div class="Storage">
-            <div class="row justify-content-center" style="width:100%">
-                <div class="col-md-12">
-                    <div class="list-group mb-5 shadow">
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Storage</div>
-                            </div>
-                        </div>
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <strong class="mb-0">USB-Disks</strong>
-                                    <p class="text-muted mb-0">List of connected USB Disks</p>
-                                </div>
-                                <div class="col-md-6">
-                                   <table style="width:100%;text-align:center">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align:center">Name</th>
-                                            <th style="text-align:center">Type</th>
-                                            <th style="text-align:center">Disk Size</th>
-                                            <th style="text-align:center">Disk Free</th>
-                                        </tr>
-                                    </thead>                                
-                                        {% for disk in pyview.subject.usbDisks.disks %}
-                                            <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
-                                                <td>{{disk.LABEL}}</td>
-                                                <td>{{disk.FSTYPE}}</td>
-                                                <td>{{disk.disk_total}}</td>
-                                                <td>{{disk.disk_free}}</td>
-                                            </tr>
-                                        {% endfor %}
-                                    </table>   
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>   
-            </div>
-        </div>    
-    
-    
-    
-    
-    
+        {{pyview.rebootShutdownView.render()}}  
+
+ 
     </div> 
     
     '''
@@ -566,3 +623,6 @@ class SettingsView(PyHtmlView):
         self.firmwareSettingsView = FirmwareSettingsView(self.subject.settings.firmwareSettings, self)
         self.wirelessSettingsView = WirelessSettingsView(self.subject.settings.wirelessSettings, self)
         self.updateServerView = TaskUpdateServerView(TaskUpdateServerInstance(), self)
+        self.realityCaptureView = RealityCaptureView(self.subject, self)
+        self.usbStorageView = UsbStorageView(self.subject.usbDisks, self)
+        self.rebootShutdownView = RebootShutdownView(self.subject, self)

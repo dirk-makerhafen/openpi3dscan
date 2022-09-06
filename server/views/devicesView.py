@@ -21,7 +21,7 @@ class DevicesView(PyHtmlView):
             
             {{ pyview.task_networkscan.render() }}
             {{ pyview.task_updateclients.render() }}  
-            {{ pyview.task_syncshots.render() }}
+           <!--- { { pyview.task_syncshots.render() } } --->
             <div class="col-md-4">
             </div>
         </div>

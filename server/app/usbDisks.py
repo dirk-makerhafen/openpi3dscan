@@ -15,7 +15,7 @@ class UsbDisk(Observable):
         self.disk_free = "0G"
         self.get_diskspace()
 
-    def mount(self, target_dir):
+    def mount(self):
         os.system("sudo mount '%s' '/shots'" % (self.NAME,))
         self.get_diskspace()
 

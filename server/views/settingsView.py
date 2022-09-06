@@ -571,6 +571,8 @@ class SettingsView(PyHtmlView):
         {{pyview.wirelessSettingsView.render()}}  
         
         {{pyview.realityCaptureView.render()}}  
+        
+        {{pyview.usbStorageView.render()}}  
           
         <div class="System">
             <div class="row justify-content-center" style="width:100%">

@@ -1,10 +1,71 @@
 import json
+import subprocess
 
 from pyhtmlgui import Observable
 import glob
 import os
 devicesInstance = None
-VERSION = "2022.09.04-04.50"
+VERSION = "2022.09.06-20.00"
+
+
+class Settings_Wireless(Observable):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.save = parent.save
+        self.ssid = ""
+        self.password = ""
+        self.status = "not_connected"
+        self.ip = ""
+        self.get_connection_status()
+
+    def set_status(self, status):
+        self.status = status
+        self.notify_observers()
+
+    def to_dict(self):
+        return {
+            "ssid" : self.ssid,
+            "password" : self.password,
+        }
+    def from_dict(self, data):
+        self.ssid = data["ssid"]
+        self.password = data["password"]
+
+    def apply(self, ssid, password):
+        if ssid == self.ssid and password == self.password:
+            return
+        self.ssid = ssid
+        self.password = password
+        self.save()
+        t = '''
+country=de
+update_config=1
+ctrl_interface=/var/run/wpa_supplicant
+network={
+    scan_ssid=1
+    ssid="%s"
+    psk="%s"
+}
+        ''' % (self.ssid, self.password)
+        open("/etc/wpa_supplicant/wpa_supplicant.conf","w").write(t)
+        self.set_status("configure")
+        subprocess.call("sudo wpa_cli -i wlan0 reconfigure", shell=True)
+        self.set_status("connecting")
+        subprocess.call("sudo systemctl restart wpa_supplicant", shell=True)
+        self.get_connection_status()
+
+    def get_connection_status(self):
+        try:
+            stdout = subprocess.check_output("ifconfig wlan0|grep -i inet", shell=True, timeout=10, stderr=subprocess.STDOUT).decode("UTF-8")
+            if "192.168" in stdout:
+                self.ip = "192.168%s" % (stdout.split("192.168")[1].split(" ")[0])
+                self.set_status("connected")
+            else:
+                self.ip = ""
+                self.set_status("not_connected")
+        except Exception as e:
+            pass
 
 class Settings_FirmwareImage(Observable):
     def __init__(self, parent):
@@ -212,6 +273,7 @@ class Settings(Observable):
         self.sequenceSettingsQuality = Settings_Sequence(self)
         self.cameraSettings = Settings_Cameras(self)
         self.firmwareSettings = Settings_FirmwareImage(self)
+        self.wirelessSettings = Settings_Wireless(self)
         self.VERSION = VERSION
         self.load()
 
@@ -220,7 +282,8 @@ class Settings(Observable):
             "sequenceSettingsSpeed" : self.sequenceSettingsSpeed.to_dict(),
             "sequenceSettingsQuality" : self.sequenceSettingsQuality.to_dict(),
             "cameraSettings" : self.cameraSettings.to_dict(),
-            "firmwareSettings" : self.firmwareSettings.to_dict()
+            "firmwareSettings" : self.firmwareSettings.to_dict(),
+            "wirelessSettings" : self.wirelessSettings.to_dict()
         }
         open("/opt/openpi3dscan/.openpi3dscan.json","w").write(json.dumps(data))
 
@@ -232,6 +295,7 @@ class Settings(Observable):
             self.sequenceSettingsQuality.from_dict(data["sequenceSettingsQuality"])
             self.cameraSettings.from_dict(data["cameraSettings"])
             self.firmwareSettings.from_dict(data["firmwareSettings"])
+            self.wirelessSettings.from_dict(data["wirelessSettings"])
         except:
             pass
         self.notify_observers()

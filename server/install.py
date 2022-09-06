@@ -43,7 +43,6 @@ if __name__ == "__main__":
     shell("sudo mv /tmp/1 /etc/hostname")
     shell("cat /etc/hosts | grep -v '192.168.99.' | grep -v localhost | grep -v raspberrypi | grep -v openpi3dscan > 1")
     shell("echo '192.168.99.254   openpi3dscan' >> 1")
-    shell("echo '127.0.0.1      openpi3dscan' >> 1")
     shell("echo '127.0.0.1      localhost' >> 1")
     shell("sudo mv 1 /etc/hosts")
 

@@ -106,7 +106,7 @@ class Settings_FirmwareImage(Observable):
             self.current_image = self.image_files[-1]
 
     def delete_image(self, image):
-        img_path = os.path.join("/opt/openpi3dscan/server/firmware/", image )
+        img_path = os.path.join("/opt/openpi3dscan/firmware/", image )
         if os.path.exists(img_path):
             os.remove(img_path)
             self.load()

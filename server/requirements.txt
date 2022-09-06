@@ -4,3 +4,4 @@ pyhtmlgui>=2.7
 bottle-websocket
 whichcraft
 zipstream-ng
+pexpect

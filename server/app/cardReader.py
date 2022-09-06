@@ -82,8 +82,9 @@ class SDCard(Observable):
         self.notify_observers()
 
     def write_image(self):
-        imgpath = "/opt/openpi3dscan/server/firmware/%s" % SettingsInstance().firmwareSettings.current_image
+        imgpath = "/opt/openpi3dscan/firmware/%s" % SettingsInstance().firmwareSettings.current_image
         if not os.path.exists(imgpath):
+            print(imgpath, "does not exist")
             return
         shell('sudo dd if="%s" of="%s" bs=4M conv=fsync' % (imgpath, self.slot.path))
         shell("fsck -y %s1" % self.slot.path)

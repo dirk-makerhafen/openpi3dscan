@@ -54,7 +54,7 @@ class UsbDisks(Observable):
 
     def load(self):
         try:
-            stdout = subprocess.check_output('lsblk -fp|grep -i /dev/sd|grep -v EFI|grep -i fat', shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output('lsblk -fp|grep -i /dev/sd|grep -v EFI|grep -v boot|grep -i fat', shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
         for line in stdout.split("\n"):
@@ -65,10 +65,14 @@ class UsbDisks(Observable):
                 NAME, FSTYPE, FSVER, LABEL, UUID, REST = line.split(" ",5)
                 if self.get_disk_by_uid(UUID) is None:
                     self.disks.append(UsbDisk(NAME, FSTYPE, FSVER, LABEL, UUID))
-
             except Exception as e:
                 print(e)
-
+        toremove = []
+        for disk in self.disks:
+            if disk.UUID not in stdout:
+                toremove.append(disk)
+        for r in toremove:
+            self.disks.remove(r)
 
     def get_disk_by_uid(self, uid):
         try:

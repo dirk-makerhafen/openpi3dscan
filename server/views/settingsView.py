@@ -109,6 +109,7 @@ class UsbStorageView(PyHtmlView):
                         <div class="list-group-item">
                             <div class="row align-items-center">
                                 <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Storage</div>
+
                             </div>
                         </div>
                         <div class="list-group-item">
@@ -117,7 +118,10 @@ class UsbStorageView(PyHtmlView):
                                     <strong class="mb-0">USB-Disks</strong>
                                     <p class="text-muted mb-0">List of connected USB Disks</p>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-1">
+                                    <button class="btn" onclick="pyview.subject.load()">Reload</button>
+                                </div>
+                                <div class="col-md-5">
                                    <table style="width:100%;text-align:center">
                                     <thead>
                                         <tr>

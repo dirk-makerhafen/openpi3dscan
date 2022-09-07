@@ -31,8 +31,8 @@ if __name__ == "__main__":
 
     # REQUIREMENTS
     shell("cd /opt/openpi3dscan/server/ ; sudo pip3 install -r requirements.txt")
-    shell("sudo DEBIAN_FRONTEND=noninteractive apt-get update")
-    shell("sudo DEBIAN_FRONTEND=noninteractive apt-get -y install avahi-daemon ntp dnsmasq iptables")
+    shell('sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" update')
+    shell('sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install avahi-daemon ntp dnsmasq iptables ntpdate ntp')
 
     # Add user for ssh login
     shell('sudo useradd openpi3dscan')

@@ -87,10 +87,6 @@ class Task_CreateShot(Observable):
         projector_sequence.append([ shot2_start_time + seqs.image2.offset/1000 , "enable" if seqs.image2.projection is True else "disable" ])
         projector_sequence.append([ shot2_end_time   + image_aquisition_time   , "default"                                                 ])
 
-        start_at = shot1_start_time + seqs.image1.offset/1000
-        self.shot_count_down = math.floor(start_at - time.time())
-        self.set_status("waiting")
-
         for device in projectors:
             device.projector.sequence(projector_sequence)
 
@@ -99,6 +95,10 @@ class Task_CreateShot(Observable):
 
         for device in cameras:
             device.camera.shots.create(shot, sequence=[shot1_end_time, shot2_end_time], shot_quality=self.shot_quality)
+
+        start_at = shot1_start_time + seqs.image1.offset/1000
+        self.shot_count_down = math.floor(start_at - time.time())
+        self.set_status("waiting")
 
         while time.time() < start_at:
             _new_shot_count_down = math.ceil(start_at - time.time())

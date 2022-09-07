@@ -19,12 +19,14 @@ from pyhtmlgui import PyHtmlGui
 from views.appView import AppView
 from app.app import AppInstance
 import os
+import time
 from app.additionalHttpEndpoints import HttpEndpoints
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 if __name__ == "__main__":
+    time.sleep(10)
     gui = PyHtmlGui(
         app_instance    = AppInstance(),
         view_class      = AppView,

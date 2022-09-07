@@ -5,6 +5,46 @@ from app.tasks.task_UpdateServer import TaskUpdateServerInstance
 from app.tasks.task_Whitebalance import TaskWhitebalanceInstance
 
 
+
+class HostnameSettingsView(PyHtmlView):
+    TEMPLATE_STR = '''
+        <div class="Hostname">
+            <div class="row justify-content-center" style="width:100%">
+                <div class="col-md-12">
+                    <div class="list-group mb-5 shadow">
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Server hostname</div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-10">
+                                    <strong class="mb-0">Name</strong>
+                                    <p class="text-muted mb-0">Wireless network name</p>
+                                </div>
+                                <div class="col-auto">
+                                    <input id="hostname" value="{{pyview.subject.hostname}}" type="text"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-10">
+                                    <strong class="mb-0">Save Changes</strong>
+                                    <p class="text-muted mb-0">Reboot to apply changes after saving!</p>
+                                </div>
+                                <div class="col-auto">
+                                   <button class="btn " style="margin-right:5px" onclick='pyview.subject.set_hostname($("#hostname").val());'> Change hostname </button>
+                                </div>
+                            </div>
+                        </div>    
+                                                       
+                    </div>
+                </div>   
+            </div>
+        </div>    
+    '''
 class WirelessSettingsView(PyHtmlView):
     TEMPLATE_STR = '''
         <div class="Wireless">
@@ -550,7 +590,7 @@ class RebootShutdownView(PyHtmlView):
                                         <p>{{pyview.subject.status}} active</p>
                                     {% endif %}
                                 </div>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -727,7 +767,8 @@ class SettingsView(PyHtmlView):
 
         {{pyview.rebootShutdownView.render()}}  
 
- 
+         {{pyview.hostnameView.render()}}  
+
     </div> 
     
     '''
@@ -743,3 +784,4 @@ class SettingsView(PyHtmlView):
         self.usbStorageView = UsbStorageView(self.subject.usbDisks, self)
         self.rebootShutdownView = RebootShutdownView(self.subject, self)
         self.cardReaderView = CardReaderView(self.subject.cardReader, self)
+        self.hostnameView = HostnameSettingsView(self.subject.settings.hostnameSettings, self)

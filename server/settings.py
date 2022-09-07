@@ -5,6 +5,9 @@ import time
 from pyhtmlgui import Observable
 import glob
 import os
+import re
+
+
 devicesInstance = None
 VERSION = "2022.09.06-03.24"
 
@@ -23,7 +26,14 @@ class Settings_Hostname(Observable):
     def from_dict(self, data):
         self.hostname = data["hostname"]
 
-    def apply(self):
+    def set_hostname(self, new_hostname):
+        new_hostname = re.sub('[^0-9a-zA-Z]+', '', new_hostname).lower()
+        if len(new_hostname) < 3:
+            return
+        if new_hostname == self.hostname:
+            return
+        self.hostname = new_hostname
+        self.notify_observers()
         open("/tmp/1", "w").write("%s\n" % self.hostname)
         os.system("sudo mv /tmp/1 /etc/hostname")
         os.system(
@@ -325,6 +335,7 @@ class Settings(Observable):
         self.cameraSettings = Settings_Cameras(self)
         self.firmwareSettings = Settings_FirmwareImage(self)
         self.wirelessSettings = Settings_Wireless(self)
+        self.hostnameSettings = Settings_Hostname(self)
         self.VERSION = VERSION
         self.load()
 
@@ -334,7 +345,8 @@ class Settings(Observable):
             "sequenceSettingsQuality" : self.sequenceSettingsQuality.to_dict(),
             "cameraSettings" : self.cameraSettings.to_dict(),
             "firmwareSettings" : self.firmwareSettings.to_dict(),
-            "wirelessSettings" : self.wirelessSettings.to_dict()
+            "wirelessSettings" : self.wirelessSettings.to_dict(),
+            "hostnameSettings" : self.hostnameSettings.to_dict()
         }
         open("/opt/openpi3dscan/.openpi3dscan.json","w").write(json.dumps(data))
 
@@ -347,6 +359,7 @@ class Settings(Observable):
             self.cameraSettings.from_dict(data["cameraSettings"])
             self.firmwareSettings.from_dict(data["firmwareSettings"])
             self.wirelessSettings.from_dict(data["wirelessSettings"])
+            self.hostnameSettings.from_dict(data["hostnameSettings"])
         except Exception as e:
             print("error loading settings:", e)
         self.save()

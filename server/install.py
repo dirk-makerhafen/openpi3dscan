@@ -44,8 +44,10 @@ if __name__ == "__main__":
     try:
         data = open("/opt/openpi3dscan/.openpi3dscan.json", "r").read()
         hostname = json.loads(data)["hostnameSettings"]["hostname"]
+        if len(hostname) < 3:
+            hostname = "openpi3dscan"
     except:
-        pass
+        hostname = "openpi3dscan"
 
     # HOSTNAME
     open("/tmp/1","w").write("%s\n" % hostname)

@@ -26,7 +26,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 if __name__ == "__main__":
     gui = PyHtmlGui(
-        app_instance    = app,
+        app_instance    = AppInstance(),
         view_class      = AppView,
         template_dir    = os.path.join(SCRIPT_DIR, "templates"),
         static_dir      = os.path.join(SCRIPT_DIR, "static"),

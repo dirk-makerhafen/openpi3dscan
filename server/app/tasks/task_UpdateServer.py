@@ -57,7 +57,7 @@ class Task_UpdateServer(Observable):
                     self.set_status("rebooting")
                     time.sleep(3)
                     AppInstance().reboot()
-                    
+
 
         self.set_status("idle")
         self.worker = None

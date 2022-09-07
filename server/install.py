@@ -1,3 +1,4 @@
+import json
 import os
 import glob
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -39,11 +40,19 @@ if __name__ == "__main__":
     shell('echo openpi3dscan:openpi3dscan | sudo chpasswd')
     shell('echo "openpi3dscan ALL=(ALL) NOPASSWD: ALL" > 1 ; sudo mv 1 "/etc/sudoers.d/010_openpi3dscan-nopasswd" ; sudo chown root:root /etc/sudoers.d/010_openpi3dscan-nopasswd ')
 
+    hostname = "openpi3dscan"
+    try:
+        data = open("/opt/openpi3dscan/.openpi3dscan.json", "r").read()
+        hostname = json.loads(data)["hostnameSettings"]["hostname"]
+    except:
+        pass
+
     # HOSTNAME
-    open("/tmp/1","w").write("openpi3dscan\n")
+    open("/tmp/1","w").write("%s\n" % hostname)
     shell("sudo mv /tmp/1 /etc/hostname")
     shell("cat /etc/hosts | grep -v '192.168.99.' | grep -v localhost | grep -v raspberrypi | grep -v openpi3dscan > 1")
     shell("echo '192.168.99.254   openpi3dscan' >> 1")
+    shell("echo '192.168.99.254   %s # openpi3dscan' >> 1" % hostname)
     shell("echo '127.0.0.1      localhost' >> 1")
     shell("sudo mv 1 /etc/hosts")
 

@@ -495,7 +495,7 @@ class RealityCaptureView(PyHtmlView):
                             <div class="row align-items-center">
                                 <div class="col-md-10">
                                     <strong class="mb-0">RealityCapture Automation Software</strong>
-                                    <p class="text-muted mb-0">Software package to automate RealityCapture. Download, unzip, run process.exe </p>
+                                    <p class="text-muted mb-0">Software package to automate RealityCapture. Download, unzip, run <b>start.bat</b> </p>
                                 </div>
                                 <div class="col-auto">
                                     <div class="custom-control custom-switch">

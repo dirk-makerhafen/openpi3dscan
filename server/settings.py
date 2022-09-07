@@ -9,6 +9,31 @@ devicesInstance = None
 VERSION = "2022.09.06-03.23"
 
 
+class Settings_Hostname(Observable):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.save = parent.save
+        self.hostname = "openpi3dscan"
+
+    def to_dict(self):
+        return {
+            "hostname" : self.hostname,
+        }
+    def from_dict(self, data):
+        self.hostname = data["hostname"]
+
+    def apply(self):
+        open("/tmp/1", "w").write("%s\n" % self.hostname)
+        os.system("sudo mv /tmp/1 /etc/hostname")
+        os.system(
+            "cat /etc/hosts | grep -v '192.168.99.' | grep -v localhost | grep -v raspberrypi | grep -v openpi3dscan > 1")
+        os.system("echo '192.168.99.254   openpi3dscan' >> 1")
+        os.system("echo '192.168.99.254   %s # openpi3dscan' >> 1" % self.hostname)
+        os.system("echo '127.0.0.1      localhost' >> 1")
+        os.system("sudo mv 1 /etc/hosts")
+
+
 class Settings_Wireless(Observable):
     def __init__(self, parent):
         super().__init__()

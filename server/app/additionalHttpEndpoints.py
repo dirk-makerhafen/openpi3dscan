@@ -142,6 +142,7 @@ class HttpEndpoints:
         for file in files:
             name = file.split("/")[-1]
             zs.add_path(file, "windows_scripts/%s" % name)
+        zs.add_path("/etc/hostname", "windows_scripts/hostname")
         headers = {
             'Content-Type': "application/zip",
             'Content-Disposition': 'attachment; filename="windows_scripts.zip"'

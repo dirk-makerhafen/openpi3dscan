@@ -32,9 +32,10 @@ except:
 
 SERVER = None
 while SERVER is None:
-    print("Resolving openpi3dscan.local" )
+    hostname = open("hostname","r").read().strip()
+    print("Resolving %s.local" % hostname )
     try:
-        SERVER = socket.getaddrinfo("openpi3dscan.local", 80)[0][4][0]
+        SERVER = socket.getaddrinfo("%s.local" % hostname, 80)[0][4][0]
     except Exception as e:
         print("Failed to resolve server IP")
         time.sleep(1)

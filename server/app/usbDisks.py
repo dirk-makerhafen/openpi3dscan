@@ -62,6 +62,8 @@ class UsbDisks(Observable):
             line = line.replace("\t"," ").replace("└─","")
             while "  " in line:
                 line = line.replace("  "," ")
+            if len(line) < 5:
+                continue
             try:
                 NAME, FSTYPE, FSVER, LABEL, UUID, REST = line.split(" ",5)
                 if self.get_disk_by_uid(UUID) is None:

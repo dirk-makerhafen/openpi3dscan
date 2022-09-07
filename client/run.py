@@ -63,10 +63,8 @@ def import_old_scans():
         print(old_shot_ids)
         for old_shot_id in old_shot_ids:
             if os.path.exists("/3dscan/%s_1.jpg" % old_shot_id):
-                ts = datetime.datetime.fromtimestamp(os.path.getmtime("/3dscan/%s_1.jpg" % old_shot_id))
-                ts = ("%s" % ts).split(".")[0].replace("-", ".").replace(":","").strip()  # 2021-07-02 16:47:50 to 2021.07.02 164750
-                new_shot_id = "%s Scan%s" % (ts, old_shot_id)
-                print("new shot id", ts)
+                new_shot_id = "0000.00.00 %s" % (old_shot_id)
+                print("new shot id", new_shot_id)
                 if not os.path.exists("/home/openpi3dscan/shots/%s" % new_shot_id):
                     pass
                     # os.mkdir("/home/openpi3dscan/shots/%s" % new_shot_id)

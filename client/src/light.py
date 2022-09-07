@@ -4,6 +4,7 @@ import threading
 from queue import Queue
 import time
 from bottle import route
+import RPi.GPIO as GPIO
 try:
     import Adafruit_PCA9685
 except:
@@ -26,8 +27,19 @@ channel_offsets = { 0:1, 1:8, 2:15, 3:6, 4:13, 5:4, 6:11, 7:2, 8:9, 9:16, 10:7, 
 
 class Light():
     def __init__(self):
-        self.pwm = Adafruit_PCA9685.PCA9685(address=0x40)
-        self.pwm.set_pwm_freq(323)
+        self.use_gpio = False
+        self.gpio_pins = [1,2,3]
+        try:
+            self.pwm = Adafruit_PCA9685.PCA9685(address=0x40)
+            self.pwm.set_pwm_freq(323)
+        except:
+            print("Failed to init i2c, using gpio")
+            self.use_gpio = True
+            GPIO.setmode(GPIO.BOARD)
+            for pin in  self.gpio_pins:
+                GPIO.setup(pin, GPIO.OUT)
+                GPIO.output(pin, False)
+
         self.task_queue = Queue()
         self.last_usage = time.time()
         self.light_segment_adjustments = [1.0] * 16
@@ -42,7 +54,7 @@ class Light():
         self._screensaver_max_steps = 1024
         self._screensaver_values_full = [0] * self._screensaver_max_steps
         self._screensaver_steps_per_col = self._screensaver_max_steps / 16
-        self.interpolate_screensaver_data()
+        #self.interpolate_screensaver_data()
         self.start()
         self.current_pwm_values = [[-1,-1] for i in range(16)]
 
@@ -81,17 +93,9 @@ class Light():
 
     def _task_loop(self):
         while True:
-            if self.last_usage > time.time() - self.screensaver_timeout:
-                self._screensaver_active = False
             try:
-                timeout = 0.1 if self._screensaver_active is True else 60
-                task = self.task_queue.get(timeout=timeout)
+                task = self.task_queue.get(timeout=60)
             except:
-                if self._screensaver_active is True:
-                    self._screensaver_step()
-                else:
-                    if self.last_usage < time.time() - self.screensaver_timeout:
-                        self._screensaver_active = True
                 continue
             HeartbeatInstance().lock()
             try:
@@ -122,9 +126,14 @@ class Light():
         if value < 1: # relative to current value
             value = self.current_value * value
         self.current_value = value
-        for channel in range(16):
-            value_percent_channel = self.light_segment_adjustments[channel] * value
-            self._set_with_offsets(channel, value_percent_channel)
+        if self.use_gpio is True:
+            GPIO.output(self.gpio_pins[0], self.current_value > 80)
+            GPIO.output(self.gpio_pins[1], self.current_value > 40)
+            GPIO.output(self.gpio_pins[2], self.current_value > 5)
+        else:
+            for channel in range(16):
+                value_percent_channel = self.light_segment_adjustments[channel] * value
+                self._set_with_offsets(channel, value_percent_channel)
 
     def _set_with_offsets(self, channel, value_percent):
         value_channel = (value_percent / 100) * 4095
@@ -169,7 +178,6 @@ class LightAPI():
         route("/light/set/<value>")(self.set)
         route("/light/adjust/<values>")(self.set)
         route("/light/sequence/<sequence>")(self.sequence)
-        route("/light/screensaver")(self.screensaver)
 
     # 1..100 # absolut light value in percent
     # 0..0.9999 # relative to current value

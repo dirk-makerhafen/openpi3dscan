@@ -20,7 +20,7 @@ class Heartbeat():
 
     def send(self):
         while self._locked is True:
-            time.sleep(5)
+            time.sleep(random.randint(10,30))
         total, used, free = shutil.disk_usage("/")
         uptime_seconds = -1
         try:

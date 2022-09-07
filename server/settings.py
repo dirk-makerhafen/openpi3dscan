@@ -6,7 +6,7 @@ from pyhtmlgui import Observable
 import glob
 import os
 devicesInstance = None
-VERSION = "2022.09.06-03.20"
+VERSION = "2022.09.06-03.22"
 
 
 class Settings_Wireless(Observable):

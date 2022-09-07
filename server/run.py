@@ -34,7 +34,7 @@ if __name__ == "__main__":
         base_template   = "base.html",
         listen_port     = 80,
         listen_host     = "0.0.0.0",
-        auto_reload     = True,
+        auto_reload     = False,
         shared_secret   = None,
     )
     httpEndpoints = HttpEndpoints(app, gui)

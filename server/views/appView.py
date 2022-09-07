@@ -22,6 +22,12 @@ class AppView(PyHtmlView):
             <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
             {% if  pyview.subject.status == "reboot"%}
                 Reboot in progress, this may take 1-2 minutes
+                <script>
+                    setTimeout(function(){
+                        location.reload();
+                    }, 30000);
+                </script>
+                
             {% endif %}
             {% if  pyview.subject.status == "shutdown"%}
                 System Shutdown

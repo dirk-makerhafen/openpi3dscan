@@ -27,3 +27,10 @@ class App(Observable):
         self.status = "shutdown"
         self.notify_observers()
         os.system("sudo shutdown -h now &")
+
+_appInstance = None
+def AppInstance():
+    global _appInstance
+    if _appInstance is None:
+        _appInstance = App()
+    return _appInstance

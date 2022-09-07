@@ -17,7 +17,7 @@ monkey.patch_time()
 
 from pyhtmlgui import PyHtmlGui
 from views.appView import AppView
-from app.app import App
+from app.app import AppInstance
 import os
 from app.additionalHttpEndpoints import HttpEndpoints
 
@@ -25,7 +25,6 @@ from app.additionalHttpEndpoints import HttpEndpoints
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 if __name__ == "__main__":
-    app = App()
     gui = PyHtmlGui(
         app_instance    = app,
         view_class      = AppView,
@@ -37,7 +36,7 @@ if __name__ == "__main__":
         auto_reload     = False,
         shared_secret   = None,
     )
-    httpEndpoints = HttpEndpoints(app, gui)
+    httpEndpoints = HttpEndpoints(AppInstance(), gui)
     gui.start(show_frontend=False, block=True)
 
 

@@ -5,6 +5,8 @@ from multiprocessing.pool import ThreadPool
 import random
 from pyhtmlgui import Observable
 import os
+
+from app.app import AppInstance
 from app.devices.devices import DevicesInstance
 from settings import SettingsInstance
 from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
@@ -54,9 +56,8 @@ class Task_UpdateServer(Observable):
                     subprocess.call("cd /home/pi/openpi3dscan/server ; sudo python3 install.py", shell=True)
                     self.set_status("rebooting")
                     time.sleep(3)
-                    os.system("sudo reboot &")
-                    time.sleep(90)
-                    #
+                    AppInstance().reboot()
+                    
 
         self.set_status("idle")
         self.worker = None

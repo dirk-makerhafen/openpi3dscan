@@ -11,6 +11,7 @@ if __name__ == "__main__":
 
     # COPY TO TARGET
     if SCRIPT_DIR != "/opt/openpi3dscan/server":
+        shell("sudo mkdir -p /shots")
         shell("sudo mkdir -p /opt/openpi3dscan/server")
         shell("sudo mkdir -p /opt/openpi3dscan/client")
         shell("sudo mkdir -p /opt/openpi3dscan/realityCapture")

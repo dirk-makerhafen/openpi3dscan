@@ -30,6 +30,8 @@ class SDCard(Observable):
         self.info_group = ""
         self.info_id = ""
         self.info_name = ""
+        self.info_segment = ""
+        self.info_row = ""
 
     def _reload(self):
         try:
@@ -69,12 +71,21 @@ class SDCard(Observable):
                 self.info_group = devsettings.split("TYPE")[1].split("=")[1].split("\n")[0].strip()
                 self.info_id = devsettings.split("ID")[1].split("=")[1].split("\n")[0].strip()
                 self.info_name =  devsettings.split("NAME")[1].split("=")[1].split("\n")[0].strip()
+
             except:
                 try:
                     self.info_group = open("%s/boot/group.txt" % mount_dir, "r").read().strip()
                     if self.info_group == "1": self.info_group = "camera"
                     if self.info_group == "2": self.info_group = "projector"
                     self.info_id = open("%s/boot/id.txt" % mount_dir, "r").read().strip()
+                except:
+                    pass
+            self.info_segment = ""
+            self.info_row = ""
+            if self.info_group == "camera":
+                try:
+                    self.info_segment = self.info_name.split("-")[0]
+                    self.info_row = self.info_name.split("-")[1]
                 except:
                     pass
             shell('sudo umount %s/boot ; sudo umount %s ; rm -d %s' % (mount_dir, mount_dir, mount_dir))

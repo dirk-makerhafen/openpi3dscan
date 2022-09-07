@@ -95,6 +95,9 @@ class Task_NetworkScan(Observable):
             # check ssh
             devices = [d for d in DevicesInstance().devices if d.online_ping != False]
             ssh_results = pool.map(lambda device: device.check_ssh_connection(), devices)
+            self.set_status("trigger_heartbeat")
+            trigger_results = pool.map(lambda ip: self._trigger_heartbeat(ip), ips_active)
+
         self.set_status("idle")
         self.worker = None
 
@@ -113,6 +116,15 @@ class Task_NetworkScan(Observable):
         except Exception as e:
             print(e)
         return None
+
+    def _trigger_heartbeat(self, ip):
+        try:
+            result = requests.get("http://%s:8080/heartbeat" % ip, timeout=5)
+            return json.loads(result.text)
+        except Exception as e:
+            print(e)
+        return None
+
 
 
 _taskNetworkScanInstance = None

@@ -226,7 +226,7 @@ class CameraShots:
     def download(self, shot_id, image_type, image_mode):
         # "/shot/<shot_id>/<image_mode>/<image_type>.jpg
         self.camera.device.wait_locked()
-        self.camera.device.lock(10)
+        self.camera.device.lock(5)
         try:
             r = self.camera.device.api_request("/camera/shots/get/%s/%s/%s.jpg" % (shot_id, image_mode, image_type),max_tries=1)
             data = r.content

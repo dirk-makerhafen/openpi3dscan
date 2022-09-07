@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from views.appView import AppView
 from pyhtmlgui import PyHtmlView
 from views.sidebar.shotsView import ShotsView
-from views.sidebar.cardReaderView import CardReaderView
 
 
 
@@ -27,18 +26,16 @@ class SidebarView(PyHtmlView):
     </div>
    
     {{pyview.shotsView.render()}}
-    <div class="row" style="overflow-y:scroll">
+    <div class="row" style="overflow-y:scroll;position: absolute;bottom: 0px; width: 100%;">
         <div class="col-md-12" style="padding-right: 0px;">
             <input id="_search_input" value="{{pyview.current_search}}" onKeyUp='pyview.search($("#_search_input").val())' onchange='pyview.search($("#_search_input").val())' style="width:100%;font-size: 1.3em;" placeholder="SEARCH" type="text"/>
         </div>
     </div>
-    {{ pyview.cardReaderView.render() }}
     '''
 
     def __init__(self, subject: App, parent: AppView):
         super().__init__(subject, parent)
         self.shotsView = ShotsView(subject=subject.shots_remote.shots, parent=self)
-        self.cardReaderView = CardReaderView(self.subject.cardReader, self)
         self.current_search = ""
 
     def show_devices(self):

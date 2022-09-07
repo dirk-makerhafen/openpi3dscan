@@ -1,3 +1,4 @@
+import datetime
 import json
 import random
 import sys
@@ -49,7 +50,6 @@ def clean_shots_dir(min_disk_free=300):
                 os.system("rm -r '%s'" % shots[0])
                 del shots[0]
             free = shutil.disk_usage("/")[2] / 1024 / 1024
-
 
 def download_shots(min_disk_free=1000):
     total, used, free = shutil.disk_usage("/")

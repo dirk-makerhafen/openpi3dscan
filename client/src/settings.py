@@ -7,7 +7,7 @@ class Settings():
         self.ID = "%s" % random.randint(1000, 99999)
         self.TYPE = "camera"
         self.NAME = "noname"
-        self.VERSION = "2022.09.04-07.00"
+        self.VERSION = "2022.09.07-02.00"
         self.load()
 
     def save(self):

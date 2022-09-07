@@ -6,7 +6,7 @@ from pyhtmlgui import Observable
 import glob
 import os
 devicesInstance = None
-VERSION = "2022.09.06-23.50"
+VERSION = "2022.09.06-02.00"
 
 
 class Settings_Wireless(Observable):
@@ -64,7 +64,7 @@ network={
         subprocess.call("sudo wpa_cli -i wlan0 reconfigure", shell=True)
         self.set_status("connecting")
         subprocess.call("sudo systemctl restart wpa_supplicant", shell=True)
-        time.sleep(5)
+        time.sleep(8)
         self.get_connection_status()
         self.apply_worker = None
 
@@ -320,8 +320,9 @@ class Settings(Observable):
             self.cameraSettings.from_dict(data["cameraSettings"])
             self.firmwareSettings.from_dict(data["firmwareSettings"])
             self.wirelessSettings.from_dict(data["wirelessSettings"])
-        except:
-            pass
+        except Exception as e:
+            print("error loading settings:", e)
+        self.save()
         self.notify_observers()
 
 

@@ -169,12 +169,15 @@ class Device(Observable):
     def _task_thread(self):
         while True:
             task = self.task_queue.get()
-            if type(task) == list:
-                args = task[1:]
-                task = task[0]
-                task(*args)
-            else:
-                task()
+            try:
+                if type(task) == list:
+                    args = task[1:]
+                    task = task[0]
+                    task(*args)
+                else:
+                    task()
+            except Exception as e:
+                print("failed to execute task", task,e)
 
     def _ssh(self, cmd, timeout=120):
         ssh_cmd = 'ssh %s@%s %s "%s"' % (self.username, self.ip, SSH_OPTIONS, cmd)

@@ -1,3 +1,8 @@
+import datetime
+import glob
+import threading
+
+from PIL import Image
 from bottle import run, route
 import time
 import random
@@ -45,6 +50,45 @@ def stop_other_processes():
         os.system("sudo sh -c 'sync ; echo 3 > /proc/sys/vm/drop_caches'") # free some memory
         wait(10, 30)
 
+def heartbeat():
+    def f():
+        time.sleep(random.randint(1,4))
+        HeartbeatInstance().send()
+    threading.Thread(target=f, daemon=True).start()
+
+def import_old_scans():
+    def f():
+        files = glob.glob(os.path.join("/3dscan/", "*.jpg"))
+        old_shot_ids = set([f.split("/")[-1].split("_")[0] for f in files])
+        print(old_shot_ids)
+        for old_shot_id in old_shot_ids:
+            if os.path.exists("/3dscan/%s_1.jpg" % old_shot_id):
+                ts = datetime.datetime.fromtimestamp(os.path.getmtime("/3dscan/%s_1.jpg" % old_shot_id))
+                ts = ("%s" % ts).split(".")[0].replace("-", ".").replace(":","").strip()  # 2021-07-02 16:47:50 to 2021.07.02 164750
+                new_shot_id = "%s Scan%s" % (ts, old_shot_id)
+                print("new shot id", ts)
+                if not os.path.exists("/home/openpi3dscan/shots/%s" % new_shot_id):
+                    pass
+                    # os.mkdir("/home/openpi3dscan/shots/%s" % new_shot_id)
+                # os.system("mv '/3dscan/%s_1.jpg' '/home/openpi3dscan/shots/%s/normal.jpg'" % (old_shot_id, new_shot_id))
+                # os.system("mv '/3dscan/%s_2.jpg' '/home/openpi3dscan/shots/%s/projection.jpg'" % (old_shot_id, new_shot_id))
+                # os.system("rm '/3dscan/%s_3.jpg'" % old_shot_id)#
+                try:
+                    img = Image.open('/home/openpi3dscan/shots/%s/normal.jpg' % new_shot_id)
+                    img = img.resize([800, 600])
+                    img.save('/home/openpi3dscan/shots/%s/normal_preview.jpg' % new_shot_id, format="jpeg", quality=85)
+                except Exception as e:
+                    print("Failed to create preview for normal", e)
+                try:
+                    img = Image.open('/home/openpi3dscan/shots/%s/projection.jpg' % new_shot_id)
+                    img = img.resize([800, 600])
+                    img.save('/home/openpi3dscan/shots/%s/projection_preview.jpg' % new_shot_id, format="jpeg", quality=85)
+                except Exception as e:
+                    print("Failed to create preview for projection", e)
+
+
+    threading.Thread(target=f, daemon=True).start()
+
 
 if __name__ == "__main__":
 
@@ -58,8 +102,6 @@ if __name__ == "__main__":
         if HeartbeatInstance().send() is True: #if master is up we start
             break
         time.sleep(60)
-        #if start < time.time() - 600: # exit after 10 minutes without master
-        #    exit(0)
 
     stop_other_processes()
     wait(10, 60)
@@ -67,6 +109,7 @@ if __name__ == "__main__":
     route("/id")(device_id)
     route("/shutdown")(shutdown)
     route("/reboot")(reboot)
+    route("/heartbeat")(heartbeat)
     quiet = False
     if src.settings.Settings.TYPE == "camera":
         from src import camera

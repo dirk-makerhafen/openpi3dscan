@@ -5,3 +5,4 @@ bottle-websocket
 whichcraft
 zipstream-ng
 pexpect
+pillow

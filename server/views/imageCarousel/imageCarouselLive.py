@@ -81,8 +81,10 @@ class PreviewQueue:
                 except:
                     pass
             else:
-                self.data_in_q.remove(device_id)
-
+                try:
+                    self.data_in_q.remove(device_id)
+                except:
+                    pass
     def get_image(self,  device_id):
         if device_id not in self.data_in_q:
             self.data_in_q.append(device_id)

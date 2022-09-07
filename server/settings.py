@@ -6,7 +6,7 @@ from pyhtmlgui import Observable
 import glob
 import os
 devicesInstance = None
-VERSION = "2022.09.06-03.22"
+VERSION = "2022.09.06-03.23"
 
 
 class Settings_Wireless(Observable):
@@ -64,7 +64,7 @@ network={
         subprocess.call("sudo wpa_cli -i wlan0 reconfigure", shell=True)
         self.set_status("connecting")
         subprocess.call("sudo systemctl restart wpa_supplicant", shell=True)
-        time.sleep(8)
+        time.sleep(5)
         self.get_connection_status()
         self.apply_worker = None
 
@@ -75,19 +75,21 @@ network={
         self.status_worker.start()
 
     def _get_connection_status(self):
-        self.set_status("checking")
-        time.sleep(2)
-        try:
-            stdout = subprocess.check_output("ifconfig wlan0|grep -i inet", shell=True, timeout=10, stderr=subprocess.STDOUT).decode("UTF-8")
-            if "192.168" in stdout:
-                self.ip = "192.168%s" % (stdout.split("192.168")[1].split(" ")[0])
-                self.set_status("connected")
-            else:
+        for i in range(10):
+            self.set_status("checking")
+            time.sleep(2)
+            try:
+                stdout = subprocess.check_output("ifconfig wlan0|grep -i inet", shell=True, timeout=10, stderr=subprocess.STDOUT).decode("UTF-8")
+                if "192.168" in stdout:
+                    self.ip = "192.168%s" % (stdout.split("192.168")[1].split(" ")[0])
+                    self.set_status("connected")
+                    break
+                else:
+                    self.ip = ""
+                    self.set_status("not_connected")
+            except Exception as e:
                 self.ip = ""
                 self.set_status("not_connected")
-        except Exception as e:
-            self.ip = ""
-            self.set_status("not_connected")
         self.status_worker = None
 
 

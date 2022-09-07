@@ -33,7 +33,7 @@ class Task_UpdateServer(Observable):
 
         self.set_status("download")
         if os.path.exists("/home/pi/openpi3dscan"):
-            subprocess.call("cd /home/pi/openpi3dscan ; git reset --hard ; git pull",shell=True)
+            subprocess.call("cd /home/pi/openpi3dscan ; sudo git reset --hard ; sudo git clean -f -d ; sudo git pull",shell=True)
         else:
             subprocess.call("cd /home/pi/ ; git clone 'https://github.com/dirk-makerhafen/openpi3dscan.git'", shell=True)
 

@@ -26,7 +26,7 @@ from app.additionalHttpEndpoints import HttpEndpoints
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 if __name__ == "__main__":
-    time.sleep(10)
+    time.sleep(15)
     gui = PyHtmlGui(
         app_instance    = AppInstance(),
         view_class      = AppView,

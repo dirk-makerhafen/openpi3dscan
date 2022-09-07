@@ -41,7 +41,7 @@ class UsbDisks(Observable):
         super().__init__()
         self.disks = []
         self.load()
-        self.automount()
+
 
     def automount(self):
         try:
@@ -76,7 +76,9 @@ class UsbDisks(Observable):
                 toremove.append(disk)
         for r in toremove:
             self.disks.remove(r)
+        self.automount()
         self.notify_observers()
+
 
     def get_disk_by_uid(self, uid):
         try:

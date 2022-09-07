@@ -20,8 +20,8 @@ class HostnameSettingsView(PyHtmlView):
                         <div class="list-group-item">
                             <div class="row align-items-center">
                                 <div class="col-md-10">
-                                    <strong class="mb-0">Name</strong>
-                                    <p class="text-muted mb-0">Wireless network name</p>
+                                    <strong class="mb-0">Hostname</strong>
+                                    <p class="text-muted mb-0">Server will be reachable at <a href="http://{{pyview.subject.hostname}}.local">http://{{pyview.subject.hostname}}.local</a></p>
                                 </div>
                                 <div class="col-auto">
                                     <input id="hostname" value="{{pyview.subject.hostname}}" type="text"/>

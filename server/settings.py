@@ -9,7 +9,7 @@ import re
 
 
 devicesInstance = None
-VERSION = "2022.09.06-03.25"
+VERSION = "2022.09.06-03.26"
 
 
 class Settings_Hostname(Observable):
@@ -33,11 +33,11 @@ class Settings_Hostname(Observable):
         if new_hostname == self.hostname:
             return
         self.hostname = new_hostname
+        self.save()
         self.notify_observers()
         open("/tmp/1", "w").write("%s\n" % self.hostname)
         os.system("sudo mv /tmp/1 /etc/hostname")
-        os.system(
-            "cat /etc/hosts | grep -v '192.168.99.' | grep -v localhost | grep -v raspberrypi | grep -v openpi3dscan > 1")
+        os.system("cat /etc/hosts | grep -v '192.168.99.' | grep -v localhost | grep -v raspberrypi | grep -v openpi3dscan > 1")
         os.system("echo '192.168.99.254   openpi3dscan' >> 1")
         os.system("echo '192.168.99.254   %s # openpi3dscan' >> 1" % self.hostname)
         os.system("echo '127.0.0.1      localhost' >> 1")

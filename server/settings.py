@@ -6,7 +6,7 @@ from pyhtmlgui import Observable
 import glob
 import os
 devicesInstance = None
-VERSION = "2022.09.06-03.23"
+VERSION = "2022.09.06-03.24"
 
 
 class Settings_Hostname(Observable):

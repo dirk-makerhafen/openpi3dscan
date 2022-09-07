@@ -35,7 +35,10 @@ while SERVER is None:
     hostname = open("hostname","r").read().strip()
     print("Resolving %s.local" % hostname )
     try:
-        SERVER = socket.getaddrinfo("%s.local" % hostname, 80)[0][4][0]
+        for ip in socket.getaddrinfo("%s.local" % hostname, 80):
+            if ":" in ip[4][0]:
+                continue
+            SERVER = ip[4][0]
     except Exception as e:
         print("Failed to resolve server IP")
         time.sleep(1)

@@ -601,8 +601,6 @@ class RebootShutdownView(PyHtmlView):
    
     '''
 
-
-
 class CardReaderSlotView(PyHtmlView):
     DOM_ELEMENT = "tr"
     TEMPLATE_STR = '''
@@ -735,7 +733,7 @@ class SettingsView(PyHtmlView):
                     <div class="list-group mb-5 shadow">
                         <div class="list-group-item">
                             <div class="row align-items-center">
-                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Openpi3dscan</div>
+                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Version</div>
                             </div>
                         </div>
                         <div class="list-group-item">

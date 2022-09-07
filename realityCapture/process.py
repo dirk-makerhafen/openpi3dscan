@@ -41,7 +41,7 @@ while SERVER is None:
             SERVER = ip[4][0]
     except Exception as e:
         print("Failed to resolve server IP")
-        time.sleep(1)
+    time.sleep(1)
 
   
 DEBUG = "debug" in sys.argv

@@ -119,11 +119,6 @@ class ModelFile(Observable):
         return self
 
 
-class Foo():
-    def __init__(self, root_path, name):
-        self.root_path = root_path
-        self.name = name
-        self.path = os.path.join(root_path, name)
 
 class Shot(Observable):
     def __init__(self, shot_id):

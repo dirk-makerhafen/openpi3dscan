@@ -7,10 +7,8 @@ import glob
 import os
 import re
 
-
 devicesInstance = None
-VERSION = "2022.09.08-08.09"
-
+VERSION = "2022.09.08-08.10"
 
 class Settings_Hostname(Observable):
     def __init__(self, parent):
@@ -42,7 +40,6 @@ class Settings_Hostname(Observable):
         os.system("echo '192.168.99.254   %s # openpi3dscan' >> 1" % self.hostname)
         os.system("echo '127.0.0.1      localhost' >> 1")
         os.system("sudo mv 1 /etc/hosts")
-
 
 class Settings_Wireless(Observable):
     def __init__(self, parent):
@@ -126,7 +123,6 @@ network={
                 self.ip = ""
                 self.set_status("not_connected")
         self.status_worker = None
-
 
 class Settings_FirmwareImage(Observable):
     def __init__(self, parent):
@@ -402,7 +398,6 @@ class Settings(Observable):
             print("error loading settings:", e)
         self.save()
         self.notify_observers()
-
 
 
 _settingsInstance = None

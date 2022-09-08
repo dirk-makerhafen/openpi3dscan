@@ -7,7 +7,7 @@ from app.settings.settingsHostname import SettingsHostname
 from app.settings.settingsSequence import SettingsSequence
 from app.settings.settingsWireless import SettingsWireless
 
-VERSION = "2022.09.08-22.03"
+VERSION = "2022.09.08-22.04"
 
 
 class Settings(Observable):

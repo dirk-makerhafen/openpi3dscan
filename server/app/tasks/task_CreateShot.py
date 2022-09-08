@@ -69,12 +69,12 @@ class Task_CreateShot(Observable):
             image_aquisition_time = 1.0 / 9.0
             seqs = SettingsInstance().sequenceSettingsSpeed
 
-        global_start_time =  time.time() + 3 + image_aquisition_time*2
+        global_start_time =  time.time() + seqs.startup_delay + image_aquisition_time*2
         global_start_time = global_start_time - (global_start_time % image_aquisition_time)
 
         shot1_start_time = global_start_time
         shot1_end_time   = shot1_start_time + image_aquisition_time
-        shot2_start_time = shot1_end_time
+        shot2_start_time = shot1_end_time + (seqs.image_delay * image_aquisition_time)
         shot2_end_time   = shot2_start_time + image_aquisition_time
 
         light_sequence = []

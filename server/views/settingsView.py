@@ -273,6 +273,28 @@ class SequenceSettingsView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
+                            <div class="col-md-10"> 
+                                <strong class="mb-0">Startup Delay</strong>
+                                <p class="text-muted mb-0">Delay between clicking and actually taking the images. Default: 3 Seconds</p>
+                             </div>
+                            <div class="col-md-2" style="text-align:center"> 
+                            <input id="startup_delay_{{pyview.uid}}" value={{pyview.subject.startup_delay}} onchange='pyview.subject.set_startup_delay($("#startup_delay_{{pyview.uid}}").val())' type="number" min="2" max="10" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-10"> 
+                                <strong class="mb-0">Second Image Delay</strong>
+                                <p class="text-muted mb-0">Delay between first and second image, in 110ms Steps. Default: 0</p>
+                             </div>
+                            <div class="col-md-2" style="text-align:center"> 
+                            <input id="image_delay_{{pyview.uid}}" value={{pyview.subject.image_delay}} onchange='pyview.subject.set_image_delay($("#image_delay_{{pyview.uid}}").val())' type="number"  min="0" max="10"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
                             <div class="col-md-8"> 
                                 <strong class="mb-0">Image</strong>
                                 <p class="text-muted mb-0">Two images are generated at any shot</p>

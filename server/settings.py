@@ -8,7 +8,7 @@ import os
 import re
 
 devicesInstance = None
-VERSION = "2022.09.08-08.11"
+VERSION = "2022.09.08-15.00"
 
 class Settings_Hostname(Observable):
     def __init__(self, parent):

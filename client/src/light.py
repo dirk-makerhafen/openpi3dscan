@@ -28,15 +28,15 @@ channel_offsets = { 0:1, 1:8, 2:15, 3:6, 4:13, 5:4, 6:11, 7:2, 8:9, 9:16, 10:7, 
 class Light():
     def __init__(self):
         self.use_gpio = False
-        self.gpio_pins = [4, 17, 22, 27]
+        self.gpio_pins = [4]
         try:
             self.pwm = Adafruit_PCA9685.PCA9685(address=0x40)
-            self.pwm.set_pwm_freq(323)
+            self.pwm.set_pwm_freq(423)
         except:
             print("Failed to init i2c, using gpio")
             self.use_gpio = True
             GPIO.setmode(GPIO.BOARD)
-            for pin in  self.gpio_pins:
+            for pin in self.gpio_pins:
                 GPIO.setup(pin, GPIO.OUT)
                 GPIO.output(pin, False)
 
@@ -128,12 +128,9 @@ class Light():
         self.current_value = value
 
         if self.use_gpio is True:
-            v = int(round(value / (100 / 15), 0))
-            GPIO.output(self.gpio_pins[0], v & 0x1 != 0)
-            GPIO.output(self.gpio_pins[1], v & 0x2 != 0)
-            GPIO.output(self.gpio_pins[2], v & 0x4 != 0)
-            GPIO.output(self.gpio_pins[3], v & 0x8 != 0)
-
+            v = int(round(value / (100 / ((2**len(self.gpio_pins))-1)), 0))
+            for i in range(len(self.gpio_pins)):
+                GPIO.output(self.gpio_pins[i], v & (2**i) != 0)
         else:
             for channel in range(16):
                 value_percent_channel = self.light_segment_adjustments[channel] * value

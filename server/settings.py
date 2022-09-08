@@ -9,7 +9,7 @@ import re
 
 
 devicesInstance = None
-VERSION = "2022.09.07-17.02"
+VERSION = "2022.09.08-08.01"
 
 
 class Settings_Hostname(Observable):

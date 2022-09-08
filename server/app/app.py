@@ -11,9 +11,9 @@ class App(Observable):
     def __init__(self):
         super().__init__()
         self.status = "active"
-        self.usbDisks = UsbDisks()
         self.devices = DevicesInstance()
         self.shots_remote = ShotsInstance(self.devices)
+        self.usbDisks = UsbDisks()
         self.tasks = TasksInstance()
         self.cardReader = CardReaderInstance()
         self.settings = SettingsInstance(DevicesInstance())

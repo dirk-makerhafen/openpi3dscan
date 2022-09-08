@@ -98,9 +98,8 @@ class Devices(Observable):
                 last_status =  device.status
                 if device.status != "installing":
                     device.status = "online"
-                if "UPTIME" in data:
-                    if data["UPTIME"] < 300:
-                        device.status = "warmup"
+                if "UPTIME" in data and data["UPTIME"] < 300:
+                    device.status = "warmup"
 
                 if data["TYPE"] == "camera" and device.status == "online" and last_status != "online":
                     device.camera.shots.refresh_list()

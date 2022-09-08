@@ -28,7 +28,7 @@ channel_offsets = { 0:1, 1:8, 2:15, 3:6, 4:13, 5:4, 6:11, 7:2, 8:9, 9:16, 10:7, 
 class Light():
     def __init__(self):
         self.use_gpio = False
-        self.gpio_pins = [1,2,3]
+        self.gpio_pins = [4, 17, 22, 27]
         try:
             self.pwm = Adafruit_PCA9685.PCA9685(address=0x40)
             self.pwm.set_pwm_freq(323)
@@ -126,10 +126,14 @@ class Light():
         if value < 1: # relative to current value
             value = self.current_value * value
         self.current_value = value
+
         if self.use_gpio is True:
-            GPIO.output(self.gpio_pins[0], self.current_value > 80)
-            GPIO.output(self.gpio_pins[1], self.current_value > 40)
-            GPIO.output(self.gpio_pins[2], self.current_value > 5)
+            v = int(round(value / (100 / 15), 0))
+            GPIO.output(self.gpio_pins[0], v & 0x1 != 0)
+            GPIO.output(self.gpio_pins[1], v & 0x2 != 0)
+            GPIO.output(self.gpio_pins[2], v & 0x4 != 0)
+            GPIO.output(self.gpio_pins[3], v & 0x8 != 0)
+
         else:
             for channel in range(16):
                 value_percent_channel = self.light_segment_adjustments[channel] * value

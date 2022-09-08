@@ -45,6 +45,7 @@ class HostnameSettingsView(PyHtmlView):
             </div>
         </div>    
     '''
+
 class WirelessSettingsView(PyHtmlView):
     TEMPLATE_STR = '''
         <div class="Wireless">
@@ -159,7 +160,12 @@ class UsbStorageView(PyHtmlView):
                                     <p class="text-muted mb-0">List of connected USB Disks</p>
                                 </div>
                                 <div class="col-md-1">
+                                {% if pyview.subject.status == "idle" %}
                                     <button class="btn" onclick="pyview.subject.load()">Reload</button>
+                                {% else %}
+                                    {{pyview.subject.status }}
+                                {% endif %}
+                                    
                                 </div>
                                 <div class="col-md-5">
                                    <table style="width:100%;text-align:center">

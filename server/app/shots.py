@@ -30,8 +30,6 @@ class ModelFile(Observable):
         self.filesize = 0
         self.create_textures = create_textures
         self.path = os.path.join(self.parentShot.path, "models")
-        if not os.path.exists(self.path):
-            os.mkdir(self.path)
 
     def set_status(self, new_status):
         self.status = new_status
@@ -49,7 +47,8 @@ class ModelFile(Observable):
         if self.filetype in ["gif", "webp"]:
             ext = ""
         self.filename = "%s_%s%s%s%s.%s%s" % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, self.filetype, ext)
-
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
         with FileObjectThread(os.path.join(self.path, self.filename), "wb") as f:
             with FileObjectThread(input_file,"rb") as fi:
                 buf = fi.read(32000)
@@ -130,22 +129,12 @@ class Shot(Observable):
         self.nr_of_files = 0
         self.devices = set()
         self.path = os.path.join(SHOT_DIR, self.shot_id)
-        self.preview_image = "SEG1-CAM4"
         self.worker = None
         self.models = ObservableList()
-
+        self.path_exists = False
+        self.load()
         if os.path.exists(self.path):
-            self.load()
-        else:
-            os.mkdir(os.path.join(self.path))
-            os.mkdir(os.path.join(self.path, "images"))
-            os.mkdir(os.path.join(self.path, "images", "normal"))
-            os.mkdir(os.path.join(self.path, "images", "projection"))
-            os.mkdir(os.path.join(self.path, "preview_images"))
-            os.mkdir(os.path.join(self.path, "preview_images", "normal"))
-            os.mkdir(os.path.join(self.path, "preview_images", "projection"))
-            self.save()
-        if self.nr_of_files == 0:
+            self.path_exists = True
             self.count_number_of_files()
 
     @property
@@ -164,14 +153,33 @@ class Shot(Observable):
     def nr_of_models_failed(self):
         return len( [m for m in self.models if m.status == "failed"])
 
+    def create_folders(self):
+        if not os.path.exists(self.path):
+            self.path_exists = True
+            os.mkdir(os.path.join(self.path))
+            os.mkdir(os.path.join(self.path, "images"))
+            os.mkdir(os.path.join(self.path, "images", "normal"))
+            os.mkdir(os.path.join(self.path, "images", "projection"))
+            os.mkdir(os.path.join(self.path, "preview_images"))
+            os.mkdir(os.path.join(self.path, "preview_images", "normal"))
+            os.mkdir(os.path.join(self.path, "preview_images", "projection"))
+            self.save()
+
     def set_name(self, name):
+        if self.name == name:
+            return
         self.name = name
         self.save()
+        self.backup_meta()
         self.notify_observers()
 
     def set_comment(self, comment):
+        if self.comment == comment:
+            return
         self.comment = comment
         self.save()
+        self.backup_meta()
+        self.notify_observers()
 
     def add_device(self, device):
         if device not in self.devices:
@@ -198,6 +206,7 @@ class Shot(Observable):
     def _sync_remote(self):
         self.status = "Sync"
         self.notify_observers()
+        self.create_folders()
         tasks = []
         existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
         for device in [d for d in self.devices if d.status == "online"]:
@@ -216,7 +225,6 @@ class Shot(Observable):
                 p.map(lambda task: task[0].camera.shots.download(*task[1]), tasks)
             p.join()
             self.count_number_of_files()
-            self.save()
 
         existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
         for i in range(101,213):
@@ -275,6 +283,8 @@ class Shot(Observable):
             return False
 
     def add_image(self, image_type, image_mode, device_id, image_data):
+        if self.path_exists is False:
+            return
         if image_mode == "normal":
             folder_name = "images"
         else:
@@ -284,10 +294,10 @@ class Shot(Observable):
             f.write(image_data)
             if image_mode == "normal":
                 self.nr_of_files += 1
-                self.save()
             self.notify_observers()
 
     def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from = "projection", create_textures = False):
+        self.create_folders()
         model = self.get_model(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures)
         if model is not None:
             if model.status == "failed":
@@ -325,27 +335,46 @@ class Shot(Observable):
         self.nr_of_files = len(glob.glob(os.path.join(self.path, "images", "normal", "*.jpg"))) + len(glob.glob(os.path.join(self.path, "images", "projection", "*.jpg")))
 
     def save(self):
-        with open(os.path.join(self.path, "metadata.json"), "w") as f:
+        if os.path.exists(self.path):
+            with open(os.path.join(self.path, "metadata.json"), "w") as f:
+                f.write(json.dumps({
+                    "name": self.name,
+                    "comment": self.comment,
+                    "models" : [ m.to_dict() for m in self.models]
+                }))
+        if not os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id):
+            self.backup_meta()
+
+    def backup_meta(self):
+        with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "w") as f:
             f.write(json.dumps({
                 "name": self.name,
                 "comment": self.comment,
-                "preview_image": self.preview_image,
-                "models" : [ m.to_dict() for m in self.models]
             }))
 
+
     def load(self):
-        try:
-            with open(os.path.join(self.path, "metadata.json"), "r") as f:
-                data = json.loads(f.read())
-                self.name = data["name"]
-                self.comment = data["comment"]
-                self.preview_image = data["preview_image"]
-                try:
-                    self.models = ObservableList([ ModelFile(self).from_dict(m) for m in data["models"] ])
-                except:
-                    pass
-        except:
-            pass
+        if os.path.exists(os.path.join(self.path, "metadata.json")):
+            try:
+                with open(os.path.join(self.path, "metadata.json"), "r") as f:
+                    data = json.loads(f.read())
+                    self.name = data["name"]
+                    self.comment = data["comment"]
+                    try:
+                        self.models = ObservableList([ ModelFile(self).from_dict(m) for m in data["models"] ])
+                    except:
+                        pass
+            except Exception as e:
+                print("failed to load", e)
+        elif os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id):
+            try:
+                with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "r") as f:
+                    data = json.loads(f.read())
+                    self.name = data["name"]
+                    self.comment = data["comment"]
+            except Exception as e:
+                print("failed to load1", e)
+        self.path_exists = os.path.exists(self.path)
         self.notify_observers()
 
     def get_clean_shotname(self):
@@ -441,7 +470,6 @@ class Shots:
     def get_unprocessed_models(self):
         models = []
         [models.extend(shot.get_models_by_status("waiting")) for shot in self.shots]
-
         return models
 
     def _add_deleted_shot_id(self, shot_id):
@@ -453,23 +481,28 @@ class Shots:
         self.save()
 
     def save(self):
-        with open(os.path.join("/shots/", "shots.json"), "w") as f:
+        with open("/opt/openpi3dscan/.shots.json", "w") as f:
             f.write(json.dumps({
                 "deleted_shot_ids": self.deleted_shot_ids,
             }))
 
     def load(self):
         try:
-            with open(os.path.join("/shots/", "shots.json"), "r") as f:
+            with open("/opt/openpi3dscan/.shots.json", "r") as f:
                 data = json.loads(f.read())
                 self.deleted_shot_ids = data["deleted_shot_ids"]
         except:
             pass
 
+    def load_shots_from_disk(self):
         for path in glob.glob("/shots/*"):
             if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images")) :
                 shot_id = path.split("/")[-1]
-                self.shots.append(Shot(shot_id))
+                shot = self.get(shot_id)
+                if shot is None:
+                    self.shots.append(Shot(shot_id))
+                else:
+                    shot.load()
         self.shots.sort()
 
 

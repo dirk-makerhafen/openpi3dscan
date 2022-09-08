@@ -17,6 +17,7 @@ if __name__ == "__main__":
         shell("sudo mkdir -p /opt/openpi3dscan/client")
         shell("sudo mkdir -p /opt/openpi3dscan/realityCapture")
         shell("sudo mkdir -p /opt/openpi3dscan/firmware")
+        shell("sudo mkdir -p /opt/openpi3dscan/meta") # meta data backup dir
         shell('sudo rsync --delete -rav %s/*                    /opt/openpi3dscan/server/ ' % SCRIPT_DIR)
         shell('sudo rsync --delete -rav %s/../client/*          /opt/openpi3dscan/client/ ' % SCRIPT_DIR)
         shell('sudo rsync --delete -rav %s/../realityCapture/*  /opt/openpi3dscan/realityCapture/ ' % SCRIPT_DIR)

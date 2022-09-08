@@ -1,6 +1,10 @@
 import os
 import subprocess
+import threading
+
 from pyhtmlgui import Observable
+
+from app.shots import ShotsInstance
 
 
 class UsbDisk(Observable):
@@ -16,8 +20,17 @@ class UsbDisk(Observable):
         self.get_diskspace()
 
     def mount(self):
-        os.system("sudo mount '%s' '/shots'" % (self.NAME,))
+        try:
+            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.NAME,), shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+        except:
+            stdout = ""
         self.get_diskspace()
+
+    def umount(self):
+        try:
+            stdout = subprocess.check_output("sudo mxount '%s' '/shots'" % (self.NAME,), shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+        except:
+            stdout = ""
 
     def get_diskspace(self):
         try:
@@ -40,8 +53,13 @@ class UsbDisks(Observable):
     def __init__(self):
         super().__init__()
         self.disks = []
-        self.load()
+        self.load_worker = None
+        self.status="idle"
+        self._load()
 
+    def set_status(self, status):
+        self.status = status
+        self.notify_observers()
 
     def automount(self):
         try:
@@ -51,20 +69,28 @@ class UsbDisks(Observable):
         if "/shots" not in stdout:
             if len(self.disks) > 0:
                 self.disks[0].mount()
+                ShotsInstance().load_shots_from_disk()
         self.notify_observers()
 
     def load(self):
+        if self.load_worker is None:
+            self.load_worker = threading.Thread(target=self._load, daemon=True)
+            self.load_worker.run()
+
+    def _load(self):
+        self.set_status("reload")
         try:
             stdout = subprocess.check_output('lsblk -fp | grep -i /dev/sd | grep -v EFI | grep -v boot | grep -i fat', shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
+
         for line in stdout.split("\n"):
-            line = line.replace("\t"," ").replace("└─","")
-            while "  " in line:
-                line = line.replace("  "," ")
-            if len(line) < 5:
-                continue
             try:
+                line = line.replace("\t"," ").replace("└─","")
+                while "  " in line:
+                    line = line.replace("  "," ")
+                if len(line) < 5:
+                    continue
                 NAME, FSTYPE, FSVER, LABEL, UUID, REST = line.split(" ",5)
                 if self.get_disk_by_uid(UUID) is None:
                     self.disks.append(UsbDisk(NAME, FSTYPE, FSVER, LABEL, UUID))
@@ -77,6 +103,8 @@ class UsbDisks(Observable):
         for r in toremove:
             self.disks.remove(r)
         self.automount()
+        self.set_status("idle")
+        self.load_worker = None
         self.notify_observers()
 
 

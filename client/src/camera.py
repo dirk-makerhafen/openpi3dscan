@@ -39,9 +39,9 @@ def clear_memory():
 
 
 class Frame():
-    def __init__(self,  timestamp, buffer):
+    def __init__(self,  timestamp, buffer, framesize):
         self.timestamp = timestamp
-        self.image_framesize = (2592, 1944)
+        self.image_framesize = framesize
         self.preview_framesize = (800, 600)
         self.image = None
         self.preview = None
@@ -108,6 +108,7 @@ class Buffer():
 class CameraPort():
     def __init__(self, camera, port_nr):
         self._camera = camera
+        self.framesize = (camera.max_x, camera.max_y)
         self._port_nr = port_nr
         self.framerate = 9
         if self._port_nr == STILL_PORT_NR:  # STILL PORT
@@ -116,7 +117,7 @@ class CameraPort():
         self.s_per_frame = 1.0 / self.framerate
         self.s_per_half_frame = self.s_per_frame / 2.0
 
-        self._output.framesize = (2592, 1944)
+        self._output.framesize = self.framesize
         self._output.framerate = self.framerate
         self._output.format = mmal.MMAL_ENCODING_I420
         self._output.commit()
@@ -195,10 +196,10 @@ class CameraPort():
         if frame_finished is True:
             while len(self.capture_timestamps) > 0 and self.capture_timestamps[0] != -1 and timestamp > (self.capture_timestamps[0] + self.s_per_half_frame):  # timestamp missed and is too old
                 del self.capture_timestamps[0]
-                self.buffer.put(Frame(timestamp, None))
+                self.buffer.put(Frame(timestamp, None, self.framesize))
             if len(self.capture_timestamps) > 0 and ((abs(timestamp - self.capture_timestamps[0]) <= self.s_per_half_frame or self.capture_timestamps[0] == -1)):  # hit
                 del self.capture_timestamps[0]
-                self.buffer.put(Frame(timestamp, buffer))
+                self.buffer.put(Frame(timestamp, buffer, self.framesize))
             if self._pll_active is True:
                 self._pll_adjust(timestamp)
 
@@ -304,7 +305,9 @@ class Camera():
         self.autopll_active = False
         self.capture_active = False
         self.cameralock = threading.Lock()
-
+        self.revision = 'ov5647'
+        self.max_x = 2592
+        self.max_y = 1944
         self.mmal_camera = mmalobj.MMALCamera()
         self._setup()
         self.port_still = CameraPortStill(self)
@@ -322,13 +325,23 @@ class Camera():
         self.mmal_camera.control.params[mmal.MMAL_PARAMETER_CAMERA_CUSTOM_SENSOR_CONFIG] = 2
         if not self.mmal_camera.control.enabled:
             self.mmal_camera.control.enable()
+
+
+        with mmalobj.MMALCameraInfo() as camera_info:
+            if camera_info.info_rev > 1:
+                self.revision = camera_info.control.params[mmal.MMAL_PARAMETER_CAMERA_INFO].cameras[0].camera_name.decode('ascii')
+
+        if self.revision == "imx219":
+            self.max_x = 3280
+            self.max_y = 2464
+
         cc = self.mmal_camera.control.params[picamera.mmal.MMAL_PARAMETER_CAMERA_CONFIG]
-        cc.max_stills_w = 2592
-        cc.max_stills_h = 1944
+        cc.max_stills_w = self.max_x
+        cc.max_stills_h = self.max_y
         cc.stills_yuv422 = 0
         cc.one_shot_stills = 1
-        cc.max_preview_video_w = 2592
-        cc.max_preview_video_h = 1944
+        cc.max_preview_video_w = self.max_x
+        cc.max_preview_video_h = self.max_y
         cc.num_preview_video_frames = 1
         cc.stills_capture_circular_buffer_height = 0
         cc.fast_preview_resume = 0

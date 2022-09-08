@@ -11,15 +11,8 @@ gpulock = threading.Lock()
 class Resize_YUV():
     def __init__(self):
         self.resizer = mmalobj.MMALResizer()
-        self.resizer.inputs[0].format = mmal.MMAL_ENCODING_I420
-        self.resizer.inputs[0].framesize = (2592, 1944)
-        self.resizer.inputs[0].commit()
-        self.resizer.outputs[0].format = mmal.MMAL_ENCODING_I420
-        self.resizer.outputs[0].framesize = (800, 600)
-        self.resizer.outputs[0].commit()
         self.finished = Event()
         self.output = None
-
 
     def _callback(self, port, buf):
         finished = bool(buf.flags & mmal.MMAL_BUFFER_HEADER_FLAG_FRAME_END)
@@ -38,10 +31,12 @@ class Resize_YUV():
             if type(output) == str:
                 self.output = open(output, "wb")
 
+            self.resizer.inputs[0].format = mmal.MMAL_ENCODING_I420
             self.resizer.inputs[0].framesize  = from_size
             self.resizer.inputs[0].commit()
             self.resizer.inputs[0].enable(lambda port, buf: True)
 
+            self.resizer.outputs[0].format = mmal.MMAL_ENCODING_I420
             self.resizer.outputs[0].framesize = to_size
             self.resizer.outputs[0].commit()
             self.resizer.outputs[0].enable(self._callback)
@@ -70,13 +65,6 @@ class Resize_YUV():
 class YUV_to_JPEG():
     def __init__(self):
         self.encoder = mmalobj.MMALImageEncoder()
-        self.encoder.inputs[0].format = mmal.MMAL_ENCODING_I420
-        self.encoder.inputs[0].framesize = (2592, 1944)
-        self.encoder.inputs[0].commit()
-        self.encoder.outputs[0].copy_from(self.encoder.inputs[0])
-        self.encoder.outputs[0].format = mmal.MMAL_ENCODING_JPEG
-        self.encoder.outputs[0].params[mmal.MMAL_PARAMETER_JPEG_Q_FACTOR] = 100
-        self.encoder.outputs[0].commit()
         self.finished = Event()
         self.output = None
 
@@ -97,10 +85,13 @@ class YUV_to_JPEG():
             if type(output) == str:
                 self.output = open(output, "wb")
 
+            self.encoder.inputs[0].format = mmal.MMAL_ENCODING_I420
             self.encoder.inputs[0].framesize = framesize
             self.encoder.inputs[0].commit()
             self.encoder.inputs[0].enable(lambda port, buf: True)
 
+            self.encoder.outputs[0].copy_from(self.encoder.inputs[0])
+            self.encoder.outputs[0].format = mmal.MMAL_ENCODING_JPEG
             self.encoder.outputs[0].params[mmal.MMAL_PARAMETER_JPEG_Q_FACTOR] = quality
             self.encoder.outputs[0].framesize = framesize
             self.encoder.outputs[0].commit()

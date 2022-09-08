@@ -12,9 +12,26 @@ from .sidebar.sidebarView import SidebarView
 
 class CurrentView(PyHtmlView):
     TEMPLATE_STR = '''{{ pyview.current_view.render()}}'''
-    def __init__(self, subject, parent, current_view):
+    def __init__(self, subject, parent):
         super().__init__(subject, parent)
-        self.current_view = current_view
+        self.devicesView = DevicesView(subject=subject.devices, parent=self)
+        self.liveView = LiveView(subject=subject, parent=self)
+        self.shotView = ShotView(subject=subject, parent=self)
+        self.settingsView = SettingsView(self.subject, self)
+        self.current_view = self.devicesView
+
+    def show_devicesView(self):
+        return self.set_view(self.devicesView)
+
+    def show_settingsView(self):
+        return self.set_view(self.settingsView)
+
+    def show_liveView(self):
+        return self.set_view(self.liveView)
+
+    def show_shotView(self, shot):
+        self.shotView.show_shot(shot)
+        return self.set_view(self.shotView)
 
     def set_view(self, new_view):
         if self.current_view != new_view:
@@ -52,23 +69,7 @@ class AppView(PyHtmlView):
 
     def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
+        self.currentView = CurrentView(subject, self)
         self.sidebarView = SidebarView(subject=subject, parent=self)
-        self.devicesView = DevicesView(subject=subject.devices, parent=self)
-        self.liveView = LiveView(subject=subject, parent=self)
-        self.shotView = ShotView(subject=subject, parent=self)
-        self.settingsView = SettingsView(self.subject, self)
-        self.currentView = CurrentView(subject, self, self.devicesView)
 
-    def show_devicesView(self):
-        return self.currentView.set_view(self.devicesView)
-
-    def show_settingsView(self):
-        return self.currentView.set_view(self.settingsView)
-
-    def show_liveView(self):
-        return self.currentView.set_view(self.liveView)
-
-    def show_shotView(self, shot):
-        self.shotView.show_shot(shot)
-        return self.currentView.set_view(self.shotView)
 

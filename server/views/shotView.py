@@ -72,7 +72,7 @@ class ShotView(PyHtmlView):
         </div>   
     '''
 
-    def __init__(self, subject: App, parent: AppView):
+    def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
         self.imageCarousel = ImageCarouselStatic(self.subject, self)
         self.shotModels = ShotModelsView(self.subject, self)

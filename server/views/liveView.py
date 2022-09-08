@@ -100,7 +100,7 @@ class LiveView(PyHtmlView):
     </div>   
     '''
 
-    def __init__(self, subject: App, parent: AppView):
+    def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
         self.imageCarousel = ImageCarouselLive(self.subject, self)
         self._name_input = ""

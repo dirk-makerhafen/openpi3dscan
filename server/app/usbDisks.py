@@ -21,7 +21,7 @@ class UsbDisk(Observable):
 
     def mount(self):
         try:
-            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.NAME,), shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.NAME,), shell=True, timeout=20, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
         self.get_diskspace()

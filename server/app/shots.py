@@ -375,6 +375,9 @@ class Shot(Observable):
             except Exception as e:
                 print("failed to load1", e)
         self.path_exists = os.path.exists(self.path)
+        if self.path_exists is True and self.nr_of_files == 0:
+            self.count_number_of_files()
+
         self.notify_observers()
 
     def get_clean_shotname(self):

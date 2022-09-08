@@ -9,7 +9,7 @@ import re
 
 
 devicesInstance = None
-VERSION = "2022.09.08-08.07"
+VERSION = "2022.09.08-08.08"
 
 
 class Settings_Hostname(Observable):
@@ -263,7 +263,7 @@ class Settings_Sequence(Observable):
         try:
             self.image_delay = data["image_delay"]
         except:
-            self.image_delay = 3
+            self.image_delay = 0
 
 class Settings_Cameras(Observable):
     def __init__(self, parent):

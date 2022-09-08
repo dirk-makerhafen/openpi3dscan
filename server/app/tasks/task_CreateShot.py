@@ -101,11 +101,11 @@ class Task_CreateShot(Observable):
         self.set_status("waiting")
 
         while time.time() < start_at:
-            time.sleep(0.03)
             _new_shot_count_down = math.ceil(start_at - time.time())
             if self.shot_count_down != _new_shot_count_down:
                 self.shot_count_down = _new_shot_count_down
                 self.notify_observers()
+            time.sleep(0.02)
 
         self.set_status("shot")
 

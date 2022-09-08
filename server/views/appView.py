@@ -25,7 +25,7 @@ class AppView(PyHtmlView):
                 <script>
                     setTimeout(function(){
                         location.reload();
-                    }, 60000);
+                    }, 70000);
                 </script>
                 
             {% endif %}

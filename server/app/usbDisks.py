@@ -63,7 +63,7 @@ class UsbDisks(Observable):
 
     def automount(self):
         try:
-            stdout = subprocess.check_output('mount', shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output('mount', shell=True, timeout=20, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
         if "/shots" not in stdout:

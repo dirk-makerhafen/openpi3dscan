@@ -35,7 +35,7 @@ class Light():
         except:
             print("Failed to init i2c, using gpio")
             self.use_gpio = True
-            GPIO.setmode(GPIO.BOARD)
+            GPIO.setmode(GPIO.BCM)
             for pin in self.gpio_pins:
                 GPIO.setup(pin, GPIO.OUT)
                 GPIO.output(pin, False)

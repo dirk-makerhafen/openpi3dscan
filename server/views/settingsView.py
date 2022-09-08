@@ -286,7 +286,7 @@ class SequenceSettingsView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-10"> 
                                 <strong class="mb-0">Second Image Delay</strong>
-                                <p class="text-muted mb-0">Delay between first and second image, in 110ms Steps. Default: 0</p>
+                                <p class="text-muted mb-0">Delay between first and second image, in steps of 110ms. Default: 0</p>
                              </div>
                             <div class="col-md-2" style="text-align:center"> 
                             <input id="image_delay_{{pyview.uid}}" value={{pyview.subject.image_delay}} onchange='pyview.subject.set_image_delay($("#image_delay_{{pyview.uid}}").val())' type="number"  min="0" max="10"/>
@@ -499,7 +499,7 @@ class CameraSettingsView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-8">
                                 <strong class="mb-0">Shutter speed (0=Auto)</strong>
-                                <p class="text-muted mb-0">Set Shutter speed for cameras, or select balance to select automatically.</p>
+                                <p class="text-muted mb-0">Set Shutter speed for cameras, or click <i>Balance</i> to select automatically.</p>
                             </div>
                             <div class="col-md-2">{{pyview.shutterbalance_view.render()}}</div>
                             <div class="col-md-2">
@@ -514,7 +514,7 @@ class CameraSettingsView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-8">
                                 <strong class="mb-0">Whitebalance gains</strong>
-                                <p class="text-muted mb-0">Set whitebalance gains for cameras, or select balance to select automatically.</p>
+                                <p class="text-muted mb-0">Set whitebalance gains for cameras, or ckick <i>Balance</i> to select automatically.</p>
                             </div>
                             <div class="col-md-2">{{pyview.whitebalance_view.render()}}</div>
                             <div class="col-md-2">

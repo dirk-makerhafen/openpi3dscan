@@ -17,11 +17,10 @@ class UsbDisk(Observable):
         self.UUID = UUID
         self.disk_total = "0G"
         self.disk_free = "0G"
-        self.get_diskspace()
 
     def mount(self):
         try:
-            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.NAME,), shell=True, timeout=20, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.NAME,), shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
         self.get_diskspace()
@@ -80,7 +79,7 @@ class UsbDisks(Observable):
     def _load(self):
         self.set_status("reload")
         try:
-            stdout = subprocess.check_output('lsblk -fp | grep -i /dev/sd | grep -v EFI | grep -v boot | grep -i fat', shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output('lsblk -fp | grep -i /dev/sd | grep -v EFI | grep -v boot | grep -i fat', shell=True, timeout=20, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
 

@@ -11,13 +11,13 @@ from views.sidebar.shotsView import ShotsView
 class SidebarButtonsView(PyHtmlView):
     DOM_ELEMENT_CLASS = "row menu"
     TEMPLATE_STR = '''
-        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.settingsView %} selected {% endif %}" onclick='pyview.show_settings();'>
+        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.settingsView %} selected {% endif %}" onclick='pyview.parent.show_settings();'>
             Settings
         </div>
-        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.devicesView %} selected {% endif %}" onclick='pyview.show_devices();'>
+        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.devicesView %} selected {% endif %}" onclick='pyview.parent.show_devices();'>
             Devices
         </div>
-        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.liveView %} selected {% endif %}" onclick='pyview.show_liveview();'>
+        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.liveView %} selected {% endif %}" onclick='pyview.parent.show_liveview();'>
            Live
         </div>
         <div class="col-md-12 item" style="height:3px"'>

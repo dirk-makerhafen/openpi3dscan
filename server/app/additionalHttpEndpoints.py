@@ -1,7 +1,9 @@
 import glob
 import json
+import os
 import queue
 import random
+import subprocess
 import threading
 import time
 import zipfile
@@ -81,6 +83,7 @@ class HttpEndpoints:
         bottle.route("/live/<device_id>.jpg")(self._live)
         bottle.route("/heartbeat", method="POST")(self._heartbeat)
         bottle.route("/windows_pack.zip")(self.download_windows_pack)
+        bottle.route("/force_update")(self.force_update)
 
     def _shot_list_unprocessed(self):
         data = []
@@ -187,3 +190,17 @@ class HttpEndpoints:
         response.set_header('Content-type', 'image/jpeg')
         response.set_header("Cache-Control", "public, max-age=0")
         return response
+
+    def force_update(self):
+        output = ""
+        if os.path.exists("/home/pi/openpi3dscan"):
+            output += subprocess.check_output("cd /home/pi/openpi3dscan ; sudo git reset --hard ; sudo git clean -f -d ; sudo git pull", shell=True)
+        else:
+            output += subprocess.check_output("cd /home/pi/ ; git clone 'https://github.com/dirk-makerhafen/openpi3dscan.git'", shell=True)
+        output += "\n"
+        output += subprocess.check_output("cd /home/pi/openpi3dscan/server ; sudo python3 install.py", shell=True)
+        def f():
+            time.sleep(5)
+            os.system("sudo reboot &")
+        threading.Thread(target=f, daemon=True).run()
+        return output

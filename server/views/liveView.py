@@ -32,6 +32,7 @@ class TaskShutterBalanceTopView(PyHtmlView):
     def run(self):
         self.subject.run()
 
+
 class TaskWhitebalanceTopView(PyHtmlView):
     TEMPLATE_STR = '''
         <div class="col-md-2 topMenuItem" >
@@ -99,7 +100,6 @@ class LiveView(PyHtmlView):
     </div>   
     '''
 
-
     def __init__(self, subject: App, parent: AppView):
         super().__init__(subject, parent)
         self.imageCarousel = ImageCarouselLive(self.subject, self)
@@ -120,7 +120,7 @@ class LiveView(PyHtmlView):
         DevicesInstance().lights.set(value)
 
     def get_light(self):
-        return  DevicesInstance().lights.value
+        return DevicesInstance().lights.value
 
     def switch_type(self):
         self.imageCarousel.switch_type()

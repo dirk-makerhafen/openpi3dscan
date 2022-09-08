@@ -10,6 +10,7 @@ from .devicesView import DevicesView
 from .liveView import LiveView
 from .sidebar.sidebarView import SidebarView
 
+
 class AppView(PyHtmlView):
     DOM_ELEMENT_CLASS = "AppView container"
     TEMPLATE_STR = '''

@@ -1,16 +1,17 @@
 from pyhtmlgui import Observable
-from app.settings.settings_sequenceImage import Settings_SequenceImage
+
+from app.settings.settingsSequenceImage import SettingsSequenceImage
 
 
-class Settings_Sequence(Observable):
+class SettingsSequence(Observable):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.save = parent.save
-        self.image1 = Settings_SequenceImage(self)
-        self.image2 = Settings_SequenceImage(self)
-        self.startup_delay = 3 # seconds
-        self.image_delay = 0# frames
+        self.image1 = SettingsSequenceImage(self)
+        self.image2 = SettingsSequenceImage(self)
+        self.startup_delay = 3  # seconds
+        self.image_delay = 0  # frames
 
     def set_startup_delay(self, value):
         try:
@@ -40,11 +41,12 @@ class Settings_Sequence(Observable):
 
     def to_dict(self):
         return {
-            "image1" : self.image1.to_dict(),
-            "image2" : self.image2.to_dict(),
-            "startup_delay" : self.startup_delay,
-            "image_delay" : self.image_delay,
+            "image1": self.image1.to_dict(),
+            "image2": self.image2.to_dict(),
+            "startup_delay": self.startup_delay,
+            "image_delay": self.image_delay,
         }
+
     def from_dict(self, data):
         self.image1.from_dict(data["image1"])
         self.image2.from_dict(data["image2"])

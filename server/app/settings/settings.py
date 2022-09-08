@@ -1,25 +1,25 @@
 import json
 from pyhtmlgui import Observable
 
-from app.settings.settings_cameras import Settings_Cameras
-from app.settings.settings_firmware import Settings_FirmwareImage
-from app.settings.settings_hostname import Settings_Hostname
-from app.settings.settings_sequence import Settings_Sequence
-from app.settings.settings_wireless import Settings_Wireless
+from app.settings.settingsCameras import SettingsCameras
+from app.settings.settingsFirmware import SettingsFirmwareImage
+from app.settings.settingsHostname import SettingsHostname
+from app.settings.settingsSequence import SettingsSequence
+from app.settings.settingsWireless import SettingsWireless
 
-VERSION = "2022.09.08-17.00"
+VERSION = "2022.09.08-18.00"
 
 
 class Settings(Observable):
     def __init__(self, devicesInstance):
         super().__init__()
         self.devicesInstance = devicesInstance
-        self.sequenceSettingsSpeed = Settings_Sequence(self)
-        self.sequenceSettingsQuality = Settings_Sequence(self)
-        self.cameraSettings = Settings_Cameras(self)
-        self.firmwareSettings = Settings_FirmwareImage(self)
-        self.wirelessSettings = Settings_Wireless(self)
-        self.hostnameSettings = Settings_Hostname(self)
+        self.sequenceSettingsSpeed = SettingsSequence(self)
+        self.sequenceSettingsQuality = SettingsSequence(self)
+        self.cameraSettings = SettingsCameras(self)
+        self.firmwareSettings = SettingsFirmwareImage(self)
+        self.wirelessSettings = SettingsWireless(self)
+        self.hostnameSettings = SettingsHostname(self)
         self.VERSION = VERSION
         self.load()
 
@@ -32,7 +32,7 @@ class Settings(Observable):
             "wirelessSettings" : self.wirelessSettings.to_dict(),
             "hostnameSettings" : self.hostnameSettings.to_dict()
         }
-        open("/opt/openpi3dscan/.openpi3dscan.json","w").write(json.dumps(data))
+        open("/opt/openpi3dscan/.openpi3dscan.json", "w").write(json.dumps(data))
 
     def load(self):
         try:
@@ -51,7 +51,9 @@ class Settings(Observable):
 
 
 _settingsInstance = None
-def SettingsInstance(devicesInstance = None):
+
+
+def SettingsInstance(devicesInstance=None):
     global _settingsInstance
     if _settingsInstance is None:
         _settingsInstance = Settings(devicesInstance)

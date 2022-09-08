@@ -1,5 +1,6 @@
 from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
+
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''
         <div class="row">
@@ -93,12 +94,12 @@ class ShotFilesView(PyHtmlView):
         self.filesListView = ObservableListView(self.current_models_list, self, item_class=ModelFileItemView, dom_element="tbody")
 
     def show(self):
-        if self.is_hidden == True and self.is_visible:
+        if self.is_hidden is True and self.is_visible:
             self.is_hidden = False
             self.update()
 
     def hide(self):
-        if self.is_hidden == False and self.is_visible:
+        if self.is_hidden is False and self.is_visible:
             self.is_hidden = True
             self.update()
 

@@ -9,13 +9,13 @@ from app.devices.devices import DevicesInstance
 from app.settings.settings import SettingsInstance
 from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
 
+
 class Task_ShutterBalance(Observable):
     def __init__(self):
         super().__init__()
         self.name = "ShutterBalance"
         self.status = "idle"
         self.worker = None
-
 
     def set_status(self, value):
         self.status = value
@@ -39,9 +39,9 @@ class Task_ShutterBalance(Observable):
         random.shuffle(cameras)
 
         for device in cameras:
-            device.camera.settings.locked = True # prevent changes of settings by heartbeat
-            PreviewQueueInstance().get_image(device_id=device.device_id)# trigger pll in case cameras are in sleep
-        time.sleep(3) # wait for heartbeat queue to empty
+            device.camera.settings.locked = True  # prevent changes of settings by heartbeat
+            PreviewQueueInstance().get_image(device_id=device.device_id)  # trigger pll in case cameras are in sleep
+        time.sleep(3)  # wait for heartbeat queue to empty
 
         # set exposure_mode, iso to selected mode
         for device in cameras:
@@ -59,10 +59,10 @@ class Task_ShutterBalance(Observable):
             if device.name.endswith("CAM6") or device.name.endswith("CAM5") or device.name.endswith("CAM4"):
                 exposure_speeds.append(device.camera.settings.exposure_speed)
 
-        exposure_speeds = [g for g in exposure_speeds if g != None and g != 0]
+        exposure_speeds = [g for g in exposure_speeds if g is not None and g != 0]
 
         # average exposure_speeds
-        avg_exposure_speed =  round(sum([g for g in exposure_speeds]) / len(exposure_speeds), 3)
+        avg_exposure_speed = round(sum([g for g in exposure_speeds]) / len(exposure_speeds), 3)
 
         print("avg_exposure_speeds", avg_exposure_speed)
 
@@ -79,6 +79,8 @@ class Task_ShutterBalance(Observable):
         
         
 _taskShutterBalanceInstance = None
+
+
 def TaskShutterBalanceInstance():
     global _taskShutterBalanceInstance
     if _taskShutterBalanceInstance is None:

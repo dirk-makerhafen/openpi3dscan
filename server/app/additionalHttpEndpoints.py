@@ -1,23 +1,23 @@
 import glob
+import json
 import queue
 import random
 import threading
 import time
+import zipfile
 from zipfile import ZIP_STORED
-import json
+
 import bottle
-from bottle import request
-import os
 import gevent
 import zipstream
-import zipfile
+from bottle import request
 
 from app.devices.devices import DevicesInstance
-from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
 from app.shots import ShotsInstance
-
+from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
 
 bottle.BaseRequest.MEMFILE_MAX = 250 * 1024 * 1024
+
 
 class DownloadStreamer:
     def __init__(self, data):
@@ -33,7 +33,7 @@ class DownloadStreamer:
 
     def _worker_thread(self):
         while True:
-            while len(self.results.keys()) > 5 and self.last_request + 120 > time.time(): # 120 second timeout
+            while len(self.results.keys()) > 5 and self.last_request + 120 > time.time():  # 120 second timeout
                 time.sleep(1)
             if self.last_request + 120 < time.time():
                 break
@@ -41,7 +41,7 @@ class DownloadStreamer:
                 data = self.data_queue.get(timeout=1)
             except Exception:
                 break
-            filename, shot_id, image_type, device_id= data
+            filename, shot_id, image_type, device_id = data
             image = ShotsInstance().get(shot_id).get_image(image_type, "normal", device_id)
             if image is None:
                 self.results[filename] = b''
@@ -64,6 +64,7 @@ class DownloadStreamer:
             item = b''
         yield item
 
+
 class HttpEndpoints:
     def __init__(self, app, gui):
         self.app = app
@@ -72,13 +73,13 @@ class HttpEndpoints:
         bottle.route("/shots/list")(self._shot_list)
         bottle.route("/shots/list/unprocessed")(self._shot_list_unprocessed)
         bottle.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
-        bottle.route("/shots/<shot_id>/upload/<model_id>",method="POST")(self._shot_upload_model)
+        bottle.route("/shots/<shot_id>/upload/<model_id>", method="POST")(self._shot_upload_model)
         bottle.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
         bottle.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
-        bottle.route("/shots/<shot_id>/<image_mode>/<image_type>/<device_id>.jpg")(self._shot_get_image) # return remote shot as jpeg
+        bottle.route("/shots/<shot_id>/<image_mode>/<image_type>/<device_id>.jpg")(self._shot_get_image)  # return remote shot as jpeg
         bottle.route("/shots/<shot_id>.zip")(self._shot_get_images_zip)
         bottle.route("/live/<device_id>.jpg")(self._live)
-        bottle.route("/heartbeat",method="POST")(self._heartbeat)
+        bottle.route("/heartbeat", method="POST")(self._heartbeat)
         bottle.route("/windows_pack.zip")(self.download_windows_pack)
 
     def _shot_list_unprocessed(self):
@@ -102,7 +103,7 @@ class HttpEndpoints:
             'Content-Type': "application/zip",
             'Content-Disposition': 'attachment; filename="%s"' % model.filename
         }
-        return bottle.HTTPResponse(open(model.get_path(),"rb"), **headers)
+        return bottle.HTTPResponse(open(model.get_path(), "rb"), **headers)
 
     def _shot_download_model_file(self, shot_id, model_id, filename):
         model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
@@ -114,12 +115,12 @@ class HttpEndpoints:
             'Cache-Control': "public, max-age=3600"
         }
         with zipfile.ZipFile(model.get_path(), 'r') as zip_ref:
-            return bottle.HTTPResponse( zip_ref.read(filename), **headers)
+            return bottle.HTTPResponse(zip_ref.read(filename), **headers)
 
     def _shot_processing_failed(self, shot_id, model_id):
         ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("failed")
 
-    def _shot_upload_model(self, shot_id, model_id ):
+    def _shot_upload_model(self, shot_id, model_id):
         file = request.files.get('upload_file').file
         ShotsInstance().get(shot_id).get_model_by_id(model_id).write_file(file)
 
@@ -157,7 +158,7 @@ class HttpEndpoints:
         filelist = []
         for i in range(101, 213):
             device_id = "%s" % i
-            if shot.image_may_exist("normal", "normal", device_id):   #  # image_mode = normal | preview , image_type = normal | projection
+            if shot.image_may_exist("normal", "normal", device_id):  # image_mode = normal | preview , image_type = normal | projection
                 filelist.append(["normal/%s.jpg" % device_id, shot_id, "normal", device_id])
             if shot.image_may_exist("projection", "normal", device_id):
                 filelist.append(["projection/%s.jpg" % device_id, shot_id, "projection", device_id])
@@ -181,7 +182,7 @@ class HttpEndpoints:
         DevicesInstance().heartbeat_received(ip, data)
         return "OK"
 
-    def _live(self,device_id):
+    def _live(self, device_id):
         response = bottle.HTTPResponse(PreviewQueueInstance().get_image(device_id))
         response.set_header('Content-type', 'image/jpeg')
         response.set_header("Cache-Control", "public, max-age=0")

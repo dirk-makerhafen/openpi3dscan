@@ -1,15 +1,14 @@
 import json
+import subprocess
 import threading
 from multiprocessing.pool import ThreadPool
-import subprocess
 
 import requests
 from pyhtmlgui import Observable
 
 from app.devices.devices import DevicesInstance
-
-from .task import Task
 from ..devices.device import Device
+
 
 class Task_NetworkScan(Observable):
     def __init__(self):
@@ -36,13 +35,13 @@ class Task_NetworkScan(Observable):
 
         ips = []
         ip_base = "192.168.99"
-        for i in range(99,253):
+        for i in range(99, 253):
             ip = "%s.%s" % (ip_base, i)
             ips.append(ip)
 
         with ThreadPool(15) as pool:
             ping_results = pool.map(lambda ip: self._ping(ip), ips)
-            ips_active = [ips[i] for i,item in enumerate(ping_results) if item is not False]
+            ips_active = [ips[i] for i, item in enumerate(ping_results) if item is not False]
             self.set_status("api_scan")
             device_id_results = pool.map(lambda ip: self._device_id(ip), ips_active)
             self.set_status("inspecting")
@@ -54,7 +53,7 @@ class Task_NetworkScan(Observable):
                         device = Device()
                         device.device_id = device_id_result["id"]
                         device.ip = ip
-                        device.name =  device_id_result["name"]
+                        device.name = device_id_result["name"]
                         device.device_type = device_id_result["type"]
                         try:
                             device.version = device_id_result["version"]
@@ -63,10 +62,10 @@ class Task_NetworkScan(Observable):
                         DevicesInstance().devices.append(device)
                         if device.device_type == "camera":
                             device.camera.shots.refresh_list()
-                            #device.camera.performance.receive()
+                            # device.camera.performance.receive()
 
                     device.online_api = True
-                    if device.ip != ip: # ip changed or new id:
+                    if device.ip != ip:  # ip changed or new id:
                         old_device = DevicesInstance().get_device_by_ip(ip)
                         if old_device is not None:
                             old_device.ip = ""
@@ -76,7 +75,7 @@ class Task_NetworkScan(Observable):
                         device.ip = ip
                     device.notify_observers()
 
-                else: # no api response
+                else:  # no api response
                     device = DevicesInstance().get_device_by_ip(ip)
                     if device is not None:
                         device.notify_observers()
@@ -93,7 +92,7 @@ class Task_NetworkScan(Observable):
                     device.notify_observers()
             self.set_status("ssh_scan")
             # check ssh
-            devices = [d for d in DevicesInstance().devices if d.online_ping != False]
+            devices = [d for d in DevicesInstance().devices if d.online_ping is not False]
             ssh_results = pool.map(lambda device: device.check_ssh_connection(), devices)
             self.set_status("trigger_heartbeat")
             trigger_results = pool.map(lambda ip: self._trigger_heartbeat(ip), ips_active)
@@ -104,7 +103,7 @@ class Task_NetworkScan(Observable):
     def _ping(self, host):
         try:
             stdout = subprocess.check_output("ping -c 1 -t 2 " + host, shell=True, timeout=10, stderr=subprocess.STDOUT)
-            ping_time = round(float(stdout.split(b"\n")[-2].split(b"/")[4]),2)
+            ping_time = round(float(stdout.split(b"\n")[-2].split(b"/")[4]), 2)
             return ping_time
         except Exception as e:
             return False
@@ -126,8 +125,9 @@ class Task_NetworkScan(Observable):
         return None
 
 
-
 _taskNetworkScanInstance = None
+
+
 def TaskNetworkScanInstance():
     global _taskNetworkScanInstance
     if _taskNetworkScanInstance is None:

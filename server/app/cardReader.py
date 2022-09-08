@@ -11,6 +11,7 @@ def shell(cmd):
     print("-> %s" % cmd)
     subprocess.call(cmd, shell=True)
 
+
 class Partition(Observable):
     def __init__(self, card, partition_name, size, fstype):
         super().__init__()
@@ -55,7 +56,6 @@ class SDCard(Observable):
                 self.partitions[partition_name] = Partition(self, partition_name, size, fstype)
         self._reload_fs_info()
 
-
     def _reload_fs_info(self):
         self.info_group = ""
         self.info_name = ""
@@ -65,7 +65,7 @@ class SDCard(Observable):
         mount_dir = "/tmp/mnt/%s" % self.slot.device_name
         shell("sudo mkdir -p '%s'" % mount_dir)
         if len(keys) == 2 and self.partitions[keys[1]].fstype.find("FAT32") != 1:
-            shell('sudo mount %s %s ; sudo mount %s %s/boot' % ( self.partitions[keys[1]].partition_name, mount_dir,self.partitions[keys[0]].partition_name, mount_dir))
+            shell('sudo mount %s %s ; sudo mount %s %s/boot' % (self.partitions[keys[1]].partition_name, mount_dir, self.partitions[keys[0]].partition_name, mount_dir))
             try:
                 devsettings = open("%s/boot/device.settings" % mount_dir, "r").read()
                 self.info_group = devsettings.split("TYPE")[1].split("=")[1].split("\n")[0].strip()
@@ -113,7 +113,7 @@ class SDCard(Observable):
 
         try:
             with open("%s/tmp/id.txt" % mount_dir, "w") as f:
-                f.write( self.info_id )
+                f.write(self.info_id)
 
             with open("%s/tmp/group.txt" % mount_dir, "w") as f:
                 if self.info_group == "camera":    f.write("1")
@@ -175,7 +175,7 @@ class CardReaderSlot(Observable):
             return
         self.status = "writing"
         self.notify_observers()
-        self.task_queue.put(["write_image", [ group, dev_id, name]])
+        self.task_queue.put(["write_image", [group, dev_id, name]])
         print("write image", group, dev_id, name)
 
     def update_card_task(self, group, dev_id, name):
@@ -183,7 +183,7 @@ class CardReaderSlot(Observable):
             return
         self.status = "update"
         self.notify_observers()
-        self.task_queue.put(["update_card", [ group, dev_id, name]])
+        self.task_queue.put(["update_card", [group, dev_id, name]])
         print("update_card", group, dev_id, name)
 
     def _worker_thread(self):
@@ -263,7 +263,10 @@ class CardReader(Observable):
             item._reload()
         self.notify_observers()
 
+
 _cardReaderInstance = None
+
+
 def CardReaderInstance():
     global _cardReaderInstance
     if _cardReaderInstance is None:

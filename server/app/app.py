@@ -7,6 +7,7 @@ from app.usbDisks import UsbDisks
 import os
 from app.settings.settings import SettingsInstance
 
+
 class App(Observable):
     def __init__(self):
         super().__init__()
@@ -28,7 +29,10 @@ class App(Observable):
         self.notify_observers()
         os.system("sudo shutdown -h now &")
 
+
 _appInstance = None
+
+
 def AppInstance():
     global _appInstance
     if _appInstance is None:

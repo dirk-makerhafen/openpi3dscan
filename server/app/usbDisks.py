@@ -1,33 +1,33 @@
-import os
 import subprocess
 import threading
 import time
+
 from pyhtmlgui import Observable
 
 from app.shots import ShotsInstance
 
 
 class UsbDisk(Observable):
-    def __init__(self, NAME, FSTYPE, FSVER, LABEL, UUID):
+    def __init__(self, name, fstype, fsver, label, uuid):
         super().__init__()
-        self.NAME = NAME
-        self.FSTYPE = FSTYPE
-        self.FSVER = FSVER
-        self.LABEL = LABEL
-        self.UUID = UUID
+        self.name = name
+        self.fstype = fstype
+        self.fsver = fsver
+        self.label = label
+        self.uuid = uuid
         self.disk_total = "0G"
         self.disk_free = "0G"
 
     def mount(self):
         try:
-            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.NAME,), shell=True, timeout=60, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.name,), shell=True, timeout=60, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
         self.get_diskspace()
 
     def umount(self):
         try:
-            stdout = subprocess.check_output("sudo mxount '%s' '/shots'" % (self.NAME,), shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output("sudo mxount '%s' '/shots'" % (self.name,), shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
 
@@ -38,22 +38,23 @@ class UsbDisk(Observable):
             stdout = ""
         line = stdout.split("\n")[0]
         while "  " in line:
-            line = line.replace("  "," ")
+            line = line.replace("  ", " ")
         try:
             print(line)
-            fs,size,used,avail,usedp,mount = line.split(" ")
+            fs, size, used, avail, usedp, mount = line.split(" ")
             self.disk_total = size
             self.disk_free = avail
         except Exception as e:
             print(e)
             pass
 
+
 class UsbDisks(Observable):
     def __init__(self):
         super().__init__()
         self.disks = []
         self.load_worker = None
-        self.status="idle"
+        self.status = "idle"
         for i in range(5):
             self._load()
             try:
@@ -93,22 +94,22 @@ class UsbDisks(Observable):
 
         for line in stdout.split("\n"):
             try:
-                line = line.replace("\t"," ").replace("└─","")
+                line = line.replace("\t", " ").replace("└─", "")
                 while "  " in line:
-                    line = line.replace("  "," ")
+                    line = line.replace("  ", " ")
                 if len(line) < 5:
                     continue
-                NAME, FSTYPE, FSVER, LABEL, UUID, REST = line.split(" ",5)
-                disk = self.get_disk_by_uid(UUID)
+                name, fstype, fsver, label, uuid, rest = line.split(" ", 5)
+                disk = self.get_disk_by_uid(uuid)
                 if disk is None:
-                    self.disks.append(UsbDisk(NAME, FSTYPE, FSVER, LABEL, UUID))
+                    self.disks.append(UsbDisk(name, fstype, fsver, label, uuid))
                 else:
                     disk.get_diskspace()
             except Exception as e:
                 print(e)
         toremove = []
         for disk in self.disks:
-            if disk.UUID not in stdout:
+            if disk.uuid not in stdout:
                 toremove.append(disk)
         for r in toremove:
             self.disks.remove(r)
@@ -117,10 +118,9 @@ class UsbDisks(Observable):
         self.load_worker = None
         self.notify_observers()
 
-
     def get_disk_by_uid(self, uid):
         try:
-            return [d for d in self.disks if d.UUID == uid][0]
+            return [d for d in self.disks if d.uuid == uid][0]
         except:
             return None
 

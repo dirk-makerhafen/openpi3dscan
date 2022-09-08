@@ -7,7 +7,8 @@ from views.imageCarousel.imageCarousel import ImageCarousel
 from app.devices.devices import DevicesInstance
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-loading_img_path = os.path.join(SCRIPT_DIR, "..","..","static","images","nophoto.jpg")
+loading_img_path = os.path.join(SCRIPT_DIR, "..", "..", "static", "images", "nophoto.jpg")
+
 
 class PreviewQueue:
     def __init__(self):
@@ -18,7 +19,7 @@ class PreviewQueue:
         for i in range(25):
             t = threading.Thread(target=self._worker_thread, daemon=True)
             t.start()
-        self.loading_img = open(loading_img_path,"rb").read()
+        self.loading_img = open(loading_img_path, "rb").read()
 
     def put(self, imageRowView):
         self.imageRowViews[imageRowView._device.device_id] = imageRowView
@@ -85,6 +86,7 @@ class PreviewQueue:
                     self.data_in_q.remove(device_id)
                 except:
                     pass
+
     def get_image(self,  device_id):
         if device_id not in self.data_in_q:
             self.data_in_q.append(device_id)
@@ -96,8 +98,10 @@ class PreviewQueue:
             return self.preview_data[device_id]["image"]
         return self.loading_img
 
+
 class ImageCarouselLive(ImageCarousel):
     DOM_ELEMENT_CLASS = "ImageCarousel"
+
     def __init__(self, subject, parent):
         super().__init__(subject, parent)
 
@@ -113,7 +117,10 @@ class ImageCarouselLive(ImageCarousel):
         super().switch_type()
         DevicesInstance().projectors.set(self.image_type == "projection")
 
+
 _previewQueue = None
+
+
 def PreviewQueueInstance():
     global _previewQueue
     if _previewQueue is None:

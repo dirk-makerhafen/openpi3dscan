@@ -1,7 +1,7 @@
 from pyhtmlgui import Observable
 
 
-class Settings_SequenceImage(Observable):
+class SettingsSequenceImage(Observable):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
@@ -12,6 +12,7 @@ class Settings_SequenceImage(Observable):
 
     def _get_projection(self):
         return self._projection
+
     def _set_projection(self, value):
         value = bool(value)
         self._projection = value
@@ -21,6 +22,7 @@ class Settings_SequenceImage(Observable):
 
     def _get_light(self):
         return self._light
+
     def _set_light(self, value):
         value = float(value)
         self._light = value
@@ -30,6 +32,7 @@ class Settings_SequenceImage(Observable):
 
     def _get_offset(self):
         return self._offset
+
     def _set_offset(self, value):
         value = float(value)
         self._offset = value
@@ -43,6 +46,7 @@ class Settings_SequenceImage(Observable):
             "light" : self._light,
             "offset" : self._offset,
         }
+
     def from_dict(self, data):
         self._projection = data["projection"]
         self._light = data["light"]

@@ -14,7 +14,6 @@ class Task_SyncShots(Observable):
         self.status = "idle"
         self.worker = None
 
-
     def set_status(self, value):
         self.status = value
         self.notify_observers()
@@ -43,6 +42,8 @@ class Task_SyncShots(Observable):
 
         
 _taskSyncShotsInstance = None
+
+
 def TaskSyncShotsInstance():
     global _taskSyncShotsInstance
     if _taskSyncShotsInstance is None:

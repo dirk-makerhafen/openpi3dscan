@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 from pyhtmlgui import PyHtmlView, ObservableListView
 from app.devices.devices import DevicesInstance
 
-class DevicesView(PyHtmlView):
 
+class DevicesView(PyHtmlView):
     TEMPLATE_STR = '''
       <div class="main">
         <div class="topMenu row" style="height:50px">
@@ -51,7 +51,7 @@ class DevicesView(PyHtmlView):
 
     def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
-        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x:x.subject.ip)
+        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: x.subject.ip)
         self.task_networkscan = TaskNetworkscanView(TaskNetworkScanInstance(), self)
         self.task_syncshots = TaskSyncShotsView(TaskSyncShotsInstance(), self)
         self.task_updateclients = TaskUpdateClientsView(TaskUpdateClientsInstance(), self)
@@ -61,7 +61,6 @@ class DevicesView(PyHtmlView):
 
     def sync(self):
         DevicesInstance().cameras.sync_shotlists()
-
 
 
 class DeviceRowView(PyHtmlView):
@@ -117,6 +116,7 @@ class TaskNetworkscanView(PyHtmlView):
 
     def start_scan(self):
         self.subject.run()
+
 
 class TaskUpdateClientsView(PyHtmlView):
     TEMPLATE_STR = '''

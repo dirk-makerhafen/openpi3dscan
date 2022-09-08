@@ -32,13 +32,13 @@ class ShotCommentsView(PyHtmlView):
         self.is_hidden = True
 
     def show(self):
-        if self.is_hidden == True:
+        if self.is_hidden is True:
             self.is_hidden = False
             if self.is_visible:
                 self.update()
 
     def hide(self):
-        if self.is_hidden == False:
+        if self.is_hidden is False:
             self.is_hidden = True
             if self.is_visible:
                 self.update()

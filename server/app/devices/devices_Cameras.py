@@ -34,7 +34,6 @@ class Cameras:
             if device.camera.settings.exposure_mode != exposure_mode:
                 device.camera.settings.set_exposure_mode(exposure_mode)
 
-
     def set_awb_mode(self, awb_mode):
         for device in self.list():
             if device.camera.settings.awb_mode != awb_mode:

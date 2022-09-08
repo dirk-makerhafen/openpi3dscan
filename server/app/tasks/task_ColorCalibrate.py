@@ -10,7 +10,6 @@ class Task_ColorCalibrate(Task):
         self.name = "ColorCalibrate"
         self.light_segment_adjustments = [0.95] * 16
 
-
     def run(self):
         cameras = DevicesInstance().cameras.list()
         lc = len(cameras)
@@ -79,3 +78,4 @@ class Task_ColorCalibrate(Task):
         print("self.light_segment_adjustments", self.light_segment_adjustments)
 
         return light_changed
+

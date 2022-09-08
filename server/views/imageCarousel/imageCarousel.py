@@ -37,12 +37,14 @@ class ImageRowView(PyHtmlView):
     def __hash__(self):
         return id(self)
 
+
 class SegmentView(PyHtmlView):
     TEMPLATE_STR = '''
         {% for image in pyview.images %}
               {{image.render()}}
          {% endfor %}
     '''
+
     @property
     def DOM_ELEMENT_CLASS(self):
         return "segment segment_%s" % self.seg_nr
@@ -54,7 +56,8 @@ class SegmentView(PyHtmlView):
     def __init__(self, subject, parent, seg_nr):
         super().__init__(subject, parent)
         self.seg_nr = seg_nr
-        self.images = [ ImageRowView(subject, self, i) for i in range(1,8) ]
+        self.images = [ImageRowView(subject, self, i) for i in range(1, 8)]
+
 
 class ImageCarousel(PyHtmlView):
     TEMPLATE_STR = ''' 
@@ -84,7 +87,7 @@ class ImageCarousel(PyHtmlView):
         super().__init__(subject, parent)
         self.center_segment = 1
         self.segments_shown = 5
-        self.image_type = "normal" # normal|projection
+        self.image_type = "normal"  # normal|projection
         self.cid = None
         self._segments = []
         self.worker = None
@@ -112,8 +115,10 @@ class ImageCarousel(PyHtmlView):
         segments = []
         segment = first_segment
         for i in range(self.segments_shown):
-            if segment < 1: segment = 16
-            if segment > 16: segment = 1
+            if segment < 1:
+                segment = 16
+            if segment > 16:
+                segment = 1
             segments.append(int(segment))
             segment = segment + 1
         segments.reverse()
@@ -165,3 +170,4 @@ class ImageCarousel(PyHtmlView):
         self.image_type = "projection" if self.image_type == "normal" else "normal"
         if self.is_visible:
             self.update()
+

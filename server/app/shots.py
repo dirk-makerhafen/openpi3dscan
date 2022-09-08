@@ -1,31 +1,32 @@
 import glob
+import json
 import os
+import random
+import re
 import shutil
 import threading
-import json
-from multiprocessing.pool import ThreadPool
-import random
 import uuid
-import re
-import math
+from multiprocessing.pool import ThreadPool
+
 import gevent
 from PIL import Image
+from gevent.fileobject import FileObjectThread
 from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
-from gevent.fileobject import FileObjectThread
 
 SHOT_DIR = "/shots"
 
+
 class ModelFile(Observable):
-    def __init__(self, parentShot, filetype="obj", reconstruction_quality = "high", quality="high", create_mesh_from="projection", create_textures=False):
+    def __init__(self, parentShot, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False):
         super().__init__()
         self.parentShot = parentShot
         self.model_id = "%s" % uuid.uuid4()
-        self.status = "waiting" # ready, failed
-        self.filetype = filetype # "obj", obj, 3mf, stl
-        self.reconstruction_quality = reconstruction_quality   # normal, high,
+        self.status = "waiting"  # ready, failed
+        self.filetype = filetype  # "obj", obj, 3mf, stl
+        self.reconstruction_quality = reconstruction_quality  # normal, high,
         self.quality = quality   # "high", normal, low
-        self.create_mesh_from = create_mesh_from # normal, projection, all
+        self.create_mesh_from = create_mesh_from  # normal, projection, all
         self.filename = ""
         self.filesize = 0
         self.create_textures = create_textures
@@ -50,13 +51,13 @@ class ModelFile(Observable):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         with FileObjectThread(os.path.join(self.path, self.filename), "wb") as f:
-            with FileObjectThread(input_file,"rb") as fi:
+            with FileObjectThread(input_file, "rb") as fi:
                 buf = fi.read(32000)
                 while buf:
                     f.write(buf)
                     buf = fi.read(32000)
 
-        self.filesize = int(round( os.path.getsize(os.path.join(self.path, self.filename)) / 1024 / 1024, 0))
+        self.filesize = int(round(os.path.getsize(os.path.join(self.path, self.filename)) / 1024 / 1024, 0))
         self.set_status("ready")
 
     def get_data(self):
@@ -93,8 +94,10 @@ class ModelFile(Observable):
         self.filetype = data["filetype"]
         self.quality = data["quality"]
         self.filename = data["filename"]
-        if self.quality == "ultra": self.quality = "high"
-        if self.quality == "default": self.quality = "normal"
+        if self.quality == "ultra":
+            self.quality = "high"
+        if self.quality == "default":
+            self.quality = "normal"
         try:
             self.model_id = data["model_id"]
         except:
@@ -147,11 +150,11 @@ class Shot(Observable):
 
     @property
     def nr_of_models_waiting(self):
-        return len( [m for m in self.models if m.status == "waiting"])
+        return len([m for m in self.models if m.status == "waiting"])
 
     @property
     def nr_of_models_failed(self):
-        return len( [m for m in self.models if m.status == "failed"])
+        return len([m for m in self.models if m.status == "failed"])
 
     def create_folders(self):
         if not os.path.exists(self.path):
@@ -199,7 +202,7 @@ class Shot(Observable):
 
     def sync_remote(self):
         if self.worker is None:
-            self.worker = threading.Thread(target=self._sync_remote, daemon = True)
+            self.worker = threading.Thread(target=self._sync_remote, daemon=True)
             self.worker.start()
 
     # image_mode = normal | preview, image_type = normal | projection
@@ -210,8 +213,8 @@ class Shot(Observable):
         tasks = []
         existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
         for device in [d for d in self.devices if d.status == "online"]:
-            for image_mode in [ "normal", "preview" ]:
-                for image_type in [ "normal", "projection" ]:
+            for image_mode in ["normal", "preview"]:
+                for image_type in ["normal", "projection"]:
                     if image_mode == "normal":
                         folder_name = "images"
                     else:
@@ -221,17 +224,17 @@ class Shot(Observable):
                         tasks.append([device, [self.shot_id, image_type, image_mode, False]])
         if len(tasks) > 0:
             random.shuffle(tasks)
-            with ThreadPool(min([5,len(tasks)])) as p:
+            with ThreadPool(min([5, len(tasks)])) as p:
                 p.map(lambda task: task[0].camera.shots.download(*task[1]), tasks)
             p.join()
             self.count_number_of_files()
 
         existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
-        for i in range(101,213):
+        for i in range(101, 213):
             for image_type in ["normal", "projection"]:
                 img_path = os.path.join(self.path, "images", image_type, "%s.jpg" % i)
                 preview_path = os.path.join(self.path, "preview_images", image_type, "%s.jpg" % i)
-                if not preview_path in existing_images and img_path in existing_images:
+                if preview_path not in existing_images and img_path in existing_images:
                     try:
                         print("creating preview image")
                         img = Image.open(img_path)
@@ -249,17 +252,19 @@ class Shot(Observable):
             folder_name = "images"
         else:
             folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id )
+        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id)
         if os.path.exists(img_path):
-            with open(img_path,"rb") as f:
+            with open(img_path, "rb") as f:
                 return f.read()
         try:
             device = [d for d in self.devices if d.device_id == device_id and d.status == "online"][0]
         except:
             return None
         img = [b'']
+
         def f():
-            img[0] = device.camera.shots.download(self.shot_id, image_type, image_mode = image_mode)
+            img[0] = device.camera.shots.download(self.shot_id, image_type, image_mode=image_mode)
+
         t = threading.Thread(target=f, daemon=True)
         t.start()
         while t.is_alive():
@@ -273,7 +278,7 @@ class Shot(Observable):
             folder_name = "images"
         else:
             folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id )
+        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id)
         if os.path.exists(img_path):
             return True
         try:
@@ -289,14 +294,14 @@ class Shot(Observable):
             folder_name = "images"
         else:
             folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id )
+        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id)
         with FileObjectThread(img_path, "wb") as f:
             f.write(image_data)
             if image_mode == "normal":
                 self.nr_of_files += 1
                 self.notify_observers()
 
-    def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from = "projection", create_textures = False):
+    def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False):
         self.create_folders()
         model = self.get_model(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures)
         if model is not None:
@@ -308,7 +313,7 @@ class Shot(Observable):
             self.save()
         self.notify_observers()
 
-    def get_model(self, filetype="obj",reconstruction_quality="high", quality="high", create_mesh_from = "projection", create_textures= False):
+    def get_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False):
         try:
             return [m for m in self.models if m.filetype == filetype and m.quality == quality and m.reconstruction_quality == reconstruction_quality and m.create_mesh_from == create_mesh_from and m.create_textures == create_textures][0]
         except:
@@ -340,7 +345,7 @@ class Shot(Observable):
                 f.write(json.dumps({
                     "name": self.name,
                     "comment": self.comment,
-                    "models" : [ m.to_dict() for m in self.models]
+                    "models" : [m.to_dict() for m in self.models]
                 }))
         if not os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id):
             self.backup_meta()
@@ -352,7 +357,6 @@ class Shot(Observable):
                 "comment": self.comment,
             }))
 
-
     def load(self):
         if os.path.exists(os.path.join(self.path, "metadata.json")):
             try:
@@ -361,7 +365,7 @@ class Shot(Observable):
                     self.name = data["name"]
                     self.comment = data["comment"]
                     try:
-                        self.models = ObservableList([ ModelFile(self).from_dict(m) for m in data["models"] ])
+                        self.models = ObservableList([ModelFile(self).from_dict(m) for m in data["models"]])
                     except:
                         pass
             except Exception as e:
@@ -407,7 +411,7 @@ class Shot(Observable):
 
 # All remote Shots
 class Shots:
-    def __init__(self, devices ):
+    def __init__(self, devices):
         self.shots = ObservableList()
         self.path = "/shots/"
         self.cache = {}
@@ -418,7 +422,7 @@ class Shots:
     def create(self, shot_id, name):
         s = Shot(shot_id)
         s.set_name(name)
-        self.shots.insert(0,s)
+        self.shots.insert(0, s)
         return s
 
     def get(self, shot_id):
@@ -509,9 +513,10 @@ class Shots:
         self.shots.sort()
 
 
-
 _shotsInstance = None
-def ShotsInstance(devices = None):
+
+
+def ShotsInstance(devices=None):
     global _shotsInstance
     if _shotsInstance is None:
         _shotsInstance = Shots(devices)

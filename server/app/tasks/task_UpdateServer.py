@@ -29,7 +29,7 @@ class Task_UpdateServer(Observable):
 
         self.set_status("download")
         if os.path.exists("/home/pi/openpi3dscan"):
-            subprocess.call("cd /home/pi/openpi3dscan ; sudo git reset --hard ; sudo git clean -f -d ; sudo git pull",shell=True)
+            subprocess.call("cd /home/pi/openpi3dscan ; sudo git reset --hard ; sudo git clean -f -d ; sudo git pull", shell=True)
         else:
             subprocess.call("cd /home/pi/ ; git clone 'https://github.com/dirk-makerhafen/openpi3dscan.git'", shell=True)
 
@@ -40,10 +40,10 @@ class Task_UpdateServer(Observable):
             if os.path.exists("/opt/openpi3dscan/server/settings.py"):
                 installed_version = 0
                 try:
-                    installed_version = open("/opt/openpi3dscan/server/settings.py","r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()
+                    installed_version = open("/opt/openpi3dscan/server/app/settings/settings.py", "r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()
                 except Exception as e:
                     print(e)
-                new_version = open("/home/pi/openpi3dscan/server/settings.py","r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()
+                new_version = open("/home/pi/openpi3dscan/server/app/settings/settings.py", "r").read().split("VERSION")[1].split("\n")[0].split("=")[1].strip()
                 if installed_version == new_version:
                     self.set_status("up to date")
                     time.sleep(5)
@@ -54,12 +54,13 @@ class Task_UpdateServer(Observable):
                     time.sleep(3)
                     AppInstance().reboot()
 
-
         self.set_status("idle")
         self.worker = None
         
         
 _taskUpdateServerInstance = None
+
+
 def TaskUpdateServerInstance():
     global _taskUpdateServerInstance
     if _taskUpdateServerInstance is None:

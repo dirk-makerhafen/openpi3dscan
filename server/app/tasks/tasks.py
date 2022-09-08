@@ -4,7 +4,6 @@ from .task_ColorCalibrate import Task_ColorCalibrate
 from pyhtmlgui import Observable
 
 
-
 class Tasks(Observable):
     def __init__(self):
         super().__init__()
@@ -25,8 +24,9 @@ class Tasks(Observable):
         self.task_queue.put(Task_ColorCalibrate())
 
 
-
 _tasksInstance = None
+
+
 def TasksInstance():
     global _tasksInstance
     if _tasksInstance is None:

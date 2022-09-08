@@ -1,7 +1,10 @@
+import subprocess
+import threading
+import time
 from pyhtmlgui import Observable
-import threading, time, subprocess
 
-class Settings_Wireless(Observable):
+
+class SettingsWireless(Observable):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
@@ -12,7 +15,6 @@ class Settings_Wireless(Observable):
         self.ip = ""
         self.apply_worker = None
         self.status_worker = None
-
         self.get_connection_status()
 
     def set_status(self, status):
@@ -21,14 +23,15 @@ class Settings_Wireless(Observable):
 
     def to_dict(self):
         return {
-            "ssid" : self.ssid,
-            "password" : self.password,
+            "ssid": self.ssid,
+            "password": self.password,
         }
+
     def from_dict(self, data):
         self.ssid = data["ssid"]
         self.password = data["password"]
 
-    def apply(self,ssid, password):
+    def apply(self, ssid, password):
         if self.apply_worker is not None:
             return
         if ssid == self.ssid and password == self.password:
@@ -51,7 +54,7 @@ network={
     psk="%s"
 }
         ''' % (self.ssid, self.password)
-        open("/etc/wpa_supplicant/wpa_supplicant.conf","w").write(t)
+        open("/etc/wpa_supplicant/wpa_supplicant.conf", "w").write(t)
         self.set_status("configure")
         subprocess.call("sudo wpa_cli -i wlan0 reconfigure", shell=True)
         self.set_status("connecting")
@@ -71,7 +74,8 @@ network={
             self.set_status("checking")
             time.sleep(2)
             try:
-                stdout = subprocess.check_output("ifconfig wlan0|grep -i inet", shell=True, timeout=10, stderr=subprocess.STDOUT).decode("UTF-8")
+                stdout = subprocess.check_output("ifconfig wlan0|grep -i inet", shell=True, timeout=10,
+                                                 stderr=subprocess.STDOUT).decode("UTF-8")
                 if "192.168" in stdout:
                     self.ip = "192.168%s" % (stdout.split("192.168")[1].split(" ")[0])
                     self.set_status("connected")

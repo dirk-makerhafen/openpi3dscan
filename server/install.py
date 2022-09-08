@@ -8,6 +8,7 @@ def shell(cmd):
     print(cmd)
     os.system(cmd)
 
+
 if __name__ == "__main__":
 
     # COPY TO TARGET
@@ -17,15 +18,15 @@ if __name__ == "__main__":
         shell("sudo mkdir -p /opt/openpi3dscan/client")
         shell("sudo mkdir -p /opt/openpi3dscan/realityCapture")
         shell("sudo mkdir -p /opt/openpi3dscan/firmware")
-        shell("sudo mkdir -p /opt/openpi3dscan/meta") # meta data backup dir
+        shell("sudo mkdir -p /opt/openpi3dscan/meta")  # meta data backup dir
         shell('sudo rsync --delete -rav %s/*                    /opt/openpi3dscan/server/ ' % SCRIPT_DIR)
         shell('sudo rsync --delete -rav %s/../client/*          /opt/openpi3dscan/client/ ' % SCRIPT_DIR)
         shell('sudo rsync --delete -rav %s/../realityCapture/*  /opt/openpi3dscan/realityCapture/ ' % SCRIPT_DIR)
 
         for imgzippath in glob.glob("%s/../firmware/*.img.zip" % SCRIPT_DIR):
-            imgfile = imgzippath.split("/")[-1].replace(".zip","")
+            imgfile = imgzippath.split("/")[-1].replace(".zip", "")
             if not os.path.exists("/opt/openpi3dscan/firmware/%s" % imgfile):
-                shell("cp '%s' /opt/openpi3dscan/firmware/ " % (imgzippath))
+                shell("cp '%s' /opt/openpi3dscan/firmware/ " % imgzippath)
                 shell("cd /opt/openpi3dscan/firmware/ ; unzip '%s.zip' ; rm '%s.zip'" % (imgfile, imgfile))
 
     # LISTEN ON ALL IPS, PORT 80
@@ -51,7 +52,7 @@ if __name__ == "__main__":
         hostname = "openpi3dscan"
 
     # HOSTNAME
-    open("/tmp/1","w").write("%s\n" % hostname)
+    open("/tmp/1", "w").write("%s\n" % hostname)
     shell("sudo mv /tmp/1 /etc/hostname")
     shell("cat /etc/hosts | grep -v '192.168.99.' | grep -v localhost | grep -v raspberrypi | grep -v openpi3dscan > 1")
     shell("echo '192.168.99.254   openpi3dscan' >> 1")
@@ -63,9 +64,9 @@ if __name__ == "__main__":
     shell("cat /etc/dhcpcd.conf | grep -v '#openPi3dScan'  > /tmp/1")
     s  = '\ninterface eth0 #openPi3dScan \n'
     s  += 'static ip_address=192.168.99.254/24 #openPi3dScan \n'
-    #s  += 'static routers=192.168.99.254 #openPi3dScan \n'
+    # s  += 'static routers=192.168.99.254 #openPi3dScan \n'
     s  += 'static domain_name_servers=8.8.8.8 #openPi3dScan'
-    open("/tmp/1","a").write(s)
+    open("/tmp/1", "a").write(s)
     shell("sudo mv /tmp/1 /etc/dhcpcd.conf")
 
     # DHCPD
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     s += 'domain-needed   \n'
     s += 'bogus-priv      \n'
     s += 'dhcp-range=192.168.99.2,192.168.2.64,96h \n'
-    open("/tmp/1","w").write(s)
+    open("/tmp/1", "w").write(s)
     shell("sudo mv /tmp/1 /etc/dnsmasq.conf")
 
     # NTP

@@ -7,7 +7,6 @@ from pyhtmlgui import PyHtmlView
 from views.sidebar.shotsView import ShotsView
 
 
-
 class SidebarView(PyHtmlView):
     DOM_ELEMENT_CLASS = "Sidebar col-md-3"
     TEMPLATE_STR = '''

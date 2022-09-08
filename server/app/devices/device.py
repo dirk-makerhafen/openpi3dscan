@@ -17,6 +17,7 @@ from .device_Projector import Projector
 SSH_OPTIONS = '-q -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -oPubkeyAuthentication=no'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+
 class Device(Observable):
     def __init__(self):
         super().__init__()
@@ -40,7 +41,6 @@ class Device(Observable):
         # shutdown  -> after shutdown has been called successfuly
         # installing -> installing client
         # rebooting  -> reboot triggered
-
 
         self.latest_heartbeat_time = 0
         self.disksize = -1
@@ -76,18 +76,18 @@ class Device(Observable):
         if result is None:
             self.notify_observers()
             return
-        if result.find("TYPE") != -1:# our config exists
-            self.device_id   = result.split("ID", 1)[1].split("=", 1)[1].split("\n")[0].strip()
-            self.device_type = result.split("TYPE",1)[1].split("=",1)[1].split("\n")[0].strip()
-            self.name = result.split("NAME",1)[1].split("=",1)[1].split("\n")[0].strip()
-        elif result.lower().find("no such file or") != -1: # our config does not exist
+        if result.find("TYPE") != -1:  # our config exists
+            self.device_id = result.split("ID", 1)[1].split("=", 1)[1].split("\n")[0].strip()
+            self.device_type = result.split("TYPE", 1)[1].split("=", 1)[1].split("\n")[0].strip()
+            self.name = result.split("NAME", 1)[1].split("=", 1)[1].split("\n")[0].strip()
+        elif result.lower().find("no such file or") != -1:  # our config does not exist
             self.name = ""
             legacy_id = self._ssh("cat /boot/id.txt", timeout=15)
             try:
                 legacy_id = int(legacy_id)
             except:
                 legacy_id = "no such file"
-            if legacy_id.lower().find("no such file") != -1: # legacy config does not exist
+            if legacy_id.lower().find("no such file") != -1:  # legacy config does not exist
                 self.device_id = ""
                 self.device_type = "device"
             else:
@@ -103,13 +103,12 @@ class Device(Observable):
                     self.name = "P%s" % self.device_id
         self.notify_observers()
 
-
     def deploy(self):
         self.task_queue.put(self._deploy)
 
     def _deploy(self):
         self._set_status("installing")
-        client_dir = os.path.join(SCRIPT_DIR, "..","..","..","client")
+        client_dir = os.path.join(SCRIPT_DIR, "..", "..", "..", "client")
         self._ssh_exec('scp -r %s "%s" %s@%s:/home/%s/' % (SSH_OPTIONS, client_dir, self.username, self.ip, self.username), 60)
         self._ssh('cd /home/%s/client ; python3 install.py "%s" "%s" "%s" "install_after_reboot"' % (self.username, self.device_id, self.device_type, self.name), timeout=1200)
         self.latest_heartbeat_time = 0
@@ -122,7 +121,7 @@ class Device(Observable):
     def _reboot(self):
         self._set_status("reboot")
         try:
-            r = self.api_request("/reboot")
+            self.api_request("/reboot")
         except:
             self._ssh('sudo reboot & ', timeout=10)
 
@@ -132,7 +131,7 @@ class Device(Observable):
     def _shutdown(self):
         self._set_status("shutdown")
         try:
-            r = self.api_request("/shutdown")
+            self.api_request("/shutdown")
         except:
             print("shutdown via sshd")
             self._ssh("sudo shutdown -h now &", timeout=10)
@@ -160,10 +159,6 @@ class Device(Observable):
         except:
             result = None
 
-        if result is None:
-            self.online = False
-        else:
-            self.online = True
         return result
 
     def _task_thread(self):
@@ -177,7 +172,7 @@ class Device(Observable):
                 else:
                     task()
             except Exception as e:
-                print("failed to execute task", task,e)
+                print("failed to execute task", task, e)
 
     def _ssh(self, cmd, timeout=120):
         ssh_cmd = 'ssh %s@%s %s "%s"' % (self.username, self.ip, SSH_OPTIONS, cmd)
@@ -194,18 +189,18 @@ class Device(Observable):
         try:
             child.expect(pexpect.EOF)
         except Exception as e:
-            print("EOF FAILED")
+            print("EOF FAILED", e)
             return None
         finally:
             child.close()
         return child.logfile.getvalue()
 
     def wait_locked(self):
-        while self.busy_until > time.time(): gevent.sleep(0.2)
+        while self.busy_until > time.time():
+            gevent.sleep(0.2)
 
     def lock(self, seconds):
         self.busy_until = time.time() + seconds
 
     def unlock(self):
         self.busy_until = 0
-

@@ -14,7 +14,6 @@ class Task_UpdateClients(Observable):
         self.percent_done = 0
         self.worker = None
 
-
     def set_status(self, value):
         self.status = value
         self.notify_observers()
@@ -53,6 +52,8 @@ class Task_UpdateClients(Observable):
         
         
 _taskUpdateClientsInstance = None
+
+
 def TaskUpdateClientsInstance():
     global _taskUpdateClientsInstance
     if _taskUpdateClientsInstance is None:

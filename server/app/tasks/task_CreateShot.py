@@ -4,12 +4,11 @@ import re
 import threading
 import time
 import random
-
 from pyhtmlgui import Observable
-
 from app.devices.devices import DevicesInstance
 from app.shots import ShotsInstance
 from app.settings.settings import SettingsInstance
+
 
 class Task_CreateShot(Observable):
     def __init__(self):
@@ -20,14 +19,13 @@ class Task_CreateShot(Observable):
         self.processed_percent = 0
         self.worker = None
 
-
     def set_status(self, value):
         self.status = value
         self.notify_observers()
 
     def run(self, shot_name, shot_quality):
         if self.worker is None:
-            self.worker = threading.Thread(target=self._run, daemon=True, args=[ shot_name, shot_quality])
+            self.worker = threading.Thread(target=self._run, daemon=True, args=[shot_name, shot_quality])
             self.worker.start()
 
     def _run(self, shot_name, shot_quality):
@@ -57,7 +55,7 @@ class Task_CreateShot(Observable):
         print("new shot: id:", shot_id, shot_name)
         random.shuffle(cameras)
         for device in cameras:
-            device.lock(6) # lock early to prevent previews and other querys to camera
+            device.lock(6)  # lock early to prevent previews and other querys to camera
 
         shot = ShotsInstance().create(shot_id, shot_name)
 
@@ -68,7 +66,7 @@ class Task_CreateShot(Observable):
             image_aquisition_time = 1.0 / 9.0
             seqs = SettingsInstance().sequenceSettingsSpeed
 
-        global_start_time =  time.time() + seqs.startup_delay + image_aquisition_time*2
+        global_start_time = time.time() + seqs.startup_delay + image_aquisition_time*2
         global_start_time = global_start_time - (global_start_time % image_aquisition_time)
 
         shot1_start_time = global_start_time
@@ -76,16 +74,16 @@ class Task_CreateShot(Observable):
         shot2_start_time = shot1_end_time + (seqs.image_delay * image_aquisition_time)
         shot2_end_time   = shot2_start_time + image_aquisition_time
 
-        light_sequence = []
-        light_sequence.append([ shot1_start_time + seqs.image1.offset/1000 , seqs.image1.light   ])
-        light_sequence.append([ shot2_start_time + seqs.image2.offset/1000 , seqs.image2.light   ])
-        light_sequence.append([ shot2_end_time + image_aquisition_time     , -1                  ])
-
-        projector_sequence = []
-        projector_sequence.append([ shot1_start_time + seqs.image1.offset/1000 , "enable" if seqs.image1.projection is True else "disable" ])
-        projector_sequence.append([ shot2_start_time + seqs.image2.offset/1000 , "enable" if seqs.image2.projection is True else "disable" ])
-        projector_sequence.append([ shot2_end_time   + image_aquisition_time   , "default"                                                 ])
-
+        light_sequence = [
+            [shot1_start_time + seqs.image1.offset/1000 , seqs.image1.light ],
+            [shot2_start_time + seqs.image2.offset/1000 , seqs.image2.light ],
+            [shot2_end_time + image_aquisition_time     , -1                ],
+        ]
+        projector_sequence = [
+            [shot1_start_time + seqs.image1.offset/1000 , "enable" if seqs.image1.projection is True else "disable" ],
+            [shot2_start_time + seqs.image2.offset/1000 , "enable" if seqs.image2.projection is True else "disable" ],
+            [shot2_end_time   + image_aquisition_time   , "default"                                                 ]
+        ]
         for device in projectors:
             device.projector.sequence(projector_sequence)
 
@@ -126,18 +124,21 @@ class Task_CreateShot(Observable):
     def _clean_name(self, name):
         if name != "":
             name = name.replace("ä", "ae").replace("ü", "ue").replace("Ü", "Ue")
-            name = name.replace("ö", "oe").replace("Ä","Ae").replace("Ö", "Oe")
-            name = re.sub('\s+', ' ', name )
+            name = name.replace("ö", "oe").replace("Ä", "Ae").replace("Ö", "Oe")
+            name = re.sub('\s+', ' ', name)
             name = re.sub('[^A-Za-z0-9_. ]+', '', name)
-            name = name.replace("..",".").replace("__","_").replace("  "," ")
+            name = name.replace("..", ".").replace("__", "_").replace("  ", " ")
             name = name.strip()
-            while name[-1] in ["_","."]:
+            while name[-1] in ["_", "."]:
                 name = name[:-1].strip()
-            while name[0] in ["_","."]:
+            while name[0] in ["_", "."]:
                 name = name[1:].strip()
         return name
 
+
 _taskCreateShotInstance = None
+
+
 def TaskCreateShotInstance():
     global _taskCreateShotInstance
     if _taskCreateShotInstance is None:

@@ -8,13 +8,13 @@ from app.devices.devices import DevicesInstance
 from app.settings.settings import SettingsInstance
 from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
 
+
 class Task_Whitebalance(Observable):
     def __init__(self):
         super().__init__()
         self.name = "Whitebalance"
         self.status = "idle"
         self.worker = None
-
 
     def set_status(self, value):
         self.status = value
@@ -40,9 +40,9 @@ class Task_Whitebalance(Observable):
         # set awb_mode to selected mode
 
         for device in cameras:
-            device.camera.settings.locked = True # prevent changes of settings by heartbeat
-            PreviewQueueInstance().get_image(device_id=device.device_id)# trigger pll in case cameras are in sleep
-        time.sleep(5) # wait for heartbeat queue to empty
+            device.camera.settings.locked = True  # prevent changes of settings by heartbeat
+            PreviewQueueInstance().get_image(device_id=device.device_id)  # trigger pll in case cameras are in sleep
+        time.sleep(5)  # wait for heartbeat queue to empty
 
         for device in cameras:
             device.camera.settings.set_awb_mode(SettingsInstance().cameraSettings.awb_mode)
@@ -58,7 +58,7 @@ class Task_Whitebalance(Observable):
             if device.name.endswith("CAM6") or device.name.endswith("CAM5") or device.name.endswith("CAM4"):
                 awb_gains.append(device.camera.settings.awb_gains)
 
-        awb_gains = [g for g in awb_gains if g != None and g[0] != 0]
+        awb_gains = [g for g in awb_gains if g is not None and g[0] != 0]
 
         # average awb_gains
         avg_awb_gains = [
@@ -81,6 +81,8 @@ class Task_Whitebalance(Observable):
         
         
 _taskWhitebalanceInstance = None
+
+
 def TaskWhitebalanceInstance():
     global _taskWhitebalanceInstance
     if _taskWhitebalanceInstance is None:

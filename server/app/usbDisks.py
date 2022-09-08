@@ -1,7 +1,7 @@
 import os
 import subprocess
 import threading
-
+import time
 from pyhtmlgui import Observable
 
 from app.shots import ShotsInstance
@@ -20,7 +20,7 @@ class UsbDisk(Observable):
 
     def mount(self):
         try:
-            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.NAME,), shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.NAME,), shell=True, timeout=60, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
         self.get_diskspace()
@@ -54,7 +54,15 @@ class UsbDisks(Observable):
         self.disks = []
         self.load_worker = None
         self.status="idle"
-        self._load()
+        for i in range(5):
+            self._load()
+            try:
+                stdout = subprocess.check_output('mount', shell=True, timeout=20, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            except:
+                stdout = ""
+            if "/shots" in stdout:
+                break
+            time.sleep(10)
 
     def set_status(self, status):
         self.status = status
@@ -79,7 +87,7 @@ class UsbDisks(Observable):
     def _load(self):
         self.set_status("reload")
         try:
-            stdout = subprocess.check_output('lsblk -fp | grep -i /dev/sd | grep -v EFI | grep -v boot | grep -i fat', shell=True, timeout=20, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output('lsblk -fp | grep -i /dev/sd | grep -v EFI | grep -v boot | grep -i fat', shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
 

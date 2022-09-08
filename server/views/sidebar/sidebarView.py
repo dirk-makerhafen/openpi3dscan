@@ -11,13 +11,13 @@ class SidebarView(PyHtmlView):
     DOM_ELEMENT_CLASS = "Sidebar col-md-3"
     TEMPLATE_STR = '''
     <div class="row menu">
-        <div class="col-md-12 item {% if pyview.parent.current_view == pyview.parent.settings %} selected {% endif %}" onclick='pyview.show_settings();'>
+        <div class="col-md-12 item {% if pyview.parent.currentView.current_view == pyview.parent.settingsView %} selected {% endif %}" onclick='pyview.show_settings();'>
             Settings
         </div>
-        <div class="col-md-12 item {% if pyview.parent.current_view == pyview.parent.devices %} selected {% endif %}" onclick='pyview.show_devices();'>
+        <div class="col-md-12 item {% if pyview.parent.currentView.current_view == pyview.parent.devicesView %} selected {% endif %}" onclick='pyview.show_devices();'>
             Devices
         </div>
-        <div class="col-md-12 item {% if pyview.parent.current_view == pyview.parent.liveView %} selected {% endif %}" onclick='pyview.show_liveview();'>
+        <div class="col-md-12 item {% if pyview.parent.currentView.current_view == pyview.parent.liveView %} selected {% endif %}" onclick='pyview.show_liveview();'>
            Live
         </div>
         <div class="col-md-12 item" style="height:3px"'>

@@ -218,10 +218,10 @@ class Shot(Observable):
                         folder_name = "preview_images"
                     img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device.device_id)
                     if img_path not in existing_images:
-                        tasks.append([device, [self.shot_id, image_type, image_mode]])
+                        tasks.append([device, [self.shot_id, image_type, image_mode, False]])
         if len(tasks) > 0:
             random.shuffle(tasks)
-            with ThreadPool(min([4,len(tasks)])) as p:
+            with ThreadPool(min([5,len(tasks)])) as p:
                 p.map(lambda task: task[0].camera.shots.download(*task[1]), tasks)
             p.join()
             self.count_number_of_files()
@@ -294,7 +294,7 @@ class Shot(Observable):
             f.write(image_data)
             if image_mode == "normal":
                 self.nr_of_files += 1
-            self.notify_observers()
+                self.notify_observers()
 
     def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from = "projection", create_textures = False):
         self.create_folders()

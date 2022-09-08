@@ -223,7 +223,7 @@ class CameraShots:
         return True
 
     # image_mode = normal | preview, image_type = normal | projection
-    def download(self, shot_id, image_type, image_mode):
+    def download(self, shot_id, image_type, image_mode, return_image=True):
         # "/shot/<shot_id>/<image_mode>/<image_type>.jpg
         self.camera.device.wait_locked()
         self.camera.device.lock(5)
@@ -237,6 +237,8 @@ class CameraShots:
         if len(data) < 10000:
             return None
         ShotsInstance().get(shot_id).add_image(image_type, image_mode, self.camera.device.device_id,data)
+        if return_image is False:
+            return None
         return data
 
     def _refresh_list(self):

@@ -59,7 +59,7 @@ class SidebarView(PyHtmlView):
             self.buttonsView.update()
 
     def show_shot(self, shot):
-        if self.parent.show_shotView(shot)  is True:
+        if self.parent.show_shotView(shot) is True:
             self.buttonsView.update()
 
     def search(self, value):

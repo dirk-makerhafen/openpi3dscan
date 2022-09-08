@@ -99,8 +99,11 @@ class UsbDisks(Observable):
                 if len(line) < 5:
                     continue
                 NAME, FSTYPE, FSVER, LABEL, UUID, REST = line.split(" ",5)
-                if self.get_disk_by_uid(UUID) is None:
+                disk = self.get_disk_by_uid(UUID)
+                if disk is None:
                     self.disks.append(UsbDisk(NAME, FSTYPE, FSVER, LABEL, UUID))
+                else:
+                    disk.get_diskspace()
             except Exception as e:
                 print(e)
         toremove = []

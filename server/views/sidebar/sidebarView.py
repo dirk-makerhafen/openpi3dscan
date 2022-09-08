@@ -7,23 +7,28 @@ from pyhtmlgui import PyHtmlView
 from views.sidebar.shotsView import ShotsView
 
 
-class SidebarView(PyHtmlView):
-    DOM_ELEMENT_CLASS = "Sidebar col-md-3"
+
+class SidebarButtonsView(PyHtmlView):
+    DOM_ELEMENT_CLASS = "row menu"
     TEMPLATE_STR = '''
-    <div class="row menu">
-        <div class="col-md-12 item {% if pyview.parent.currentView.current_view == pyview.parent.settingsView %} selected {% endif %}" onclick='pyview.show_settings();'>
+        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.settingsView %} selected {% endif %}" onclick='pyview.show_settings();'>
             Settings
         </div>
-        <div class="col-md-12 item {% if pyview.parent.currentView.current_view == pyview.parent.devicesView %} selected {% endif %}" onclick='pyview.show_devices();'>
+        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.devicesView %} selected {% endif %}" onclick='pyview.show_devices();'>
             Devices
         </div>
-        <div class="col-md-12 item {% if pyview.parent.currentView.current_view == pyview.parent.liveView %} selected {% endif %}" onclick='pyview.show_liveview();'>
+        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.liveView %} selected {% endif %}" onclick='pyview.show_liveview();'>
            Live
         </div>
         <div class="col-md-12 item" style="height:3px"'>
-        </div>
-    </div>
-   
+        </div> 
+    '''
+
+class SidebarView(PyHtmlView):
+    DOM_ELEMENT_CLASS = "Sidebar col-md-3"
+    TEMPLATE_STR = '''
+
+    {{pyview.buttonsView.render()}}
     {{pyview.shotsView.render()}}
     <div class="row" style="overflow-y:scroll;position: absolute;bottom: 0px; width: 100%;">
         <div class="col-md-12" style="padding-right: 0px;">
@@ -35,22 +40,27 @@ class SidebarView(PyHtmlView):
     def __init__(self, subject: App, parent: AppView):
         super().__init__(subject, parent)
         self.shotsView = ShotsView(subject=subject.shots_remote.shots, parent=self)
+        self.buttonsView = SidebarButtonsView(subject=subject, parent=self)
         self.current_search = ""
 
     def show_devices(self):
         self.shotsView.select_shot(None)
-        self.parent.show_devicesView()
+        if self.parent.show_devicesView() is True:
+            self.buttonsView.update()
 
     def show_settings(self):
         self.shotsView.select_shot(None)
-        self.parent.show_settingsView()
+        if self.parent.show_settingsView() is True:
+            self.buttonsView.update()
 
     def show_liveview(self):
         self.shotsView.select_shot(None)
-        self.parent.show_liveView()
+        if self.parent.show_liveView() is True:
+            self.buttonsView.update()
 
     def show_shot(self, shot):
-        self.parent.show_shotView(shot)
+        if self.parent.show_shotView(shot)  is True:
+            self.buttonsView.update()
 
     def search(self, value):
         self.current_search = value

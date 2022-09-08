@@ -20,6 +20,8 @@ class CurrentView(PyHtmlView):
         if self.current_view != new_view:
             self.current_view = new_view
             self.update()
+            return True
+        return False
 
 class AppView(PyHtmlView):
     DOM_ELEMENT_CLASS = "AppView container"
@@ -58,15 +60,15 @@ class AppView(PyHtmlView):
         self.currentView = CurrentView(subject, self, self.devicesView)
 
     def show_devicesView(self):
-        self.currentView.set_view(self.devicesView)
+        return self.currentView.set_view(self.devicesView)
 
     def show_settingsView(self):
-        self.currentView.set_view(self.settingsView)
+        return self.currentView.set_view(self.settingsView)
 
     def show_liveView(self):
-        self.currentView.set_view(self.liveView)
+        return self.currentView.set_view(self.liveView)
 
     def show_shotView(self, shot):
         self.shotView.show_shot(shot)
-        self.currentView.set_view(self.shotView)
+        return self.currentView.set_view(self.shotView)
 

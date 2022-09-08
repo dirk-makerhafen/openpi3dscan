@@ -192,7 +192,8 @@ class HttpEndpoints:
         return response
 
     def force_update(self):
-        output = ""
+        output = "Update and system reboot triggered, this will take 2-3 minutes!\n\n"
+        output += "UPDATE LOG:\n"
         if os.path.exists("/home/pi/openpi3dscan"):
             output += subprocess.check_output("cd /home/pi/openpi3dscan ; sudo git reset --hard ; sudo git clean -f -d ; sudo git pull", shell=True,stderr=subprocess.STDOUT).decode("utf-8")
         else:
@@ -203,4 +204,4 @@ class HttpEndpoints:
             time.sleep(5)
             os.system("sudo reboot &")
         threading.Thread(target=f, daemon=True).run()
-        return output
+        return bottle.HTTPResponse(output)

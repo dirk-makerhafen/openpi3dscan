@@ -135,10 +135,11 @@ class HttpEndpoints:
         image = shot.get_image(image_type, image_mode, device_id)
         if image is None:
             return bottle.HTTPResponse(status=503)
-        response = bottle.HTTPResponse(image)
-        response.set_header('Content-type', 'image/jpeg')
-        response.set_header("Cache-Control", "public, max-age=3600")
-        return response
+        headers = {
+            'Content-Type': "image/jpeg",
+            'Cache-Control': "public, max-age=36000"
+        }
+        return bottle.HTTPResponse(image, **headers)
 
     def download_windows_pack(self):
         files = glob.glob("/opt/openpi3dscan/realityCapture/*.*")
@@ -186,9 +187,11 @@ class HttpEndpoints:
         return "OK"
 
     def _live(self, device_id):
-        response = bottle.HTTPResponse(PreviewQueueInstance().get_image(device_id))
-        response.set_header('Content-type', 'image/jpeg')
-        response.set_header("Cache-Control", "public, max-age=0")
+        headers = {
+            'Content-Type': "image/jpeg",
+            'Cache-Control': "public, max-age=0"
+        }
+        response = bottle.HTTPResponse(PreviewQueueInstance().get_image(device_id), **headers)
         return response
 
     def force_update(self):
@@ -204,4 +207,8 @@ class HttpEndpoints:
             time.sleep(5)
             os.system("sudo reboot &")
         threading.Thread(target=f, daemon=True).run()
-        return bottle.HTTPResponse(output)
+        headers = {
+            'Content-Type': "text/plain ; charset=UTF-8",
+            'Cache-Control': "public, max-age=0"
+        }
+        return bottle.HTTPResponse(output, **headers)

@@ -16,7 +16,7 @@ from app.devices.devices import DevicesInstance
 from app.shots import ShotsInstance
 from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
 
-bottle.BaseRequest.MEMFILE_MAX = 250 * 1024 * 1024
+bottle.BaseRequest.MEMFILE_MAX = 800 * 1024 * 1024
 
 
 class DownloadStreamer:

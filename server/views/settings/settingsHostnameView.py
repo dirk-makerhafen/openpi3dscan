@@ -34,7 +34,6 @@ class HostnameSettingsView(PyHtmlView):
                                 </div>
                             </div>
                         </div>    
-
                     </div>
                 </div>   
             </div>

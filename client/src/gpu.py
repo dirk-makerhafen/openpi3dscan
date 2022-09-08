@@ -21,7 +21,6 @@ class Resize_YUV():
         self.output = None
 
 
-
     def _callback(self, port, buf):
         finished = bool(buf.flags & mmal.MMAL_BUFFER_HEADER_FLAG_FRAME_END)
         if finished is True:

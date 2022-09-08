@@ -7,10 +7,9 @@ import random
 
 from pyhtmlgui import Observable
 
-from .task import Task
 from app.devices.devices import DevicesInstance
 from app.shots import ShotsInstance
-from settings import SettingsInstance
+from app.settings.settings import SettingsInstance
 
 class Task_CreateShot(Observable):
     def __init__(self):

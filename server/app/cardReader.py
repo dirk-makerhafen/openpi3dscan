@@ -4,7 +4,7 @@ import subprocess
 import threading
 
 from pyhtmlgui import ObservableDict, Observable
-from settings import SettingsInstance
+from app.settings.settings import SettingsInstance
 
 
 def shell(cmd):

@@ -1,12 +1,11 @@
 import threading
-import time
 from multiprocessing.pool import ThreadPool
 
 from pyhtmlgui import Observable
 
 from app.devices.devices import DevicesInstance
 from app.shots import ShotsInstance
-from settings import SettingsInstance
+
 
 class Task_SyncShots(Observable):
     def __init__(self):

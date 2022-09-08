@@ -1,15 +1,11 @@
 import subprocess
 import threading
 import time
-from multiprocessing.pool import ThreadPool
-import random
 from pyhtmlgui import Observable
 import os
 
 from app.app import AppInstance
-from app.devices.devices import DevicesInstance
-from settings import SettingsInstance
-from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
+
 
 class Task_UpdateServer(Observable):
     def __init__(self):

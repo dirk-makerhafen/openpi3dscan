@@ -5,18 +5,18 @@ from app.tasks.tasks import TasksInstance
 from app.cardReader import CardReaderInstance
 from app.usbDisks import UsbDisks
 import os
-from settings import SettingsInstance
+from app.settings.settings import SettingsInstance
 
 class App(Observable):
     def __init__(self):
         super().__init__()
         self.status = "active"
         self.devices = DevicesInstance()
+        self.settings = SettingsInstance(DevicesInstance())
         self.shots_remote = ShotsInstance(self.devices)
         self.usbDisks = UsbDisks()
         self.tasks = TasksInstance()
         self.cardReader = CardReaderInstance()
-        self.settings = SettingsInstance(DevicesInstance())
 
     def reboot(self):
         self.status = "reboot"

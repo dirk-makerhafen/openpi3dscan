@@ -8,7 +8,7 @@ from .device import Device
 from .devices_Cameras import Cameras
 from .devices_Lights import Lights
 from .devices_Projectors import Projectors
-from settings import SettingsInstance
+from app.settings.settings import SettingsInstance
 
 class Devices(Observable):
     def __init__(self):

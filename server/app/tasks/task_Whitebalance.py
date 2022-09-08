@@ -5,7 +5,7 @@ import random
 from pyhtmlgui import Observable
 
 from app.devices.devices import DevicesInstance
-from settings import SettingsInstance
+from app.settings.settings import SettingsInstance
 from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
 
 class Task_Whitebalance(Observable):

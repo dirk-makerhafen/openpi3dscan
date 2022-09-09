@@ -94,7 +94,7 @@ box_rcbox = '''
 <ReconstructionRegion globalCoordinateSystem="NONE" globalCoordinateSystemWkt="NONE" globalCoordinateSystemName="NONE"
    isGeoreferenced="0" isLatLon="0" yawPitchRoll="0 -0 -0" widthHeightDepth="%s %s %s">
   <Header magic="5395016" version="2"/>
-  <CentreEuclid centre="0 0 1.25"/>
+  <CentreEuclid centre="0 0 %s"/>
   <Residual R="1 0 0 0 1 0 0 0 1" t="0 0 0" s="1" ownerId="{65DB1F2C-807B-4520-937D-FB2D78C646D9}"/>
 </ReconstructionRegion>
 '''
@@ -354,7 +354,7 @@ class RealityCapture():
         with open(os.path.join(self.source_folder, "DetectMarkersParams.xml"), "w") as f:
             f.write(DetectMarkersParams_xml)
         with open(os.path.join(self.source_folder, "box.rcbox"), "w") as f:
-            f.write(box_rcbox  % (round(BOX_DIMENSIONS[0], 2), round(BOX_DIMENSIONS[1], 2), round(BOX_DIMENSIONS[2], 2)))
+            f.write(box_rcbox  % (round(BOX_DIMENSIONS[0], 2), round(BOX_DIMENSIONS[1], 2), round(BOX_DIMENSIONS[2], 2), round(BOX_DIMENSIONS[2]/2, 2)))
         with open(os.path.join(self.source_folder, "exportRegistrationSettings.xml"), "w") as f:
             f.write(ExportRegistrationSettings_xml)
         with open(os.path.join(self.source_folder, "xmp_settings.xml"), "w") as f:

@@ -169,12 +169,16 @@ class CameraSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Set whitebalance gains for cameras, or ckick <i>Balance</i> to select automatically.</p>
                             </div>
                             <div class="col-md-2">{{pyview.whitebalance_view.render()}}</div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <div class="custom-control custom-switch">
+                                    <p style="color:red" >red</p>
                                     <input id="awb_gain_red" type="number" step="0.01" value="{{pyview.subject.awb_gains[0]}}" onchange='pyview._set_awb_gain_red($("#awb_gain_red").val())'>
-                                    <lable class="custom-control-label" style="color:red" for="awb_gain_red">red</lable>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <p style="color:blue" >blue</p>
                                     <input id="awb_gain_blue" type="number" step="0.01" value="{{pyview.subject.awb_gains[1]}}" onchange='pyview._set_awb_gain_blue($("#awb_gain_blue").val())'>
-                                    <lable class="custom-control-label" style="color:blue" for="awb_gain_blue">blue</lable>
                                 </div>
                             </div>
                         </div>

@@ -171,9 +171,9 @@ class CameraSettingsView(PyHtmlView):
                             <div class="col-md-2">{{pyview.whitebalance_view.render()}}</div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
-                                    <input id="awb_gain_red" type=number value="{{pyview.subject.awb_gains[0]}}" onchange='pyview._set_awb_gain_red($("#awb_gain_red").val())'>
+                                    <input id="awb_gain_red" type="number" step="0.01" value="{{pyview.subject.awb_gains[0]}}" onchange='pyview._set_awb_gain_red($("#awb_gain_red").val())'>
                                     <lable class="custom-control-label" style="color:red" for="awb_gain_red">red</lable>
-                                    <input id="awb_gain_blue" type=number value="{{pyview.subject.awb_gains[1]}}" onchange='pyview._set_awb_gain_blue($("#awb_gain_blue").val())'>
+                                    <input id="awb_gain_blue" type="number" step="0.01" value="{{pyview.subject.awb_gains[1]}}" onchange='pyview._set_awb_gain_blue($("#awb_gain_blue").val())'>
                                     <lable class="custom-control-label" style="color:blue" for="awb_gain_blue">blue</lable>
                                 </div>
                             </div>

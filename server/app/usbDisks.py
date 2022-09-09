@@ -23,6 +23,7 @@ class UsbDisk(Observable):
             stdout = subprocess.check_output("sudo mount '%s' '/shots'" % (self.name,), shell=True, timeout=60, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
+        time.sleep(5)
         self.get_diskspace()
 
     def umount(self):
@@ -78,6 +79,9 @@ class UsbDisks(Observable):
             if len(self.disks) > 0:
                 self.disks[0].mount()
                 ShotsInstance().load_shots_from_disk()
+        else:
+            if len(self.disks) > 0:
+                self.disks[0].get_diskspace()
         self.notify_observers()
 
     def load(self):
@@ -103,8 +107,7 @@ class UsbDisks(Observable):
                 disk = self.get_disk_by_uid(uuid)
                 if disk is None:
                     self.disks.append(UsbDisk(name, fstype, fsver, label, uuid))
-                else:
-                    disk.get_diskspace()
+
             except Exception as e:
                 print(e)
         toremove = []

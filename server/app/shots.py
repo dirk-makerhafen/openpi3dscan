@@ -24,7 +24,7 @@ class ModelFile(Observable):
         self.model_id = "%s" % uuid.uuid4()
         self.status = "waiting"  # ready, failed
         self.filetype = filetype  # "obj", obj, 3mf, stl
-        self.reconstruction_quality = reconstruction_quality  # normal, high,
+        self.reconstruction_quality = reconstruction_quality  # preview, normal, high,
         self.quality = quality   # "high", normal, low
         self.create_mesh_from = create_mesh_from  # normal, projection, all
         self.filename = ""

@@ -55,6 +55,7 @@ class ShotFilesView(PyHtmlView):
                             <select name="reconstruction_quality" id="reconstruction_quality">
                               <option value="high">High</option>
                               <option value="normal">Normal</option>
+                              <option value="preview">Preview</option>
                             </select>                            
                         </td>
                         <td>

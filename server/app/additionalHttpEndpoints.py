@@ -15,6 +15,7 @@ import zipstream
 from bottle import request
 
 from app.devices.devices import DevicesInstance
+from app.settings.settings import SettingsInstance
 from app.shots import ShotsInstance
 from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
 
@@ -73,7 +74,6 @@ class HttpEndpoints:
         self.gui = gui
         # image_mode = normal | preview, image_type = normal | projection
         bottle.route("/shots/list")(self._shot_list)
-        bottle.route("/shots/list/unprocessed")(self._shot_list_unprocessed)
         bottle.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
         bottle.route("/shots/<shot_id>/upload/<model_id>", method="POST")(self._shot_upload_model)
         bottle.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
@@ -84,15 +84,23 @@ class HttpEndpoints:
         bottle.route("/heartbeat", method="POST")(self._heartbeat)
         bottle.route("/windows_pack.zip")(self.download_windows_pack)
         bottle.route("/force_update")(self.force_update)
+        bottle.route("/realityCaptureProcess")(self.realityCaptureProcess)
 
-    def _shot_list_unprocessed(self):
-        data = []
-        for model in ShotsInstance().get_unprocessed_models():
+    def realityCaptureProcess(self):
+        data = {
+            "models" : [],
+            "markers" : "",
+        }
+        for model in ShotsInstance().get_unprocessed_models()[:1]:
             shot = model.parentShot
             model = model.to_dict()
             model["shot_id"] = shot.shot_id
             model["shot_name"] = shot.name
-            data.append(model)
+            data["models"].append(model)
+        if len(data["models"]) > 0:
+            data["markers"] = SettingsInstance().realityCaptureSettings.markers
+            dia = SettingsInstance().realityCaptureSettings.diameter
+            data["box_dimensions"] = [dia, dia, SettingsInstance().realityCaptureSettings.height]
         return json.dumps(data)
 
     def _shot_list(self):

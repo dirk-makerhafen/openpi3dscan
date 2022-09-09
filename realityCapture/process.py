@@ -12,7 +12,7 @@ from multiprocessing.pool import ThreadPool
 
 
 CACHE_DIR = 'c:\shots'
-CACHE_SIZE = 50
+CACHE_SIZE = 25
 
 try:
     RCEXE = glob.glob("C:\*\Capturing Reality\RealityCapture\RealityCapture.exe")[0]
@@ -60,126 +60,33 @@ CLEAN_MISALIGNED = False
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+MARKERS = []
+DISTANCES = {}
 
-MARKERS = [
-    '1x12:011',
-    '1x12:012',
-    '1x12:013',
-    '1x12:014',
-    '1x12:015',
-    '1x12:016',
 
-    '1x12:047',
-    '1x12:048',
-    '1x12:049',
-    '1x12:04a',
-    '1x12:04b',
-    '1x12:04d',
-    '1x12:04e',
-    '1x12:04f',
-    '1x12:051',
-    '1x12:052',
-    '1x12:053',
-    '1x12:055',
-    '1x12:056',
-    '1x12:057',
-    '1x12:059',
-    '1x12:05a',
-    '1x12:05b',
-    '1x12:05c',
-    '1x12:05d',
-    '1x12:05e',
-    '1x12:05f',
-    '1x12:063',
-    '1x12:065',
-    '1x12:066',
-    '1x12:067',
-    '1x12:069',
-    '1x12:06a',
-    '1x12:06b',
-    '1x12:06c',
-    '1x12:06d',
-    '1x12:06e',
-    '1x12:06f',
-    '1x12:071',
-    '1x12:072',
-    '1x12:073',
-    '1x12:074',
-    '1x12:075',
-    '1x12:076',
-    '1x12:077',
-    '1x12:079',
-    '1x12:07a',
-    '1x12:07b',
-    '1x12:07d',
-    '1x12:07e',
-    '1x12:07f',
-    '1x12:092',
-    '1x12:093',
-    '1x12:095',
-    '1x12:096',
-    '1x12:097',
-    '1x12:099',
-    '1x12:09a',
-    '1x12:09b',
-    '1x12:09c'
-]
-
-DISTANCES = {
-    '1x12:011': {
-        '1x12:012': 0.500,
-        '1x12:013': 0.866,
-        '1x12:014': 1.000,
-        '1x12:015': 0.866,
-        '1x12:016': 0.500
-    },
-    '1x12:012': {
-        '1x12:013': 0.500,
-        '1x12:014': 0.866,
-        '1x12:015': 1.000,
-        '1x12:016': 0.866
-    },
-    '1x12:013': {
-        '1x12:014': 0.500,
-        '1x12:015': 0.866,
-        '1x12:016': 1.000
-    },
-    '1x12:014': {
-        '1x12:015': 0.500,
-        '1x12:016': 0.866
-    },
-    '1x12:015': {
-        '1x12:016': 0.500,
-    },
-    '1x12:047': { '1x12:048': 0.095, },
-    '1x12:049': { '1x12:04a': 0.095, },
-    '1x12:04b': { '1x12:04d': 0.095, },
-    '1x12:04e': { '1x12:04f': 0.095, },
-    '1x12:051': { '1x12:052': 0.095, },
-    '1x12:053': { '1x12:055': 0.095, },
-    '1x12:056': { '1x12:057': 0.095, },
-    '1x12:059': { '1x12:05a': 0.095, },
-    '1x12:05b': { '1x12:05c': 0.095, },
-    '1x12:05d': { '1x12:05e': 0.095, },
-    '1x12:05f': { '1x12:063': 0.095, },
-    '1x12:065': { '1x12:066': 0.095, },
-    '1x12:067': { '1x12:069': 0.095, },
-    '1x12:06a': { '1x12:06b': 0.095, },
-    '1x12:06c': { '1x12:06d': 0.095, },
-    '1x12:06e': { '1x12:06f': 0.095, },
-    '1x12:071': { '1x12:072': 0.095, },
-    '1x12:073': { '1x12:074': 0.095, },
-    '1x12:075': { '1x12:076': 0.095, },
-    '1x12:077': { '1x12:079': 0.095, },
-    '1x12:07a': { '1x12:07b': 0.095, },
-    '1x12:07d': { '1x12:07e': 0.095, },
-    '1x12:07f': { '1x12:092': 0.095, },
-    '1x12:093': { '1x12:095': 0.095, },
-    '1x12:096': { '1x12:097': 0.095, },
-    '1x12:099': { '1x12:09a': 0.095, },
-    '1x12:09b': { '1x12:09c': 0.095, }  
-    
-}
+def load_markers(source_string):
+    global MARKERS
+    global DISTANCES
+    MARKERS = []
+    DISTANCES = {}
+    for line in sorted(source_string.split("\n")):
+        line = line.split("#")[0].strip()
+        if " - " not in line:
+            continue
+        try:
+            m1, m2, distance = line.split(" - ")
+            m1 = m1.strip()
+            m2 = m2.strip()
+            distance = float(distance.strip())
+            MARKERS.append(m1)
+            MARKERS.append(m2)
+            if m1 not in DISTANCES:
+                DISTANCES[m1] = {}
+            DISTANCES[m1][m2] = distance
+        except:
+            pass
+    MARKERS = list(set(MARKERS))
+    print("%s Markers loaded from server" % len(MARKERS))
 
 BOX_DIMENSIONS = [1.9, 1.9, 2.5]
 
@@ -190,7 +97,7 @@ box_rcbox = '''
   <CentreEuclid centre="0 0 1.25"/>
   <Residual R="1 0 0 0 1 0 0 0 1" t="0 0 0" s="1" ownerId="{65DB1F2C-807B-4520-937D-FB2D78C646D9}"/>
 </ReconstructionRegion>
-''' % (round(BOX_DIMENSIONS[0], 2), round(BOX_DIMENSIONS[1], 2), round(BOX_DIMENSIONS[2], 2))
+'''
 DetectMarkersParams_xml = '''
 <Configuration id="{8D21413B-0848-49A9-BF6E-8EBCCA356BC7}">
   <entry key="minMarkerMeasurements" value="0x4"/>
@@ -447,7 +354,7 @@ class RealityCapture():
         with open(os.path.join(self.source_folder, "DetectMarkersParams.xml"), "w") as f:
             f.write(DetectMarkersParams_xml)
         with open(os.path.join(self.source_folder, "box.rcbox"), "w") as f:
-            f.write(box_rcbox)
+            f.write(box_rcbox  % (round(BOX_DIMENSIONS[0], 2), round(BOX_DIMENSIONS[1], 2), round(BOX_DIMENSIONS[2], 2)))
         with open(os.path.join(self.source_folder, "exportRegistrationSettings.xml"), "w") as f:
             f.write(ExportRegistrationSettings_xml)
         with open(os.path.join(self.source_folder, "xmp_settings.xml"), "w") as f:
@@ -578,8 +485,9 @@ class RealityCapture():
             cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
             cmd += '-moveReconstructionRegion "%s" "%s" "0" ' % (self.box_center_correction[0], self.box_center_correction[1])  #
             cmd += '-correctColors '
-            #cmd += '-calculatePreviewModel '
-            if self.reconstruction_quality == "high":
+            if self.reconstruction_quality == "preview":
+                cmd += '-calculatePreviewModel '
+            elif self.reconstruction_quality == "high":
                 cmd += '-calculateHighModel '
             else:
                 cmd += '-calculateNormalModel '
@@ -727,9 +635,8 @@ class RealityCapture():
 
          
     def _get_cmd_cleanup_lower_region(self):
-        offsetxy = 0.80
-        offsetxy = round(BOX_DIMENSIONS[0] / 2 + offsetxy, 2)
-        offsetz = BOX_DIMENSIONS[2] - 0.15
+        offsetxy = BOX_DIMENSIONS[0] - 0.20
+        offsetz  = BOX_DIMENSIONS[2] - 0.15
         cmd = '-moveReconstructionRegion 0 "%s" "-%s" ' % (offsetxy, offsetz)  #
         cmd += '-selectTrianglesInsideReconReg '
         cmd += '-removeSelectedTriangles '
@@ -930,8 +837,13 @@ class Downloader():
     def get_unprocessed_models(self):
         models = []
         try:
-            d = requests.get("http://%s/shots/list/unprocessed" % SERVER).text
-            models = json.loads(d)
+            d = requests.get("http://%s/realityCaptureProcess" % SERVER).text
+            data = json.loads(d)
+            models = data["models"]
+            if len(models) > 0:
+                load_markers(data["markers"])
+                global BOX_DIMENSIONS
+                BOX_DIMENSIONS = data["box_dimensions"]
         except Exception as e:
             print(e)     
         print("%s unprocessed shot ids received from server" % len(models))

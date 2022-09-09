@@ -6,8 +6,9 @@ from app.settings.settingsFirmware import SettingsFirmwareImage
 from app.settings.settingsHostname import SettingsHostname
 from app.settings.settingsSequence import SettingsSequence
 from app.settings.settingsWireless import SettingsWireless
+from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2022.09.08-22.07"
+VERSION = "2022.09.08-22.08"
 
 
 class Settings(Observable):
@@ -20,6 +21,7 @@ class Settings(Observable):
         self.firmwareSettings = SettingsFirmwareImage(self)
         self.wirelessSettings = SettingsWireless(self)
         self.hostnameSettings = SettingsHostname(self)
+        self.realityCaptureSettings = SettingsRealityCapture(self)
         self.VERSION = VERSION
         self.load()
 
@@ -30,7 +32,8 @@ class Settings(Observable):
             "cameraSettings" : self.cameraSettings.to_dict(),
             "firmwareSettings" : self.firmwareSettings.to_dict(),
             "wirelessSettings" : self.wirelessSettings.to_dict(),
-            "hostnameSettings" : self.hostnameSettings.to_dict()
+            "hostnameSettings" : self.hostnameSettings.to_dict(),
+            "realityCaptureSettings" : self.realityCaptureSettings.to_dict()
         }
         open("/opt/openpi3dscan/.openpi3dscan.json", "w").write(json.dumps(data))
 
@@ -38,14 +41,37 @@ class Settings(Observable):
         try:
             data = open("/opt/openpi3dscan/.openpi3dscan.json", "r").read()
             data = json.loads(data)
-            self.sequenceSettingsSpeed.from_dict(data["sequenceSettingsSpeed"])
-            self.sequenceSettingsQuality.from_dict(data["sequenceSettingsQuality"])
-            self.cameraSettings.from_dict(data["cameraSettings"])
-            self.firmwareSettings.from_dict(data["firmwareSettings"])
-            self.wirelessSettings.from_dict(data["wirelessSettings"])
-            self.hostnameSettings.from_dict(data["hostnameSettings"])
         except Exception as e:
             print("error loading settings:", e)
+            return
+        try:
+            self.sequenceSettingsSpeed.from_dict(data["sequenceSettingsSpeed"])
+        except:
+            pass
+        try:
+            self.sequenceSettingsQuality.from_dict(data["sequenceSettingsQuality"])
+        except:
+            pass
+        try:
+            self.cameraSettings.from_dict(data["cameraSettings"])
+        except:
+            pass
+        try:
+            self.firmwareSettings.from_dict(data["firmwareSettings"])
+        except:
+            pass
+        try:
+            self.wirelessSettings.from_dict(data["wirelessSettings"])
+        except:
+            pass
+        try:
+            self.hostnameSettings.from_dict(data["hostnameSettings"])
+        except:
+            pass
+        try:
+            self.realityCaptureSettings.from_dict(data["realityCaptureSettings"])
+        except:
+            pass
         self.save()
         self.notify_observers()
 

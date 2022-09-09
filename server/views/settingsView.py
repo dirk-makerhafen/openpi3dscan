@@ -91,7 +91,7 @@ class SettingsView(PyHtmlView):
         self.firmwareSettingsView = FirmwareSettingsView(self.subject.settings.firmwareSettings, self)
         self.wirelessSettingsView = WirelessSettingsView(self.subject.settings.wirelessSettings, self)
         self.updateServerView = TaskUpdateServerView(TaskUpdateServerInstance(), self)
-        self.realityCaptureView = RealityCaptureView(self.subject, self)
+        self.realityCaptureView = RealityCaptureView(self.subject.settings.realityCaptureSettings, self)
         self.usbStorageView = UsbStorageView(self.subject.usbDisks, self)
         self.rebootShutdownView = RebootShutdownView(self.subject, self)
         self.cardReaderView = CardReaderView(self.subject.cardReader, self)

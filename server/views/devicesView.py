@@ -103,10 +103,11 @@ class TaskNetworkscanView(PyHtmlView):
             {% if pyview.subject.status == "idle" %} 
                 <button class="btn" onclick='pyview.start_scan();'> Search Devices </button>
             {% else %}
-                {% if pyview.subject.status == "ping_scan"  %} Step 1/4 Ping scan {% endif %}
-                {% if pyview.subject.status == "api_scan"   %} Step 2/4 API scan{% endif %}
-                {% if pyview.subject.status == "inspecting" %} Step 3/4 Inspecting results{% endif %}
-                {% if pyview.subject.status == "ssh_scan"   %} Step 4/4 SSH scan {% endif %}
+                {% if pyview.subject.status == "ping_scan"  %} Step 1/5 Ping scan {% endif %}
+                {% if pyview.subject.status == "api_scan"   %} Step 2/5 API scan{% endif %}
+                {% if pyview.subject.status == "inspecting" %} Step 3/5 Inspecting results{% endif %}
+                {% if pyview.subject.status == "ssh_scan"   %} Step 4/5 SSH scan {% endif %}
+                {% if pyview.subject.status == "trigger_heartbeat" %} Step 5/5 Trigger Heartbeat {% endif %}
             {% endif %}
         </div>
     '''

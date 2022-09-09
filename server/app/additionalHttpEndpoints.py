@@ -74,6 +74,7 @@ class HttpEndpoints:
         self.gui = gui
         # image_mode = normal | preview, image_type = normal | projection
         bottle.route("/shots/list")(self._shot_list)
+        bottle.route("/shots/<shot_id>/processing/<model_id>")(self._shot_processing)
         bottle.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
         bottle.route("/shots/<shot_id>/upload/<model_id>", method="POST")(self._shot_upload_model)
         bottle.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
@@ -131,6 +132,9 @@ class HttpEndpoints:
 
     def _shot_processing_failed(self, shot_id, model_id):
         ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("failed")
+
+    def _shot_processing(self, shot_id, model_id):
+        ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("processing")
 
     def _shot_upload_model(self, shot_id, model_id):
         file = request.files.get('upload_file').file

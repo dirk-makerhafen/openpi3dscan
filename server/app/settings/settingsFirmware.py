@@ -15,8 +15,13 @@ class SettingsFirmwareImage(Observable):
 
     def set_image(self, value):
         self.current_image = value
-        if self.current_image not in self.image_files and len(self.image_files) > 0:
-            self.current_image = self.image_files[-1]
+        if self.current_image not in self.image_files:
+            if len(self.image_files) > 0:
+                self.current_image = self.image_files[-1]
+            else:
+                self.current_image = ""
+        self.save()
+        self.notify_observers()
 
     def delete_image(self, image):
         img_path = os.path.join("/opt/openpi3dscan/firmware/", image)
@@ -27,8 +32,12 @@ class SettingsFirmwareImage(Observable):
     def load(self):
         self.image_files = [f.replace("/opt/openpi3dscan/firmware/", "") for f in glob.glob("/opt/openpi3dscan/firmware/*.img")]
         self.image_files.sort()
-        if self.current_image not in self.image_files and len(self.image_files) > 0:
-            self.current_image = self.image_files[-1]
+        if self.current_image not in self.image_files:
+            if len(self.image_files) > 0:
+                self.current_image = self.image_files[-1]
+            else:
+                self.current_image = ""
+            self.save()
         self.notify_observers()
 
     def to_dict(self):

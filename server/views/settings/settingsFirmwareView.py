@@ -23,7 +23,7 @@ class FirmwareSettingsView(PyHtmlView):
                                 <div class="custom-control custom-switch">
                                     <select name="image" id="image"  onchange='pyview.subject.set_image($("#image").val())'>
                                         {% for image in pyview.subject.image_files %}
-                                            <option value="image" {% if pyview.subject.current_image == image   %}selected{%endif%}>{{image}}</option>
+                                            <option value="{{image}}" {% if pyview.subject.current_image == image   %}selected{%endif%}>{{image}}</option>
                                         {% endfor %}
                                     </select> 
                                     <span class="custom-control-label"></span>

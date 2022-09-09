@@ -81,7 +81,7 @@ class SettingsRealityCapture(Observable):
         self.notify_observers()
 
     def set_pin(self, pin):
-        self.pin = pin
+        self.pin = pin.strip()
         self.save()
         self.notify_observers()
 

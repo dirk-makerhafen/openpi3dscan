@@ -28,6 +28,19 @@ class RealityCaptureView(PyHtmlView):
                         </div>
                         <div class="list-group-item">
                             <div class="row align-items-center">
+                                <div class="col-md-10">
+                                    <strong class="mb-0">Pin</strong>
+                                    <p class="text-muted mb-0">Setup RealityCapture pin at <a target="blanc" href="https://www.capturingreality.com/my.pin">https://www.capturingreality.com/my.pin</a></p>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="custom-control custom-switch">
+                                        <input id="rc_pin" type="text" value="{{pyview.subject.pin}}" onchange='pyview.subject.set_pin($("#rc_pin").val())'>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <strong class="mb-0">Marker Distances</strong>
                                     <p class="text-muted mb-0"> Distances of markers for RealityCapture reconstruction scaling</p>
@@ -55,19 +68,6 @@ class RealityCaptureView(PyHtmlView):
                                     <div class="custom-control custom-switch">
                                         <p>Height</p>
                                         <input id="region_height" type="number" step="0.01" value="{{pyview.subject.height}}" onchange='pyview.subject.set_height($("#region_height").val())'>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-10">
-                                    <strong class="mb-0">Pin</strong>
-                                    <p class="text-muted mb-0">Setup RealityCapture pin at <a target="blanc" href="https://www.capturingreality.com/my.pin">https://www.capturingreality.com/my.pin</a></p>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="custom-control custom-switch">
-                                        <input id="rc_pin" type="text" value="{{pyview.subject.pin}}" onchange='pyview.subject.set_pin($("#rc_pin").val())'>
                                     </div>
                                 </div>
                             </div>

@@ -884,6 +884,10 @@ def webrequest_loop():
         for model in models:
             shot_path = Downloader().download_shot(model["shot_id"])
             if shot_path is None:
+                try:
+                    requests.get("http://%s/shots/%s/processing_failed/%s" % (SERVER, model["shot_id"], model["model_id"]))
+                except:
+                    print("failed to reach server")
                 continue
                 
             rc = RealityCapture(
@@ -897,8 +901,10 @@ def webrequest_loop():
             )
             if model["shot_name"].lower().find("calibration") != -1:
                 rc.process_calibration()
-                requests.get("http://%s/shots/%s/processing_failed/%s" % (SERVER, model["shot_id"],  model["model_id"]))
-                    
+                try:
+                    requests.get("http://%s/shots/%s/processing_failed/%s" % (SERVER, model["shot_id"],  model["model_id"]))
+                except:
+                    print("failed to reach server")
             else:
                 model_result_path = None
                 try:
@@ -910,12 +916,19 @@ def webrequest_loop():
                 if model_result_path is not None:
                     with open(model_result_path, 'rb') as f:
                         print("Uploading model: %s" % model_result_path)
-                        requests.post("http://%s/shots/%s/upload/%s" % (SERVER, model["shot_id"],  model["model_id"]), files= {'upload_file': f})
-                        print("Upload finished")
+                        try:
+                            requests.post("http://%s/shots/%s/upload/%s" % (SERVER, model["shot_id"],  model["model_id"]), files= {'upload_file': f})
+                            print("Upload finished")
+                        except:
+                            print("failed to reach server while uploading")
+
                     if DEBUG is False:
                         os.remove(model_result_path)
                 else:
-                    requests.get("http://%s/shots/%s/processing_failed/%s" % (SERVER, model["shot_id"],  model["model_id"]))
+                    try:
+                        requests.get("http://%s/shots/%s/processing_failed/%s" % (SERVER, model["shot_id"],  model["model_id"]))
+                    except:
+                        print("failed to reach server")
                     print("Model processing failed")
                     if DEBUG is False and os.path.exists(shot_path):
                         print("not caching shot %s" % shot_path )

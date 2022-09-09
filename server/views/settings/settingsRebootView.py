@@ -16,7 +16,7 @@ class RebootShutdownView(PyHtmlView):
                             <div class="row align-items-center">
                                 <div class="col-md-10">
                                     <strong class="mb-0">Reboot</strong>
-                                    <p class="text-muted mb-0">Reboot server, this will take 1-2 minutes</p>
+                                    <p class="text-muted mb-0">Reboot server, this will take 2-3 minutes</p>
                                 </div>
                                 <div class="col-auto">
                                     {% if pyview.subject.status == "active"%}

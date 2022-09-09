@@ -835,6 +835,7 @@ class Downloader():
         return os.path.join(CACHE_DIR, shot_id)
         
     def get_unprocessed_models(self):
+        print("Checking Server for work")
         models = []
         try:
             d = requests.get("http://%s/realityCaptureProcess" % SERVER).text
@@ -845,8 +846,9 @@ class Downloader():
                 global BOX_DIMENSIONS
                 BOX_DIMENSIONS = data["box_dimensions"]
         except Exception as e:
-            print(e)     
-        print("%s unprocessed shot ids received from server" % len(models))
+            print(e)
+        if len(models) > 0:
+            print("%s unprocessed models received from server" % len(models))
         return models
 
     def _unpack_zip(self, path):
@@ -871,9 +873,14 @@ class Downloader():
 
 def webrequest_loop():
     while True:
-        clean_shot_dir()
         models = Downloader().get_unprocessed_models()
- 
+
+        if len(models) == 0:
+            time.sleep(45)
+            continue
+
+        clean_shot_dir()
+
         for model in models:
             shot_path = Downloader().download_shot(model["shot_id"])
             if shot_path is None:
@@ -913,7 +920,7 @@ def webrequest_loop():
                     if DEBUG is False and os.path.exists(shot_path):
                         print("not caching shot %s" % shot_path )
                         shutil.rmtree(shot_path)
-        time.sleep(10)
+
 
 
 webrequest_loop()

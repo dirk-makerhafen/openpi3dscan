@@ -91,7 +91,7 @@ class HttpEndpoints:
             "models" : [],
             "markers" : "",
         }
-        for model in ShotsInstance().get_unprocessed_models()[:1]:
+        for model in ShotsInstance().get_unprocessed_models(limit=1):
             shot = model.parentShot
             model = model.to_dict()
             model["shot_id"] = shot.shot_id

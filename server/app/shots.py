@@ -474,9 +474,12 @@ class Shots:
             if shot.shot_id not in shot_ids:
                 shot.remove_device(device)
 
-    def get_unprocessed_models(self):
+    def get_unprocessed_models(self, limit = None):
         models = []
-        [models.extend(shot.get_models_by_status("waiting")) for shot in self.shots]
+        for shot in self.shots:
+            models.extend(shot.get_models_by_status("waiting"))
+            if limit is not None and len(models) >= limit:
+                return models
         return models
 
     def _add_deleted_shot_id(self, shot_id):

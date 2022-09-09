@@ -50,7 +50,7 @@ class ShotsItemView(PyHtmlView):
                 {{pyview.subject.name}} {{pyview.subject.status}}
             </div>
             <div class="info"> 
-                {{pyview.subject.nr_of_devices}},{{pyview.subject.nr_of_files}},{{pyview.subject.nr_of_models}}{% if pyview.subject.nr_of_models_waiting > 0 or pyview.subject.nr_of_models_failed > 0 %}({% if pyview.subject.nr_of_models_waiting > 0%}{{pyview.subject.nr_of_models_waiting}}{% endif %}{% if pyview.subject.nr_of_models_waiting > 0 and pyview.subject.nr_of_models_failed > 0 %},{% endif %}{% if pyview.subject.nr_of_models_failed > 0%}{{pyview.subject.nr_of_models_failed}}!{% endif %}){% endif %} 
+                {{pyview.subject.nr_of_devices}},{{pyview.subject.nr_of_files}},{{pyview.subject.nr_of_models}}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 or pyview.subject.nr_of_models_failed > 0 %}({% if pyview.subject.nr_of_models_waiting_or_processing > 0%}{{pyview.subject.nr_of_models_waiting_or_processing}}{% endif %}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 and pyview.subject.nr_of_models_failed > 0 %},{% endif %}{% if pyview.subject.nr_of_models_failed > 0%}{{pyview.subject.nr_of_models_failed}}!{% endif %}){% endif %} 
             </div>  
         </div>  
     </div>

@@ -47,13 +47,7 @@ while SERVER is None:
 DEBUG = "debug" in sys.argv
 if DEBUG:
     sys.argv.remove("debug")
-if len(sys.argv) < 2:
-    while True:
-        LICENSE_PIN = str(input('\nEnter License Pin:')).strip()
-        reply = str(input('Pin "%s" correct? (y/n):' % LICENSE_PIN)).lower().strip()
-        if reply == "y": break
-else: 
-    LICENSE_PIN = sys.argv[-1]
+
 
 
 CLEAN_MISALIGNED = False
@@ -62,7 +56,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 MARKERS = []
 DISTANCES = {}
-
+LICENSE_PIN = ""
 
 def load_markers(source_string):
     global MARKERS
@@ -845,6 +839,8 @@ class Downloader():
                 load_markers(data["markers"])
                 global BOX_DIMENSIONS
                 BOX_DIMENSIONS = data["box_dimensions"]
+                global LICENSE_PIN
+                LICENSE_PIN = data["pin"]
         except Exception as e:
             print(e)
         if len(models) > 0:

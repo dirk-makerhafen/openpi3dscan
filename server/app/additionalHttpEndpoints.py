@@ -101,6 +101,7 @@ class HttpEndpoints:
             data["markers"] = SettingsInstance().realityCaptureSettings.markers
             dia = SettingsInstance().realityCaptureSettings.diameter
             data["box_dimensions"] = [dia, dia, SettingsInstance().realityCaptureSettings.height]
+            data["pin"] = SettingsInstance().realityCaptureSettings.pin
         return json.dumps(data)
 
     def _shot_list(self):

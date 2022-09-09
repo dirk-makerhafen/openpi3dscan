@@ -59,22 +59,31 @@ class SettingsRealityCapture(Observable):
         self.markers = MARKERS_PRELOAD
         self.diameter = 1.9
         self.height = 2.5
+        self.pin = ""
 
     def to_dict(self):
         return {
             "markers": self.markers,
             "diameter": self.diameter,
             "height": self.height,
+            "pin": self.pin,
         }
 
     def from_dict(self, data):
         self.markers = data["markers"]
         self.diameter = data["diameter"]
         self.height = data["height"]
+        self.pin = data["pin"]
 
     def set_markers(self, markers):
         self.markers = markers
         self.save()
+        self.notify_observers()
+
+    def set_pin(self, pin):
+        self.pin = pin
+        self.save()
+        self.notify_observers()
 
     def set_height(self, new_height):
         try:

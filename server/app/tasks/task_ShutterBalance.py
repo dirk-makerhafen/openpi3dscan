@@ -49,7 +49,7 @@ class Task_ShutterBalance(Observable):
             device.camera.settings.set_exposure_mode(SettingsInstance().cameraSettings.exposure_mode)
             device.camera.settings.set_iso(SettingsInstance().cameraSettings.iso)
 
-        time.sleep(10)
+        time.sleep(12)
         # get exposure_speed
         with ThreadPool(20) as p:
             exposure_speeds = p.map(lambda device: device.camera.settings.get_exposure_speed(), cameras)
@@ -71,7 +71,7 @@ class Task_ShutterBalance(Observable):
             device.camera.settings.set_exposure_mode("off")
 
         SettingsInstance().cameraSettings.shutter_speed = avg_exposure_speed
-        time.sleep(2)
+        time.sleep(3)
         for device in cameras:
             device.camera.settings.locked = False
         self.set_status("idle")

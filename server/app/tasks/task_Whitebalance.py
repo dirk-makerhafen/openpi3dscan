@@ -42,12 +42,12 @@ class Task_Whitebalance(Observable):
         for device in cameras:
             device.camera.settings.locked = True  # prevent changes of settings by heartbeat
             PreviewQueueInstance().get_image(device_id=device.device_id)  # trigger pll in case cameras are in sleep
-        time.sleep(3)  # wait for heartbeat queue to empty
+        time.sleep(5)  # wait for heartbeat queue to empty
 
         for device in cameras:
             device.camera.settings.set_awb_mode(SettingsInstance().cameraSettings.awb_mode)
 
-        time.sleep(10)
+        time.sleep(12)
 
         # get awb_gains
         with ThreadPool(20) as p:

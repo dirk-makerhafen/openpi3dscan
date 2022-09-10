@@ -49,7 +49,6 @@ class Task_Whitebalance(Observable):
 
         time.sleep(12)
 
-        # get awb_gains
         with ThreadPool(20) as p:
             awb_gains = p.map(lambda device: device.camera.settings.get_awb_gains(), cameras)
 
@@ -60,15 +59,12 @@ class Task_Whitebalance(Observable):
 
         awb_gains = [g for g in awb_gains if g is not None and g[0] != 0]
 
-        # average awb_gains
         avg_awb_gains = [
             round(sum([g[0] for g in awb_gains]) / len(awb_gains), 3),
             round(sum([g[1] for g in awb_gains]) / len(awb_gains), 3),
         ]
-
         print("avg_awb_gains", avg_awb_gains)
 
-        # set awb_mode to off
         for device in cameras:
             device.camera.settings.set_awb_mode("off")
         SettingsInstance().cameraSettings.awb_gains = avg_awb_gains

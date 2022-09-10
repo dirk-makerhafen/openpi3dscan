@@ -1,6 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from pyhtmlgui import PyHtmlView
+
+from app.tasks.task_CameraBalance import TaskCameraBalanceInstance
+
 if TYPE_CHECKING:
     from app.app import App
     from views.appView import AppView
@@ -48,6 +51,25 @@ class TaskWhitebalanceTopView(PyHtmlView):
         self.subject.run()
 
 
+class TaskCameraBalanceTopView(PyHtmlView):
+    TEMPLATE_STR = '''
+    <div class="col-md-2 topMenuItem">
+        {% if pyview.subject.status == "idle" %} 
+            <button class="btn btn-success" onclick='pyview.run();'> Balance Camera </button>
+        {% else %}
+            Balancing
+        {% endif %}
+    </div>
+    '''
+
+    def __init__(self, subject, parent):
+        super().__init__(subject, parent)
+
+    def run(self):
+        self.subject.run()
+
+
+
 class TaskCreateShotView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="col-md-2 topMenuItem">
@@ -83,9 +105,8 @@ class LiveView(PyHtmlView):
                 <p id="light_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">Light ({{pyview.get_light()}}%)</p>
                 <input onchange="pyview.set_light(this.value)" oninput="document.getElementById('light_value').innerHTML = 'Light ('+this.value+'%)' " type="range" min="0" max="100" value="{{pyview.get_light()}}" style="min-height:30px;">
             </div>
-            <div class="col-md-1 topMenuItem">&nbsp;</div>
-            {{ pyview.shutterbalance_view.render() }}
-            {{ pyview.whitebalance_view.render() }}   
+            <div class="col-md-2 topMenuItem">&nbsp;</div>
+            {{ pyview.camerabalance_view.render() }}
         </div>
         <div style="overflow-y:scroll;height:calc(100% - 35px);">
              {{ pyview.imageCarousel.render() }}
@@ -99,8 +120,9 @@ class LiveView(PyHtmlView):
         self._name_input = ""
         self.shot_quality = "speed"
         self.create_shot_view = TaskCreateShotView(TaskCreateShotInstance(), self)
-        self.whitebalance_view = TaskWhitebalanceTopView(TaskWhitebalanceInstance(), self)
-        self.shutterbalance_view = TaskShutterBalanceTopView(TaskShutterBalanceInstance(), self)
+        #self.whitebalance_view = TaskWhitebalanceTopView(TaskWhitebalanceInstance(), self)
+        #self.shutterbalance_view = TaskShutterBalanceTopView(TaskShutterBalanceInstance(), self)
+        self.camerabalance_view = TaskCameraBalanceTopView(TaskCameraBalanceInstance(), self)
         self._tasks = TasksInstance()
 
     def whitebalance(self):

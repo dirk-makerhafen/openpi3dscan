@@ -1,7 +1,20 @@
 from pyhtmlgui import PyHtmlView
 
+from app.tasks.task_CameraBalance import TaskCameraBalanceInstance
 from app.tasks.task_ShutterBalance import TaskShutterBalanceInstance
 from app.tasks.task_Whitebalance import TaskWhitebalanceInstance
+
+
+
+class TaskCameraBalanceView(PyHtmlView):
+    TEMPLATE_STR = '''
+        {% if pyview.subject.status == "idle" %} 
+            <button class="btn" onclick='pyview.subject.run();'> Balance </button>
+        {% else %}
+            <p class="btn" style="color:green">Balancing</p>
+        {% endif %}
+    '''
+
 
 
 class TaskShutterBalanceView(PyHtmlView):
@@ -166,9 +179,8 @@ class CameraSettingsView(PyHtmlView):
                     <div class="row align-items-center">
                         <div class="col-md-6">
                             <strong class="mb-0">Whitebalance gains</strong>
-                            <p class="text-muted mb-0">Set whitebalance gains for cameras, or ckick <i>Balance</i> to select automatically.</p>
+                            <p class="text-muted mb-0">Set whitebalance gains for cameras, or click <i>Balance</i> to select automatically.</p>
                         </div>
-                        <div class="col-md-2">{{pyview.whitebalance_view.render()}}</div>
                         <div class="col-md-2">
                             <div class="custom-control custom-switch">
                                 <p style="color:red" >red</p>
@@ -182,7 +194,16 @@ class CameraSettingsView(PyHtmlView):
                             </div>
                         </div>
                     </div>
-                </div>        
+                </div>   
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <strong class="mb-0">Auto balance</strong>
+                            <p class="text-muted mb-0">Automatically set shutter speed and whitebalance gains.</p>
+                        </div>
+                        <div class="col-md-2">{{pyview.camerabalance_view.render()}}</div>
+                    </div>
+                </div>                    
             </div>
         </div>
     </div>
@@ -192,6 +213,7 @@ class CameraSettingsView(PyHtmlView):
         super().__init__(subject, parent)
         self.whitebalance_view = TaskWhitebalanceView(TaskWhitebalanceInstance(), self)
         self.shutterbalance_view = TaskShutterBalanceView(TaskShutterBalanceInstance(), self)
+        self.camerabalance_view = TaskCameraBalanceView(TaskCameraBalanceInstance(), self)
 
     def _set_awb_gain_red(self, value):
         gains = self.subject.awb_gains

@@ -424,6 +424,7 @@ class Shots:
 
     def create(self, shot_id, name):
         s = Shot(shot_id)
+        s.create_folders()
         s.set_name(name)
         self.shots.insert(0, s)
         return s

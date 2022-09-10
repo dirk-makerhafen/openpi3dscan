@@ -3,10 +3,10 @@ from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''
-        <div class="row">
+        <div class="row" style="margin-bottom: 10px;">
             <div class="col-md-11" style="font-weight:bold;padding-bottom:10px;">Images</div>
-            <div class="col-md-1" style="font-weight:bold;" onclick='pyview.hide()'>
-                <a style="text-align: right;float: right;color: gray;">Close</a>
+            <div class="col-md-1" style="font-weight:bold;cursor: pointer" onclick='pyview.hide()'>
+                <a style="text-align: right;float: right;color: gray; ">Close</a>
             </div>
             <div class="col-md-12">
                 <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a>
@@ -19,10 +19,10 @@ class ShotFilesView(PyHtmlView):
                  <thead>
                   <tr>
                     <th style="text-align:center">Type</th>
-                    <th style="text-align:center">Mesh from</th>
-                    <th style="text-align:center">Textures</th>
                     <th style="text-align:center">Reconstruction Quality</th>
                     <th style="text-align:center">Export Quality</th>
+                    <th style="text-align:center">Mesh from</th>
+                    <th style="text-align:center">Textures</th>
                     <th style="text-align:center">File</th>
                     <th style="text-align:center">Action</th>
                   </tr>
@@ -42,16 +42,6 @@ class ShotFilesView(PyHtmlView):
                             </select>
                         </td>
                         <td>
-                            <select name="create_mesh_from" id="create_mesh_from">
-                              <option value="projection">Projection</option>
-                              <option value="normal">Normal</option>
-                              <option value="all">All Images</option>
-                            </select>   
-                        </td>
-                        <td>
-                            <input id="create_textures" checked type="checkbox"/>
-                        </td>
-                        <td>
                             <select name="reconstruction_quality" id="reconstruction_quality">
                               <option value="high">High</option>
                               <option value="normal">Normal</option>
@@ -64,6 +54,16 @@ class ShotFilesView(PyHtmlView):
                               <option value="normal">Normal (1M)</option>
                               <option value="low">Low (500K)</option>
                             </select>                            
+                        </td>
+                        <td>
+                            <select name="create_mesh_from" id="create_mesh_from">
+                              <option value="projection">Projection</option>
+                              <option value="normal">Normal</option>
+                              <option value="all">All Images</option>
+                            </select>   
+                        </td>
+                        <td>
+                            <input id="create_textures" checked type="checkbox"/>
                         </td>
                         <td>&nbsp;</td>
                         <td>
@@ -132,10 +132,10 @@ class ModelFileItemView(PyHtmlView):
     DOM_ELEMENT_EXTRAS = 'style="line-height: 3em;"'
     TEMPLATE_STR = '''
         <td>{{pyview.subject.filetype}} </td>
-        <td>{{pyview.subject.create_mesh_from}}</td>
-        <td>{{pyview.subject.create_textures}}</td>
         <td>{{pyview.subject.reconstruction_quality}}</td>
         <td>{{pyview.subject.quality}}</td>
+        <td>{{pyview.subject.create_mesh_from}}</td>
+        <td>{{pyview.subject.create_textures}}</td>
         <td>
             {% if pyview.subject.status == "ready" %} 
                 <a href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}}  </a>({{pyview.subject.filesize}} MB)

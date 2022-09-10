@@ -5,7 +5,7 @@ class ShotCommentsView(PyHtmlView):
     TEMPLATE_STR = '''
         <div class="row">
             <div class="col-md-11" style="font-weight:bold;padding-bottom:10px;">Comments</div>
-            <div class="col-md-1" style="font-weight:bold;"  onclick='pyview.hide()'>
+            <div class="col-md-1" style="font-weight:bold;cursor: pointer"  onclick='pyview.hide()'>
                 <a style="text-align: right;float: right;color: gray;">Close</a>
             </div>
         </div>

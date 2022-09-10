@@ -69,6 +69,7 @@ class Frame():
             os.rename(tpath, output)
         else:
             self.preview.save(output, format="jpeg", quality=quality)  # make image smaller
+
     def image_to_jpeg(self, quality):
         self.image = YUV_to_JPEGInstance().encode(self.image, framesize=self.image_framesize, quality=quality)
 
@@ -275,8 +276,8 @@ class CameraTasks():
             HeartbeatInstance().lock()
             try:
                 if task[0] == "shot":
-                    task, shot_id, timestamps, quality = task
-                    self.camera.create_shot(shot_id, timestamps, quality)
+                    task, shot_id, timestamps, quality, projection_first = task
+                    self.camera.create_shot(shot_id, timestamps, quality, projection_first)
                 elif task[0] == "benchmark":
                     self.camera.benchmark()
                 #elif task[0] == "whitebalance":
@@ -288,8 +289,8 @@ class CameraTasks():
                 print(e)
             HeartbeatInstance().unlock()
 
-    def create_shot(self, shot_id, timestamps, mode):
-        self.task_queue.put(["shot", shot_id, timestamps, mode])
+    def create_shot(self, shot_id, timestamps, quality, projection_first):
+        self.task_queue.put(["shot", shot_id, timestamps, quality, projection_first])
 
     #def whitebalance(self):
     #    self.task_queue.put(["whitebalance",])
@@ -425,10 +426,15 @@ class Camera():
         meanrgb = list(image.mean(axis=(0, 1)))
         return meanrgb
 
-    def create_shot(self, shot_id, timestamps, quality = "speed"):
+    def create_shot(self, shot_id, timestamps, quality, projection_first ):
         self.last_usage = time.time()
         self.capture_active = True
         self.cameralock.acquire()
+        if projection_first is True:
+            names = ["projection", "normal"]
+        else:
+            names = ["normal", "projection"]
+
         try:
             self.quality = quality
             self.check_autopll()
@@ -437,10 +443,10 @@ class Camera():
 
             path = "%s/%s/" % (storage_dir, shot_id)
             if frames[0] is not None:
-                self.create_frame_tasks(frames[0], "projection", path)
+                self.create_frame_tasks(frames[0], names[0], path)
                 frames[0] = None
             if frames[1] is not None:
-                self.create_frame_tasks(frames[1], "normal", path)
+                self.create_frame_tasks(frames[1], names[1], path)
                 frames[1] = None
 
         finally:
@@ -471,7 +477,7 @@ class Camera():
 
 
     def clean_shots_dir(self, min_disk_free=300):
-        if random.randint(0,4) != 1:
+        if random.randint(0,10) != 1:
             return
         if shutil.disk_usage("/")[2] / 1024 / 1024 > min_disk_free:
             return
@@ -479,11 +485,12 @@ class Camera():
             os.path.join("/3dscan/", "*.jpg"),
             os.path.join(storage_dir, "*")
         ]
+
         for path in paths:
             shots = sorted([path for path in glob.glob(path)])
             free = shutil.disk_usage("/")[2] / 1024 / 1024
             while free < min_disk_free and len(shots) > 0:
-                for i in range(10):
+                for i in range(30):
                     if len(shots) == 0: break
                     os.system("rm -r '%s'" % shots[0])
                     del shots[0]
@@ -781,8 +788,7 @@ class CameraAPI():
         route("/camera/calibrate/get_avg_rgb")(self.get_avg_rgb)
 
         route("/camera/shots/list")(self.shots_list)
-        route("/camera/shots/create/<shot_id>/<timestamps>")(self.shots_create)
-        route("/camera/shots/create/<shot_id>/<timestamps>/<quality>")(self.shots_create)
+        route("/camera/shots/create/<shot_id>/<timestamps>/<quality>/<projection_first>")(self.shots_create)
         route("/camera/shots/get/<shot_id>/<image_mode>/<image_type>.jpg")(self.shots_get)
         route("/camera/shots/delete/<shot_id>")(self.delete_shot)
 
@@ -850,8 +856,9 @@ class CameraAPI():
             shots.append(path)
         return json.dumps(shots)
 
-    def shots_create(self, shot_id, timestamps, quality = "speed"):
+    def shots_create(self, shot_id, timestamps, quality, projection_first):
         timestamps = [float(x) for x in timestamps.split(";")]
+        projection_first = bool(projection_first)
         now = time.time()
         for ts in timestamps:
             if ts - 20 > now:
@@ -860,7 +867,7 @@ class CameraAPI():
             if ts < now - 10:
                 print("shot in past, ignore", ts)
                 return
-        self.camera.tasks.create_shot(shot_id, timestamps, quality)
+        self.camera.tasks.create_shot(shot_id, timestamps, quality, projection_first)
 
     # image_mode = normal | preview
     # image_type = normal | projection

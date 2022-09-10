@@ -74,6 +74,10 @@ class Task_CreateShot(Observable):
         shot2_start_time = shot1_end_time + (seqs.image_delay * image_aquisition_time)
         shot2_end_time   = shot2_start_time + image_aquisition_time
 
+        start_at = shot1_start_time + seqs.image1.offset/1000
+        self.shot_count_down = math.floor(start_at - time.time())
+        self.set_status("waiting")
+
         light_sequence = [
             [shot1_start_time + seqs.image1.offset/1000 , seqs.image1.light ],
             [shot2_start_time + seqs.image2.offset/1000 , seqs.image2.light ],
@@ -90,24 +94,26 @@ class Task_CreateShot(Observable):
         for device in lights:
             device.light.sequence(light_sequence)
 
+        projection_first = True
+        if seqs.image1.projection is False and seqs.image2.projection is True:
+            projection_first = False
+
         for device in cameras:
-            device.camera.shots.create(shot, sequence=[shot1_end_time, shot2_end_time], shot_quality=self.shot_quality)
+            device.camera.shots.create(shot, sequence=[shot1_end_time, shot2_end_time], shot_quality=self.shot_quality, projection_first=projection_first)
 
-        start_at = shot1_start_time + seqs.image1.offset/1000
-        self.shot_count_down = math.floor(start_at - time.time())
-        self.set_status("waiting")
-
-        while time.time() < start_at:
-            _new_shot_count_down = math.ceil(start_at - time.time())
-            if self.shot_count_down != _new_shot_count_down:
-                self.shot_count_down = _new_shot_count_down
-                self.notify_observers()
-            time.sleep(0.02)
+        while start_at > time.time():
+            start_in = start_at - time.time()
+            self.shot_count_down = int(round(start_in,0))
+            sleeptime = start_in - math.floor(start_in)
+            self.notify_observers()
+            if sleeptime > 0:
+                time.sleep(sleeptime + 0.01)
 
         self.set_status("shot")
 
-        while time.time() < shot2_end_time :
-            time.sleep(0.1)
+        sleeptime = (shot2_end_time + 0.1) - time.time()
+        if sleeptime > 0:
+            time.sleep(sleeptime)
 
         processing_time = 12
         self.processed_percent = 0

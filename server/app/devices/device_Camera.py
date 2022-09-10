@@ -196,8 +196,8 @@ class CameraShots:
         self.camera = camera
         self.shotlist = []
 
-    def create(self, remote_shot, sequence, shot_quality):
-        self.camera.device.task_queue.put([self._create, remote_shot, sequence, shot_quality])
+    def create(self, remote_shot, sequence, shot_quality, projection_first):
+        self.camera.device.task_queue.put([self._create, remote_shot, sequence, shot_quality, projection_first])
 
     def delete(self, shot_id):
         self.camera.device.task_queue.put([self._delete, shot_id])
@@ -211,12 +211,15 @@ class CameraShots:
             self.shotlist.remove(shot_id)
         return True
 
-    def _create(self, remote_shot, sequence, shot_quality):
-        sequence = ";".join(["%s" % s for s in sequence])
+    def _create(self, remote_shot, sequence, shot_quality, projection_first):
+        sequence_str = ";".join(["%s" % s for s in sequence])
         self.camera.device.lock(6)  # + self.image_processing_time
-        url = "/camera/shots/create/%s/%s/%s" % (remote_shot.shot_id, sequence, shot_quality)
+        url = "/camera/shots/create/%s/%s/%s/%s" % (remote_shot.shot_id, sequence_str, shot_quality, projection_first)
         result = self.camera.device.api_request(url, max_time=5)
         if result is not None:
+            sleeptime = sequence[-1] - time.time()
+            if sleeptime > 0 and sleeptime < 6:
+                time.sleep(sleeptime)
             self.shotlist.append(remote_shot.shot_id)
             remote_shot.add_device(self.camera.device)
         return True

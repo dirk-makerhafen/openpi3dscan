@@ -177,18 +177,18 @@ class CameraSettingsView(PyHtmlView):
                 </div> 
                 <div class="list-group-item">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <strong class="mb-0">Whitebalance gains</strong>
                             <p class="text-muted mb-0">Set whitebalance gains for cameras, or click <i>Balance</i> to select automatically.</p>
                         </div>
                         <div class="col-md-2">{{pyview.whitebalance_view.render()}}</div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <div class="custom-control custom-switch">
                                 <p style="color:red" >red</p>
                                 <input style="width:100%" id="awb_gain_red" type="number" step="0.01" value="{{pyview.subject.awb_gains[0]}}" onchange='pyview._set_awb_gain_red($("#awb_gain_red").val())'>
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <div class="custom-control custom-switch">
                                 <p style="color:blue" >blue</p>
                                 <input style="width:100%" id="awb_gain_blue" type="number" step="0.01" value="{{pyview.subject.awb_gains[1]}}" onchange='pyview._set_awb_gain_blue($("#awb_gain_blue").val())'>
@@ -198,7 +198,7 @@ class CameraSettingsView(PyHtmlView):
                 </div>   
                 <div class="list-group-item">
                     <div class="row align-items-center">
-                        <div class="col-md-8">
+                        <div class="col-md-10">
                             <strong class="mb-0">Auto balance</strong>
                             <p class="text-muted mb-0">Automatically set shutter speed and whitebalance gains.</p>
                         </div>

@@ -8,7 +8,7 @@ from app.settings.settingsSequence import SettingsSequence
 from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2022.09.10-21.03"
+VERSION = "2022.09.10-21.04"
 
 
 class Settings(Observable):

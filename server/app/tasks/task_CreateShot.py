@@ -114,8 +114,10 @@ class Task_CreateShot(Observable):
         sleeptime = (shot2_end_time + 0.1) - time.time()
         if sleeptime > 0:
             time.sleep(sleeptime)
+        else:
+            time.sleep(0.2)
 
-        processing_time = 12
+        processing_time = 10
         self.processed_percent = 0
         self.set_status("processing")
         for i in range(int(math.ceil(processing_time))):

@@ -858,7 +858,7 @@ class CameraAPI():
 
     def shots_create(self, shot_id, timestamps, quality, projection_first):
         timestamps = [float(x) for x in timestamps.split(";")]
-        projection_first = bool(projection_first)
+        projection_first = projection_first in [ "True", "true"]
         now = time.time()
         for ts in timestamps:
             if ts - 20 > now:

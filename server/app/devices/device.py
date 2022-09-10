@@ -120,9 +120,13 @@ class Device(Observable):
 
     def _reboot(self):
         self._set_status("reboot")
+        r = None
         try:
-            self.api_request("/reboot")
+            r = self.api_request("/reboot", timeout=5)
         except:
+            pass
+        if r is None:
+            print("reboot via sshd")
             self._ssh('sudo reboot & ', timeout=10)
 
     def shutdown(self):
@@ -130,9 +134,12 @@ class Device(Observable):
 
     def _shutdown(self):
         self._set_status("shutdown")
+        r = None
         try:
-            self.api_request("/shutdown")
+            r =self.api_request("/shutdown", timeout=5)
         except:
+            pass
+        if r is None:
             print("shutdown via sshd")
             self._ssh("sudo shutdown -h now &", timeout=10)
 

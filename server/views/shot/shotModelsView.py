@@ -4,8 +4,8 @@ from pyhtmlgui import PyHtmlView, ObservableList, ObservableListView
 class ModelPreviewFileItemView(PyHtmlView):
     DOM_ELEMENT = "tr"
     TEMPLATE_STR = '''
-    <td>{{pyview.subject.create_mesh_from}}</td>
-    <td>{{pyview.subject.create_textures}}</td>
+    <td> {{pyview.subject.create_mesh_from}} </td>
+    <td> {{pyview.subject.create_textures}}  </td>
     <td>
         {% if pyview.subject.status == "ready" %} 
             <button class="btn btn-sm" style="line-height: 1em;padding-top: 2px;padding-bottom: 2px;margin-bottom:2px;"  onclick="pyview.select_model()">show</button>
@@ -30,66 +30,65 @@ class ModelPreviewFileItemView(PyHtmlView):
 class ShotModelsView(PyHtmlView):
     DOM_ELEMENT_EXTRAS = ''
     TEMPLATE_STR = ''' 
-        <div class="modelfiles">
-            <div class="row"></div>
-            <div class="row"></div>
-            <div class="row">
-                <table style="width:100%;text-align:center">
-                 <thead>
-                  <tr>
-                    <td style="text-align:center">Mesh </td>
-                    <td style="text-align:center">Texture</td>
-                    <td style="text-align:center">Action</td>
-                  </tr>
-                  </thead>
-                  
-                  {{pyview.filesListView.render()}}
-                  
-                  <tr style="border-top: 1px solid lightgray; line-height: 3em;">
-                        <td>
-                            <select name="m_create_mesh_from" id="m_create_mesh_from">
-                              <option value="projection">Projection</option>
-                              <option value="normal">Normal</option>
-                              <option value="all">All Images</option>
-                            </select>   
-                        </td>
-                        <td>
-                            <input id="m_create_textures" checked type="checkbox"/>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm " style="line-height: 1em;    padding-top: 2px;padding-bottom: 2px; margin-bottom: 5px;" onclick='pyview.parent.create_model("glb", "high", "low", $("#m_create_mesh_from").val(), $("#m_create_textures")[0].checked);'> Create Model </button>
-                        </td>
-                    </tr>    
-                </table>
-            </div>
+    <div class="modelfiles">
+        <div class="row"></div>
+        <div class="row"></div>
+        <div class="row">
+            <table style="width:100%;text-align:center">
+             <thead>
+              <tr>
+                <td style="text-align:center">Mesh </td>
+                <td style="text-align:center">Texture</td>
+                <td style="text-align:center">Action</td>
+              </tr>
+              </thead>
+              
+              {{pyview.filesListView.render()}}
+              
+              <tr style="border-top: 1px solid lightgray; line-height: 3em;">
+                    <td>
+                        <select name="m_create_mesh_from" id="m_create_mesh_from">
+                          <option value="projection">Projection</option>
+                          <option value="normal">Normal</option>
+                          <option value="all">All Images</option>
+                        </select>   
+                    </td>
+                    <td>
+                        <input id="m_create_textures" checked type="checkbox"/>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm " style="line-height: 1em;    padding-top: 2px;padding-bottom: 2px; margin-bottom: 5px;" onclick='pyview.parent.create_model("glb", "high", "low", $("#m_create_mesh_from").val(), $("#m_create_textures")[0].checked);'> Create Model </button>
+                    </td>
+                </tr>    
+            </table>
         </div>
-        {% if pyview.selected_model != None %}
-            <model-viewer  
-                src="{{pyview.get_model_url()}}"
-                orientation="0deg -90deg 90deg" 
-                ar ar-modes="webxr scene-viewer quick-look"  
-                seamless-poster 
-                shadow-intensity="1" 
-                camera-controls 
-                enable-pan
-                style="width:100%;height:100%"
-            >
-                <div id="button-load" slot="poster">
-                    <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
-                        loading model
-                    </div>
+    </div>
+    {% if pyview.selected_model != None %}
+        <model-viewer  
+            src="{{pyview.get_model_url()}}"
+            orientation="0deg -90deg 90deg" 
+            ar ar-modes="webxr scene-viewer quick-look"  
+            seamless-poster 
+            shadow-intensity="1" 
+            camera-controls 
+            enable-pan
+            style="width:100%;height:100%"
+        >
+            <div id="button-load" slot="poster">
+                <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
+                    loading model
                 </div>
-            </model-viewer>
-        {% else %}
-            <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
-                {% if pyview.has_preview_models %}
-                     no model selected 
-                {% else %}
-                     no model previews found
-                {% endif %}         
             </div>
-        {% endif %}
- 
+        </model-viewer>
+    {% else %}
+        <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
+            {% if pyview.has_preview_models %}
+                 no model selected 
+            {% else %}
+                 no model previews found
+            {% endif %}         
+        </div>
+    {% endif %}
     '''
 
     def __init__(self, subject, parent):

@@ -5,12 +5,12 @@ from pyhtmlgui import PyHtmlView
 
 class ImageRowView(PyHtmlView):
     TEMPLATE_STR = '''
-        <img 
-            id="S{{pyview.parent.seg_nr}}_R{{pyview.row_nr}}" 
-            style="min-height:{{pyview.parent.parent.img_height}}vw" 
-            onerror="this.onerror=null;this.src='/static/images/nophoto.jpg';" 
-            src="{{pyview.get_image_source()}}"
-        >
+    <img 
+        id="S{{pyview.parent.seg_nr}}_R{{pyview.row_nr}}" 
+        style="min-height:{{pyview.parent.parent.img_height}}vw" 
+        onerror="this.onerror=null;this.src='/static/images/nophoto.jpg';" 
+        src="{{pyview.get_image_source()}}"
+    >
     '''
 
     def __init__(self, subject, parent, row_nr):
@@ -40,9 +40,9 @@ class ImageRowView(PyHtmlView):
 
 class SegmentView(PyHtmlView):
     TEMPLATE_STR = '''
-        {% for image in pyview.images %}
-              {{image.render()}}
-         {% endfor %}
+    {% for image in pyview.images %}
+        {{image.render()}}
+    {% endfor %}
     '''
 
     @property
@@ -68,7 +68,6 @@ class ImageCarousel(PyHtmlView):
         <div class="col-md-3" ><button class="btn zoomout"    onclick='pyview.zoom_out();'  > -  </button></div>            
         <div class="col-md-3" ><button style="margin-top:10px;padding:6px" class="btn zoomout"    onclick='pyview.switch_type();'  > <i class="fa-solid fa-border-none" style="font-size:1.5em;{% if pyview.image_type == "projection" %}color:#3e8f3e{% endif %}"></i> </button></div>            
     </div>                         
-
     <div class="carousel">
          {% for segment in pyview.segments %}
               {{segment.render()}}

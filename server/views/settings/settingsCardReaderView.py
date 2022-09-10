@@ -5,8 +5,8 @@ class CardReaderSlotView(PyHtmlView):
     DOM_ELEMENT = "tr"
     TEMPLATE_STR = '''
      {% if pyview.subject.sdcard is not none %}
-        <td>{{ pyview.subject.sdcard.size }}GB</td>
-        <td>{{ pyview.subject.status }} </td>
+        <td> {{ pyview.subject.sdcard.size }}GB </td>
+        <td {% if pyview.subject.status != "idle" %}style="color:green"{% endif %}> {{ pyview.subject.status }} </td>
         <td>                    
             <select {% if pyview.subject.status != "idle" %}disabled{% endif %}  id="{{pyview.uid}}_group" name="" >
                     <option {% if pyview.subject.sdcard.info_group == "camera" %}selected{% endif %} value="camera"> Camera </option>
@@ -21,13 +21,12 @@ class CardReaderSlotView(PyHtmlView):
             <button {% if pyview.subject.status != "idle" %}disabled{% endif %} class="btn-small"  onclick='pyview.update_card(document.getElementById("{{pyview.uid}}_group").value, document.getElementById("{{pyview.uid}}_id").value, document.getElementById("{{pyview.uid}}_name").value);'>Update Card</button>
         </td>            
     {% else %}
-        <td>Not Connected</td>
+        <td>No Card inserted</td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
-
     {% endif %}            
     '''
 

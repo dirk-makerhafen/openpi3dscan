@@ -43,28 +43,22 @@ class CurrentView(PyHtmlView):
 class AppView(PyHtmlView):
     DOM_ELEMENT_CLASS = "AppView container"
     TEMPLATE_STR = '''
-        {% if pyview.subject.status == "active"%}
-            <div class="row" >
-                {{ pyview.sidebarView.render() }}
-                {{ pyview.currentView.render()}}
-            </div>
-        {% else %}
-            <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
+    {% if pyview.subject.status == "active"%}
+        <div class="row" >
+            {{ pyview.sidebarView.render() }}
+            {{ pyview.currentView.render()}}
+        </div>
+    {% else %}
+        <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
             {% if  pyview.subject.status == "reboot"%}
                 Reboot in progress, this may take 2-3 minutes
-                <script>
-                    setTimeout(function(){
-                        location.reload();
-                    }, 130000);
-                </script>
-                
+                <script> setTimeout(function(){ location.reload();}, 130000); </script>
             {% endif %}
             {% if  pyview.subject.status == "shutdown"%}
                 System Shutdown
             {% endif %}
-                
-            </div>
-        {% endif %}
+        </div>
+    {% endif %}
     '''
 
     def __init__(self, subject: App, parent):

@@ -4,10 +4,9 @@ from pyhtmlgui import PyHtmlView, ObservableListView
 class ShotsView(ObservableListView):
     DOM_ELEMENT_CLASS = "ShotsView row"
     TEMPLATE_STR = '''
-        {% for item in pyview.get_items() %}
-            {{ item.render()}}
-        {% endfor %}
-
+    {% for item in pyview.get_items() %}
+        {{ item.render()}}
+    {% endfor %}
     '''
 
     def __init__(self, subject, parent, **kwargs):

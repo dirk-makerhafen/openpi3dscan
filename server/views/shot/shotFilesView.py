@@ -3,21 +3,21 @@ from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''
-        <div class="row" style="margin-bottom: 10px;">
-            <div class="col-md-11" style="font-weight:bold;padding-bottom:10px;">Images</div>
-            <div class="col-md-1" style="font-weight:bold;cursor: pointer" onclick='pyview.hide()'>
-                <a style="text-align: right;float: right;color: gray; ">Close</a>
-            </div>
-            <div class="col-md-12">
-                <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a>
-            </div>
+    <div class="row" style="margin-bottom: 10px;">
+        <div class="col-md-11" style="font-weight:bold;padding-bottom:10px;">Images</div>
+        <div class="col-md-1" style="font-weight:bold;cursor: pointer" onclick='pyview.hide()'>
+            <a style="text-align: right;float: right;color: gray;"> Close </a>
         </div>
-        <div class="row">
-            <div class="col-md-12" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">Model Files</div>
-            <div class="col-md-12">
-                <table style="width:100%;text-align:center">
-                 <thead>
-                  <tr>
+        <div class="col-md-12">
+            <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">Model Files</div>
+        <div class="col-md-12">
+            <table style="width:100%;text-align:center">
+                <thead>
+                    <tr>
                     <th style="text-align:center">Type</th>
                     <th style="text-align:center">Reconstruction Quality</th>
                     <th style="text-align:center">Export Quality</th>
@@ -25,62 +25,57 @@ class ShotFilesView(PyHtmlView):
                     <th style="text-align:center">Textures</th>
                     <th style="text-align:center">File</th>
                     <th style="text-align:center">Action</th>
-                  </tr>
-                  </thead>
-                  {{pyview.filesListView.render()}}
-                  <tr style="border-top: 1px solid lightgray;    line-height: 3em;">
-                        <td>
-                            <select name="filetype" id="filetype">
-                                <option value="obj">OBJ</option>
-                                <option value="stl">STL</option>
-                                <option value="3mf">3MF</option>
-                                <option value="glb">GLB</option>
-                                <option value="fbx">FBX</option>
-                                <option value="rcproj">RCPROJ</option>
-                                <option value="gif">GIF</option>
-                                <option value="webp">WebP</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select name="reconstruction_quality" id="reconstruction_quality">
-                              <option value="high">High</option>
-                              <option value="normal">Normal</option>
-                              <option value="preview">Preview</option>
-                            </select>                            
-                        </td>
-                        <td>
-                            <select name="quality" id="quality">
-                              <option value="high">High (4M)</option>
-                              <option value="normal">Normal (1M)</option>
-                              <option value="low">Low (500K)</option>
-                            </select>                            
-                        </td>
-                        <td>
-                            <select name="create_mesh_from" id="create_mesh_from">
-                              <option value="projection">Projection</option>
-                              <option value="normal">Normal</option>
-                              <option value="all">All Images</option>
-                            </select>   
-                        </td>
-                        <td>
-                            <input id="create_textures" checked type="checkbox"/>
-                        </td>
-                        <td>&nbsp;</td>
-                        <td>
-                            <button class="btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked);'> Create Model </button>
-                        </td>
                     </tr>
-                  
-                </table>
-            </div>
+                </thead>
+                {{pyview.filesListView.render()}}
+                <tr style="border-top: 1px solid lightgray;    line-height: 3em;">
+                    <td>
+                        <select name="filetype" id="filetype">
+                            <option value="obj">OBJ</option>
+                            <option value="stl">STL</option>
+                            <option value="3mf">3MF</option>
+                            <option value="glb">GLB</option>
+                            <option value="fbx">FBX</option>
+                            <option value="rcproj">RCPROJ</option>
+                            <option value="gif">GIF</option>
+                            <option value="webp">WebP</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="reconstruction_quality" id="reconstruction_quality">
+                            <option value="high">High</option>
+                            <option value="normal">Normal</option>
+                            <option value="preview">Preview</option>
+                        </select>                            
+                    </td>
+                    <td>
+                        <select name="quality" id="quality">
+                            <option value="high">High (4M)</option>
+                            <option value="normal">Normal (1M)</option>
+                            <option value="low">Low (500K)</option>
+                        </select>                            
+                    </td>
+                    <td>
+                        <select name="create_mesh_from" id="create_mesh_from">
+                            <option value="projection">Projection</option>
+                            <option value="normal">Normal</option>
+                            <option value="all">All Images</option>
+                        </select>   
+                    </td>
+                    <td> <input id="create_textures" checked type="checkbox"/> </td>
+                    <td> &nbsp; </td>
+                    <td> <button class="btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked);'> Create Model </button></td>
+                </tr>
+            </table>
         </div>
-        <script>
-            {% if pyview.is_hidden %}
-                $('#files_btn').removeClass('top_button_selected');
-            {% else %}
-                $('#files_btn').addClass('top_button_selected');
-            {% endif %}
-        </script>
+    </div>
+    <script>
+        {% if pyview.is_hidden %}
+            $('#files_btn').removeClass('top_button_selected');
+        {% else %}
+            $('#files_btn').addClass('top_button_selected');
+        {% endif %}
+    </script>
     '''
 
     @property

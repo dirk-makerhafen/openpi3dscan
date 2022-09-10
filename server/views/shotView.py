@@ -14,62 +14,61 @@ from app.shots import ShotsInstance
 
 class ShotView(PyHtmlView):
     TEMPLATE_STR = '''
-        <div class="main">
-            <div class="topMenu row">
-                {% if pyview.current_shot._deleted != True %}
-                    <div class="col-md-3 topMenuItem">
-                        <input id="_name_input" value="{{pyview.current_shot.name}}" onchange='pyview.current_shot.set_name($("#_name_input").val())' style="width:100%;line-height: 1.5em;font-size: 1.1em;" placeholder="NAME" type="text"/>
-                    </div>
-                    <div class="col-md-1 topMenuItem {% if pyview.current_view == pyview.imageCarousel%}selected{%endif%}" onclick='pyview.show_shot_2d();'>
-                       Images
-                    </div>
-                    <div class="col-md-1 topMenuItem {% if pyview.current_view == pyview.shotModels   %}selected{%endif%}" onclick='pyview.show_shot_3d();'>
-                        3D Models 
-                    </div>
-                    <div id="comments_btn" class="col-md-1 topMenuItem" onclick='pyview.toggle_comments();'>
-                        Comments
-                    </div>        
-                    <div id="files_btn" class="col-md-1 topMenuItem" onclick='pyview.toggle_files();'>
-                        Files
-                    </div>
-                    <div class="col-md-3 topMenuItem">&nbsp;</div>
-                    <div class="col-md-1 topMenuItem">
-                        <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
-                    </div>
-                    <div class="col-md-1 topMenuItem">
-                        <button class="btn btn-warning" style="margin-right:5px" onclick='$("#confirm_delete").show();'> Delete </button>
-                        <div id="confirm_delete" class="confirm_delete" style="display:none;z-index:999;position:fixed;left:40%;top:10%;width:40%;background-color:white;padding: 10px;padding-botton:20px;border: 5px solid #f33;">
-                            <div class="row">
-                                <div class="col-md-12" style="font-weight:bold;padding-bottom:10px;text-align:center">
-                                    Delete Shot '{{pyview.current_shot.name}}' ? 
-                                </div>
-                                <div class="col-md-6" style="font-weight:bold;">
-                                    <button class="btn btn-danger" onclick='pyview.delete_shot();$("#confirm_delete").hide();'>DELETE</button>
-                                </div>
-                                <div class="col-md-6" style="font-weight:bold;">
-                                    <button class="btn btn-success"  onclick='$("#confirm_delete").hide();'>Cancel</button>
-                                </div>
-                            </div>
-                        </div>                    
-                    </div>
-
-                {% endif %}
-            </div>
-            <div style="overflow-y:scroll;height:calc(100% - 0{% if pyview.current_view == pyview.imageCarousel %}35{%endif%}px);">
-                {% if pyview.current_shot._deleted != True %}
-                    {{ pyview.current_view.render() }}
-                {% else %}
-                    <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
-                        <b>{{pyview.current_shot.name}}</b> <br>
-                        has been removed      
-                    </div>
-                {% endif %}
-            </div>
+    <div class="main">
+        <div class="topMenu row">
             {% if pyview.current_shot._deleted != True %}
-                {{ pyview.comments.render() }}
-                {{ pyview.shotFiles.render() }}
+                <div class="col-md-3 topMenuItem">
+                    <input id="_name_input" value="{{pyview.current_shot.name}}" onchange='pyview.current_shot.set_name($("#_name_input").val())' style="width:100%;line-height: 1.5em;font-size: 1.1em;" placeholder="NAME" type="text"/>
+                </div>
+                <div class="col-md-1 topMenuItem {% if pyview.current_view == pyview.imageCarousel%}selected{%endif%}" onclick='pyview.show_shot_2d();'>
+                   Images
+                </div>
+                <div class="col-md-1 topMenuItem {% if pyview.current_view == pyview.shotModels   %}selected{%endif%}" onclick='pyview.show_shot_3d();'>
+                    3D Models 
+                </div>
+                <div id="comments_btn" class="col-md-1 topMenuItem" onclick='pyview.toggle_comments();'>
+                    Comments
+                </div>        
+                <div id="files_btn" class="col-md-1 topMenuItem" onclick='pyview.toggle_files();'>
+                    Files
+                </div>
+                <div class="col-md-3 topMenuItem">&nbsp;</div>
+                <div class="col-md-1 topMenuItem">
+                    <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
+                </div>
+                <div class="col-md-1 topMenuItem">
+                    <button class="btn btn-warning" style="margin-right:5px" onclick='$("#confirm_delete").show();'> Delete </button>
+                    <div id="confirm_delete" class="confirm_delete" style="display:none;z-index:999;position:fixed;left:40%;top:10%;width:40%;background-color:white;padding: 10px;padding-botton:20px;border: 5px solid #f33;">
+                        <div class="row">
+                            <div class="col-md-12" style="font-weight:bold;padding-bottom:10px;text-align:center">
+                                Delete Shot '{{pyview.current_shot.name}}' ? 
+                            </div>
+                            <div class="col-md-6" style="font-weight:bold;">
+                                <button class="btn btn-danger" onclick='pyview.delete_shot();$("#confirm_delete").hide();'>DELETE</button>
+                            </div>
+                            <div class="col-md-6" style="font-weight:bold;">
+                                <button class="btn btn-success"  onclick='$("#confirm_delete").hide();'>Cancel</button>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
             {% endif %}
-        </div>   
+        </div>
+        <div style="overflow-y:scroll;height:calc(100% - 0{% if pyview.current_view == pyview.imageCarousel %}35{%endif%}px);">
+            {% if pyview.current_shot._deleted != True %}
+                {{ pyview.current_view.render() }}
+            {% else %}
+                <div style="width:100%;text-align:center;font-size:3em;padding-top: 20%;color:#aaa">
+                    <b>{{pyview.current_shot.name}}</b> <br>
+                    has been removed      
+                </div>
+            {% endif %}
+        </div>
+        {% if pyview.current_shot._deleted != True %}
+            {{ pyview.comments.render() }}
+            {{ pyview.shotFiles.render() }}
+        {% endif %}
+    </div>   
     '''
 
     def __init__(self, subject: App, parent):

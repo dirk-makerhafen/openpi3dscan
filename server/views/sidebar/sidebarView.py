@@ -11,23 +11,21 @@ from views.sidebar.shotsView import ShotsView
 class SidebarButtonsView(PyHtmlView):
     DOM_ELEMENT_CLASS = "row menu"
     TEMPLATE_STR = '''
-        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.settingsView %} selected {% endif %}" onclick='pyview.parent.show_settings();'>
-            Settings
-        </div>
-        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.devicesView %} selected {% endif %}" onclick='pyview.parent.show_devices();'>
-            Devices
-        </div>
-        <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.liveView %} selected {% endif %}" onclick='pyview.parent.show_liveview();'>
-           Live
-        </div>
-        <div class="col-md-12 item" style="height:3px"'>
-        </div> 
+    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.settingsView %} selected {% endif %}" onclick='pyview.parent.show_settings();'>
+        Settings
+    </div>
+    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.devicesView %} selected {% endif %}" onclick='pyview.parent.show_devices();'>
+        Devices
+    </div>
+    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.liveView %} selected {% endif %}" onclick='pyview.parent.show_liveview();'>
+       Live
+    </div>
+    <div class="col-md-12 item" style="height:3px"'> </div> 
     '''
 
 class SidebarView(PyHtmlView):
     DOM_ELEMENT_CLASS = "Sidebar col-md-3"
     TEMPLATE_STR = '''
-
     {{pyview.buttonsView.render()}}
     {{pyview.shotsView.render()}}
     <div class="row" style="overflow-y:scroll;position: absolute;bottom: 0px; width: 100%;">

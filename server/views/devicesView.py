@@ -13,40 +13,38 @@ from app.devices.devices import DevicesInstance
 
 class DevicesView(PyHtmlView):
     TEMPLATE_STR = '''
-      <div class="main">
+    <div class="main">
         <div class="topMenu row" style="height:50px">
             <div class="col-md-2 topMenuItem">
-               <button class="btn" onclick='pyview.shutdown();'> Shutdown Devices </button>
+                <button class="btn" onclick='pyview.shutdown();'> Shutdown Devices </button>
             </div>
-            
             {{ pyview.task_networkscan.render() }}
             {{ pyview.task_updateclients.render() }}  
-           <!--- { { pyview.task_syncshots.render() } } --->
-            <div class="col-md-4">
-            </div>
+            <!--- { { pyview.task_syncshots.render() } } --->
+            <div class="col-md-4"></div>
         </div>
         <div class="devicelist">
             <table class="table">
-            <thead>
-              <tr>
-                <th>IP</th>
-                <th>ID</th>
-                <th>Type</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Version</th>
-                <th>Heartbeat</th>
-                <th>Disk Free/Total</th>
-                <th>AWB gains</th>
-                <th>D/A gains</th>
-                <th>Exposure</th>
-                <th>Actions</th>
-              </tr>
-              </thead>
-              {{ pyview.device_list.render() }}
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Version</th>
+                        <th>Heartbeat</th>
+                        <th>Disk Free/Total</th>
+                        <th>AWB gains</th>
+                        <th>D/A gains</th>
+                        <th>Exposure</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                {{ pyview.device_list.render() }}
             </table>
         </div>      
-      </div>      
+    </div>      
     '''
 
     def __init__(self, subject: App, parent):
@@ -66,27 +64,27 @@ class DevicesView(PyHtmlView):
 class DeviceRowView(PyHtmlView):
     DOM_ELEMENT = "tr"
     TEMPLATE_STR = '''
-        <td>{{pyview.subject.ip}}</td>
-        <td>{{pyview.subject.device_id}}</td>
-        <td>{{pyview.subject.device_type}}</td>
-        <td>{{pyview.subject.name}}</td>
-        <td>{{pyview.subject.status}}</td>
-        <td>{{pyview.subject.version}}</td>
-        <td>{{pyview.subject.latest_heartbeat_time_diff}}</td>
-        <td>{{pyview.subject.diskfree}}/{{pyview.subject.disksize}}</td>
-        {% if pyview.subject.device_type == "camera" %}
-            <td>   {{"%.3f"|format(pyview.subject.camera.settings.awb_gains[0])}} / {{"%.3f"|format(pyview.subject.camera.settings.awb_gains[1])}}</td>
-            <td>   {{"%.3f"|format(pyview.subject.camera.settings.digital_gain)}} / {{"%.3f"|format(pyview.subject.camera.settings.analog_gain)}}</td>
-            <td>{{pyview.subject.camera.settings.exposure_speed}}</td>
-        {% else %}
-            <td></td>
-            <td></td>
-            <td></td>
-        {% endif %}
-        <td style="color:#000">
-            <button onclick="pyview.install_device()">Update</button>
-            <button onclick="pyview.reboot_device()">Reboot</button>
-        </td>
+    <td> {{pyview.subject.ip}} </td>
+    <td> {{pyview.subject.device_id}} </td>
+    <td> {{pyview.subject.device_type}} </td>
+    <td> {{pyview.subject.name}} </td>
+    <td> {{pyview.subject.status}} </td>
+    <td> {{pyview.subject.version}} </td>
+    <td> {{pyview.subject.latest_heartbeat_time_diff}} </td>
+    <td> {{pyview.subject.diskfree}}/{{pyview.subject.disksize}} </td>
+    {% if pyview.subject.device_type == "camera" %}
+        <td> {{"%.3f"|format(pyview.subject.camera.settings.awb_gains[0])}} / {{"%.3f"|format(pyview.subject.camera.settings.awb_gains[1])}} </td>
+        <td> {{"%.3f"|format(pyview.subject.camera.settings.digital_gain)}} / {{"%.3f"|format(pyview.subject.camera.settings.analog_gain)}}  </td>
+        <td> {{pyview.subject.camera.settings.exposure_speed}} </td>
+    {% else %}
+        <td> </td>
+        <td> </td>
+        <td> </td>
+    {% endif %}
+    <td style="color:#000">
+        <button onclick="pyview.install_device()"> Update </button>
+        <button onclick="pyview.reboot_device()"> Reboot </button>
+    </td>
     '''
 
     def install_device(self):
@@ -99,17 +97,17 @@ class DeviceRowView(PyHtmlView):
 # idle, ping_scan, api_scan, inspecting, ssh_scan
 class TaskNetworkscanView(PyHtmlView):
     TEMPLATE_STR = '''
-        <div class="col-md-2 topMenuItem" >
-            {% if pyview.subject.status == "idle" %} 
-                <button class="btn" onclick='pyview.start_scan();'> Search Devices </button>
-            {% else %}
-                {% if pyview.subject.status == "ping_scan"  %} Step 1/5 Ping scan {% endif %}
-                {% if pyview.subject.status == "api_scan"   %} Step 2/5 API scan{% endif %}
-                {% if pyview.subject.status == "inspecting" %} Step 3/5 Inspecting results{% endif %}
-                {% if pyview.subject.status == "ssh_scan"   %} Step 4/5 SSH scan {% endif %}
-                {% if pyview.subject.status == "trigger_heartbeat" %} Step 5/5 Trigger Heartbeat {% endif %}
-            {% endif %}
-        </div>
+    <div class="col-md-2 topMenuItem" >
+        {% if pyview.subject.status == "idle" %} 
+            <button class="btn" onclick='pyview.start_scan();'> Search Devices </button>
+        {% else %}
+            {% if pyview.subject.status == "ping_scan"  %} Step 1/5 Ping scan {% endif %}
+            {% if pyview.subject.status == "api_scan"   %} Step 2/5 API scan{% endif %}
+            {% if pyview.subject.status == "inspecting" %} Step 3/5 Inspecting results{% endif %}
+            {% if pyview.subject.status == "ssh_scan"   %} Step 4/5 SSH scan {% endif %}
+            {% if pyview.subject.status == "trigger_heartbeat" %} Step 5/5 Trigger Heartbeat {% endif %}
+        {% endif %}
+    </div>
     '''
 
     def __init__(self, subject, parent):
@@ -121,14 +119,14 @@ class TaskNetworkscanView(PyHtmlView):
 
 class TaskUpdateClientsView(PyHtmlView):
     TEMPLATE_STR = '''
-        <div class="col-md-2 topMenuItem" >
-            {% if pyview.subject.status == "idle" %} 
-                <button class="btn" onclick='pyview.subject.run();'> Update Devices </button>
-            {% else %}
-                {% if pyview.subject.status == "deploying"  %} Deploying ({{pyview.subject.percent_done}}%) {% endif %}
-                {% if pyview.subject.status == "installing"   %} Installing{% endif %}
-            {% endif %}
-        </div>
+    <div class="col-md-2 topMenuItem" >
+        {% if pyview.subject.status == "idle" %} 
+            <button class="btn" onclick='pyview.subject.run();'> Update Devices </button>
+        {% else %}
+            {% if pyview.subject.status == "deploying"  %} Deploying ({{pyview.subject.percent_done}}%) {% endif %}
+            {% if pyview.subject.status == "installing"   %} Installing{% endif %}
+        {% endif %}
+    </div>
     '''
 
     def __init__(self, subject, parent):
@@ -138,14 +136,14 @@ class TaskUpdateClientsView(PyHtmlView):
 # idle, ping_scan, api_scan, inspecting, ssh_scan
 class TaskSyncShotsView(PyHtmlView):
     TEMPLATE_STR = '''
-        <div class="col-md-2 topMenuItem" >
-            {% if pyview.subject.status == "idle" %} 
-                <button class="btn" onclick='pyview.start_sync();'> Sync Shotlists </button>
-            {% else %}
-                 {% if pyview.subject.status == "list" %}Syncing lists {% endif %}
-                 {% if pyview.subject.status == "shots" %}Syncing shots{% endif %}
-            {% endif %}
-        </div>
+    <div class="col-md-2 topMenuItem" >
+        {% if pyview.subject.status == "idle" %} 
+            <button class="btn" onclick='pyview.start_sync();'> Sync Shotlists </button>
+        {% else %}
+             {% if pyview.subject.status == "list" %}Syncing lists {% endif %}
+             {% if pyview.subject.status == "shots" %}Syncing shots{% endif %}
+        {% endif %}
+    </div>
     '''
 
     def __init__(self, subject, parent):

@@ -13,11 +13,11 @@ from views.settings.settingsWirelessView import WirelessSettingsView
 
 class TaskUpdateServerView(PyHtmlView):
     TEMPLATE_STR = '''
-        {% if pyview.subject.status == "idle" %} 
-            <button class="btn" onclick='pyview.subject.run();'> Update Server </button>
-        {% else %}
-            <p class="btn">{{pyview.subject.status}}</p>
-        {% endif %}
+    {% if pyview.subject.status == "idle" %} 
+        <button class="btn" onclick='pyview.subject.run();'> Update Server </button>
+    {% else %}
+        <p class="btn" style="color:green">{{pyview.subject.status}}</p>
+    {% endif %}
     '''
 
 
@@ -39,7 +39,6 @@ class SettingsView(PyHtmlView):
         
         {{pyview.usbStorageView.render()}}  
         
-          
         <div class="System">
             <div class="row justify-content-center" style="width:100%">
                 <div class="col-md-12">
@@ -78,7 +77,7 @@ class SettingsView(PyHtmlView):
 
         {{pyview.rebootShutdownView.render()}}  
 
-         {{pyview.hostnameView.render()}}  
+        {{pyview.hostnameView.render()}}  
 
     </div> 
     

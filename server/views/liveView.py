@@ -55,7 +55,7 @@ class TaskCameraBalanceTopView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="col-md-2 topMenuItem">
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn btn-success" onclick='pyview.run();'> Balance Camera </button>
+            <button class="btn" onclick='pyview.run();'> Balance cameras </button>
         {% else %}
             Balancing
         {% endif %}
@@ -77,7 +77,7 @@ class TaskCreateShotView(PyHtmlView):
     </div>
     <div class="col-md-2 topMenuItem" >
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn btn-success" style="margin-right:5px" onclick='pyview.create_shot( $("#_name_input").val());' style="color:#484"> TAKE SHOT  </button>
+            <button class="btn btn-success" style="margin-right:5px; width: 80%;" onclick='pyview.create_shot( $("#_name_input").val());' style="color:#484"> TAKE SHOT  </button>
         {% else %}
             {% if pyview.subject.status == "preparing"  %} Warmup {% endif %}
             {% if pyview.subject.status == "waiting"    %} Shot in {{pyview.subject.shot_count_down}}{% endif %}
@@ -101,11 +101,11 @@ class LiveView(PyHtmlView):
     <div class="main">
         <div class="topMenu row" style="height:50px">
             {{ pyview.create_shot_view.render() }}
+            <div class="col-md-4 topMenuItem">&nbsp;</div>
             <div class="col-md-2 topMenuItem">
                 <p id="light_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">Light ({{pyview.get_light()}}%)</p>
                 <input onchange="pyview.set_light(this.value)" oninput="document.getElementById('light_value').innerHTML = 'Light ('+this.value+'%)' " type="range" min="0" max="100" value="{{pyview.get_light()}}" style="min-height:30px;">
             </div>
-            <div class="col-md-2 topMenuItem">&nbsp;</div>
             {{ pyview.camerabalance_view.render() }}
         </div>
         <div style="overflow-y:scroll;height:calc(100% - 35px);">

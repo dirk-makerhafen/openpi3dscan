@@ -162,7 +162,7 @@ class CameraSettingsView(PyHtmlView):
                 </div>
                 <div class="list-group-item">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <strong class="mb-0">Shutter speed (0=Auto)</strong>
                             <p class="text-muted mb-0">Set Shutter speed for cameras, or click <i>Balance</i> to select automatically.</p>
                         </div>
@@ -181,6 +181,7 @@ class CameraSettingsView(PyHtmlView):
                             <strong class="mb-0">Whitebalance gains</strong>
                             <p class="text-muted mb-0">Set whitebalance gains for cameras, or click <i>Balance</i> to select automatically.</p>
                         </div>
+                        <div class="col-md-2">{{pyview.whitebalance_view.render()}}</div>
                         <div class="col-md-2">
                             <div class="custom-control custom-switch">
                                 <p style="color:red" >red</p>
@@ -197,7 +198,7 @@ class CameraSettingsView(PyHtmlView):
                 </div>   
                 <div class="list-group-item">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <strong class="mb-0">Auto balance</strong>
                             <p class="text-muted mb-0">Automatically set shutter speed and whitebalance gains.</p>
                         </div>

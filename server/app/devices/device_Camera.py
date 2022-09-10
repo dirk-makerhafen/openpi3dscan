@@ -218,8 +218,8 @@ class CameraShots:
         result = self.camera.device.api_request(url, max_time=5)
         if result is not None:
             sleeptime = sequence[-1] - time.time()
-            if sleeptime > 0 and sleeptime < 6:
-                time.sleep(sleeptime)
+            if sleeptime > 0 and sleeptime < 10:
+                time.sleep(sleeptime + 1)
             self.shotlist.append(remote_shot.shot_id)
             remote_shot.add_device(self.camera.device)
         return True
@@ -228,7 +228,7 @@ class CameraShots:
     def download(self, shot_id, image_type, image_mode, return_image=True):
         # "/shot/<shot_id>/<image_mode>/<image_type>.jpg
         self.camera.device.wait_locked()
-        self.camera.device.lock(5)
+        self.camera.device.lock(10)
         try:
             r = self.camera.device.api_request("/camera/shots/get/%s/%s/%s.jpg" % (shot_id, image_mode, image_type), max_tries=1)
             data = r.content

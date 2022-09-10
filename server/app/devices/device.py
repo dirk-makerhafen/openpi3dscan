@@ -204,7 +204,7 @@ class Device(Observable):
 
     def wait_locked(self):
         while self.busy_until > time.time():
-            gevent.sleep(0.2)
+            gevent.sleep(0.3)
 
     def lock(self, seconds):
         self.busy_until = time.time() + seconds

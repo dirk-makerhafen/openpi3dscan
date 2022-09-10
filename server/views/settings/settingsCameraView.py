@@ -9,9 +9,9 @@ from app.tasks.task_Whitebalance import TaskWhitebalanceInstance
 class TaskCameraBalanceView(PyHtmlView):
     TEMPLATE_STR = '''
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn" onclick='pyview.subject.run();'> Balance </button>
+            <button class="btn" onclick='pyview.subject.run();'> Calibrate all </button>
         {% else %}
-            <p class="btn" style="color:green">Balancing</p>
+            <p class="btn" style="color:green">Calibrating</p>
         {% endif %}
     '''
 
@@ -20,9 +20,9 @@ class TaskCameraBalanceView(PyHtmlView):
 class TaskShutterBalanceView(PyHtmlView):
     TEMPLATE_STR = '''
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn" onclick='pyview.subject.run();'> Balance </button>
+            <button class="btn" onclick='pyview.subject.run();'> Calibrate </button>
         {% else %}
-            <p class="btn" style="color:green">Balancing</p>
+            <p class="btn" style="color:green">Calibrating</p>
         {% endif %}
     '''
 
@@ -30,9 +30,9 @@ class TaskShutterBalanceView(PyHtmlView):
 class TaskWhitebalanceView(PyHtmlView):
     TEMPLATE_STR = '''
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn" onclick='pyview.subject.run();'> Balance </button>
+            <button class="btn" onclick='pyview.subject.run();'> Calibrate </button>
         {% else %}
-            <p class="btn" style="color:green">Balancing</p>
+            <p class="btn" style="color:green">Calibrating</p>
         {% endif %}
     '''
 
@@ -156,15 +156,15 @@ class CameraSettingsView(PyHtmlView):
         <div class="col-md-12">
             <div class="list-group mb-5 shadow">
                 <div class="list-group-item">
-                        <div class="row align-items-center">
-                            <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Image calibration</div>
-                        </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Image calibration</div>
+                    </div>
                 </div>
                 <div class="list-group-item">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <strong class="mb-0">Shutter speed (0=Auto)</strong>
-                            <p class="text-muted mb-0">Set Shutter speed for cameras, or click <i>Balance</i> to select automatically.</p>
+                            <p class="text-muted mb-0">Set Shutter speed for cameras, or click <i>Calibrate</i> to select automatically.</p>
                         </div>
                         <div class="col-md-2">{{pyview.shutterbalance_view.render()}}</div>
                         <div class="col-md-2">
@@ -179,7 +179,7 @@ class CameraSettingsView(PyHtmlView):
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <strong class="mb-0">Whitebalance gains</strong>
-                            <p class="text-muted mb-0">Set whitebalance gains for cameras, or click <i>Balance</i> to select automatically.</p>
+                            <p class="text-muted mb-0">Set whitebalance gains for cameras, or click <i>Calibrate</i> to select automatically.</p>
                         </div>
                         <div class="col-md-2">{{pyview.whitebalance_view.render()}}</div>
                         <div class="col-md-1">
@@ -190,7 +190,7 @@ class CameraSettingsView(PyHtmlView):
                         </div>
                         <div class="col-md-1">
                             <div class="custom-control custom-switch">
-                                <p style="color:blue" >blue</p>
+                                <p style="color:blue">blue</p>
                                 <input style="width:100%" id="awb_gain_blue" type="number" step="0.01" value="{{pyview.subject.awb_gains[1]}}" onchange='pyview._set_awb_gain_blue($("#awb_gain_blue").val())'>
                             </div>
                         </div>
@@ -198,8 +198,8 @@ class CameraSettingsView(PyHtmlView):
                 </div>   
                 <div class="list-group-item">
                     <div class="row align-items-center">
-                        <div class="col-md-10">
-                            <strong class="mb-0">Auto balance</strong>
+                        <div class="col-md-8">
+                            <strong class="mb-0">Auto calibrate</strong>
                             <p class="text-muted mb-0">Automatically set shutter speed and whitebalance gains.</p>
                         </div>
                         <div class="col-md-2">{{pyview.camerabalance_view.render()}}</div>

@@ -9,7 +9,7 @@ class TaskShutterBalanceView(PyHtmlView):
         {% if pyview.subject.status == "idle" %} 
             <button class="btn" onclick='pyview.subject.run();'> Balance </button>
         {% else %}
-            <p class="btn">Balancing</p>
+            <p class="btn" style="color:green">Balancing</p>
         {% endif %}
     '''
 
@@ -19,7 +19,7 @@ class TaskWhitebalanceView(PyHtmlView):
         {% if pyview.subject.status == "idle" %} 
             <button class="btn" onclick='pyview.subject.run();'> Balance </button>
         {% else %}
-            <p class="btn">Balancing</p>
+            <p class="btn" style="color:green">Balancing</p>
         {% endif %}
     '''
 

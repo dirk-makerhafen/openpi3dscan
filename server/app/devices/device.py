@@ -53,15 +53,16 @@ class Device(Observable):
 
     @property
     def latest_heartbeat_time_diff(self):
+        if self.latest_heartbeat_time == 0:
+            return -1
         return int(time.time() - self.latest_heartbeat_time)
 
     @property
     def is_available(self):
         if self.device_type == "device":
             return False
-        if self.latest_heartbeat_time_diff > 650:
-            if self.status == "online":
-                self._set_status("offline")
+        if self.latest_heartbeat_time_diff > 650 and self.status == "online":
+            self._set_status("offline")
         return self.status == "online"
 
     def _set_status(self, new_status):

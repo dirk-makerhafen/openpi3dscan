@@ -12,6 +12,8 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 if __name__ == "__main__":
     time.sleep(20)  # wait for system
+    os.system("sudo ntpdate -u de.pool.ntp.org")
+
     gui = PyHtmlGui(
         app_instance    = AppInstance(),
         view_class      = AppView,

@@ -102,6 +102,10 @@ if __name__ == "__main__":
         time.sleep(60)
 
     stop_other_processes()
+
+    if NOWAIT is False:
+        os.system("sudo ntpdate -u 192.168.99.254")
+
     wait(10, 60)
 
     route("/id")(device_id)

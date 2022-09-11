@@ -40,12 +40,12 @@ class Task_UpdateClients(Observable):
             for i in range(150):
                 self.percent_done = int((100 / ld) * len([c for c in devices if c.status == "installing"]))
                 self.set_status("deploying")
-                if self.percent_done > 95:
+                if self.percent_done >= 99:
                     break
                 time.sleep(1)
             self.set_status("installing")
 
-        time.sleep(60)
+        time.sleep(90)
 
         self.set_status("idle")
         self.worker = None

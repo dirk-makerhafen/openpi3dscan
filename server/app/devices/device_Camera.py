@@ -103,10 +103,16 @@ class CameraSettings:
         self.camera.device.task_queue.put([self._set_shutter_speed, new_shutter_speed])
 
     def _set_shutter_speed(self, new_shutter_speed):
-        try:
-            self.shutter_speed = int(self.camera.device.api_request("/camera/settings/shutter_speed/%s" % new_shutter_speed).text)
-        except Exception as e:
-            print("failed to set shutter_speed on ", e)
+        new_shutter_speed_sr = ";".join(["%s" % g for g in new_shutter_speed])
+        for i in range(3):
+            if self.camera.device.api_request("/camera/settings/shutter_speed/%s" % new_shutter_speed_sr) is None:
+                print("failed to set shutter_speed")
+                break
+            time.sleep(0.5)
+            self.get_shutter_speed()
+            if abs(self.shutter_speed - new_shutter_speed) < 100: # set successfull
+                break
+            print("must repeat set_shutter_speed")
         self.camera.device.notify_observers()
 
     def set_awb_gains(self, new_gains):
@@ -133,6 +139,14 @@ class CameraSettings:
             print("failed to get awb_gains", e)
         self.camera.device.notify_observers()
         return self.awb_gains
+
+    def get_shutter_speed(self):
+        try:
+            self.shutter_speed = int(self.camera.device.api_request("/camera/settings/shutter_speed").text)
+        except Exception as e:
+            print("failed to get shutter_speed", e)
+        self.camera.device.notify_observers()
+        return self.shutter_speed
 
     def get_exposure_speed(self):
         try:

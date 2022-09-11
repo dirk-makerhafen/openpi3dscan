@@ -126,7 +126,7 @@ class CameraSettings:
                 break
             time.sleep(0.5)
             self.get_awb_gains()
-            if abs(self.awb_gains[0] - new_gains[0]) > 0.01 or abs(self.awb_gains[1] - new_gains[1]) < 0.01: # set successfull
+            if abs(self.awb_gains[0] - new_gains[0]) < 0.01 and abs(self.awb_gains[1] - new_gains[1]) < 0.01: # set successfull
                 break
             print("must repeat aws gain set")
 

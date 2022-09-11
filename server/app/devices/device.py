@@ -144,7 +144,7 @@ class Device(Observable):
             print("shutdown via sshd")
             self._ssh("sudo shutdown -h now &", timeout=10)
 
-    def api_request(self, url, max_time=7, max_tries=5, timeout=6):
+    def api_request(self, url, max_time=9, max_tries=5, timeout=6):
         result = None
         trynr = 0
         timeout_time = time.time() + max_time

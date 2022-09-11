@@ -113,11 +113,17 @@ class CameraSettings:
         self.camera.device.task_queue.put([self._set_awb_gains, new_gains])
 
     def _set_awb_gains(self, new_gains):
-        try:
-            new_gains = ";".join(["%s" % g for g in new_gains])
-            self.awb_gains = json.loads(self.camera.device.api_request("/camera/settings/awb_gains/%s" % new_gains).text)
-        except Exception as e:
-            print("failed to set awb_gains", e)
+        new_gains_str = ";".join(["%s" % g for g in new_gains])
+        for i in range(3):
+            if self.camera.device.api_request("/camera/settings/awb_gains/%s" % new_gains_str) is None:
+                print("failed to set awb_gains")
+                break
+            time.sleep(0.5)
+            self.get_awb_gains()
+            if abs(self.awb_gains[0] - new_gains[0]) > 0.01 or abs(self.awb_gains[1] - new_gains[1]) < 0.01: # set successfull
+                break
+            print("must repeat aws gain set")
+
         self.camera.device.notify_observers()
 
     def get_awb_gains(self):

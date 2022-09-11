@@ -119,7 +119,7 @@ class Task_NetworkScan(Observable):
     def _trigger_heartbeat(self, ip):
         try:
             result = requests.get("http://%s:8080/heartbeat" % ip, timeout=5)
-            return json.loads(result.text)
+            return True
         except Exception as e:
             print(e)
         return None

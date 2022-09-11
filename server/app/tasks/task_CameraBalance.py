@@ -75,6 +75,8 @@ class Task_CameraBalance(Observable):
             device.camera.settings.set_exposure_mode("off")
             device.camera.settings.set_awb_mode("off")
 
+        time.sleep(2)
+
         SettingsInstance().cameraSettings.shutter_speed = avg_exposure_speed
         SettingsInstance().cameraSettings.awb_gains = avg_awb_gains
 

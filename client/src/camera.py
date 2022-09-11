@@ -52,7 +52,7 @@ class Frame():
                 self.capture_success = True
 
     def create_preview(self, framesize):
-        if self.preview is None:
+        if self.image is None:
             return
         self.preview = Resize_YUVInstance().resize(self.image, from_size=self.image_framesize, to_size=framesize)
         self.preview_framesize = framesize

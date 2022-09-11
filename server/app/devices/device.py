@@ -109,8 +109,8 @@ class Device(Observable):
     def _deploy(self):
         self._set_status("installing")
         client_dir = os.path.join(SCRIPT_DIR, "..", "..", "..", "client")
-        self._ssh_exec('scp -r %s "%s" %s@%s:/home/%s/' % (SSH_OPTIONS, client_dir, self.username, self.ip, self.username), 60)
-        self._ssh('cd /home/%s/client ; python3 install.py "%s" "%s" "%s" "install_after_reboot"' % (self.username, self.device_id, self.device_type, self.name), timeout=1200)
+        self._ssh_exec('scp -r %s "%s" %s@%s:/home/%s/' % (SSH_OPTIONS, client_dir, self.username, self.ip, self.username), 180)
+        self._ssh('cd /home/%s/client ; python3 install.py "%s" "%s" "%s" "install_after_reboot"' % (self.username, self.device_id, self.device_type, self.name), timeout=180)
         self.latest_heartbeat_time = 0
         self._ssh('sudo reboot & ', timeout=10)
         self.notify_observers()

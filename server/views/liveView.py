@@ -19,7 +19,7 @@ class TaskShutterBalanceTopView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="col-md-2 topMenuItem">
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn btn-success" onclick='pyview.run();'> ShutterBalance </button>
+            <button class="btn btn-success" onclick='pyview.run();'> Shutterbalance </button>
         {% else %}
             Balancing
         {% endif %}
@@ -55,7 +55,7 @@ class TaskCameraBalanceTopView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="col-md-2 topMenuItem">
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn" onclick='pyview.run();'> Balance cameras </button>
+            <button class="btn" onclick='pyview.run();'> Balance </button>
         {% else %}
             Balancing
         {% endif %}

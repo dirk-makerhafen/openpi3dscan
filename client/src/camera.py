@@ -45,21 +45,31 @@ class Frame():
         self.preview_framesize = (800, 600)
         self.image = None
         self.preview = None
+        self.capture_success = False
         if buffer is not None:
             with buffer as data:
                 self.image = bytes(data)
+                self.capture_success = True
 
     def create_preview(self, framesize):
+        if self.preview is None:
+            return
         self.preview = Resize_YUVInstance().resize(self.image, from_size=self.image_framesize, to_size=framesize)
         self.preview_framesize = framesize
 
     def preview_to_jpeg(self, quality):
+        if self.preview is None:
+            return
         self.preview = YUV_to_JPEGInstance().encode(self.preview, framesize=self.preview_framesize, quality=quality)
 
     def optimise_preview(self):
+        if self.preview is None:
+            return
         self.preview = Image.open(BytesIO(self.preview))
 
     def save_preview(self, output, quality = 85):
+        if self.preview is None:
+            return
         if type(output) == type(""):
             path = "/".join(output.split("/")[0:-1])
             if not os.path.exists(path):
@@ -71,12 +81,18 @@ class Frame():
             self.preview.save(output, format="jpeg", quality=quality)  # make image smaller
 
     def image_to_jpeg(self, quality):
+        if self.image is None:
+            return
         self.image = YUV_to_JPEGInstance().encode(self.image, framesize=self.image_framesize, quality=quality)
 
     def optimise_image(self):
+        if self.image is None:
+            return
         self.image = Image.open(BytesIO(self.image))
 
     def save_image(self, output, quality = 100):
+        if self.image is None:
+            return
         if type(output) == type(""):
             path = "/".join(output.split("/")[0:-1])
             if not os.path.exists(path):
@@ -137,7 +153,7 @@ class CameraPort():
     def capture(self,nr_of_frames= -1, timestamps= None, use_pll = True):
         if timestamps is None:
             timestamps = [-1 for i in range(nr_of_frames)]
-        self.capture_timestamps = [ t for t in  timestamps ]
+        self.capture_timestamps = [ t for t in timestamps ]
 
         was_enabled = self.enabled
         pll_was_already_active = self._pll_active
@@ -148,7 +164,7 @@ class CameraPort():
 
         while len(timestamps) > 0:
             try:
-                frame = self.buffer.get(timeout=10)
+                frame = self.buffer.get(timeout=20)
             except:
                 break
             while len(timestamps) > 0 and frame.timestamp > (timestamps[0] + self.s_per_half_frame) and timestamps[0] != -1:  # timestamp missed and is too old
@@ -156,7 +172,7 @@ class CameraPort():
                 yield None
             if len(timestamps) > 0 and (abs(frame.timestamp - timestamps[0]) <= self.s_per_half_frame or timestamps[0] == -1):  # hit
                 del timestamps[0]
-                yield frame
+                yield frame if frame.capture_success is True else None
             else:
                 frame.clear()
 
@@ -384,6 +400,7 @@ class Camera():
         if self.workerqueue.qsize() != 0:
             return None
         self.cameralock.acquire()
+        frame = None
         try:
             if quality is not None:
                 self.quality = quality
@@ -392,6 +409,9 @@ class Camera():
             frame = [frame for frame in self.port.capture(nr_of_frames=1)][0]
         finally:
             self.cameralock.release()
+
+        if frame is None:
+            return None
 
         if self.capture_active is True: # return quick if capture was started
             frame.clear()

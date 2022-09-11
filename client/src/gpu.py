@@ -27,6 +27,7 @@ class Resize_YUV():
 
     def resize(self, YUV_DATA, output = None, from_size = (2592, 1944), to_size = (800, 600)):
         gpulock.acquire()
+        result = None
         try:
             if type(output) == str:
                 self.output = open(output, "wb")
@@ -45,22 +46,20 @@ class Resize_YUV():
             buf.data = YUV_DATA
             self.resizer.inputs[0].send_buffer(buf)
 
-            if not self.finished.wait(10):
+            if not self.finished.wait(30):
                 raise Exception('resizer timed out')
-            self.finished.clear()
 
-            self.resizer.outputs[0].disable()
-            self.resizer.inputs[0].disable()
-
-            r = None
             if type(output) == str:
                 self.output.close()
             else:
-                r = self.output
+                result = self.output
             self.output = None
         finally:
+            self.resizer.outputs[0].disable()
+            self.resizer.inputs[0].disable()
+            self.finished.clear()
             gpulock.release()
-        return r
+        return result
 
 class YUV_to_JPEG():
     def __init__(self):
@@ -81,6 +80,7 @@ class YUV_to_JPEG():
 
     def encode(self, YUV_DATA, output = None, framesize = (2592, 1944), quality = 100):
         gpulock.acquire()
+        result = None
         try:
             if type(output) == str:
                 self.output = open(output, "wb")
@@ -103,20 +103,18 @@ class YUV_to_JPEG():
 
             if not self.finished.wait(30):
                 raise Exception('encode timed out')
-            self.finished.clear()
 
-            self.encoder.outputs[0].disable()
-            self.encoder.inputs[0].disable()
-
-            r = None
             if type(output) == str:
                 self.output.close()
             else:
-                r = self.output
+                result = self.output
             self.output = None
         finally:
+            self.encoder.outputs[0].disable()
+            self.encoder.inputs[0].disable()
+            self.finished.clear()
             gpulock.release()
-        return r
+        return result
 
 
 

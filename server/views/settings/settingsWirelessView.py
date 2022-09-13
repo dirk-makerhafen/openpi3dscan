@@ -16,7 +16,7 @@ class WirelessSettingsView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-10">
                                 <strong class="mb-0">Name</strong>
-                                <p class="text-muted mb-0">Wireless network name</p>
+                                <p class="text-muted mb-0">Wireless network name. Use <i>name;address</i> if you need to force a specific AP address</p>
                             </div>
                             <div class="col-auto">
                                 <input id="wireless_ssid" value="{{pyview.subject.ssid}}" type="text"/>
@@ -76,7 +76,9 @@ class WirelessSettingsView(PyHtmlView):
                             <div class="col-md-1">
                                 {% if pyview.subject.scan_worker == None %}
                                     <button class="btn " style="margin-right:5px" onclick='pyview.subject.scan();'> Scan </button>
-                                    <button class="btn " style="margin-right:5px;margin-top:5px" onclick='pyview.subject.clear();'> Clear </button>
+                                    {% if  pyview.subject.wireless_networks|length > 0 %}
+                                        <button class="btn " style="margin-right:5px;margin-top:5px" onclick='pyview.subject.clear();'> Clear </button>
+                                    {% endif %}
                                 {% else %}
                                     <button class="btn " disabled style="margin-right:5px" > Scanning </button>
                                 {% endif %}

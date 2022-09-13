@@ -3,14 +3,6 @@ import threading
 import time
 from pyhtmlgui import Observable, ObservableList
 
-bssid = part.split("\n")[0]
-ssid = part.split("ESSID:\"")[0].split('"')[0]
-frequency = "2.4ghz"
-if "Frequency:5" in part:
-    frequency = "5ghz"
-channel = part.split("Chnnel:")[1].split("\n")[0]
-signal = part.split("Quality=")[1].split(" ")[0]
-
 
 class WirelessNetwork():
     def __init__(self, bssid, ssid, frequency, channel, signal):

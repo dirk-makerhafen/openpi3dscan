@@ -55,9 +55,12 @@ class SettingsWireless(Observable):
         self.apply_worker.start()
 
     def _apply(self):
-        idstr = "ssid"
-        if len(self.ssid) == 17 and self.ssid.count(":") == 5:
-            idstr = "bssid"
+        if ";" in self.ssid:
+            ssid = self.ssid.split(";")[0]
+            bssid = "bssid=%s" % self.ssid.split(";")[1]
+        else:
+            ssid = self.ssid
+            bssid = "#no bssid"
 
         t = '''
 country=de
@@ -65,10 +68,11 @@ update_config=1
 ctrl_interface=/var/run/wpa_supplicant
 network={
     scan_ssid=1
-    %s="%s"
+    ssid="%s"
+    %s
     psk="%s"
 }
-        ''' % (idstr, self.ssid, self.password)
+        ''' % (ssid, bssid, self.password)
         open("/etc/wpa_supplicant/wpa_supplicant.conf", "w").write(t)
         self.set_status("configure")
         subprocess.call("sudo wpa_cli -i wlan0 reconfigure", shell=True)
@@ -126,5 +130,6 @@ network={
                 self.wireless_networks.append(WirelessNetwork(bssid,ssid,frequency,channel, signal))
             except:
                 pass
+        sorted(self.wireless_networks, key=lambda wn: (wn.ssid, wn.frequency, wn.signal, wn.channel ))
         self.scan_worker = None
         self.notify_observers()

@@ -85,8 +85,8 @@ class WirelessSettingsView(PyHtmlView):
                                     <table style="width:100%;text-align:center">
                                         <thead>
                                         <tr>
-                                            <td>SSID</td>
-                                            <td>BSSID</td>
+                                            <td>Name</td>
+                                            <td>Address</td>
                                             <td>Frequency</td>
                                             <td>Channel</td>
                                             <td>Signal</td>

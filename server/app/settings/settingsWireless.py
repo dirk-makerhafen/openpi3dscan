@@ -130,6 +130,6 @@ network={
                 self.wireless_networks.append(WirelessNetwork(bssid,ssid,frequency,channel, signal))
             except:
                 pass
-        sorted(self.wireless_networks, key=lambda wn: (wn.ssid, wn.frequency, wn.signal, wn.channel ))
+        sort(self.wireless_networks, key=lambda wn: (wn.ssid, wn.frequency, wn.signal, wn.channel ))
         self.scan_worker = None
         self.notify_observers()

@@ -76,6 +76,7 @@ class WirelessSettingsView(PyHtmlView):
                             <div class="col-md-1">
                                 {% if pyview.subject.scan_worker == None %}
                                     <button class="btn " style="margin-right:5px" onclick='pyview.subject.scan();'> Scan </button>
+                                    <button class="btn " style="margin-right:5px;margin-top:5px" onclick='pyview.subject.clear();'> Clear </button>
                                 {% else %}
                                     <button class="btn " disabled style="margin-right:5px" > Scanning </button>
                                 {% endif %}

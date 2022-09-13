@@ -106,6 +106,10 @@ network={
                 self.set_status("not_connected")
         self.status_worker = None
 
+    def clear(self):
+        self.wireless_networks = []
+        self.notify_observers()
+
     def scan(self):
         if self.scan_worker is not None:
             return
@@ -130,6 +134,6 @@ network={
                 self.wireless_networks.append(WirelessNetwork(bssid,ssid,frequency,channel, signal))
             except:
                 pass
-        sort(self.wireless_networks, key=lambda wn: (wn.ssid, wn.frequency, wn.signal, wn.channel ))
+        self.wireless_networks = sorted(self.wireless_networks, key=lambda wn: (wn.ssid, wn.frequency, wn.signal, wn.channel ))
         self.scan_worker = None
         self.notify_observers()

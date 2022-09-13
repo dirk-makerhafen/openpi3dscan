@@ -1,7 +1,24 @@
 import subprocess
 import threading
 import time
-from pyhtmlgui import Observable
+from pyhtmlgui import Observable, ObservableList
+
+bssid = part.split("\n")[0]
+ssid = part.split("ESSID:\"")[0].split('"')[0]
+frequency = "2.4ghz"
+if "Frequency:5" in part:
+    frequency = "5ghz"
+channel = part.split("Chnnel:")[1].split("\n")[0]
+signal = part.split("Quality=")[1].split(" ")[0]
+
+
+class WirelessNetwork():
+    def __init__(self, bssid, ssid, frequency, channel, signal):
+        self.bssid = bssid
+        self.ssid = ssid
+        self.frequency = frequency
+        self.channel = channel
+        self.signal = signal
 
 
 class SettingsWireless(Observable):
@@ -15,7 +32,9 @@ class SettingsWireless(Observable):
         self.ip = ""
         self.apply_worker = None
         self.status_worker = None
+        self.scan_worker = None
         self.get_connection_status()
+        self.wireless_networks = []
 
     def set_status(self, status):
         self.status = status
@@ -44,16 +63,20 @@ class SettingsWireless(Observable):
         self.apply_worker.start()
 
     def _apply(self):
+        idstr = "ssid"
+        if len(self.ssid) == 17 and self.ssid.count(":") == 5:
+            idstr = "bssid"
+
         t = '''
 country=de
 update_config=1
 ctrl_interface=/var/run/wpa_supplicant
 network={
     scan_ssid=1
-    ssid="%s"
+    %s="%s"
     psk="%s"
 }
-        ''' % (self.ssid, self.password)
+        ''' % (idstr, self.ssid, self.password)
         open("/etc/wpa_supplicant/wpa_supplicant.conf", "w").write(t)
         self.set_status("configure")
         subprocess.call("sudo wpa_cli -i wlan0 reconfigure", shell=True)
@@ -87,3 +110,27 @@ network={
                 self.ip = ""
                 self.set_status("not_connected")
         self.status_worker = None
+
+    def scan(self):
+        if self.scan_worker is not None:
+            return
+        self.scan_worker = threading.Thread(target=self._scan(), daemon=True)
+        self.scan_worker.start()
+
+    def _scan(self):
+        self.wireless_networks = []
+        stdout = subprocess.check_output("sudo iwlist wlan0 scan", shell=True, timeout=30,stderr=subprocess.STDOUT).decode("UTF-8")
+        parts = stdout.split("Address: ")
+        for part in parts:
+            try:
+                bssid = part.split("\n")[0].strip()
+                ssid = part.split("ESSID:\"")[0].split('"')[0].strip()
+                frequency = "2.4ghz"
+                if "Frequency:5" in part:
+                    frequency = "5ghz"
+                channel = part.split("Channel:")[1].split("\n")[0].strip()
+                signal = part.split("Quality=")[1].split(" ")[0].strip()
+                self.wireless_networks.append(WirelessNetwork(bssid,ssid,frequency,channel, signal))
+            except:
+                pass
+        self.notify_observers()

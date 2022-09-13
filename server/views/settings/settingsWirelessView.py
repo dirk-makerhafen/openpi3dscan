@@ -62,7 +62,43 @@ class WirelessSettingsView(PyHtmlView):
                                 {% if pyview.subject.status == "checking" %}Checking Status{% endif %}
                             </div>
                         </div>
-                    </div>                                  
+                    </div>   
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <strong class="mb-0">Wlan Scan</strong>
+                                <p class="text-muted mb-0">Search for available wireless networks.</p>
+                            </div>
+                            <div class="col-md-1">
+                                <button class="btn " style="margin-right:5px" onclick='pyview.subject.scan();'> Scan </button>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="custom-control custom-switch">
+                                    <table style="width:100%;text-align:center">
+                                        <thead>
+                                        <tr>
+                                            <td>SSID</td>
+                                            <td>BSSID</td>
+                                            <td>Frequency</td>
+                                            <td>Channel</td>
+                                            <td>Signal</td>
+                                        </tr>
+                                        </thead>
+                                        {% for wireless_network in pyview.subject.wireless_networks %}
+                                            <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
+                                                <td> {{wireless_network.ssid}} </td>
+                                                <td> {{wireless_network.bssid}} </td>
+                                                <td> {{wireless_network.frequency}} </td>
+                                                <td> {{wireless_network.channel}} </td>
+                                                <td> {{wireless_network.signal}} </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>                 
+                                    <span class="custom-control-label"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                               
                 </div>
             </div>   
         </div>

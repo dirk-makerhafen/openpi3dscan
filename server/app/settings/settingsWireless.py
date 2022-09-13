@@ -115,8 +115,8 @@ network={
         parts = stdout.split("Address: ")
         for part in parts:
             try:
-                bssid = part.split("\n")[0].strip()
-                ssid = part.split("ESSID:\"")[0].split('"')[0].strip()
+                bssid = part.split("\n")[0].split("\n")[0].strip()
+                ssid = part.split("ESSID:\"")[1].split('"')[0].strip()
                 frequency = "2.4ghz"
                 if "Frequency:5" in part:
                     frequency = "5ghz"

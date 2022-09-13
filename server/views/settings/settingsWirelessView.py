@@ -65,7 +65,7 @@ class WirelessSettingsView(PyHtmlView):
                     </div>   
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <strong class="mb-0">Wlan Scan</strong>
                                 <p class="text-muted mb-0">Search for available wireless networks.</p>
                             </div>

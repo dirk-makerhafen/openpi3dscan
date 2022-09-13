@@ -52,7 +52,11 @@ class WirelessSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Wireless network status</p>
                             </div>
                             <div class="col-md-2">
-                               <button class="btn " style="margin-right:5px" onclick='pyview.subject.get_connection_status();'> Get Status </button>
+                                {% if pyview.subject.status != "checking" and pyview.subject.status != "configure" and pyview.subject.status != "connecting" %}
+                                    <button class="btn " diabled style="margin-right:5px" > Working </button>
+                                {% else %}
+                                    <button class="btn " style="margin-right:5px" onclick='pyview.subject.get_connection_status();'> Get Status </button>
+                                {% endif %}
                             </div>
                             <div class="col-md-2">
                                 {% if pyview.subject.status == "not_connected" %}NOT Connected{% endif %}
@@ -70,7 +74,11 @@ class WirelessSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Search for available wireless networks.</p>
                             </div>
                             <div class="col-md-1">
-                                <button class="btn " style="margin-right:5px" onclick='pyview.subject.scan();'> Scan </button>
+                                {% if pyview.subject.scan_worker == None %}
+                                    <button class="btn " style="margin-right:5px" onclick='pyview.subject.scan();'> Scan </button>
+                                {% else %}
+                                    <button class="btn " diabled style="margin-right:5px" > Working </button>
+                                {% endif %}
                             </div>
                             <div class="col-md-5">
                                 <div class="custom-control custom-switch">

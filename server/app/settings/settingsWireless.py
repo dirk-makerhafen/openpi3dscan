@@ -110,6 +110,7 @@ network={
         self.scan_worker.start()
 
     def _scan(self):
+        self.notify_observers()
         self.wireless_networks = []
         stdout = subprocess.check_output("sudo iwlist wlan0 scan", shell=True, timeout=30,stderr=subprocess.STDOUT).decode("UTF-8")
         parts = stdout.split("Address: ")
@@ -125,4 +126,5 @@ network={
                 self.wireless_networks.append(WirelessNetwork(bssid,ssid,frequency,channel, signal))
             except:
                 pass
+        self.scan_worker = None
         self.notify_observers()

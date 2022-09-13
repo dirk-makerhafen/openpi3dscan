@@ -114,7 +114,7 @@ network={
     def scan(self):
         if self.scan_worker is not None:
             return
-        self.scan_worker = threading.Thread(target=self._scan(), daemon=True)
+        self.scan_worker = threading.Thread(target=self._scan, daemon=True)
         self.scan_worker.start()
 
     def _scan(self):

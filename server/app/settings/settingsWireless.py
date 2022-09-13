@@ -89,8 +89,7 @@ network={
             self.set_status("checking")
             time.sleep(2)
             try:
-                stdout = subprocess.check_output("ifconfig wlan0|grep -i inet", shell=True, timeout=10,
-                                                 stderr=subprocess.STDOUT).decode("UTF-8")
+                stdout = subprocess.check_output("ifconfig wlan0|grep -i inet", shell=True, timeout=10,stderr=subprocess.STDOUT).decode("UTF-8")
                 if "192.168" in stdout:
                     self.ip = "192.168%s" % (stdout.split("192.168")[1].split(" ")[0])
                     self.set_status("connected")
@@ -110,8 +109,9 @@ network={
         self.scan_worker.start()
 
     def _scan(self):
-        self.notify_observers()
         self.wireless_networks = []
+        self.notify_observers()
+
         stdout = subprocess.check_output("sudo iwlist wlan0 scan", shell=True, timeout=30,stderr=subprocess.STDOUT).decode("UTF-8")
         parts = stdout.split("Address: ")
         for part in parts:

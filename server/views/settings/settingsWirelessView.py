@@ -37,7 +37,7 @@ class WirelessSettingsView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
-                                <strong class="mb-0">Save Changes</strong>
+                                <strong class="mb-0">Save changes</strong>
                                 <p class="text-muted mb-0">Apply new wlan settings</p>
                             </div>
                             <div class="col-auto">
@@ -52,8 +52,8 @@ class WirelessSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Wireless network status</p>
                             </div>
                             <div class="col-md-2">
-                                {% if pyview.subject.status != "checking" and pyview.subject.status != "configure" and pyview.subject.status != "connecting" %}
-                                    <button class="btn " diabled style="margin-right:5px" > Working </button>
+                                {% if pyview.subject.status == "checking" or pyview.subject.status == "configure" or pyview.subject.status == "connecting" %}
+                                    <button class="btn " disabled style="margin-right:5px" > Working </button>
                                 {% else %}
                                     <button class="btn " style="margin-right:5px" onclick='pyview.subject.get_connection_status();'> Get Status </button>
                                 {% endif %}
@@ -70,14 +70,14 @@ class WirelessSettingsView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-6">
-                                <strong class="mb-0">Wlan Scan</strong>
+                                <strong class="mb-0">Wireless scan</strong>
                                 <p class="text-muted mb-0">Search for available wireless networks.</p>
                             </div>
                             <div class="col-md-1">
                                 {% if pyview.subject.scan_worker == None %}
                                     <button class="btn " style="margin-right:5px" onclick='pyview.subject.scan();'> Scan </button>
                                 {% else %}
-                                    <button class="btn " diabled style="margin-right:5px" > Working </button>
+                                    <button class="btn " disabled style="margin-right:5px" > Scanning </button>
                                 {% endif %}
                             </div>
                             <div class="col-md-5">

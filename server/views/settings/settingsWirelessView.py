@@ -101,7 +101,7 @@ class WirelessSettingsView(PyHtmlView):
                                                 <td> {{wireless_network.bssid}} </td>
                                                 <td> {{wireless_network.frequency}} </td>
                                                 <td> {{wireless_network.channel}} </td>
-                                                <td> {{wireless_network.signal}} </td>
+                                                <td> {{wireless_network.signal}}% </td>
                                             </tr>
                                         {% endfor %}
                                     </table>                 

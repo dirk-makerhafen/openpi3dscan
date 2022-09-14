@@ -55,7 +55,7 @@ class SettingsWireless(Observable):
         self.apply_worker.start()
 
     def _apply(self):
-        if ";" in self.ssid:
+        if ";" in self.ssid and self.ssid.count(":") == 5:
             ssid = self.ssid.split(";")[0]
             bssid = "bssid=%s" % self.ssid.split(";")[1]
         else:
@@ -130,7 +130,8 @@ network={
                 if "Frequency:5" in part:
                     frequency = "5ghz"
                 channel = part.split("Channel:")[1].split("\n")[0].strip()
-                signal = part.split("Quality=")[1].split(" ")[0].strip()
+                signal = [int(x) for x in part.split("Quality=")[1].split(" ")[0].strip().split("/")]
+                signal = int(100.0/signal[1]*signal[0])
                 self.wireless_networks.append(WirelessNetwork(bssid,ssid,frequency,channel, signal))
             except:
                 pass

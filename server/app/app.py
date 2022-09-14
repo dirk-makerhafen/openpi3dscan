@@ -6,7 +6,7 @@ from app.cardReader import CardReaderInstance
 from app.usbDisks import UsbDisks
 import os
 from app.settings.settings import SettingsInstance
-
+import time
 
 class App(Observable):
     def __init__(self):
@@ -22,11 +22,13 @@ class App(Observable):
     def reboot(self):
         self.status = "reboot"
         self.notify_observers()
+        time.sleep(3)
         os.system("sudo reboot &")
 
     def shutdown(self):
         self.status = "shutdown"
         self.notify_observers()
+        time.sleep(3)
         os.system("sudo shutdown -h now &")
 
 

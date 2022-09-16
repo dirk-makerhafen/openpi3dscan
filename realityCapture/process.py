@@ -1,4 +1,6 @@
 import math
+
+import imageio
 import requests, json, sys
 import os, glob, sys, shutil
 import subprocess, shlex, time
@@ -673,12 +675,17 @@ class RealityCapture():
             os.system('mogrify.exe -crop %sx%s+100+100 +repage "%s"' % (size-100,size-100,file))
             os.system('optipng.exe -clobber "%s"' % file)
         ThreadPool(8).map(f, files)
-        
-        total_duration = 400 # in 1/100th of a seconds
-        delay = int(round(total_duration / len(files),0))
 
-        cmd = 'convert.exe -fuzz 5%% -quality 95 -delay %s -loop 0  -layers OptimizePlus "%s" "%s"' % (delay, os.path.join(path, "screenshot_*.png"), output_file)
-        os.system(cmd)
+        images = []
+        for file in files:
+            images.append(imageio.imread(file))
+        imageio.mimsave(output_file, images, fps=int(len(files)/4))
+        os.system('optipng.exe "%s"' % output_file)
+        #total_duration = 400 # in 1/100th of a seconds
+        #delay = int(round(total_duration / len(files),0))
+
+        #cmd = 'convert.exe -fuzz 5%% -quality 95 -delay %s -loop 0  -layers OptimizePlus "%s" "%s"' % (delay, os.path.join(path, "screenshot_*.png"), output_file)
+        #os.system(cmd)
         if DEBUG is False:
             for f in glob.glob(os.path.join(path, "screenshot_*.*")):
                 os.remove(f)

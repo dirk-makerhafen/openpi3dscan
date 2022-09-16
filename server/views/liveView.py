@@ -98,7 +98,7 @@ class TaskCreateShotView(PyHtmlView):
 
 class LiveView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="main">
+    <div class="main" >
         <div class="topMenu row" style="height:50px">
             {{ pyview.create_shot_view.render() }}
             <div class="col-md-4 topMenuItem">&nbsp;</div>
@@ -108,7 +108,7 @@ class LiveView(PyHtmlView):
             </div>
             {{ pyview.camerabalance_view.render() }}
         </div>
-        <div style="overflow-y:scroll;height:calc(100% - 35px);">
+        <div style="height:calc(100% - 35px);">
              {{ pyview.imageCarousel.render() }}
         </div>
     </div>   

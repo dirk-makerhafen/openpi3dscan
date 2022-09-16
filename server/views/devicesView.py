@@ -13,7 +13,7 @@ from app.devices.devices import DevicesInstance
 
 class DevicesView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="main">
+    <div class="main" style="overflow-y:scroll;">
         <div class="topMenu row" style="height:50px">
             <div class="col-md-2 topMenuItem">
                 <button class="btn" onclick='pyview.shutdown();'> Shutdown Devices </button>

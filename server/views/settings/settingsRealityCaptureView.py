@@ -61,13 +61,13 @@ class RealityCaptureView(PyHtmlView):
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
                                     <p>Diameter</p> 
-                                    <input id="region_diameter" type="number" step="0.01" value="{{pyview.subject.diameter}}" onchange='pyview.subject.set_diameter($("#region_diameter").val())'>
+                                    <input  style="width:100%;text-align:center" id="region_diameter" type="number" step="0.01" value="{{pyview.subject.diameter}}" onchange='pyview.subject.set_diameter($("#region_diameter").val())'>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
                                     <p>Height</p>
-                                    <input id="region_height" type="number" step="0.01" value="{{pyview.subject.height}}" onchange='pyview.subject.set_height($("#region_height").val())'>
+                                    <input  style="width:100%;text-align:center" id="region_height" type="number" step="0.01" value="{{pyview.subject.height}}" onchange='pyview.subject.set_height($("#region_height").val())'>
                                 </div>
                             </div>
                         </div>

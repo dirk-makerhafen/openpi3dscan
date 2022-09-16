@@ -138,8 +138,16 @@ class ImageCarousel(PyHtmlView):
         return _segments
 
     def segment_color(self, segment):
-        colors = ["#aaa0", "#aaa2", "#aaa4", "#aaa6", "#aaa8", "#aaaa", "#aaac", "#aaae", "#aaaf", "#aaae", "#aaac", "#aaaa", "#aaa8", "#aaa6", "#aaa4", "#aaa2", ]
-        return colors[segment-1]
+        s = SettingsInstance().settingsScanner.segments
+        # colors : 0 - 255 - 0
+        colorstep_per_segment = 255 / (s/ 2.0)
+        s = abs( segment - (s / 2.0))       # seg8 - 16/2     seg0-8  seg16-8
+        c = int(round(255 - (s*colorstep_per_segment),0))
+        if c <   0: c = 0
+        if c > 255: c = 255
+        return "#aaaaaa%x" % c
+        #colors = ["#aaa0", "#aaa2", "#aaa4", "#aaa6", "#aaa8", "#aaaa", "#aaac", "#aaae", "#aaaf", "#aaae", "#aaac", "#aaaa", "#aaa8", "#aaa6", "#aaa4", "#aaa2", ]
+        #return colors[segment-1]
 
     def rotate_cw(self):
         self.center_segment = self.center_segment + 1

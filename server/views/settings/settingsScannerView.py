@@ -18,9 +18,9 @@ class SettingsScannerView(PyHtmlView):
                                 <strong class="mb-0">Segments</strong>
                                 <p class="text-muted mb-0">Number of segments installed</p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-1">
                                 <div class="custom-control custom-switch">
-                                    <input id="scanner_segments" type="number" min=2 max=24 value="{{pyview.subject.segments}}" onchange='pyview.subject.set_segments($("#scanner_segments").val())'>
+                                    <input style="width:100%;text-align:center" id="scanner_segments" type="number" min=2 max=24 value="{{pyview.subject.segments}}" onchange='pyview.subject.set_segments($("#scanner_segments").val())'>
                                 </div>
                             </div>
                         </div>
@@ -31,9 +31,9 @@ class SettingsScannerView(PyHtmlView):
                                 <strong class="mb-0">Cameras</strong>
                                 <p class="text-muted mb-0">Number of cameras per segment</p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-1">
                                 <div class="custom-control custom-switch">
-                                    <input id="scanner_cameras_per_segment" type="number" min=1 max=24 value="{{pyview.subject.cameras_per_segment}}" onchange='pyview.subject.set_cameras_per_segment($("#scanner_cameras_per_segment").val())'>
+                                    <input style="width:100%;text-align:center" id="scanner_cameras_per_segment" type="number" min=1 max=24 value="{{pyview.subject.cameras_per_segment}}" onchange='pyview.subject.set_cameras_per_segment($("#scanner_cameras_per_segment").val())'>
                                 </div>
                             </div>
                         </div>

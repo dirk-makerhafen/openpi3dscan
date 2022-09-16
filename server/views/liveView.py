@@ -53,7 +53,7 @@ class TaskWhitebalanceTopView(PyHtmlView):
 
 class TaskCameraBalanceTopView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="col-md-2 topMenuItem">
+    <div class="col-md-2 topMenuItem" style="border-right: 0px;">
         {% if pyview.subject.status == "idle" %} 
             <button class="btn" onclick='pyview.run();'> Balance </button>
         {% else %}
@@ -108,7 +108,7 @@ class LiveView(PyHtmlView):
             </div>
             {{ pyview.camerabalance_view.render() }}
         </div>
-        <div style="height:calc(100% - 35px);">
+        <div style="overflow-y:scroll;height:calc(100% - 35px);">
              {{ pyview.imageCarousel.render() }}
         </div>
     </div>   

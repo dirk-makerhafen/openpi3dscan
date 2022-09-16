@@ -36,7 +36,7 @@ class ShotView(PyHtmlView):
                 <div class="col-md-1 topMenuItem">
                     <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
                 </div>
-                <div class="col-md-1 topMenuItem">
+                <div class="col-md-1 topMenuItem" style="border-right: 0px;">
                     <button class="btn btn-warning" style="margin-right:5px" onclick='$("#confirm_delete").show();'> Delete </button>
                     <div id="confirm_delete" class="confirm_delete" style="display:none;z-index:999;position:fixed;left:40%;top:10%;width:40%;background-color:white;padding: 10px;padding-botton:20px;border: 5px solid #f33;">
                         <div class="row">

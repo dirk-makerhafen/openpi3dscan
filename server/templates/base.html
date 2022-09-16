@@ -101,19 +101,18 @@
 
 
     .main {
-        width:80%;
+        width:calc(80% - 3px);
         height:100%;
         position:absolute;
-
-        left:20%;
+        left:calc(20% + 3px);
     }
 
     .topMenu {
         height: 50px;
         position: fixed;
         top: 0px;
-        left: 21%;
-        width: 80%;
+        left: calc(20% + 18px);
+        width: calc(80% - 18px);
         background: lightgray;
         height: 50px;
         line-height: 50px;
@@ -194,8 +193,8 @@
     .ImageCarousel .numbers {
         position: fixed;
         bottom: 0px;
-        width: 80%;
-        left:20%;
+        width: calc(80% - 3px);
+        left:calc(20% + 3px);
         height:35px;
         overflow-y:scroll;
     }

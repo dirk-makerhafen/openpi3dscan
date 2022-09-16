@@ -99,7 +99,7 @@ class TaskCreateShotView(PyHtmlView):
 class LiveView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="main" >
-        <div class="topMenu row" style="height:50px">
+        <div class="topMenu row" style="height:50px;overflow-y:scroll">
             {{ pyview.create_shot_view.render() }}
             <div class="col-md-4 topMenuItem">&nbsp;</div>
             <div class="col-md-2 topMenuItem">

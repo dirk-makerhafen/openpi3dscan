@@ -101,11 +101,11 @@
 
 
     .main {
-        width:80%;
+        width:79%;
         height:100%;
         position:absolute;
-        overflow:scroll;
-        left:20%;
+        overflow-y:scroll;
+        left:21%;
     }
 
     .topMenu {
@@ -113,11 +113,11 @@
         position: fixed;
         top: 0px;
         left: 21%;
-        z-index: 9999;
         width: 80%;
         background: lightgray;
         height: 50px;
         line-height: 50px;
+        z-index:1;
     }
 
     .topMenu .topMenuItem{
@@ -176,10 +176,10 @@
     }
 
     .ImageCarousel .controls {
-        position:absolute;
+        position:fixed;
         top:60px;
-        left:0px;
-        z-index:999;
+        left:20%;
+        z-index:1;
         width:200px;
     }
     .ImageCarousel .controls button{
@@ -189,11 +189,13 @@
     .ImageCarousel .carousel {
         position: relative;
         user-select: none;
+        z-index:-3;
     }
     .ImageCarousel .numbers {
-        position: absolute;
+        position: fixed;
         bottom: 0px;
-        width: calc(100% - 17px);
+        width: 80%;
+        left:20%;
         height:35px;
     }
 
@@ -220,10 +222,11 @@
     .DevicesView .devicelist  {
         top: 50px;
         position: absolute;
-        overflow-y: scroll;
+        #overflow-y: scroll;
         width: 100%;
-        height: calc(100% - 50px);
+        #height: calc(100% - 50px);
         color:#fff;
+        z-index:-2;
     }
 
 

@@ -145,7 +145,7 @@ class ImageCarousel(PyHtmlView):
         c = int(round(255 - (s*colorstep_per_segment),0))
         if c <   0: c = 0
         if c > 255: c = 255
-        return "#aaaaaa%x" % c
+        return "#aaaaaa%02x" % c
         #colors = ["#aaa0", "#aaa2", "#aaa4", "#aaa6", "#aaa8", "#aaaa", "#aaac", "#aaae", "#aaaf", "#aaae", "#aaac", "#aaaa", "#aaa8", "#aaa6", "#aaa4", "#aaa2", ]
         #return colors[segment-1]
 

@@ -2,14 +2,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.app import App
-    from views.appView import AppView
 
 from pyhtmlgui import PyHtmlView
 from views.shot.shotFilesView import ShotFilesView
 from views.shot.shotModelsView import ShotModelsView
 from views.shot.shotComentsView import ShotCommentsView
 from views.imageCarousel.imageCarouselStatic import ImageCarouselStatic
-from app.shots import ShotsInstance
+from app.files.shots import ShotsInstance
 
 
 class ShotView(PyHtmlView):

@@ -5,7 +5,6 @@ import random
 import re
 import shutil
 import threading
-import uuid
 from multiprocessing.pool import ThreadPool
 
 import gevent
@@ -14,116 +13,11 @@ from gevent.fileobject import FileObjectThread
 from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
 
-SHOT_DIR = "/shots"
-
-
-class ModelFile(Observable):
-    def __init__(self, parentShot, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False):
-        super().__init__()
-        self.parentShot = parentShot
-        self.model_id = "%s" % uuid.uuid4()
-        self.status = "waiting"  # ready, failed
-        self.filetype = filetype  # "obj", obj, 3mf, stl
-        self.reconstruction_quality = reconstruction_quality  # preview, normal, high,
-        self.quality = quality   # "high", normal, low
-        self.create_mesh_from = create_mesh_from  # normal, projection, all
-        self.filename = ""
-        self.filesize = 0
-        self.create_textures = create_textures
-        self.path = os.path.join(self.parentShot.path, "models")
-
-    def set_status(self, new_status):
-        self.status = new_status
-        self.parentShot.save()
-        self.notify_observers()
-        self.parentShot.notify_observers()
-
-    def write_file(self, input_file):
-        rcStr = self.reconstruction_quality[0].upper()
-        qStr = self.quality[0].upper()
-        meshFromStr = self.create_mesh_from[0].upper()
-        textureStr = "T" if self.create_textures else ""
-
-        ext = ".zip"
-        if self.filetype in ["gif", "webp"]:
-            ext = ""
-        self.filename = "%s_%s%s%s%s.%s%s" % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, self.filetype, ext)
-        if not os.path.exists(self.path):
-            os.mkdir(self.path)
-        with FileObjectThread(os.path.join(self.path, self.filename), "wb") as f:
-            with FileObjectThread(input_file, "rb") as fi:
-                buf = fi.read(32000)
-                while buf:
-                    f.write(buf)
-                    buf = fi.read(32000)
-
-        self.filesize = int(round(os.path.getsize(os.path.join(self.path, self.filename)) / 1024 / 1024, 0))
-        self.set_status("ready")
-
-    def get_data(self):
-        if self.filename != "":
-            if os.path.exists(os.path.join(self.path, self.filename)):
-                with open(os.path.join(self.path, self.filename), "rb") as f:
-                    return f.read()
-        return None
-
-    def get_path(self):
-        return os.path.join(self.path, self.filename)
-
-    def delete(self):
-        if self.filename != "":
-            if os.path.exists(os.path.join(self.path, self.filename)):
-                os.remove(os.path.join(self.path, self.filename))
-        self.parentShot.remove_model(self)
-
-    def to_dict(self):
-        return {
-            "model_id": self.model_id,
-            "status": self.status,
-            "filetype": self.filetype,
-            "quality": self.quality,
-            "create_mesh_from": self.create_mesh_from,
-            "filename": self.filename,
-            "filesize": self.filesize,
-            "create_textures": self.create_textures,
-            "reconstruction_quality": self.reconstruction_quality,
-        }
-
-    def from_dict(self, data):
-        self.status = data["status"]
-        self.filetype = data["filetype"]
-        self.quality = data["quality"]
-        self.filename = data["filename"]
-        if self.quality == "ultra":
-            self.quality = "high"
-        if self.quality == "default":
-            self.quality = "normal"
-        try:
-            self.model_id = data["model_id"]
-        except:
-            pass
-        try:
-            self.filesize = data["filesize"]
-        except:
-            pass
-        try:
-            self.create_textures = data["create_textures"]
-        except:
-            pass
-        try:
-            self.create_mesh_from = data["create_mesh_from"]
-        except:
-            pass
-        try:
-            self.reconstruction_quality = data["reconstruction_quality"]
-        except:
-            pass
-        return self
-
+from app.files.modelFile import ModelFile
 
 
 class Shot(Observable):
-    def __init__(self, shot_id):
+    def __init__(self, shot_dir, shot_id):
         super().__init__()
         self.shot_id = shot_id
         self.name = self.shot_id
@@ -131,7 +25,7 @@ class Shot(Observable):
         self.comment = ""
         self.nr_of_files = 0
         self.devices = set()
-        self.path = os.path.join(SHOT_DIR, self.shot_id)
+        self.path = os.path.join(shot_dir, self.shot_id)
         self.worker = None
         self.models = ObservableList()
         self.path_exists = False
@@ -410,121 +304,3 @@ class Shot(Observable):
 
     def __lt__(self, other):
         return other is not None and self.shot_id < other.shot_id
-
-
-# All remote Shots
-class Shots:
-    def __init__(self, devices):
-        self.shots = ObservableList()
-        self.path = "/shots/"
-        self.cache = {}
-        self.devices = devices
-        self.deleted_shot_ids = []
-        self.load()
-
-    def create(self, shot_id, name):
-        s = Shot(shot_id)
-        s.create_folders()
-        s.set_name(name)
-        self.shots.insert(0, s)
-        return s
-
-    def get(self, shot_id):
-        try:
-            return self.cache[shot_id]
-        except:
-            pass
-        try:
-            v = [s for s in self.shots if s.shot_id == shot_id][0]
-            self.cache[shot_id] = v
-            return v
-        except:
-            pass
-        return None
-
-    def add(self, shot_id, device):
-        if shot_id in self.deleted_shot_ids:
-            device.camera.shots.delete(shot_id)
-            return
-        s = self.get(shot_id)
-        if s is None:
-            s = Shot(shot_id)
-            index = 0
-            for i in range(len(self.shots)):
-                index = i
-                if self.shots[index] < s:
-                    break
-            self.shots.insert(index, s)
-            self.cache[shot_id] = s
-        s.add_device(device)
-        return s
-
-    def delete(self, shot):
-        if shot is not None:
-            shot.delete()
-            self.shots.remove(shot)
-            try:
-                del self.cache[shot.shot_id]
-            except:
-                pass
-            self._add_deleted_shot_id(shot.shot_id)
-        else:
-            print("shot not found")
-
-    def sync_shotlist(self, shot_ids, device):
-        for shot_id in shot_ids:
-            self.add(shot_id, device)
-        for shot in self.shots:
-            if shot.shot_id not in shot_ids:
-                shot.remove_device(device)
-
-    def get_unprocessed_models(self, limit = None):
-        models = []
-        for shot in self.shots:
-            models.extend(shot.get_models_by_status("waiting"))
-            if limit is not None and len(models) >= limit:
-                return models
-        return models
-
-    def _add_deleted_shot_id(self, shot_id):
-        if shot_id not in self.deleted_shot_ids:
-            self.deleted_shot_ids.append(shot_id)
-        self.deleted_shot_ids.sort()
-        while len(self.deleted_shot_ids) >= 1000:
-            del self.deleted_shot_ids[0]
-        self.save()
-
-    def save(self):
-        with open("/opt/openpi3dscan/.shots.json", "w") as f:
-            f.write(json.dumps({
-                "deleted_shot_ids": self.deleted_shot_ids,
-            }))
-
-    def load(self):
-        try:
-            with open("/opt/openpi3dscan/.shots.json", "r") as f:
-                data = json.loads(f.read())
-                self.deleted_shot_ids = data["deleted_shot_ids"]
-        except:
-            pass
-
-    def load_shots_from_disk(self):
-        for path in glob.glob("/shots/*"):
-            if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images")) :
-                shot_id = path.split("/")[-1]
-                shot = self.get(shot_id)
-                if shot is None:
-                    self.shots.append(Shot(shot_id))
-                else:
-                    shot.load()
-        self.shots.sort()
-
-
-_shotsInstance = None
-
-
-def ShotsInstance(devices=None):
-    global _shotsInstance
-    if _shotsInstance is None:
-        _shotsInstance = Shots(devices)
-    return _shotsInstance

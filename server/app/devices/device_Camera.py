@@ -1,7 +1,7 @@
 import json
 import time
 
-from app.shots import ShotsInstance
+from app.files.shots import ShotsInstance
 
 
 class Camera:

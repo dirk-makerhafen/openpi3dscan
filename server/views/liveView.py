@@ -11,8 +11,6 @@ from views.imageCarousel.imageCarouselLive import ImageCarouselLive
 from app.devices.devices import DevicesInstance
 from app.tasks.tasks import TasksInstance
 from app.tasks.task_CreateShot import TaskCreateShotInstance
-from app.tasks.task_Whitebalance import TaskWhitebalanceInstance
-from app.tasks.task_ShutterBalance import TaskShutterBalanceInstance
 
 
 class TaskShutterBalanceTopView(PyHtmlView):

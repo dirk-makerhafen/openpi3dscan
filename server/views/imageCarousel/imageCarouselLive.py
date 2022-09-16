@@ -16,7 +16,7 @@ class PreviewQueue:
         self.data_in_q = []
         self.imageRowViews = {}
         self.preview_data = {}
-        for i in range(25):
+        for i in range(20):
             t = threading.Thread(target=self._worker_thread, daemon=True)
             t.start()
         self.loading_img = open(loading_img_path, "rb").read()

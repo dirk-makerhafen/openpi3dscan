@@ -4,7 +4,7 @@ from multiprocessing.pool import ThreadPool
 from pyhtmlgui import Observable
 
 from app.devices.devices import DevicesInstance
-from app.shots import ShotsInstance
+from app.files.shots import ShotsInstance
 
 
 class Task_SyncShots(Observable):

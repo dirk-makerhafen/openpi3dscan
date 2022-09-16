@@ -16,7 +16,7 @@ from bottle import request
 
 from app.devices.devices import DevicesInstance
 from app.settings.settings import SettingsInstance
-from app.shots import ShotsInstance
+from app.files.shots import ShotsInstance
 from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
 
 bottle.BaseRequest.MEMFILE_MAX = 800 * 1024 * 1024

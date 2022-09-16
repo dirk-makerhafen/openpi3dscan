@@ -1,6 +1,3 @@
-import os
-import re
-
 from pyhtmlgui import Observable
 
 

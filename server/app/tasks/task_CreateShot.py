@@ -6,7 +6,7 @@ import time
 import random
 from pyhtmlgui import Observable
 from app.devices.devices import DevicesInstance
-from app.shots import ShotsInstance
+from app.files.shots import ShotsInstance
 from app.settings.settings import SettingsInstance
 
 

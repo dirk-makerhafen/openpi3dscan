@@ -1,9 +1,9 @@
 from pyhtmlgui import Observable
 from app.devices.devices import DevicesInstance
-from app.shots import ShotsInstance
+from app.files.shots import ShotsInstance
 from app.tasks.tasks import TasksInstance
-from app.cardReader import CardReaderInstance
-from app.usbDisks import UsbDisks
+from app.cardreader.cardReader import CardReaderInstance
+from app.files.usbDisks import UsbDisks
 import os
 from app.settings.settings import SettingsInstance
 import time

@@ -23,12 +23,20 @@ class SettingsScanner(Observable):
         self.cameras_per_segment = data["cameras_per_segment"]
 
     def set_segments(self, value):
+        try:
+            value = int(value)
+        except:
+            return
         if self.segments != value:
             self.segments = value
             self.save()
             self.notify_observers()
 
     def set_cameras_per_segment(self, value):
+        try:
+            value = int(value)
+        except:
+            return
         if self.cameras_per_segment != value:
             self.cameras_per_segment = value
             self.save()

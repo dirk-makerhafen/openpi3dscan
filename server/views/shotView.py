@@ -14,7 +14,7 @@ from app.shots import ShotsInstance
 
 class ShotView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="main">
+    <div class="main" style="overflow-y:hidden;">
         <div class="topMenu row">
             {% if pyview.current_shot._deleted != True %}
                 <div class="col-md-3 topMenuItem">

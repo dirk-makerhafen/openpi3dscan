@@ -103,12 +103,11 @@ class CameraSettings:
         self.camera.device.task_queue.put([self._set_shutter_speed, new_shutter_speed])
 
     def _set_shutter_speed(self, new_shutter_speed):
-        new_shutter_speed_sr = ";".join(["%s" % g for g in new_shutter_speed])
         for i in range(3):
-            if self.camera.device.api_request("/camera/settings/shutter_speed/%s" % new_shutter_speed_sr) is None:
+            if self.camera.device.api_request("/camera/settings/shutter_speed/%s" % new_shutter_speed) is None:
                 print("failed to set shutter_speed")
                 break
-            time.sleep(0.5)
+            time.sleep(1)
             self.get_shutter_speed()
             if abs(self.shutter_speed - new_shutter_speed) < 100: # set successfull
                 break
@@ -124,9 +123,9 @@ class CameraSettings:
             if self.camera.device.api_request("/camera/settings/awb_gains/%s" % new_gains_str) is None:
                 print("failed to set awb_gains")
                 break
-            time.sleep(0.5)
+            time.sleep(1)
             self.get_awb_gains()
-            if abs(self.awb_gains[0] - new_gains[0]) < 0.01 and abs(self.awb_gains[1] - new_gains[1]) < 0.01: # set successfull
+            if abs(self.awb_gains[0] - new_gains[0]) < 0.03 and abs(self.awb_gains[1] - new_gains[1]) < 0.03: # set successfull
                 break
             print("must repeat aws gain set")
 

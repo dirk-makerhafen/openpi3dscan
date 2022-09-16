@@ -6,6 +6,7 @@ from views.settings.settingsFirmwareView import FirmwareSettingsView
 from views.settings.settingsHostnameView import HostnameSettingsView
 from views.settings.settingsRealityCaptureView import RealityCaptureView
 from views.settings.settingsRebootView import RebootShutdownView
+from views.settings.settingsScannerView import SettingsScannerView
 from views.settings.settingsSequenceView import SequenceSettingsView
 from views.settings.settingsUsbStorageView import UsbStorageView
 from views.settings.settingsWirelessView import WirelessSettingsView
@@ -38,6 +39,8 @@ class SettingsView(PyHtmlView):
         {{pyview.realityCaptureView.render()}}  
         
         {{pyview.usbStorageView.render()}}  
+        
+        {{pyview.scannerSettingsView.render()}}  
         
         <div class="System">
             <div class="row justify-content-center" style="width:100%">
@@ -95,4 +98,4 @@ class SettingsView(PyHtmlView):
         self.rebootShutdownView = RebootShutdownView(self.subject, self)
         self.cardReaderView = CardReaderView(self.subject.cardReader, self)
         self.hostnameView = HostnameSettingsView(self.subject.settings.hostnameSettings, self)
-
+        self.scannerSettingsView = SettingsScannerView(self.subject.settings.settingsScanner, self)

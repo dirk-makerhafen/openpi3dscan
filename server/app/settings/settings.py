@@ -4,11 +4,12 @@ from pyhtmlgui import Observable
 from app.settings.settingsCameras import SettingsCameras
 from app.settings.settingsFirmware import SettingsFirmwareImage
 from app.settings.settingsHostname import SettingsHostname
+from app.settings.settingsScanner import SettingsScanner
 from app.settings.settingsSequence import SettingsSequence
 from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2022.09.13-21.00"
+VERSION = "2022.09.16-22.00"
 
 
 class Settings(Observable):
@@ -22,6 +23,7 @@ class Settings(Observable):
         self.wirelessSettings = SettingsWireless(self)
         self.hostnameSettings = SettingsHostname(self)
         self.realityCaptureSettings = SettingsRealityCapture(self)
+        self.settingsScanner = SettingsScanner(self)
         self.VERSION = VERSION
         self.load()
 
@@ -33,7 +35,8 @@ class Settings(Observable):
             "firmwareSettings" : self.firmwareSettings.to_dict(),
             "wirelessSettings" : self.wirelessSettings.to_dict(),
             "hostnameSettings" : self.hostnameSettings.to_dict(),
-            "realityCaptureSettings" : self.realityCaptureSettings.to_dict()
+            "realityCaptureSettings" : self.realityCaptureSettings.to_dict(),
+            "settingsScanner" : self.settingsScanner.to_dict()
         }
         open("/opt/openpi3dscan/.openpi3dscan.json", "w").write(json.dumps(data))
 
@@ -72,6 +75,11 @@ class Settings(Observable):
             self.realityCaptureSettings.from_dict(data["realityCaptureSettings"])
         except:
             pass
+        try:
+            self.settingsScanner.from_dict(data["settingsScanner"])
+        except:
+            pass
+
         self.save()
         self.notify_observers()
 

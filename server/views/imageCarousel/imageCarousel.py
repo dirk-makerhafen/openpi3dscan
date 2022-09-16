@@ -2,6 +2,8 @@ import math
 
 from pyhtmlgui import PyHtmlView
 
+from app.settings.settings import SettingsInstance
+
 
 class ImageRowView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -56,7 +58,7 @@ class SegmentView(PyHtmlView):
     def __init__(self, subject, parent, seg_nr):
         super().__init__(subject, parent)
         self.seg_nr = seg_nr
-        self.images = [ImageRowView(subject, self, i) for i in range(1, 8)]
+        self.images = [ImageRowView(subject, self, i+1) for i in range(0, SettingsInstance().settingsScanner.cameras_per_segment )]
 
 
 class ImageCarousel(PyHtmlView):
@@ -104,19 +106,20 @@ class ImageCarousel(PyHtmlView):
 
     @property
     def segments(self):
+        max_segments = SettingsInstance().settingsScanner.segments
         cid = "%s_%s" % (self.center_segment, self.segments_shown)
         if self.cid == cid:
             return self._segments
 
         first_segment = math.floor(self.center_segment - ((self.segments_shown - 1) / 2))
         if first_segment < 1:
-            first_segment = 16 + first_segment
+            first_segment = max_segments + first_segment
         segments = []
         segment = first_segment
         for i in range(self.segments_shown):
             if segment < 1:
-                segment = 16
-            if segment > 16:
+                segment = max_segments
+            if segment > max_segments:
                 segment = 1
             segments.append(int(segment))
             segment = segment + 1
@@ -140,29 +143,26 @@ class ImageCarousel(PyHtmlView):
 
     def rotate_cw(self):
         self.center_segment = self.center_segment + 1
-        if self.center_segment > 16:
+        if self.center_segment > SettingsInstance().settingsScanner.segments:
             self.center_segment = 1
         self.update()
 
     def rotate_ccw(self):
         self.center_segment = self.center_segment - 1
         if self.center_segment < 1:
-            self.center_segment = 16
+            self.center_segment = SettingsInstance().settingsScanner.segments
         self.update()
 
     def zoom_in(self):
-        if self.segments_shown == 16:
-            self.segments_shown = 15
-        else:
-            self.segments_shown = self.segments_shown - 1
-            if self.segments_shown < 1:
-                self.segments_shown = 1
+        self.segments_shown = self.segments_shown - 1
+        if self.segments_shown < 1:
+            self.segments_shown = 1
         self.update()
 
     def zoom_out(self):
         self.segments_shown = self.segments_shown + 1
-        if self.segments_shown > 16:
-            self.segments_shown = 16
+        if self.segments_shown > SettingsInstance().settingsScanner.segments:
+            self.segments_shown = SettingsInstance().settingsScanner.segments
         self.update()
 
     def switch_type(self):

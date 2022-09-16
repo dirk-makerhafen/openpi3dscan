@@ -236,14 +236,22 @@ class CardReader(Observable):
     def _reload(self):
         self.status = "reloading"
         self.notify_observers()
+
+        try:
+            stdout = subprocess.check_output("sudo mount | grep -i shots", shell=True, timeout=10, stderr=subprocess.STDOUT).decode("UTF-8")
+            diskdevicename = stdout.split("/shots")[0].split(" ")[0].split("/")[2][:-1]
+        except:
+            diskdevicename = None
+
         try:
             stdout = subprocess.check_output("sudo dmesg | grep -i 'removable disk' | cut -d[ -f 3 | cut -d] -f1", shell=True, timeout=10, stderr=subprocess.STDOUT).decode("UTF-8")
         except:
             stdout = ""
+
         device_names = []
         for line in stdout.split("\n"):
             line = line.strip()
-            if len(line) == 3:
+            if len(line) == 3 and line != diskdevicename:
                 device_names.append(line)
         active_device_names = []
         for device_name in device_names:

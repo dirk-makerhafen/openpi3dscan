@@ -1,6 +1,5 @@
 import math
 
-import imageio
 import requests, json, sys
 import os, glob, sys, shutil
 import subprocess, shlex, time
@@ -691,18 +690,25 @@ class RealityCapture():
 
         def f(file):
             os.system('mogrify.exe -resize %sx "%s"' % (size,file))
-            os.system('mogrify.exe -crop %sx%s+100+100 +repage "%s"' % (size-100,size-130,file))
+            os.system('mogrify.exe -crop %sx%s+100+100 +repage "%s"' % (size-130,size-100,file))
             os.system('optipng.exe -clobber "%s"' % file)
             os.system('convert.exe "%s" "%s"' % (file, "%s.gif" % file[:-4]))
         ThreadPool(8).map(f, files)
         total_duration = 400 # in ms
         delay = int(round(total_duration / len(files),0))
-        os.system('gifsicle.exe --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s" ' % (delay, path, output_file))
+        os.system('gifsicle.exe --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s\\tmp.gif" ' % (delay, path, path))
+        if os.path.exists(os.path.join(path, "tmp.gif")):
+            if filetype == "gif":
+                os.rename(os.path.join(path,"tmp.gif"), output_file)
+            if filetype == "webp":
+                os.system('convert.exe "%s\\tmp.gif" "%s"' % output_file)
 
         #cmd = 'convert.exe -fuzz 5%% -quality 95 -delay %s -loop 0  -layers OptimizePlus "%s" "%s"' % (delay, os.path.join(path, "screenshot_*.png"), output_file)
         #os.system(cmd)
         if DEBUG is False:
             for f in glob.glob(os.path.join(path, "screenshot_*.*")):
+                os.remove(f)
+            if os.path.exists(os.path.join(path, "tmp.gif")):
                 os.remove(f)
 
     def _get_cmd_cleanup_lower_region(self):

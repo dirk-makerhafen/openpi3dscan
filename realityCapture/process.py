@@ -707,7 +707,7 @@ class RealityCapture():
             if filetype == "gif":
                 os.rename(os.path.join(path,"tmp.gif"), output_file)
             if filetype == "webp":
-                os.system('convert.exe "%s\\tmp.gif" "%s"' % output_file)
+                os.system('convert.exe "%s\\tmp.gif" "%s"' % (path, output_file))
 
         #cmd = 'convert.exe -fuzz 5%% -quality 95 -delay %s -loop 0  -layers OptimizePlus "%s" "%s"' % (delay, os.path.join(path, "screenshot_*.png"), output_file)
         #os.system(cmd)

@@ -683,7 +683,7 @@ class RealityCapture():
         ThreadPool(8).map(f, files)
         total_duration = 4000 # in ms
         delay = int(round(total_duration / len(files),0))
-        os.system('gifsicle.exe --delay=%s --loop "%s\\screenshot_*.gif" > "%s" ' % (delay, path, output_file))
+        os.system('gifsicle.exe --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s" ' % (delay, path, output_file))
 
         #cmd = 'convert.exe -fuzz 5%% -quality 95 -delay %s -loop 0  -layers OptimizePlus "%s" "%s"' % (delay, os.path.join(path, "screenshot_*.png"), output_file)
         #os.system(cmd)

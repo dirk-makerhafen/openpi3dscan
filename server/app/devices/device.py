@@ -96,9 +96,7 @@ class Device(Observable):
                 legacy_type = self._ssh("cat /boot/group.txt", timeout=15).strip()
                 if legacy_type == "1":
                     self.device_type = "camera"
-                    segment = math.ceil(((self.device_id - 101) / 7) + 1)
-                    row = ((self.device_id - 101) % 7) + 1
-                    self.name = "SEG%s-CAM%s" % (segment, row)
+                    self.name = "unknown"
                 if legacy_type == "2":
                     self.device_type = "projector"
                     self.name = "P%s" % self.device_id

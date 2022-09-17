@@ -133,7 +133,10 @@ class CalibrationData():
         self.data = {}
         self.datapath = os.path.join(SCRIPT_DIR, "calibrationData.json")
         self.load()
-        
+
+    def get_camera_ids(self):
+        return ["%s" % key for key in self.data.keys()]
+
     def get(self, cam_id, key):
         data = self.data[cam_id][key]
             
@@ -450,7 +453,9 @@ class RealityCapture():
         camera_data = {}
         for path in glob.glob(os.path.join(self.source_folder, "images", "*", "*.xmp")):
             data = open(path, "r").read()
-            cam_id = path.split('\\')[-1].split(".")[0].strip()
+            segment = path.split('\\')[-1].split("-")[0].strip()
+            row     = path.split('\\')[-1].split("-")[1].strip()
+            cam_id = "%s-%s" % (segment, row)
             if cam_id not in camera_data:
                 camera_data[cam_id] = {
                     "FocalLength35mm": [],
@@ -482,7 +487,7 @@ class RealityCapture():
 
     def write_xmp_files(self):
         for mode in ["normal", "projection"]:
-            for cam_id in range(100,213):
+            for cam_id in calibrationData.get_camera_ids():
                 try:
                     s = XMP_TEMPLATE % {
                         "FocalLength35mm" : calibrationData.get(cam_id, "FocalLength35mm"),
@@ -494,7 +499,7 @@ class RealityCapture():
                         "InTexturing" : "1" if mode == "normal" and self.create_textures is True else "0",
                         "InMeshing" :   "0" if mode == "normal" and self.create_mesh_from == "projection" else "1",
                     }
-                    with open(os.path.join(self.source_folder, "images", mode, "%s.xmp" % cam_id), "w") as f:
+                    with open(os.path.join(self.source_folder, "images", mode, "%s-%s.xmp" % (cam_id, mode[0])), "w") as f:
                         f.write(s)
                 except:
                     pass

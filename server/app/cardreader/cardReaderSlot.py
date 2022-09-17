@@ -43,6 +43,8 @@ class CardReaderSlot(Observable):
 
 
     def write_image_task(self, group, dev_id, name):
+        name = name.strip()
+        dev_id = dev_id.strip()
         if self.status != "idle":
             return
         self.status = "writing"
@@ -51,6 +53,8 @@ class CardReaderSlot(Observable):
         print("write image", group, dev_id, name)
 
     def update_card_task(self, group, dev_id, name):
+        name = name.strip()
+        dev_id = dev_id.strip()
         if self.status != "idle":
             return
         self.status = "update"

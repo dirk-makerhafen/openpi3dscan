@@ -71,9 +71,9 @@ class ShotFilesView(PyHtmlView):
     </div>
     <script>
         {% if pyview.is_hidden %}
-            $('#files_btn').removeClass('top_button_selected');
+            $('#files_btn').removeClass('selected');
         {% else %}
-            $('#files_btn').addClass('top_button_selected');
+            $('#files_btn').addClass('selected');
         {% endif %}
     </script>
     '''

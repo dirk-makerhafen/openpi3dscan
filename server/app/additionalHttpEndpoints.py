@@ -44,8 +44,9 @@ class DownloadStreamer:
                 data = self.data_queue.get(timeout=1)
             except Exception:
                 break
-            filename, shot_id, image_type, device_id = data
-            image = ShotsInstance().get(shot_id).get_image(image_type, "normal", device_id)
+
+            filename, shot_id, image_type, segment, row = data
+            image = ShotsInstance().get(shot_id).get_image(image_type, "normal", segment, row)
             if image is None:
                 self.results[filename] = b''
             else:
@@ -79,7 +80,7 @@ class HttpEndpoints:
         bottle.route("/shots/<shot_id>/upload/<model_id>", method="POST")(self._shot_upload_model)
         bottle.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
         bottle.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
-        bottle.route("/shots/<shot_id>/<image_mode>/<image_type>/<device_id>.jpg")(self._shot_get_image)  # return remote shot as jpeg
+        bottle.route("/shots/<shot_id>/<image_mode>/<image_type>/<fname>.jpg")(self._shot_get_image)  # return remote shot as jpeg
         bottle.route("/shots/<shot_id>.zip")(self._shot_get_images_zip)
         bottle.route("/live/<device_id>.jpg")(self._live)
         bottle.route("/heartbeat", method="POST")(self._heartbeat)
@@ -141,11 +142,14 @@ class HttpEndpoints:
         ShotsInstance().get(shot_id).get_model_by_id(model_id).write_file(file)
 
     # image_mode = normal | preview , image_type = normal | projection
-    def _shot_get_image(self, shot_id, image_mode, image_type, device_id):
+    def _shot_get_image(self, shot_id, image_mode, image_type, fname):
         shot = ShotsInstance().get(shot_id)
+        segment = fname.split("-")[0].replace("seg","").strip()
+        row = fname.split("-")[1].replace("cam","").strip()
+
         if shot is None:
             return bottle.HTTPResponse(status=404)
-        image = shot.get_image(image_type, image_mode, device_id)
+        image = shot.get_image(image_type, image_mode, segment, row)
         if image is None:
             return bottle.HTTPResponse(status=503)
         headers = {
@@ -172,14 +176,12 @@ class HttpEndpoints:
         if shot is None:
             return bottle.HTTPResponse(status=404)
 
-        filelist = []
-        for i in range(101, 213):
-            device_id = "%s" % i
-            if shot.image_may_exist("normal", "normal", device_id):  # image_mode = normal | preview , image_type = normal | projection
-                filelist.append(["normal/%s.jpg" % device_id, shot_id, "normal", device_id])
-            if shot.image_may_exist("projection", "normal", device_id):
-                filelist.append(["projection/%s.jpg" % device_id, shot_id, "projection", device_id])
 
+        filelist = []
+        for _image_type in ["normal", "projection"]:
+            for file in shot.list_possible_images(_image_type, "normal"):
+                image_type, image_mode, segment, row = file
+                filelist.append(["%s/seg%s-cam%s-%s.jpg" % (image_type, segment, row, image_type[0]), shot_id, image_type, segment, row])
         random.shuffle(filelist)
 
         ds = DownloadStreamer(filelist)

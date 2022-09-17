@@ -110,13 +110,15 @@ class Shot(Observable):
         tasks = []
         existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
         for device in [d for d in self.devices if d.status == "online"]:
+            segment = device.name.split("-")[0].replace("SEG","")
+            row = device.name.split("-")[1].replace("CAM","")
             for image_mode in ["normal", "preview"]:
                 for image_type in ["normal", "projection"]:
                     if image_mode == "normal":
                         folder_name = "images"
                     else:
                         folder_name = "preview_images"
-                    img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device.device_id)
+                    img_path = os.path.join(self.path, folder_name, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
                     if img_path not in existing_images:
                         tasks.append([device, [self.shot_id, image_type, image_mode, False]])
         if len(tasks) > 0:
@@ -126,35 +128,36 @@ class Shot(Observable):
             p.join()
             self.count_number_of_files()
 
-        existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
-        for i in range(101, 213):
-            for image_type in ["normal", "projection"]:
-                img_path = os.path.join(self.path, "images", image_type, "%s.jpg" % i)
-                preview_path = os.path.join(self.path, "preview_images", image_type, "%s.jpg" % i)
-                if preview_path not in existing_images and img_path in existing_images:
+        for image_type in ["normal", "projection"]:
+            existing_images = glob.glob(os.path.join(self.path, "images", image_type, "*.jpg"))
+            existing_previews = glob.glob(os.path.join(self.path, "preview_images", image_type, "*.jpg"))
+            for existing_image in existing_images:
+                preview_path = os.path.join(self.path, "preview_images", image_type, existing_image.split("/")[-1])
+                if preview_path not in existing_previews:
                     try:
                         print("creating preview image")
-                        img = Image.open(img_path)
+                        img = Image.open(existing_image)
                         img = img.resize([800, 600])
                         img.save(preview_path, format="jpeg", quality=85)
                     except Exception as e:
                         print(e)
+
         self.status = ""
         self.worker = None
         self.notify_observers()
 
     # image_mode = normal | preview , image_type = normal | projection
-    def get_image(self, image_type, image_mode, device_id):
+    def get_image(self, image_type, image_mode, segment, row):
         if image_mode == "normal":
             folder_name = "images"
         else:
             folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id)
+        img_path = os.path.join(self.path, folder_name, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
         if os.path.exists(img_path):
             with open(img_path, "rb") as f:
                 return f.read()
         try:
-            device = [d for d in self.devices if d.device_id == device_id and d.status == "online"][0]
+            device = [d for d in self.devices if d.name == "SEG%s-CAM%s" % (segment, row) and d.status == "online"][0]
         except:
             return None
         img = [b'']
@@ -170,28 +173,37 @@ class Shot(Observable):
             return None
         return img[0]
 
-    def image_may_exist(self, image_type, image_mode, device_id):
+    def list_possible_images(self, image_type, image_mode):
         if image_mode == "normal":
             folder_name = "images"
         else:
             folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id)
-        if os.path.exists(img_path):
-            return True
-        try:
-            device = [d for d in self.devices if d.device_id == device_id and d.status == "online"][0]
-            return True
-        except:
-            return False
+        files = glob.glob(os.path.join(self.path, folder_name, image_type, "*.jpg" ))
+        results = []
+        for file in files:
+            segment = file.split("/")[-1].split("-")[0].replace("seg","")
+            row = file.split("/")[-1].split("-")[1].replace("cam","")
+            results.append([image_type, image_mode, segment, row, ])
+        for device in self.devices:
+            if device.status != "online":
+                continue
+            segment = device.name.split("-")[0].replace("SEG","")
+            row = device.name.split("-")[1].replace("CAM","")
+            try:
+                [x for x in results if x[2] == segment and x[3] == row][0]
+            except: # does not exist, but may
+                results.append([image_type, image_mode, segment, row ])
 
-    def add_image(self, image_type, image_mode, device_id, image_data):
+        return results
+
+    def add_image(self, image_type, image_mode, device_name, image_data):
         if self.path_exists is False:
             return
         if image_mode == "normal":
             folder_name = "images"
         else:
             folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "%s.jpg" % device_id)
+        img_path = os.path.join(self.path, folder_name, image_type, "%s-%s.jpg" % (device_name.lower(), image_type[0]))
         with FileObjectThread(img_path, "wb") as f:
             f.write(image_data)
             if image_mode == "normal":

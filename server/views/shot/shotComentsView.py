@@ -16,9 +16,9 @@ class ShotCommentsView(PyHtmlView):
     </div>
     <script>
         {% if pyview.is_hidden %}
-            $('#comments_btn').removeClass('top_button_selected');
+            $('#comments_btn').removeClass('selected');
         {% else %}
-            $('#comments_btn').addClass('top_button_selected');
+            $('#comments_btn').addClass('selected');
         {% endif %}
     </script>
     '''

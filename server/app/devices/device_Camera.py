@@ -9,8 +9,8 @@ class Camera:
         self.device = device
         self.settings = CameraSettings(self)
         self.shots = CameraShots(self)
-        self.reihe = 1  # 1-7 top-bottom
-        self.segment = 1  # 1-16
+        #self.reihe = 1  # 1-7 top-bottom
+        #self.segment = 1  # 1-16
         self.busy_until = 0  # lock actions on device if benchmark or shot is active
 
     def preview(self, resolution=(640, 480)):
@@ -257,7 +257,7 @@ class CameraShots:
             self.camera.device.unlock()
         if len(data) < 10000:
             return None
-        ShotsInstance().get(shot_id).add_image(image_type, image_mode, self.camera.device.device_id, data)
+        ShotsInstance().get(shot_id).add_image(image_type, image_mode, self.camera.device.name, data)
         if return_image is False:
             return None
         return data

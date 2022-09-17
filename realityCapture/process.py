@@ -227,8 +227,11 @@ class RealityCapture():
                 return None
                 
         if DEBUG is False:
-            shutil.rmtree(os.path.join(self.source_folder, self.export_foldername))
-        
+            try:
+                shutil.rmtree(os.path.join(self.source_folder, self.export_foldername))
+            except:
+                print("Failed to delete %s" % os.path.join(self.source_folder, self.export_foldername))
+
         return self.model_path
 
     def prepare_folders(self):
@@ -557,7 +560,10 @@ class RealityCapture():
             rcprojdir = os.path.join(self.source_folder, self.realityCapture_filename)
             imgdir = os.path.join(self.source_folder, "images")
             target_dir = os.path.join(self.source_folder, self.export_foldername)
-            shutil.rmtree(target_dir)
+            try:
+                shutil.rmtree(target_dir)
+            except:
+                print("Failed to delete %s" % target_dir)
             os.mkdir(target_dir)
             shutil.copy(rcproj, target_dir)
             shutil.copy("rc_rebase.exe", target_dir)
@@ -881,7 +887,10 @@ class WebAPI():
         target_dir = os.path.join(dir, name)
         print("Unpack %s" % path)
         if os.path.exists(target_dir):
-            shutil.rmtree(target_dir)
+            try:
+                shutil.rmtree(target_dir)
+            except:
+                print("Failed to delete %s" % target_dir)
         os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s.zip'\"" % (dir, name))
         os.remove(path)
         if not os.path.exists(os.path.join(target_dir, "images")):
@@ -991,8 +1000,10 @@ class Processing():
                         api.process_failed(model["shot_id"], model["model_id"])
                         if DEBUG is False and os.path.exists(shot_path):
                             print("Not caching shot %s" % shot_path )
-                            shutil.rmtree(shot_path)
-
+                            try:
+                                shutil.rmtree(shot_path)
+                            except:
+                                print("Failed to delete %s" % shot_path)
     def _clean_shot_dir(self):
         shots = []
         for path in glob.glob(os.path.join(CACHE_DIR, "*")):

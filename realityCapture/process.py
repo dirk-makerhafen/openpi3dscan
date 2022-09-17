@@ -658,7 +658,14 @@ class RealityCapture():
         
         time.sleep(5)
         angle = 0
-        angle_add = 6
+        angle_add = 8
+        if self.quality == "high":
+            angle_add = 6
+        elif self.quality == "normal":
+            angle_add = 8
+        elif self.quality == "low":
+            angle_add = 10
+
         while angle < 360:    
             browser.save_screenshot(os.path.join(output_path, "screenshot_%s.png" % ("%s"%angle).zfill(3)))
             angle += angle_add
@@ -674,14 +681,21 @@ class RealityCapture():
             print("no screenshots found")
             return
 
-        size = 1200
+        size = 1000
+        if self.quality == "high":
+            size = 1400
+        elif self.quality == "normal":
+            size = 1100
+        elif self.quality == "low":
+            size = 900
+
         def f(file):
             os.system('mogrify.exe -resize %sx "%s"' % (size,file))
             os.system('mogrify.exe -crop %sx%s+100+100 +repage "%s"' % (size-100,size-130,file))
             os.system('optipng.exe -clobber "%s"' % file)
-            os.system('convert.exe "%s" "%s"' % (file, ".gif" % file[:-4]))
+            os.system('convert.exe "%s" "%s"' % (file, "%s.gif" % file[:-4]))
         ThreadPool(8).map(f, files)
-        total_duration = 4000 # in ms
+        total_duration = 400 # in ms
         delay = int(round(total_duration / len(files),0))
         os.system('gifsicle.exe --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s" ' % (delay, path, output_file))
 

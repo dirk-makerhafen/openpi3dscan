@@ -15,7 +15,7 @@ class CardReaderSlotView(PyHtmlView):
             </select> 
         </td>
         <td> <input placeholder="101" {% if pyview.subject.status != "idle" %}disabled{% endif %}  id="{{pyview.uid}}_id" value="{{pyview.subject.sdcard.info_id}}"></input></td>
-        <td> <input placeholder="SEG1-CAM1" {% if pyview.subject.status != "idle" %}disabled{% endif %}  id="{{pyview.uid}}_name"  s value="{{pyview.subject.sdcard.info_name}}"></input></td>
+        <td> <input placeholder="SEG1-CAM1" {% if pyview.subject.status != "idle" %}disabled{% endif %}  id="{{pyview.uid}}_name"  value="{{pyview.subject.sdcard.info_name}}"></input></td>
         <td>     
             <button {% if pyview.subject.status != "idle" %}disabled{% endif %} class="btn-small"  onclick='pyview.write_image(document.getElementById("{{pyview.uid}}_group").value, document.getElementById("{{pyview.uid}}_id").value, document.getElementById("{{pyview.uid}}_name").value);'>Write Image</button>
             <button {% if pyview.subject.status != "idle" %}disabled{% endif %} class="btn-small"  onclick='pyview.update_card(document.getElementById("{{pyview.uid}}_group").value, document.getElementById("{{pyview.uid}}_id").value, document.getElementById("{{pyview.uid}}_name").value);'>Update Card</button>

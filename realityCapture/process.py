@@ -677,17 +677,13 @@ class RealityCapture():
         size = 1200
         def f(file):
             os.system('mogrify.exe -resize %sx "%s"' % (size,file))
-            os.system('mogrify.exe -crop %sx%s+100+100 +repage "%s"' % (size-100,size-100,file))
+            os.system('mogrify.exe -crop %sx%s+100+100 +repage "%s"' % (size-100,size-130,file))
             os.system('optipng.exe -clobber "%s"' % file)
+            os.system('convert.exe "%s" "%s"' % (file, ".gif" % file[:-4]))
         ThreadPool(8).map(f, files)
-
-        images = []
-        for file in files:
-            images.append(imageio.imread(file))
-        imageio.mimsave(output_file, images, fps=int(len(files)/4))
-        os.system('optipng.exe "%s"' % output_file)
-        #total_duration = 400 # in 1/100th of a seconds
-        #delay = int(round(total_duration / len(files),0))
+        total_duration = 4000 # in ms
+        delay = int(round(total_duration / len(files),0))
+        os.system('gifsicle.exe --delay=%s --loop "%s\\screenshot_*.gif" > "%s" ' % (delay, path, output_file))
 
         #cmd = 'convert.exe -fuzz 5%% -quality 95 -delay %s -loop 0  -layers OptimizePlus "%s" "%s"' % (delay, os.path.join(path, "screenshot_*.png"), output_file)
         #os.system(cmd)

@@ -46,9 +46,11 @@ class SettingsScannerView(PyHtmlView):
                             </div>
                             <div class="col-md-1">
                                 <div class="custom-control custom-switch">
-                                    <select name="camera_orientation" id="camera_orientation"  onchange='pyview.subject.set_camera_orientation($("#camera_orientation").val())'>
-                                        <option value="landscape" {% if pyview.subject.camera_orientation == "landscape" %}selected{%endif%}>Landscape</option>
-                                        <option value="portrait"  {% if pyview.subject.camera_orientation == "portrait"  %}selected{%endif%}>Portrait</option>
+                                    <select name="camera_rotation" id="camera_rotation"  onchange='pyview.subject.set_camera_rotation($("#camera_rotation").val())'>
+                                        <option value=0   {% if pyview.subject.camera_rotation == 0   %}selected{%endif%}>0</option>
+                                        <option value=90  {% if pyview.subject.camera_rotation == 90  %}selected{%endif%}>90</option>
+                                        <option value=180 {% if pyview.subject.camera_rotation == 180 %}selected{%endif%}>180</option>
+                                        <option value=270 {% if pyview.subject.camera_rotation == 270 %}selected{%endif%}>270</option>
                                     </select>  
                                 </div>
                             </div>

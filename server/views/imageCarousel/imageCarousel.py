@@ -105,7 +105,7 @@ class ImageCarousel(PyHtmlView):
 
     @property
     def img_height(self):
-        if SettingsInstance().settingsScanner.camera_orientation == "landscape":
+        if SettingsInstance().settingsScanner.camera_rotation in [0, 180]:
             return 100.0 / self.segments_shown / 4 * 3 * 0.79
         else:
             return 100.0 / self.segments_shown / 3 * 4 * 0.79

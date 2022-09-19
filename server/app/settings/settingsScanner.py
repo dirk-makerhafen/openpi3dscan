@@ -11,21 +11,21 @@ class SettingsScanner(Observable):
         self.save = parent.save
         self.segments = 16
         self.cameras_per_segment = 7
-        self.camera_orientation = "landscape"   # landscape,  portrait
+        self.camera_rotation = 0  # 0, 90, 180, 270
         self.camera_one_position = "top"  # top, bottom
 
     def to_dict(self):
         return {
             "segments": self.segments,
             "cameras_per_segment": self.cameras_per_segment,
-            "camera_orientation": self.camera_orientation,
+            "camera_rotation": self.camera_rotation,
             "camera_one_position": self.camera_one_position,
         }
 
     def from_dict(self, data):
         self.segments = data["segments"]
         self.cameras_per_segment = data["cameras_per_segment"]
-        self.camera_orientation = data["camera_orientation"]
+        self.camera_rotation = data["camera_rotation"]
         self.camera_one_position = data["camera_one_position"]
 
     def set_segments(self, value):
@@ -48,11 +48,15 @@ class SettingsScanner(Observable):
             self.save()
             self.notify_observers()
 
-    def set_camera_orientation(self, value):
-        if value not in ["landscape", "portrait"]:
+    def set_camera_rotation(self, value):
+        try:
+            value = int(value)
+        except:
             return
-        if value != self.camera_orientation:
-            self.camera_orientation = value
+        if value not in [0, 90, 180, 270]:
+            return
+        if value != self.camera_rotation:
+            self.camera_rotation = value
             self.save()
             self.notify_observers()
 

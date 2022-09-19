@@ -38,6 +38,38 @@ class SettingsScannerView(PyHtmlView):
                             </div>
                         </div>
                     </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-10">
+                                <strong class="mb-0">Orientation</strong>
+                                <p class="text-muted mb-0">Camera orientation</p>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <select name="camera_orientation" id="camera_orientation"  onchange='pyview.subject.set_camera_orientation($("#camera_orientation").val())'>
+                                        <option value="landscape" {% if pyview.subject.camera_orientation == "landscape" %}selected{%endif%}>Landscape</option>
+                                        <option value="portrait"  {% if pyview.subject.camera_orientation == "portrait"  %}selected{%endif%}>Portrait</option>
+                                    </select>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-10">
+                                <strong class="mb-0">Camera number</strong>
+                                <p class="text-muted mb-0">Position of camera 1</p>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <select name="camera_one_position" id="camera_one_position"  onchange='pyview.subject.set_camera_one_position($("#camera_one_position").val())'>
+                                        <option value="top"    {% if pyview.subject.camera_one_position == "top"    %} selected {%endif%}> Top </option>
+                                        <option value="bottom" {% if pyview.subject.camera_one_position == "bottom" %} selected {%endif%}> Bottom </option>
+                                    </select>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>   
         </div>

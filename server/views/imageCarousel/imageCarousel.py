@@ -58,7 +58,10 @@ class SegmentView(PyHtmlView):
     def __init__(self, subject, parent, seg_nr):
         super().__init__(subject, parent)
         self.seg_nr = seg_nr
-        self.images = [ImageRowView(subject, self, i+1) for i in range(0, SettingsInstance().settingsScanner.cameras_per_segment )]
+        if SettingsInstance().settingsScanner.camera_one_position == "top":
+            self.images = [ImageRowView(subject, self, i+1) for i in range(0, SettingsInstance().settingsScanner.cameras_per_segment )]
+        else:
+            self.images = [ImageRowView(subject, self, i) for i in range(SettingsInstance().settingsScanner.cameras_per_segment, 0, -1 )]
 
 
 class ImageCarousel(PyHtmlView):
@@ -102,7 +105,10 @@ class ImageCarousel(PyHtmlView):
 
     @property
     def img_height(self):
-        return 100.0 / self.segments_shown / 4 * 3 * 0.79
+        if SettingsInstance().settingsScanner.camera_orientation == "landscape":
+            return 100.0 / self.segments_shown / 4 * 3 * 0.79
+        else:
+            return 100.0 / self.segments_shown / 3 * 4 * 0.79
 
     @property
     def segments(self):

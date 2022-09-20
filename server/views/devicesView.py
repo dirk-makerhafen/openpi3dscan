@@ -24,7 +24,7 @@ class DevicesView(PyHtmlView):
             <div class="col-md-4"></div>
         </div>
         <div class="devicelist">
-            <table class="table">
+            <table id="devicetable" class="table sortable" >
                 <thead>
                     <tr>
                         <th>IP</th>
@@ -43,6 +43,10 @@ class DevicesView(PyHtmlView):
                 </thead>
                 {{ pyview.device_list.render() }}
             </table>
+            <script>
+                sorttable.makeSortable(document.getElementById("devicetable"));
+            </script>
+            
         </div>      
     </div>      
     '''

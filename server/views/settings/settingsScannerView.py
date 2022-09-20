@@ -42,15 +42,15 @@ class SettingsScannerView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-10">
                                 <strong class="mb-0">Orientation</strong>
-                                <p class="text-muted mb-0">Camera orientation</p>
+                                <p class="text-muted mb-0">Camera orientation. You must update all cameras for this change to take place!</p>
                             </div>
                             <div class="col-md-1">
                                 <div class="custom-control custom-switch">
                                     <select name="camera_rotation" id="camera_rotation"  onchange='pyview.subject.set_camera_rotation($("#camera_rotation").val())'>
-                                        <option value=0   {% if pyview.subject.camera_rotation == 0   %}selected{%endif%}>0</option>
-                                        <option value=90  {% if pyview.subject.camera_rotation == 90  %}selected{%endif%}>90</option>
-                                        <option value=180 {% if pyview.subject.camera_rotation == 180 %}selected{%endif%}>180</option>
-                                        <option value=270 {% if pyview.subject.camera_rotation == 270 %}selected{%endif%}>270</option>
+                                        <option value=0   {% if pyview.subject.camera_rotation == 0   %}selected{%endif%}>   0 </option>
+                                        <option value=90  {% if pyview.subject.camera_rotation == 90  %}selected{%endif%}>  90 </option>
+                                        <option value=180 {% if pyview.subject.camera_rotation == 180 %}selected{%endif%}> 180 </option>
+                                        <option value=270 {% if pyview.subject.camera_rotation == 270 %}selected{%endif%}> 270 </option>
                                     </select>  
                                 </div>
                             </div>

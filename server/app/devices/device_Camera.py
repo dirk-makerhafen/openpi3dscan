@@ -13,7 +13,7 @@ class Camera:
         #self.segment = 1  # 1-16
         self.busy_until = 0  # lock actions on device if benchmark or shot is active
 
-    def preview(self, resolution=(640, 480)):
+    def preview(self, resolution):
         self.device.wait_locked()
         try:
             result = self.device.api_request("/camera/preview/%s,%s/img.jpg" % (resolution[0], resolution[1]), timeout=20, max_tries=1).content

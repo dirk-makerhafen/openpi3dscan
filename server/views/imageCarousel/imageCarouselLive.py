@@ -3,6 +3,7 @@ import time
 import queue
 import os
 
+from app.settings.settings import SettingsInstance
 from views.imageCarousel.imageCarousel import ImageCarousel
 from app.devices.devices import DevicesInstance
 
@@ -36,6 +37,10 @@ class PreviewQueue:
             [1920, 1440],
             [2592, 1944],
         ]
+        if SettingsInstance().settingsScanner.camera_rotation not in [0, 180]:
+            for i in range(0, len(resolutions)):
+                resolutions[i] = reversed(resolutions[i])
+
         while True:
             device_id = self.queue.get()
             if device_id in self.imageRowViews:

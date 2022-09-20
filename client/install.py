@@ -88,6 +88,7 @@ if __name__ == "__main__":
         device_id   = sys.argv[1]
         device_type = sys.argv[2]
         name = sys.argv[3]
+        rotation = sys.argv[4]
     except: # try reading from settings
         if not os.path.exists("/boot/device.settings"):
             print("No settings provided as installer arguments and no /boot/device.settings file exists, ERROR")
@@ -96,6 +97,10 @@ if __name__ == "__main__":
         device_id   = settings_str.split("ID"  ,1)[1].split("=",1)[1].split('\n')[0].strip()
         device_type = settings_str.split("TYPE",1)[1].split("=",1)[1].split('\n')[0].strip()
         name = settings_str.split("NAME",1)[1].split("=",1)[1].split('\n')[0].strip()
+        try:
+            rotation = int(settings_str.split("ROTATION",1)[1].split("=",1)[1].split('\n')[0].strip())
+        except:
+            rotation = 0
 
     device_id = int(device_id)
     if device_id < 1 or device_id > 9999:
@@ -122,7 +127,8 @@ if __name__ == "__main__":
     # SETTINGS
     s  = 'ID   = %s\n' % device_id
     s += 'TYPE = %s\n' % device_type
-    s += 'NAME = %s' % name
+    s += 'NAME = %s\n' % name
+    s += 'ROTATION = %s' % rotation
     open("/tmp/device.settings", "w").write(s)
     shell("sudo cp /tmp/device.settings /boot/device.settings ")
 

@@ -23,10 +23,11 @@ from .gpu import YUV_to_JPEGInstance, Resize_YUVInstance
 storage_dir = "/home/openpi3dscan/shots"
 
 from src.heartbeat import HeartbeatInstance
-
+from .settings import Settings
 
 VIDEO_PORT_NR = 1
 STILL_PORT_NR = 2
+
 
 
 def clear_memory():
@@ -38,7 +39,10 @@ class Frame():
     def __init__(self,  timestamp, buffer, framesize):
         self.timestamp = timestamp
         self.image_framesize = framesize
-        self.preview_framesize = (800, 600)
+        if Settings.ROTATION in [0, 180]:
+            self.preview_framesize = (800, 600)
+        else:
+            self.preview_framesize = (600, 800)
         self.image = None
         self.preview = None
         self.capture_success = False
@@ -102,7 +106,7 @@ class Frame():
     def clear(self):
         self.image = None
         self.preview = None
-        self.buffer = None
+
 
 class Buffer():
     def __init__(self, maxsize = 4):
@@ -319,8 +323,12 @@ class Camera():
         self.capture_active = False
         self.cameralock = threading.Lock()
         self.revision = 'ov5647'
-        self.max_x = 2592
-        self.max_y = 1944
+        if Settings.ROTATION in [0, 180]:
+            self.max_x = 2592
+            self.max_y = 1944
+        else:
+            self.max_x = 1944
+            self.max_y = 2592
         self.mmal_camera = mmalobj.MMALCamera()
         self._setup()
         self.port_still = CameraPortStill(self)
@@ -345,8 +353,12 @@ class Camera():
                 self.revision = camera_info.control.params[mmal.MMAL_PARAMETER_CAMERA_INFO].cameras[0].camera_name.decode('ascii')
 
         if self.revision == "imx219":
-            self.max_x = 3280
-            self.max_y = 2464
+            if Settings.ROTATION in [0, 180]:
+                self.max_x = 3280
+                self.max_y = 2464
+            else:
+                self.max_x = 2464
+                self.max_y = 3280
 
         cc = self.mmal_camera.control.params[picamera.mmal.MMAL_PARAMETER_CAMERA_CONFIG]
         cc.max_stills_w = self.max_x
@@ -375,7 +387,7 @@ class Camera():
 
         self.image_effect = 'none'
         self.color_effects = None
-        self.rotation = 0
+        self.rotation = Settings.ROTATION
         self.hflip = self.vflip = False
         self.zoom = (0.0, 0.0, 1.0, 1.0)
 
@@ -392,7 +404,7 @@ class Camera():
         GPIO.output(self.led_pin, bool(False))
         self.led_status = False
 
-    def get_preview(self, framesize = (640, 480), quality=None):
+    def get_preview(self, framesize, quality=None):
         if self.workerqueue.qsize() != 0:
             return None
         self.cameralock.acquire()
@@ -470,7 +482,12 @@ class Camera():
             self.cameralock.release()
 
     def create_frame_tasks(self, frame, name, path):
-        self.workerqueue.put([frame.create_preview,  { "framesize": (800, 600) } ])
+        if Settings.ROTATION in [0, 180]:
+            preview_size = (800, 600)
+        else:
+            preview_size = (600, 800)
+
+        self.workerqueue.put([frame.create_preview,  { "framesize": preview_size } ])
         self.workerqueue.put([frame.image_to_jpeg,   { "quality" :  100 } ])
         self.workerqueue.put([frame.preview_to_jpeg, { "quality"  : 100} ] )
         self.workerqueue.put([frame.optimise_preview,{  } ] )

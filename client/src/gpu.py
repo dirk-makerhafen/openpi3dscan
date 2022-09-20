@@ -25,7 +25,7 @@ class Resize_YUV():
             self.finished.set()
         return finished
 
-    def resize(self, YUV_DATA, output = None, from_size = (2592, 1944), to_size = (800, 600)):
+    def resize(self, YUV_DATA,  from_size, to_size, output= None):
         gpulock.acquire()
         result = None
         try:
@@ -78,7 +78,7 @@ class YUV_to_JPEG():
             self.finished.set()
         return finished
 
-    def encode(self, YUV_DATA, output = None, framesize = (2592, 1944), quality = 100):
+    def encode(self, YUV_DATA, framesize, quality, output= None):
         gpulock.acquire()
         result = None
         try:
@@ -117,14 +117,13 @@ class YUV_to_JPEG():
         return result
 
 
-
-
 _resize_YUVInstance = None
 def Resize_YUVInstance():
     global _resize_YUVInstance
     if _resize_YUVInstance is None:
         _resize_YUVInstance = Resize_YUV()
     return _resize_YUVInstance
+
 
 _YUV_to_JPEGInstance = None
 def YUV_to_JPEGInstance():

@@ -1,6 +1,6 @@
 import random
 import os
-import math
+
 
 class Settings():
     def __init__(self):

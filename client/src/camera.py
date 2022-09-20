@@ -50,7 +50,7 @@ class Frame():
     def create_preview(self, framesize):
         if self.image is None:
             return
-        self.preview = Resize_YUVInstance().resize(self.image, from_size=self.image_framesize, to_size=framesize)
+        self.preview = Resize_YUVInstance().resize(YUV_DATA=self.image, from_size=self.image_framesize, to_size=framesize)
         self.preview_framesize = framesize
 
     def preview_to_jpeg(self, quality):

@@ -38,7 +38,7 @@ class Light():
             GPIO.setmode(GPIO.BCM)
             for pin in self.gpio_pins:
                 GPIO.setup(pin, GPIO.OUT)
-                GPIO.output(pin, False)
+                GPIO.output(pin, True)
 
         self.task_queue = Queue()
         self.last_usage = time.time()
@@ -130,7 +130,7 @@ class Light():
         if self.use_gpio is True:
             v = int(round(value / (100 / ((2**len(self.gpio_pins))-1)), 0))
             for i in range(len(self.gpio_pins)):
-                GPIO.output(self.gpio_pins[i], v & (2**i) != 0)
+                GPIO.output(self.gpio_pins[i], v & (2**i) == 0)
         else:
             for channel in range(16):
                 value_percent_channel = self.light_segment_adjustments[channel] * value

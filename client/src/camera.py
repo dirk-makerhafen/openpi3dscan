@@ -5,10 +5,7 @@ import shutil
 from fractions import Fraction
 from io import BytesIO
 from queue import Queue
-import time
 import threading
-from collections import deque
-
 import bottle
 import ctypes
 import picamera
@@ -30,7 +27,6 @@ from src.heartbeat import HeartbeatInstance
 
 VIDEO_PORT_NR = 1
 STILL_PORT_NR = 2
-
 
 
 def clear_memory():
@@ -745,6 +741,16 @@ class Camera():
             raise Exception("Invalid exposure compensation value: %s" % value)
         self.mmal_camera.control.params[mmal.MMAL_PARAMETER_EXPOSURE_COMP] = value
     exposure_compensation = property( _get_exposure_compensation, _set_exposure_compensation)
+
+    def _get_rotation(self):
+        return self.mmal_camera.outputs[0].params[mmal.MMAL_PARAMETER_ROTATION]
+    def _set_rotation(self, value):
+        value = int(value)
+        if value not in [0, 90, 180, 270]:
+            return
+        for port in self.mmal_camera.outputs:
+            port.params[mmal.MMAL_PARAMETER_ROTATION] = value
+    rotation = property(_get_rotation, _set_rotation)
 
     def to_dict(self):
         return {

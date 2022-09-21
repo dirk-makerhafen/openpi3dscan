@@ -62,17 +62,17 @@ class DevicesView(PyHtmlView):
     def sort_by(self, keydir):
         key, direction = keydir.split("-")
         if key == "ip":
-            self.device_list.sort_key = lambda x:x.ip
+            self.device_list.sort_key = lambda x:x.subject.ip
         elif key == "id":
-            self.device_list.sort_key = lambda x: x.device_id
+            self.device_list.sort_key = lambda x: x.subject.device_id
         elif key == "type":
-            self.device_list.sort_key = lambda x: x.device_type
+            self.device_list.sort_key = lambda x: x.subject.device_type
         elif key == "name":
-            self.device_list.sort_key = lambda x: [x.zfill(3) for x in re.sub("[^0-9-]", "", x.name).split("-")]
+            self.device_list.sort_key = lambda x: [v.zfill(3) for v in re.sub("[^0-9-]", "", x.subject.name).split("-")]
         elif key == "status":
-            self.device_list.sort_key = lambda x: x.status
+            self.device_list.sort_key = lambda x: x.subject.status
         elif key == "version":
-            self.device_list.sort_key = lambda x: x.version
+            self.device_list.sort_key = lambda x: x.subject.version
         self.device_list.sort_reverse = direction == "d"
         self.current_sort_key = key
         self.current_sort_dir = direction

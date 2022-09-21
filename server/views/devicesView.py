@@ -54,7 +54,7 @@ class DevicesView(PyHtmlView):
         def f(device):
             order = [-1]
             try:
-                order = [int(x) for x in re.sub("[^0-9-]", "", device.name).split("-")]
+                order = [x.zfill(3) for x in re.sub("[^0-9-]", "", device.name).split("-")]
             except:
                 pass
             order.append(device.ip)

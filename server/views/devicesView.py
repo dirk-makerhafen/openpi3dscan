@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import re
 from typing import TYPE_CHECKING
 
 from app.tasks.task_NetworkScan import TaskNetworkScanInstance
@@ -24,7 +26,7 @@ class DevicesView(PyHtmlView):
             <div class="col-md-4"></div>
         </div>
         <div class="devicelist">
-            <table id="devicetable">
+            <table id="devicetable" class="table">
                 <thead>
                     <tr>
                         <th>IP</th>
@@ -49,7 +51,15 @@ class DevicesView(PyHtmlView):
 
     def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
-        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: [x.subject.name, x.subject.ip])
+        def f(device):
+            order = [-1]
+            try:
+                order = [int(x) for x in re.sub("[^0-9-]", "", device.name).split("-")]
+            except:
+                pass
+            order.append(device.ip)
+            return order
+        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: f(x.subject))
         self.task_networkscan = TaskNetworkscanView(TaskNetworkScanInstance(), self)
         self.task_syncshots = TaskSyncShotsView(TaskSyncShotsInstance(), self)
         self.task_updateclients = TaskUpdateClientsView(TaskUpdateClientsInstance(), self)

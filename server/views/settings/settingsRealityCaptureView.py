@@ -84,7 +84,7 @@ class RealityCaptureView(PyHtmlView):
                                      <select name="default_reconstruction_quality" id="default_reconstruction_quality"  onchange='pyview.subject.set_default_reconstruction_quality($("#default_reconstruction_quality").val())'>
                                         <option value="preview" {% if pyview.subject.default_reconstruction_quality == "preview"%}selected{%endif%}>Preview</option>
                                         <option value="normal"  {% if pyview.subject.default_reconstruction_quality == "normal" %}selected{%endif%}>Normal</option>
-                                        <option value="high"    {% if pyview.subject.default_reconstruction_quality == "high    %}selected{%endif%}>High</option>
+                                        <option value="high"    {% if pyview.subject.default_reconstruction_quality == "high"    %}selected{%endif%}>High</option>
                                     </select>  
                                 </div>
                             </div>
@@ -102,7 +102,7 @@ class RealityCaptureView(PyHtmlView):
                                      <select name="default_export_quality" id="default_export_quality"  onchange='pyview.subject.set_default_export_quality($("#default_export_quality").val())'>
                                         <option value="low"    {% if pyview.subject.default_export_quality == "low"    %}selected{%endif%}>Low (500k)</option>
                                         <option value="normal" {% if pyview.subject.default_export_quality == "normal" %}selected{%endif%}>Normal (1M)</option>
-                                        <option value="high"   {% if pyview.subject.default_export_quality == "high    %}selected{%endif%}>High (4M)</option>
+                                        <option value="high"   {% if pyview.subject.default_export_quality == "high"    %}selected{%endif%}>High (4M)</option>
                                     </select>  
                                 </div>
                             </div>
@@ -120,7 +120,7 @@ class RealityCaptureView(PyHtmlView):
                                      <select name="default_create_mesh_from" id="default_create_mesh_from"  onchange='pyview.subject.set_default_create_mesh_from($("#default_create_mesh_from").val())'>
                                         <option value="normal"     {% if pyview.subject.default_create_mesh_from == "normal"     %}selected{%endif%}>Normal</option>
                                         <option value="projection" {% if pyview.subject.default_create_mesh_from == "projection" %}selected{%endif%}>Projection</option>
-                                        <option value="all"        {% if pyview.subject.default_create_mesh_from == "all         %}selected{%endif%}>All</option>
+                                        <option value="all"        {% if pyview.subject.default_create_mesh_from == "all"         %}selected{%endif%}>All</option>
                                     </select>  
                                 </div>
                             </div>

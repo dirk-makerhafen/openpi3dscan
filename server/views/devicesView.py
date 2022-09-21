@@ -35,8 +35,8 @@ class DevicesView(PyHtmlView):
                         <th onclick="pyview.sort_by('name-{{pyview.other_sort_dir}}')">Name</th>
                         <th onclick="pyview.sort_by('status-{{pyview.other_sort_dir}}')">Status</th>
                         <th onclick="pyview.sort_by('version-{{pyview.other_sort_dir}}')">Version</th>
-                        <th>Heartbeat</th>
-                        <th>Disk Free/Total</th>
+                        <th onclick="pyview.sort_by('heartbeart-{{pyview.other_sort_dir}}')">Heartbeat</th>
+                        <th onclick="pyview.sort_by('diskfree-{{pyview.other_sort_dir}}')">Disk Free/Total</th>
                         <th>AWB gains</th>
                         <th>D/A gains</th>
                         <th>Exposure</th>
@@ -68,17 +68,24 @@ class DevicesView(PyHtmlView):
         elif key == "type":
             self.device_list.sort_key = lambda x: x.subject.device_type
         elif key == "name":
-            self.device_list.sort_key = lambda x: [v.zfill(3) for v in re.sub("[^0-9-]", "", x.subject.name).split("-")]
+            def f(d):
+                o = [re.sub("[0-9-]", "", d.name), ]
+                o.extend([v.zfill(3) for v in re.sub("[^0-9-]", "", d.name).split("-")])
+            self.device_list.sort_key = lambda x: f(x)
         elif key == "status":
             self.device_list.sort_key = lambda x: x.subject.status
         elif key == "version":
             self.device_list.sort_key = lambda x: x.subject.version
+        elif key == "heartbeat":
+            self.device_list.sort_key = lambda x: x.subject.latest_heartbeat_time_diff
+        elif key == "diskfree":
+            self.device_list.sort_key = lambda x: x.subject.diskfree
         self.device_list.sort_reverse = direction == "d"
         self.current_sort_key = key
         self.current_sort_dir = direction
         self.other_sort_dir = "a" if direction == "d" else "d"
         if self.is_visible:
-            self.device_list.update()
+            self.update()
 
     def shutdown(self):
         DevicesInstance().shutdown()

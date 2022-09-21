@@ -41,8 +41,8 @@ class SettingsScannerView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
-                                <strong class="mb-0">Orientation</strong>
-                                <p class="text-muted mb-0">Camera orientation. You must update all cameras for this change to take place!</p>
+                                <strong class="mb-0">Rotation</strong>
+                                <p class="text-muted mb-0">Camera rotation. You must update all cameras for this change to take place!</p>
                             </div>
                             <div class="col-md-1">
                                 <div class="custom-control custom-switch">

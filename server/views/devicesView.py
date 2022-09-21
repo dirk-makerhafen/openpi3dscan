@@ -24,7 +24,7 @@ class DevicesView(PyHtmlView):
             <div class="col-md-4"></div>
         </div>
         <div class="devicelist">
-            <table id="devicetable" class="table sortable" >
+            <table id="devicetable">
                 <thead>
                     <tr>
                         <th>IP</th>
@@ -42,18 +42,14 @@ class DevicesView(PyHtmlView):
                     </tr>
                 </thead>
                 {{ pyview.device_list.render() }}
-            </table>
-            <script>
-                sorttable.makeSortable(document.getElementById("devicetable"));
-            </script>
-            
+            </table>            
         </div>      
     </div>      
     '''
 
     def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
-        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: x.subject.ip)
+        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: [x.subject.name, x.subject.ip])
         self.task_networkscan = TaskNetworkscanView(TaskNetworkScanInstance(), self)
         self.task_syncshots = TaskSyncShotsView(TaskSyncShotsInstance(), self)
         self.task_updateclients = TaskUpdateClientsView(TaskUpdateClientsInstance(), self)

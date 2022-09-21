@@ -56,7 +56,8 @@ class DevicesView(PyHtmlView):
             try:
                 order.append(device.name[0])
             except:
-                pass
+                order.append(device.device_type)
+
             try:
                 order.extend([x.zfill(3) for x in re.sub("[^0-9-]", "", device.name).split("-")])
             except:

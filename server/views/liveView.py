@@ -124,17 +124,25 @@ class LiveView(PyHtmlView):
              {{ pyview.imageCarousel.render() }}
         </div>
         <script>
+         
             document.onkeydown = function (e) {
+                if (document.getElementById("create_shot_btn") == undefined){ // if shot is active btn is not there
+                    return;
+                }
                 if ( e.keyCode ==  27 || e.keyCode ==  116 ){    // start or play
-                    pyview.create_shot_view.create_shot( $("#_name_input").val();
+                    e.preventDefault();
+                    pyview.create_shot_view.create_shot( $("#_name_input").val());
                 };
                 if ( e.keyCode ==  33){    // left
+                    e.preventDefault();
                     pyview.imageCarousel.rotate_cw();
                 };
-                if ( e.keyCode ==  43){    // right
+                if ( e.keyCode ==  34){    // right
+                    e.preventDefault();
                     pyview.imageCarousel.rotate_ccw();
                 };
-                if ( e.keyCode ==  190){    // right
+                if ( e.keyCode ==  190){    // 
+                    e.preventDefault();
                     pyview.imageCarousel.switch_type();
                 };
             };

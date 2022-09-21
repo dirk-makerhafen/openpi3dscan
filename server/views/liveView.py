@@ -82,7 +82,7 @@ class TaskCreateShotView(PyHtmlView):
                     left: 0px;
                     top: 0px;
                     width: 100%;
-                    background-color: #0009;
+                    background-color: #{% if pyview.subject.status == "shot"%}999{% else %}000{% endif %}9;
                     color: #fff;
                     height: 100%;
                     font-size: 8em;
@@ -96,15 +96,7 @@ class TaskCreateShotView(PyHtmlView):
             </div>
         {% endif %}
     </div>
-    <script>
-        document.onkeydown = function (e) {
-            if ( e.keyCode ==  27 ){    // start or play
-                {% if pyview.subject.status == "idle" %} 
-                    pyview.create_shot( $("#_name_input").val();
-                {% endif %}
-            };
-        };
-    </script>
+
     '''
 
     def __init__(self, subject, parent):
@@ -131,6 +123,22 @@ class LiveView(PyHtmlView):
         <div style="overflow-y:scroll;height:calc(100% - 35px);">
              {{ pyview.imageCarousel.render() }}
         </div>
+        <script>
+            document.onkeydown = function (e) {
+                if ( e.keyCode ==  27 || e.keyCode ==  116 ){    // start or play
+                    pyview.create_shot_view.create_shot( $("#_name_input").val();
+                };
+                if ( e.keyCode ==  33){    // left
+                    pyview.imageCarousel.rotate_cw();
+                };
+                if ( e.keyCode ==  43){    // right
+                    pyview.imageCarousel.rotate_ccw();
+                };
+                if ( e.keyCode ==  190){    // right
+                    pyview.imageCarousel.switch_type();
+                };
+            };
+        </script>
     </div>   
     '''
 

@@ -29,12 +29,12 @@ class DevicesView(PyHtmlView):
             <table id="devicetable" class="table">
                 <thead>
                     <tr>
-                        <th>IP</th>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Status</th>
-                        <th>Version</th>
+                        <th onclick="pyview.sort_by('ip-{{pyview.other_sort_dir}}')">IP</th>
+                        <th onclick="pyview.sort_by('id-{{pyview.other_sort_dir}}')">ID</th>
+                        <th onclick="pyview.sort_by('type-{{pyview.other_sort_dir}}')">Type</th>
+                        <th onclick="pyview.sort_by('name-{{pyview.other_sort_dir}}')">Name</th>
+                        <th onclick="pyview.sort_by('status-{{pyview.other_sort_dir}}')">Status</th>
+                        <th onclick="pyview.sort_by('version-{{pyview.other_sort_dir}}')">Version</th>
                         <th>Heartbeat</th>
                         <th>Disk Free/Total</th>
                         <th>AWB gains</th>
@@ -51,23 +51,34 @@ class DevicesView(PyHtmlView):
 
     def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
-        def f(device):
-            order = []
-            try:
-                order.append(device.name[0])
-            except:
-                order.append(device.device_type)
-
-            try:
-                order.extend([x.zfill(3) for x in re.sub("[^0-9-]", "", device.name).split("-")])
-            except:
-                pass
-            order.append(device.ip)
-            return order
-        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: f(x.subject))
+        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: x.ip)
         self.task_networkscan = TaskNetworkscanView(TaskNetworkScanInstance(), self)
         self.task_syncshots = TaskSyncShotsView(TaskSyncShotsInstance(), self)
         self.task_updateclients = TaskUpdateClientsView(TaskUpdateClientsInstance(), self)
+        self.current_sort_key = "ip"
+        self.current_sort_dir = "a"
+        self.other_sort_dir = "d"
+
+    def sort_by(self, keydir):
+        key, direction = keydir.split("-")
+        if key == "ip":
+            self.device_list.sort_key = lambda x:x.ip
+        elif key == "id":
+            self.device_list.sort_key = lambda x: x.device_id
+        elif key == "type":
+            self.device_list.sort_key = lambda x: x.device_type
+        elif key == "name":
+            self.device_list.sort_key = lambda x: [x.zfill(3) for x in re.sub("[^0-9-]", "", x.name).split("-")]
+        elif key == "status":
+            self.device_list.sort_key = lambda x: x.status
+        elif key == "version":
+            self.device_list.sort_key = lambda x: x.version
+        self.device_list.sort_reverse = direction == "d"
+        self.current_sort_key = key
+        self.current_sort_dir = direction
+        self.other_sort_dir = "a" if direction == "d" else "d"
+        if self.is_visible:
+            self.device_list.update()
 
     def shutdown(self):
         DevicesInstance().shutdown()

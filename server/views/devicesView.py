@@ -51,7 +51,7 @@ class DevicesView(PyHtmlView):
 
     def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
-        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: x.ip)
+        self.device_list = ObservableListView(subject=subject.devices, parent=self, item_class=DeviceRowView, dom_element="tbody", sort_key=lambda x: x.subject.device_id)
         self.task_networkscan = TaskNetworkscanView(TaskNetworkScanInstance(), self)
         self.task_syncshots = TaskSyncShotsView(TaskSyncShotsInstance(), self)
         self.task_updateclients = TaskUpdateClientsView(TaskUpdateClientsInstance(), self)

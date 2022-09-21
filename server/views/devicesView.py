@@ -68,10 +68,7 @@ class DevicesView(PyHtmlView):
         elif key == "type":
             self.device_list.sort_key = lambda x: x.subject.device_type
         elif key == "name":
-            def f(d):
-                o = [re.sub("[0-9-]", "", d.name), ]
-                o.extend([v.zfill(3) for v in re.sub("[^0-9-]", "", d.name).split("-")])
-            self.device_list.sort_key = lambda x: f(x)
+            self.device_list.sort_key = lambda x: [re.sub("[0-9-]", "", x.subject.name), ] + [v.zfill(3) for v in re.sub("[^0-9-]", "", x.subject.name).split("-")]
         elif key == "status":
             self.device_list.sort_key = lambda x: x.subject.status
         elif key == "version":

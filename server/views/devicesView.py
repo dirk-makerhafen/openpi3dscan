@@ -35,7 +35,7 @@ class DevicesView(PyHtmlView):
                         <th onclick="pyview.sort_by('name-{{pyview.other_sort_dir}}')">Name</th>
                         <th onclick="pyview.sort_by('status-{{pyview.other_sort_dir}}')">Status</th>
                         <th onclick="pyview.sort_by('version-{{pyview.other_sort_dir}}')">Version</th>
-                        <th onclick="pyview.sort_by('heartbeart-{{pyview.other_sort_dir}}')">Heartbeat</th>
+                        <th onclick="pyview.sort_by('heartbeat-{{pyview.other_sort_dir}}')">Heartbeat</th>
                         <th onclick="pyview.sort_by('diskfree-{{pyview.other_sort_dir}}')">Disk Free/Total</th>
                         <th>AWB gains</th>
                         <th>D/A gains</th>

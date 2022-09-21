@@ -82,7 +82,7 @@ class TaskCreateShotView(PyHtmlView):
                     left: 0px;
                     top: 0px;
                     width: 100%;
-                    background-color: #bbb9;
+                    background-color: #0009;
                     color: #fff;
                     height: 100%;
                     font-size: 8em;

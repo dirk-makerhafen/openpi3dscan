@@ -82,7 +82,7 @@ class TaskCreateShotView(PyHtmlView):
                     left: 0px;
                     top: 0px;
                     width: 100%;
-                    background-color: #{% if pyview.subject.status == "shot"%}999{% else %}000{% endif %}9;
+                    background-color: #{% if pyview.subject.status == "shot"%}aaa{% else %}000{% endif %}9;
                     color: #fff;
                     height: 100%;
                     font-size: 8em;

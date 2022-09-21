@@ -75,14 +75,36 @@ class TaskCreateShotView(PyHtmlView):
     </div>
     <div class="col-md-2 topMenuItem" >
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn btn-success" style="margin-right:5px; width: 80%;" onclick='pyview.create_shot( $("#_name_input").val());' style="color:#484"> TAKE SHOT  </button>
+            <button id="create_shot_btn" class="btn btn-success" style="margin-right:5px; width: 80%;" onclick='pyview.create_shot( $("#_name_input").val());' style="color:#484"> TAKE SHOT  </button>
         {% else %}
-            {% if pyview.subject.status == "preparing"  %} Warmup {% endif %}
-            {% if pyview.subject.status == "waiting"    %} Shot in {{pyview.subject.shot_count_down}}{% endif %}
-            {% if pyview.subject.status == "shot"       %} SHOT {% endif %}
-            {% if pyview.subject.status == "processing" %} Processing {{pyview.subject.processed_percent}}% {% endif %}
+             <div style="
+                    position: fixed;
+                    left: 0px;
+                    top: 0px;
+                    width: 100%;
+                    background-color: #bbb9;
+                    color: #fff;
+                    height: 100%;
+                    font-size: 8em;
+                    padding-top: 20%;
+                    z-index: 999;
+            "> 
+                {% if pyview.subject.status == "preparing"  %} Warmup {% endif %}
+                {% if pyview.subject.status == "waiting"    %} Shot in {{pyview.subject.shot_count_down}}  {% endif %}
+                {% if pyview.subject.status == "shot"       %} SHOT {% endif %}
+                {% if pyview.subject.status == "processing" %} Processing {{pyview.subject.processed_percent}}% {% endif %}                
+            </div>
         {% endif %}
     </div>
+    <script>
+        document.onkeydown = function (e) {
+            if ( e.keyCode ==  27 ){    // start or play
+                {% if pyview.subject.status == "idle" %} 
+                    pyview.create_shot( $("#_name_input").val();
+                {% endif %}
+            };
+        };
+    </script>
     '''
 
     def __init__(self, subject, parent):

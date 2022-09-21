@@ -59,7 +59,7 @@ class SettingsScannerView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
-                                <strong class="mb-0">Camera number</strong>
+                                <strong class="mb-0">Camera numbering</strong>
                                 <p class="text-muted mb-0">Position of camera 1</p>
                             </div>
                             <div class="col-md-1">

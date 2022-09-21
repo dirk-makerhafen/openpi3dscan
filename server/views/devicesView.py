@@ -52,9 +52,13 @@ class DevicesView(PyHtmlView):
     def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
         def f(device):
-            order = [-1]
+            order = []
             try:
-                order = [x.zfill(3) for x in re.sub("[^0-9-]", "", device.name).split("-")]
+                order.append(device.name[0])
+            except:
+                pass
+            try:
+                order.extend([x.zfill(3) for x in re.sub("[^0-9-]", "", device.name).split("-")])
             except:
                 pass
             order.append(device.ip)

@@ -102,13 +102,9 @@ if __name__ == "__main__":
         wait(60, 90)
 
     stop_other_processes()
+    os.system("sudo /etc/init.d/chrony restart")
 
     wait(1, 100)
-
-    if NOWAIT is False:
-        os.system("sudo ntpdate -u 192.168.99.254")
-        wait(3, 30)
-        os.system("sudo ntpdate -u 192.168.99.254")
 
     route("/id")(device_id)
     route("/shutdown")(shutdown)

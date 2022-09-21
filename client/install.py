@@ -144,7 +144,7 @@ if __name__ == "__main__":
         shell('sudo DEBIAN_FRONTEND=noninteractive apt-get update', tries=2)
         shell('sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" remove python3-numpy man-db')
         shell('sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install '
-              'python-pygame python-picamera python3-rpi.gpio ntp ntpdate python3-pip libopenjp2-7 ffmpeg libgstreamer1.0-0 '
+              'python-pygame python-picamera python3-rpi.gpio chrony ntpdate python3-pip libopenjp2-7 ffmpeg libgstreamer1.0-0 '
               'imagemagick python3-smbus i2c-tools  libqt4-test libqtgui4 libcblas3 libatlas-base-dev libjasper-dev  '
               'libgtk2.0-dev libcv2.4 libgtk-3-0 python-wxgtk3.0-dev  libopenblas-base libopenblas-dev   '
               'python-dev gcc gfortran  libhdf5-dev libhdf5-serial-dev', tries=2)
@@ -156,18 +156,18 @@ if __name__ == "__main__":
         if device_type == "light":
             shell('sudo raspi-config nonint do_i2c 0')
         
-        #  NTP
+        #  NTP/chrony chrony
         shell('sudo systemctl stop systemd-timesyncd ; ' )
         shell('sudo systemctl disable systemd-timesyncd ; ' )
-        shell('cat /etc/ntp.conf | grep -v "server 192.168." | grep -v "^pool " > 1 ')
+        shell('cat /etc/chrony/chrony.conf | grep -v "server 192.168." | grep -v "^pool " > 1 ')
         shell('echo "server 192.168.99.254 prefer iburst minpoll 4 maxpoll 7" >> 1')
-        shell('sudo mv 1 /etc/ntp.conf')
-        shell('sudo systemctl enable ntp' )
-        shell('sudo /etc/init.d/ntp restart')
+        shell('sudo mv 1 /etc/chrony/chrony.conf')
+        shell('sudo systemctl enable chrony' )
+        shell('sudo /etc/init.d/chrony restart')
         if device_type == "camera":
             download_shots()
 
-    # Add user for ssh login  ntpq -c pe -c re
+    # Add user for ssh login
     shell('sudo useradd openpi3dscan')
     shell('echo openpi3dscan:openpi3dscan | sudo chpasswd')
     shell('echo "openpi3dscan ALL=(ALL) NOPASSWD: ALL" > 1 ; sudo chown root:root 1 ; sudo mv 1 "/etc/sudoers.d/010_openpi3dscan-nopasswd"')

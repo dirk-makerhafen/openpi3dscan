@@ -69,6 +69,10 @@ class SettingsRealityCapture(Observable):
             "diameter": self.diameter,
             "height": self.height,
             "pin": self.pin,
+            "default_reconstruction_quality": self.default_reconstruction_quality,
+            "default_export_quality": self.default_export_quality,
+            "default_create_mesh_from": self.default_create_mesh_from,
+            "default_create_textures": self.default_create_textures,
         }
 
     def from_dict(self, data):
@@ -76,6 +80,10 @@ class SettingsRealityCapture(Observable):
         self.diameter = data["diameter"]
         self.height = data["height"]
         self.pin = data["pin"]
+        self.default_reconstruction_quality = data["default_reconstruction_quality"]
+        self.default_export_quality = data["default_export_quality"]
+        self.default_create_mesh_from = data["default_create_mesh_from"]
+        self.default_create_textures = data["default_create_textures"]
 
     def set_markers(self, markers):
         self.markers = markers

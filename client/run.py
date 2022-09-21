@@ -93,20 +93,22 @@ if __name__ == "__main__":
     if "nowait" in sys.argv:
         NOWAIT = True
 
-    wait(20,60)
+    wait(10,60)
 
     start = time.time()
     while True:
         if HeartbeatInstance().send() is True: #if master is up we start
             break
-        time.sleep(60)
+        wait(60, 90)
 
     stop_other_processes()
 
+    wait(1, 100)
+
     if NOWAIT is False:
         os.system("sudo ntpdate -u 192.168.99.254")
-
-    wait(10, 60)
+        wait(3, 30)
+        os.system("sudo ntpdate -u 192.168.99.254")
 
     route("/id")(device_id)
     route("/shutdown")(shutdown)

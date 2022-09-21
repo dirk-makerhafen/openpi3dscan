@@ -48,6 +48,7 @@ MARKERS_PRELOAD = '''
 1x12:09b - 1x12:09c - 0.095
 '''
 
+
 class SettingsRealityCapture(Observable):
     def __init__(self, parent):
         super().__init__()
@@ -57,6 +58,10 @@ class SettingsRealityCapture(Observable):
         self.diameter = 1.9
         self.height = 2.5
         self.pin = ""
+        self.default_reconstruction_quality = "normal" # preview, normal, high
+        self.default_export_quality = "normal"  # "high", normal, low
+        self.default_create_mesh_from = "projection" # normal, projection, all
+        self.default_create_textures = True
 
     def to_dict(self):
         return {
@@ -105,3 +110,35 @@ class SettingsRealityCapture(Observable):
         self.diameter = new_diameter
         self.save()
         self.notify_observers()
+
+    def set_default_reconstruction_quality(self, new_default_reconstruction_quality):
+        if new_default_reconstruction_quality not in ["preview", "normal", "high"]:
+            self.notify_observers()
+            return
+        self.default_reconstruction_quality = new_default_reconstruction_quality
+        self.save()
+        self.notify_observers()
+
+
+    def set_default_export_quality(self, new_default_export_quality):
+        if new_default_export_quality not in ["low", "normal", "high"]:
+            self.notify_observers()
+            return
+        self.default_export_quality = new_default_export_quality
+        self.save()
+        self.notify_observers()
+
+    def set_default_create_mesh_from(self, new_default_create_mesh_from):
+        if new_default_create_mesh_from not in ["normal", "projection", "all"]:
+            self.notify_observers()
+            return
+        self.default_create_mesh_from = new_default_create_mesh_from
+        self.save()
+        self.notify_observers()
+
+    def set_default_create_textures(self, new_default_create_textures):
+        self.default_create_textures =  bool(new_default_create_textures)
+        self.save()
+        self.notify_observers()
+
+

@@ -58,7 +58,7 @@ class SequenceSettingsView(PyHtmlView):
                         </div>
                         <div class="col-md-2" style="text-align:center">
                             <div class="custom-control custom-switch">   
-                                <inputid="projection_image2_{{pyview.uid}}"  type="checkbox" {% if pyview.subject.image2.projection == True %}checked{% endif %} onclick='pyview.subject.image2._set_projection($("#projection_image2_{{pyview.uid}}").prop("checked") === true)'>                                 
+                                <input id="projection_image2_{{pyview.uid}}"  type="checkbox" {% if pyview.subject.image2.projection == True %}checked{% endif %} onclick='pyview.subject.image2._set_projection($("#projection_image2_{{pyview.uid}}").prop("checked") === true)'>                                 
                                 <span class="custom-control-label"></span>
                             </div>
                         </div>

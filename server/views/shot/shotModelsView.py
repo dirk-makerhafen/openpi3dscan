@@ -1,5 +1,7 @@
 from pyhtmlgui import PyHtmlView, ObservableList, ObservableListView
 
+from app.settings.settings import SettingsInstance
+
 
 class ModelPreviewFileItemView(PyHtmlView):
     DOM_ELEMENT = "tr"
@@ -48,16 +50,16 @@ class ShotModelsView(PyHtmlView):
               <tr style="border-top: 1px solid lightgray; line-height: 3em;">
                     <td>
                         <select name="m_create_mesh_from" id="m_create_mesh_from">
-                          <option value="projection">Projection</option>
-                          <option value="normal">Normal</option>
-                          <option value="all">All Images</option>
+                          <option value="projection" {% if pyview.settings.realityCaptureSettings.default_create_mesh_from == "projection" %}selected{% endif %}>Projection</option>
+                          <option value="normal"     {% if pyview.settings.realityCaptureSettings.default_create_mesh_from == "normal"     %}selected{% endif %}>Normal</option>
+                          <option value="all"        {% if pyview.settings.realityCaptureSettings.default_create_mesh_from == "all"        %}selected{% endif %}>All Images</option>
                         </select>   
                     </td>
                     <td>
-                        <input id="m_create_textures" checked type="checkbox"/>
+                        <input id="m_create_textures" {% if pyview.settings.realityCaptureSettings.default_create_textures == true %}checked{% endif %}  type="checkbox"/>
                     </td>
                     <td>
-                        <button class="btn btn-sm " style="line-height: 1em;    padding-top: 2px;padding-bottom: 2px; margin-bottom: 5px;" onclick='pyview.parent.create_model("glb", "high", "low", $("#m_create_mesh_from").val(), $("#m_create_textures")[0].checked);'> Create Model </button>
+                        <button class="btn btn-sm " style="line-height: 1em;    padding-top: 2px;padding-bottom: 2px; margin-bottom: 5px;" onclick='pyview.create_model($("#m_create_mesh_from").val(), $("#m_create_textures")[0].checked);'> Create Model </button>
                     </td>
                 </tr>    
             </table>
@@ -96,7 +98,16 @@ class ShotModelsView(PyHtmlView):
         self.current_shot = None
         self.current_models = ObservableList()
         self.selected_model = None
+        self.settings = SettingsInstance()
         self.filesListView = ObservableListView(self.current_models, self, item_class=ModelPreviewFileItemView, dom_element="tbody", filter_function=lambda x: x.subject.filetype != "glb")
+
+    def create_model(self, create_mesh_from, create_textures):
+        self.parent.create_model(
+            filetype="glb",
+            reconstruction_quality=SettingsInstance().realityCaptureSettings.default_reconstruction_quality,
+            quality="low",
+            create_mesh_from=create_mesh_from,
+            create_textures=create_textures)
 
     @property
     def has_preview_models(self):

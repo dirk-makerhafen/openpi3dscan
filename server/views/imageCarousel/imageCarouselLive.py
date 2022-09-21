@@ -37,9 +37,6 @@ class PreviewQueue:
             [1920, 1440],
             [2592, 1944],
         ]
-        if SettingsInstance().settingsScanner.camera_rotation not in [0, 180]:
-            for i in range(0, len(resolutions)):
-                resolutions[i] = reversed(resolutions[i])
 
         while True:
             device_id = self.queue.get()
@@ -51,12 +48,18 @@ class PreviewQueue:
                     max_display_width = 3600
                     width_per_image = max_display_width /  self.imageRowViews[device_id].parent.parent.segments_shown
                     resolution = None
+                    if SettingsInstance().settingsScanner.camera_rotation in [0, 180]:
+                        index = 0
+                    else:
+                        index = 1
                     for r in resolutions:
-                        if r[0] >= width_per_image:
+                        if r[index] >= width_per_image:
                             resolution = r
                             break
                     if resolution is None:
                         resolution = resolutions[-1]
+                    if SettingsInstance().settingsScanner.camera_rotation not in [0, 180]:
+                        resolution = list(reversed(resolution))
                     try:
                         img = device.camera.preview(resolution)
                     except:

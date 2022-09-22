@@ -67,6 +67,23 @@ class ShotView(PyHtmlView):
             {{ pyview.comments.render() }}
             {{ pyview.shotFiles.render() }}
         {% endif %}
+        <script>
+            document.onkeydown = function (e) {
+                if ( e.keyCode ==  33){    // left
+                    e.preventDefault();
+                    pyview.imageCarousel.rotate_cw();
+                };
+                if ( e.keyCode ==  34){    // right
+                    e.preventDefault();
+                    pyview.imageCarousel.rotate_ccw();
+                };
+                if ( e.keyCode ==  190){    // 
+                    e.preventDefault();
+                    pyview.imageCarousel.switch_type();
+                };
+            };
+        </script>
+        
     </div>   
     '''
 

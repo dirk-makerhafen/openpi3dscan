@@ -1,4 +1,5 @@
 import math
+import random
 
 import requests, json, sys
 import os, glob, sys, shutil
@@ -16,7 +17,6 @@ CACHE_DIR = 'c:\shots'
 CACHE_SIZE = 25
 SERVER = None
 DEBUG = "debug" in sys.argv
-CLEAN_MISALIGNED = False
 MARKERS = []
 DISTANCES = {}
 LICENSE_PIN = ""
@@ -106,12 +106,17 @@ XMP_TEMPLATE_full = '''
 XMP_TEMPLATE = '''
 <x:xmpmeta xmlns:x="adobe:ns:meta/">
   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <rdf:Description xcr:Version="3" xcr:PosePrior="initial" xcr:Coordinates="absolute"
-       xcr:DistortionModel="brown3" xcr:FocalLength35mm="%(FocalLength35mm)s"
-       xcr:Skew="0" xcr:AspectRatio="1" xcr:PrincipalPointU="%(PrincipalPointU)s"
-       xcr:PrincipalPointV="%(PrincipalPointV)s" xcr:CalibrationPrior="initial"
-       xcr:CalibrationGroup="%(Group)s" xcr:DistortionGroup="%(Group)s"
+    <rdf:Description xcr:Version="3" xcr:Coordinates="absolute" xcr:DistortionModel="brown3" 
+       xcr:FocalLength35mm="%(FocalLength35mm)s"
+       xcr:PrincipalPointU="%(PrincipalPointU)s"
+       xcr:PrincipalPointV="%(PrincipalPointV)s" 
+       xcr:PosePrior="initial"
+       xcr:CalibrationPrior="%(CalibrationPrior)s"
+       xcr:CalibrationGroup="%(Group)s" 
+       xcr:DistortionGroup="%(Group)s" 
        xmlns:xcr="http://www.capturingreality.com/ns/xcr/1.1#">
+      <xcr:Rotation>%(Rotation)s</xcr:Rotation>
+      <xcr:Position>%(Position)s</xcr:Position>
       <xcr:DistortionCoeficients>%(DistortionCoeficients)s</xcr:DistortionCoeficients>
     </rdf:Description>
   </rdf:RDF>
@@ -158,7 +163,11 @@ class CalibrationData():
             return [ sum( t[i] for t in data) / len(data) for i in range(0,len(data[0])) ]
         else:
             return sum(data) / len(data)
-    
+
+    def count(self, segment, row, key):
+        cam_id = "%s-%s" % (segment, row)
+        return len(self.data[cam_id][key])
+
     def add_data(self, segment, row, key, data):
         cam_id = "%s-%s" % ( segment, row )
         if cam_id not in self.data:
@@ -166,7 +175,7 @@ class CalibrationData():
         if key not in self.data[cam_id]:
             self.data[cam_id][key] = []
         self.data[cam_id][key].append(data)
-        self.data[cam_id][key] = self.data[cam_id][key][-12:]
+        self.data[cam_id][key] = self.data[cam_id][key][-30:]
     
     def load(self):
         try:
@@ -226,9 +235,6 @@ class RealityCapture():
             else:
                 return None
 
-        if CLEAN_MISALIGNED is True:
-            self.clean_misaligned_images()
-
         self.create_raw_model()
         while not os.path.exists(os.path.join(self.source_folder, "%s.raw_exists" % self.realityCapture_filename)):
             if ask("No model created, repeat?"):
@@ -244,7 +250,7 @@ class RealityCapture():
                 return None
 
         if self.alignments_were_recreated is True:
-            self.load_xmp()
+            self.export_xmp_files()
 
         if DEBUG is False:
             try:
@@ -367,141 +373,47 @@ class RealityCapture():
         self.box_center_correction = [c_x, c_y, c_z]
         print("Box center corrections:", c_x, c_y, c_z)
 
-    def clean_misaligned_images(self):
-        # allowed_max_center_distance = boxdimensions[0]/2 * 1.5
-        # if max alignments[][1] > boxdimensions[0]/2 * 1.5
-        #   delete max alignment
-        #
-        #
-
-
-        images = self._get_images_to_skip_from_alignments()
-        while len(images) > 0:
-            must_reload_markers = True
-            for image in images:
-                for mode in ["normal", "projection"]:
-                    p = os.path.join(self.source_folder, "images", mode, image)
-                    #print("path", p)
-                    if os.path.exists(p):
-                        os.remove(p)
-                        print("removed misaligned image '%s' " % p)
-            self.load_markers(force_reload=True)
-            self.load_alignments(force_reload=True)
-            images = self._get_images_to_skip_from_alignments()
-
-    def _get_images_to_skip_from_alignments(self):
-        # fix alignments to center point
-        alignments = [[a[0], a[1] - self.box_center_correction[0], a[2] - self.box_center_correction[1], a[3], None] for
-                      a in self.alignments]
-        alignments_to_skip = set()
-
-        # find same images with different positions
-        MAX_DISTANCE = 0.03  # max 3cm error
-        for index1 in range(0, len(alignments)):
-            for index2 in range(index1 + 1, len(alignments)):
-                alignment1 = alignments[index1]
-                alignment2 = alignments[index2]
-                if alignment1 is None or alignment2 is None or alignment1[0] != alignment2[0]:
-                    continue
-                if max([abs(alignment1[i] - alignment2[i]) for i in range(1, 4)]) > MAX_DISTANCE:
-                    print("skip image", alignment1, alignment2)
-                    alignments_to_skip.add(alignment1[0])
-                    alignments[index1] = None
-                    alignments[index2] = None
-
-        alignments = [l for l in alignments if l is not None]
-        for al in alignments:
-            al[4] = math.sqrt((al[1] * al[1]) + (al[2] * al[2]))  # calculate distance to center
-        alx = [(a[1]) for a in alignments]
-        aly = [(a[2]) for a in alignments]
-        alz = [(a[3]) for a in alignments]
-        ald = [(a[4]) for a in alignments]
-
-        if len(alignments_to_skip) == 0:
-            if max(alx) > 1.2 or min(alx) < -1.2:
-                if abs(min(alx)) > abs(max(alx)):
-                    i = alx.index(min(alx))
-                else:
-                    i = alx.index(max(alx))
-                alignments_to_skip.add(alignments[i][0])
-                print("Skip image1 ", alignments[i])
-            if max(aly) > 1.2 or min(aly) < -1.2:
-                if abs(min(aly)) > abs(max(aly)):
-                    i = aly.index(min(aly))
-                else:
-                    i = aly.index(max(aly))
-                alignments_to_skip.add(alignments[i][0])
-                print("Skip image2 ", alignments[i])
-
-        if len(alignments_to_skip) == 0:
-            if max(alz) > 2.35:
-                i = alz.index(max(alz))
-                alignments_to_skip.add(alignments[i][0])
-                print("Skip image3 ", alignments[i])
-
-            if min(alz) < 0.1:
-                i = alz.index(min(alz))
-                alignments_to_skip.add(alignments[i][0])
-                print("Skip image4 ", alignments[i])
-
-        if len(alignments_to_skip) == 0:
-            if max(ald) > 1.3:
-                i = ald.index(max(ald))
-                alignments_to_skip.add(alignments[i][0])
-                print("Skip image4 ", alignments[i])
-
-        if len(alignments_to_skip) == 0:
-            if min(ald) < 0.9:
-                i = ald.index(min(ald))
-                alignments_to_skip.add(alignments[i][0])
-                print("Skip image5 ", alignments[i])
-
-        print("%s misaligned images found" % len(alignments_to_skip))
-        for a in alignments_to_skip:
-            print("Skip:", a)
-
-        return list(alignments_to_skip)
-
-    def load_xmp(self):
+    def export_xmp_files(self):
         xml_json = os.path.join(self.source_folder, "XMP_%s%s.json" % (self.create_mesh_from_str, self.create_textures_str))
         if not os.path.exists(xml_json):
-            self._delete_xmp_files()
-            self._export_xmp_files()
+            cmd = self._get_cmd_start()
+            cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
+            cmd += '-exportXMP "%s\\xmp_settings.xml" ' % self.source_folder
+            cmd += '-quit '
+            self._run_command(cmd, "export_xmp")
+
             cam_data = self._read_xmp_files()
             with open(xml_json,"w") as f:
                 f.write(json.dumps(cam_data))
             self._delete_xmp_files()
             for data in cam_data:
-                if data["FocalLength35mm"] > 36.5 or data["FocalLength35mm"] < 34.5:
+                if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
                     print("No adding", data )
                     continue
-                calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
-                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
-                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
-                calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
+                if data["CalibrationPrior"] == "initial":
+                    calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
+                    calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
+                    calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
+                    calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
+                    calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
+                    calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
 
             calibrationData.save()
-
-    def _export_xmp_files(self):
-        cmd = self._get_cmd_start()
-        cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
-        cmd += '-exportXMP "%s\\xmp_settings.xml" ' % self.source_folder
-        cmd += '-quit '
-        self._run_command(cmd, "export_xmp")
 
     def _read_xmp_files(self):
         camera_data = []
         for path in glob.glob(os.path.join(self.source_folder, "images", "*", "*.xmp")):
             data = open(path, "r").read()
             cam_data = {
-                "segment": path.split('\\')[-1].split("-")[0].replace("seg","").strip(),
-                "row"    : path.split('\\')[-1].split("-")[1].replace("cam","").strip(),
-                "mode"   : path.split('\\')[-1].split('-')[2].strip(),
-                "FocalLength35mm": float(data.split("FocalLength35mm=")[1].split('"')[1]),
-                "PrincipalPointU": float(data.split("PrincipalPointU=")[1].split('"')[1]),
-                "PrincipalPointV": float(data.split("PrincipalPointV=")[1].split('"')[1]),
+                "segment"              : path.split('\\')[-1].split("-")[0].replace("seg","").strip(),
+                "row"                  : path.split('\\')[-1].split("-")[1].replace("cam","").strip(),
+                "mode"                 : path.split('\\')[-1].split('-')[2].strip(),
+                "FocalLength35mm"      : float(data.split("FocalLength35mm=")[1].split('"')[1]),
+                "PrincipalPointU"      : float(data.split("PrincipalPointU=")[1].split('"')[1]),
+                "PrincipalPointV"      : float(data.split("PrincipalPointV=")[1].split('"')[1]),
                 "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
-                "Rotation": [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")]
+                "Rotation"             : [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")],
+                "CalibrationPrior"     : float(data.split("CalibrationPrior=")[1].split('"')[1]),
             }
             try:
                 cam_data["Position"] = [float(x) for x in data.split("Position>")[1].split('<')[0].split(" ")]
@@ -515,26 +427,30 @@ class RealityCapture():
             os.remove(path)
 
     def write_xmp_files(self):
-        for mode in ["normal", "projection"]:
-            for cam_id in calibrationData.get_camera_ids():
-                segment, row = cam_id.split("-")
-                group_id = ( int(segment) * 100 ) + int(row)
-                try:
-                    s = XMP_TEMPLATE % {
-                        "FocalLength35mm" : calibrationData.get(segment, row, "FocalLength35mm"),
-                        "PrincipalPointU" : calibrationData.get(segment, row, "PrincipalPointU"),
-                        "PrincipalPointV" : calibrationData.get(segment, row, "PrincipalPointV"),
-                        "DistortionCoeficients" : " ".join(["%s" % x for x in calibrationData.get(segment, row, "DistortionCoeficients")] ),
-                        #"Rotation" : " ".join(calibrationData.get(cam_id, "Rotation")),
-                        #"Position" : " ".join(calibrationData.get(cam_id, "Position")),
-                        #"InTexturing" : "1" if mode == "normal" and self.create_textures is True else "0",
-                        #"InMeshing" :   "0" if mode == "normal" and self.create_mesh_from == "projection" else "1",
-                        "Group": group_id,
-                    }
-                    with open(os.path.join(self.source_folder, "images", mode, "%s-%s-%s.xmp" % (segment, row, mode[0])), "w") as f:
+        for cam_id in calibrationData.get_camera_ids():
+            segment, row = cam_id.split("-")
+            group_id = ( int(segment) * 100 ) + int(row)
+
+            CalibrationPrior = "initial"
+            if calibrationData.count(segment, row, "FocalLength35mm") > 12 and random.random() > 0.1: # 10% chance to adjust focus even if we already have enough data
+                CalibrationPrior = "fixed"
+
+            try:
+                s = XMP_TEMPLATE % {
+                    "FocalLength35mm"       :                             calibrationData.get(segment, row, "FocalLength35mm"),
+                    "PrincipalPointU"       :                             calibrationData.get(segment, row, "PrincipalPointU"),
+                    "PrincipalPointV"       :                             calibrationData.get(segment, row, "PrincipalPointV"),
+                    "DistortionCoeficients" : " ".join(["%s" % x for x in calibrationData.get(segment, row, "DistortionCoeficients")] ),
+                    "Rotation"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Rotation")] ),
+                    "Position"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Position")] ),
+                    "Group"                 : group_id,
+                    "CalibrationPrior"      : CalibrationPrior,
+                }
+                for mode in ["normal", "projection"]:
+                    with open(os.path.join(self.source_folder, "images", mode, "seg%s-cam%s-%s.xmp" % (segment, row, mode[0])), "w") as f:
                         f.write(s)
-                except:
-                    pass
+            except:
+                pass
 
     def create_raw_model(self, force_reload=False):
         raw_exists_file = os.path.join(self.source_folder, "%s.raw_exists" % self.realityCapture_filename)
@@ -984,28 +900,25 @@ class Processing():
                     create_mesh_from=model["create_mesh_from"],
                     create_textures=model["create_textures"]
                 )
-                if model["shot_name"].lower().find("calibration") != -1:
-                    rc.process_calibration()
-                    api.process_failed(model["shot_id"], model["model_id"])
-                else:
-                    model_result_path = None
-                    try:
-                        model_result_path = rc.process()
-                    except Exception as e:
-                        print("Failed to process", e)
 
-                    if model_result_path is not None:
-                        api.upload_model(model["shot_id"], model["model_id"], model_result_path)
-                        if DEBUG is False:
-                            os.remove(model_result_path)
-                    else:
-                        api.process_failed(model["shot_id"], model["model_id"])
-                        if DEBUG is False and os.path.exists(shot_path):
-                            print("Not caching shot %s" % shot_path )
-                            try:
-                                shutil.rmtree(shot_path)
-                            except:
-                                print("Failed to delete %s" % shot_path)
+                model_result_path = None
+                try:
+                    model_result_path = rc.process()
+                except Exception as e:
+                    print("Failed to process", e)
+
+                if model_result_path is not None:
+                    api.upload_model(model["shot_id"], model["model_id"], model_result_path)
+                    if DEBUG is False:
+                        os.remove(model_result_path)
+                else:
+                    api.process_failed(model["shot_id"], model["model_id"])
+                    if DEBUG is False and os.path.exists(shot_path):
+                        print("Not caching shot %s" % shot_path )
+                        try:
+                            shutil.rmtree(shot_path)
+                        except:
+                            print("Failed to delete %s" % shot_path)
     def _clean_shot_dir(self):
         shots = []
         for path in glob.glob(os.path.join(CACHE_DIR, "*")):

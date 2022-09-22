@@ -94,7 +94,7 @@ XMP_TEMPLATE_full = '''
        xcr:DistortionModel="brown3" xcr:FocalLength35mm="%(FocalLength35mm)s"
        xcr:Skew="0" xcr:AspectRatio="1" xcr:PrincipalPointU="%(PrincipalPointU)s"
        xcr:PrincipalPointV="%(PrincipalPointV)s" xcr:CalibrationPrior="initial"
-       xcr:CalibrationGroup="-1" xcr:DistortionGroup="-1" xcr:InTexturing="%(InTexturing)s"
+       xcr:CalibrationGroup="%(Group)s" xcr:DistortionGroup="%(Group)s" xcr:InTexturing="%(InTexturing)s"
        xcr:InMeshing="%(InMeshing)s" xmlns:xcr="http://www.capturingreality.com/ns/xcr/1.1#">
       <xcr:Rotation>%(Rotation)s</xcr:Rotation>
       <xcr:Position>%(Position)s</xcr:Position>
@@ -204,6 +204,7 @@ class RealityCapture():
         self.export_foldername = "%s_%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.filetype)
         self.available_markers = []
         self.alignments = []
+        self.alignments_were_recreated = False
         self.model_path = None
 
     def process(self):
@@ -242,7 +243,8 @@ class RealityCapture():
             else:
                 return None
 
-        self.load_xmp()
+        if self.alignments_were_recreated is True:
+            self.load_xmp()
 
         if DEBUG is False:
             try:
@@ -322,7 +324,7 @@ class RealityCapture():
                 os.remove(rc_proj_file)
             if os.path.exists(raw_exists_file):
                 os.remove(raw_exists_file)
-
+            self.alignments_were_recreated = True
             cmd = self._get_cmd_start()
             cmd += self._get_cmd_new_scene()
             cmd += '-align '
@@ -492,9 +494,9 @@ class RealityCapture():
         for path in glob.glob(os.path.join(self.source_folder, "images", "*", "*.xmp")):
             data = open(path, "r").read()
             cam_data = {
-                "segment" : path.split('\\')[-1].split("-")[0].strip(),
-                "row" : path.split('\\')[-1].split("-")[1].strip(),
-                "mode" : path.split('\\')[-1].split('-')[2].strip(),
+                "segment": path.split('\\')[-1].split("-")[0].replace("seg","").strip(),
+                "row"    : path.split('\\')[-1].split("-")[1].replace("cam","").strip(),
+                "mode"   : path.split('\\')[-1].split('-')[2].strip(),
                 "FocalLength35mm": float(data.split("FocalLength35mm=")[1].split('"')[1]),
                 "PrincipalPointU": float(data.split("PrincipalPointU=")[1].split('"')[1]),
                 "PrincipalPointV": float(data.split("PrincipalPointV=")[1].split('"')[1]),
@@ -516,7 +518,7 @@ class RealityCapture():
         for mode in ["normal", "projection"]:
             for cam_id in calibrationData.get_camera_ids():
                 segment, row = cam_id.split("-")
-                group_id = (int(segment.replace("seg",""))*100 ) + int(row.replace("cam",""))
+                group_id = ( int(segment) * 100 ) + int(row)
                 try:
                     s = XMP_TEMPLATE % {
                         "FocalLength35mm" : calibrationData.get(segment, row, "FocalLength35mm"),

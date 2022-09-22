@@ -72,6 +72,20 @@ class SettingsScannerView(PyHtmlView):
                             </div>
                         </div>
                     </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-9">
+                                <strong class="mb-0">Flipped cameras</strong>
+                                <p class="text-muted mb-0">In case some camers are upsite down, add their names as a coma seperated list. As in: SEG1-CAM2,SEG23-CAM4...</p>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="custom-control custom-switch">
+                                    <input style="width:100%;text-align:center" id="scanner_flipped_cameras" type="text" value="{{pyview.subject.flipped_cameras}}" onchange='pyview.subject.set_flipped_cameras($("#scanner_flipped_cameras").val())'>
+                                </div>
+                            </div>
+                        </div>
+                    </div>               
+                    
                 </div>
             </div>   
         </div>

@@ -110,7 +110,14 @@ class Device(Observable):
         self._set_status("installing")
         client_dir = os.path.join(SCRIPT_DIR, "..", "..", "..", "client")
         self._ssh_exec('scp -r %s "%s" %s@%s:/home/%s/' % (SSH_OPTIONS, client_dir, self.username, self.ip, self.username), 180)
-        self._ssh('cd /home/%s/client ; python3 install.py "%s" "%s" "%s" "%s" "install_after_reboot"' % (self.username, self.device_id, self.device_type, self.name, SettingsInstance().settingsScanner.camera_rotation), timeout=180)
+        rotation = SettingsInstance().settingsScanner.camera_rotation
+        if self.name != "" and self.device_type == "camera":
+            if self.name in SettingsInstance().settingsScanner.flipped_cameras:# this camera is flipped
+                if rotation   ==   0: rotation = 180
+                elif rotation ==  90: rotation = 270
+                elif rotation == 180: rotation = 0
+                elif rotation == 270: rotation = 90
+        self._ssh('cd /home/%s/client ; python3 install.py "%s" "%s" "%s" "%s" "install_after_reboot"' % (self.username, self.device_id, self.device_type, self.name, rotation), timeout=180)
         self.latest_heartbeat_time = 0
         self._ssh('sudo reboot & ', timeout=10)
         self.notify_observers()

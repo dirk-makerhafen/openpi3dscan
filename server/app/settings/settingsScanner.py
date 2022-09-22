@@ -13,6 +13,7 @@ class SettingsScanner(Observable):
         self.cameras_per_segment = 7
         self.camera_rotation = 0  # 0, 90, 180, 270
         self.camera_one_position = "top"  # top, bottom
+        self.flipped_cameras = ""
 
     def to_dict(self):
         return {
@@ -20,6 +21,7 @@ class SettingsScanner(Observable):
             "cameras_per_segment": self.cameras_per_segment,
             "camera_rotation": self.camera_rotation,
             "camera_one_position": self.camera_one_position,
+            "flipped_cameras": self.flipped_cameras,
         }
 
     def from_dict(self, data):
@@ -27,6 +29,7 @@ class SettingsScanner(Observable):
         self.cameras_per_segment = data["cameras_per_segment"]
         self.camera_rotation = data["camera_rotation"]
         self.camera_one_position = data["camera_one_position"]
+        self.flipped_cameras = data["flipped_cameras"]
 
     def set_segments(self, value):
         try:
@@ -67,6 +70,15 @@ class SettingsScanner(Observable):
             self.camera_one_position = value
             self.save()
             self.notify_observers()
+
+
+    def set_flipped_cameras(self, value):
+        if value != self.flipped_cameras:
+            self.flipped_cameras = value
+            self.save()
+            self.notify_observers()
+
+
 
 
 

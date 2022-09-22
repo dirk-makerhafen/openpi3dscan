@@ -87,7 +87,7 @@ ExportRegistrationSettings_xml = '''
   <entry key="MvsExportMoveY" value="0.0"/>
 </Configuration>
 '''
-XMP_TEMPLATE = '''
+XMP_TEMPLATE_full = '''
 <x:xmpmeta xmlns:x="adobe:ns:meta/">
   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <rdf:Description xcr:Version="3" xcr:PosePrior="initial" xcr:Coordinates="absolute"
@@ -98,6 +98,20 @@ XMP_TEMPLATE = '''
        xcr:InMeshing="%(InMeshing)s" xmlns:xcr="http://www.capturingreality.com/ns/xcr/1.1#">
       <xcr:Rotation>%(Rotation)s</xcr:Rotation>
       <xcr:Position>%(Position)s</xcr:Position>
+      <xcr:DistortionCoeficients>%(DistortionCoeficients)s</xcr:DistortionCoeficients>
+    </rdf:Description>
+  </rdf:RDF>
+</x:xmpmeta>
+'''
+XMP_TEMPLATE = '''
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description xcr:Version="3" xcr:PosePrior="initial" xcr:Coordinates="absolute"
+       xcr:DistortionModel="brown3" xcr:FocalLength35mm="%(FocalLength35mm)s"
+       xcr:Skew="0" xcr:AspectRatio="1" xcr:PrincipalPointU="%(PrincipalPointU)s"
+       xcr:PrincipalPointV="%(PrincipalPointV)s" xcr:CalibrationPrior="initial"
+       xcr:CalibrationGroup="-1" xcr:DistortionGroup="-1"
+       xmlns:xcr="http://www.capturingreality.com/ns/xcr/1.1#">
       <xcr:DistortionCoeficients>%(DistortionCoeficients)s</xcr:DistortionCoeficients>
     </rdf:Description>
   </rdf:RDF>
@@ -130,13 +144,14 @@ def ask(question):
 class CalibrationData():
     def __init__(self):
         self.data = {}
-        self.datapath = os.path.join(SCRIPT_DIR, "calibrationData.json")
+        self.datapath = os.path.join(CACHE_DIR, "calibrationData.json")
         self.load()
 
     def get_camera_ids(self):
         return ["%s" % key for key in self.data.keys()]
 
-    def get(self, cam_id, key):
+    def get(self, segment, row, key):
+        cam_id = "%s-%s" % (segment, row)
         data = self.data[cam_id][key]
             
         if type(data[0]) == list:
@@ -144,13 +159,14 @@ class CalibrationData():
         else:
             return sum(data) / len(data)
     
-    def add_data(self, cam_id, key, data):
+    def add_data(self, segment, row, key, data):
+        cam_id = "%s-%s" % ( segment, row )
         if cam_id not in self.data:
             self.data[cam_id] = {}
         if key not in self.data[cam_id]:
             self.data[cam_id][key] = []
-        self.data[cam_id][key].extend(data)
-        self.data[cam_id][key] = self.data[cam_id][key][-10:]
+        self.data[cam_id][key].append(data)
+        self.data[cam_id][key] = self.data[cam_id][key][-12:]
     
     def load(self):
         try:
@@ -192,7 +208,9 @@ class RealityCapture():
 
     def process(self):
         self.prepare_folders()
-        
+
+        self.write_xmp_files()
+
         self.load_markers()
         while len(self.available_markers) < 2:
             if ask("%s markers loaded, repeat?" % len(self.available_markers)):
@@ -348,6 +366,13 @@ class RealityCapture():
         print("Box center corrections:", c_x, c_y, c_z)
 
     def clean_misaligned_images(self):
+        # allowed_max_center_distance = boxdimensions[0]/2 * 1.5
+        # if max alignments[][1] > boxdimensions[0]/2 * 1.5
+        #   delete max alignment
+        #
+        #
+
+
         images = self._get_images_to_skip_from_alignments()
         while len(images) > 0:
             must_reload_markers = True
@@ -438,11 +463,22 @@ class RealityCapture():
     def load_xmp(self):
         xml_json = os.path.join(self.source_folder, "XMP_%s%s.json" % (self.create_mesh_from_str, self.create_textures_str))
         if not os.path.exists(xml_json):
+            self._delete_xmp_files()
             self._export_xmp_files()
             cam_data = self._read_xmp_files()
             with open(xml_json,"w") as f:
                 f.write(json.dumps(cam_data))
             self._delete_xmp_files()
+            for data in cam_data:
+                if data["FocalLength35mm"] > 36.5 or data["FocalLength35mm"] < 34.5:
+                    print("No adding", data )
+                    continue
+                calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
+                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
+                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
+                calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
+
+            calibrationData.save()
 
     def _export_xmp_files(self):
         cmd = self._get_cmd_start()
@@ -452,35 +488,24 @@ class RealityCapture():
         self._run_command(cmd, "export_xmp")
 
     def _read_xmp_files(self):
-        camera_data = {}
+        camera_data = []
         for path in glob.glob(os.path.join(self.source_folder, "images", "*", "*.xmp")):
             data = open(path, "r").read()
-            segment = path.split('\\')[-1].split("-")[0].strip()
-            row     = path.split('\\')[-1].split("-")[1].strip()
-            cam_id = "%s-%s" % (segment, row)
-            if cam_id not in camera_data:
-                camera_data[cam_id] = {
-                    "FocalLength35mm": [],
-                    "PrincipalPointU": [],
-                    "PrincipalPointV": [],
-                    "DistortionCoeficients": [],
-                    "Rotation": [],
-                    "Position": [],
-                }
-            camera_data[cam_id]["FocalLength35mm"].append(float(data.split("FocalLength35mm=")[1].split('"')[1]))
-            camera_data[cam_id]["PrincipalPointU"].append(float(data.split("PrincipalPointU=")[1].split('"')[1]))
-            camera_data[cam_id]["PrincipalPointV"].append(float(data.split("PrincipalPointV=")[1].split('"')[1]))
-            camera_data[cam_id]["DistortionCoeficients"].append(
-                [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")])
-            camera_data[cam_id]["Rotation"].append(
-                [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")])
+            cam_data = {
+                "segment" : path.split('\\')[-1].split("-")[0].strip(),
+                "row" : path.split('\\')[-1].split("-")[1].strip(),
+                "mode" : path.split('\\')[-1].split('-')[2].strip(),
+                "FocalLength35mm": float(data.split("FocalLength35mm=")[1].split('"')[1]),
+                "PrincipalPointU": float(data.split("PrincipalPointU=")[1].split('"')[1]),
+                "PrincipalPointV": float(data.split("PrincipalPointV=")[1].split('"')[1]),
+                "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
+                "Rotation": [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")]
+            }
             try:
-                camera_data[cam_id]["Position"].append(
-                    [float(x) for x in data.split("Position>")[1].split('<')[0].split(" ")])
+                cam_data["Position"] = [float(x) for x in data.split("Position>")[1].split('<')[0].split(" ")]
             except:
-                camera_data[cam_id]["Position"].append(
-                    [float(x) for x in data.split("Position=")[1].split('"')[1].split(" ")])
-
+                cam_data["Position"] =  [float(x) for x in data.split("Position=")[1].split('"')[1].split(" ")]
+            camera_data.append(cam_data)
         return camera_data
 
     def _delete_xmp_files(self):
@@ -490,18 +515,19 @@ class RealityCapture():
     def write_xmp_files(self):
         for mode in ["normal", "projection"]:
             for cam_id in calibrationData.get_camera_ids():
+                segment, row = cam_id.split("-")
                 try:
                     s = XMP_TEMPLATE % {
-                        "FocalLength35mm" : calibrationData.get(cam_id, "FocalLength35mm"),
-                        "PrincipalPointU" : calibrationData.get(cam_id, "PrincipalPointU"),
-                        "PrincipalPointV" : calibrationData.get(cam_id, "PrincipalPointV"),
-                        "DistortionCoeficients" : " ".join(calibrationData.get(cam_id, "DistortionCoeficients")),
-                        "Rotation" : " ".join(calibrationData.get(cam_id, "Rotation")),
-                        "Position" : " ".join(calibrationData.get(cam_id, "Position")),
-                        "InTexturing" : "1" if mode == "normal" and self.create_textures is True else "0",
-                        "InMeshing" :   "0" if mode == "normal" and self.create_mesh_from == "projection" else "1",
+                        "FocalLength35mm" : calibrationData.get(segment, row, "FocalLength35mm"),
+                        "PrincipalPointU" : calibrationData.get(segment, row, "PrincipalPointU"),
+                        "PrincipalPointV" : calibrationData.get(segment, row, "PrincipalPointV"),
+                        "DistortionCoeficients" : " ".join(calibrationData.get(segment, row, "DistortionCoeficients")),
+                        #"Rotation" : " ".join(calibrationData.get(cam_id, "Rotation")),
+                        #"Position" : " ".join(calibrationData.get(cam_id, "Position")),
+                        #"InTexturing" : "1" if mode == "normal" and self.create_textures is True else "0",
+                        #"InMeshing" :   "0" if mode == "normal" and self.create_mesh_from == "projection" else "1",
                     }
-                    with open(os.path.join(self.source_folder, "images", mode, "%s-%s.xmp" % (cam_id, mode[0])), "w") as f:
+                    with open(os.path.join(self.source_folder, "images", mode, "%s-%s-%s.xmp" % (segment, row, mode[0])), "w") as f:
                         f.write(s)
                 except:
                     pass
@@ -621,32 +647,20 @@ class RealityCapture():
                 print("Model zip created")
                 self.model_path = model_file_zip
 
-    def process_calibration(self):
-        return
-        self.delete_xmp()
+    def process_lens_calibration(self):
         self.prepare_folders()
         self.load_markers()
         self.load_alignments()
-        self.export_xmp()
-        
-        cam_data = self.read_xmp_data()
+
+        self._export_xmp_files()
+        cam_data = self._read_xmp_files()
+        self._delete_xmp_files()
         for key in cam_data:
             calibrationData.add_data(key, "FocalLength35mm", cam_data[key]["FocalLength35mm"])
             calibrationData.add_data(key, "PrincipalPointU", cam_data[key]["PrincipalPointU"])
             calibrationData.add_data(key, "PrincipalPointV", cam_data[key]["PrincipalPointV"])
             calibrationData.add_data(key, "DistortionCoeficients", cam_data[key]["DistortionCoeficients"])
-                
-        self.delete_xmp()
-        self.write_xmp_files()
-        self.load_markers(force_reload=True)
-        self.load_alignments(force_reload=True)
-        self.export_xmp()
-        
-        cam_data = self.read_xmp_data()
-        for key in cam_data:
-            calibrationData.add_data(key, "Rotation", cam_data[key]["Rotation"])
-            calibrationData.add_data(key, "Position", cam_data[key]["Position"])
-        
+
         calibrationData.save()     
 
     def _convert_glb_to_images(self, glb_path, output_path):

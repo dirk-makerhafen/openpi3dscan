@@ -618,7 +618,7 @@ class RealityCapture():
             os.system('optipng.exe -clobber "%s"' % file)
             os.system('convert.exe "%s" "%s"' % (file, "%s.gif" % file[:-4]))
         ThreadPool(8).map(f, files)
-        total_duration = 400 # in ms
+        total_duration = 400 # in 1/100s of seconds
         delay = int(round(total_duration / len(files),0))
         os.system('gifsicle.exe --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s\\tmp.gif" ' % (delay, path, path))
         if os.path.exists(os.path.join(path, "tmp.gif")):
@@ -627,13 +627,11 @@ class RealityCapture():
             if filetype == "webp":
                 os.system('convert.exe "%s\\tmp.gif" "%s"' % (path, output_file))
 
-        #cmd = 'convert.exe -fuzz 5%% -quality 95 -delay %s -loop 0  -layers OptimizePlus "%s" "%s"' % (delay, os.path.join(path, "screenshot_*.png"), output_file)
-        #os.system(cmd)
         if DEBUG is False:
             for f in glob.glob(os.path.join(path, "screenshot_*.*")):
                 os.remove(f)
             if os.path.exists(os.path.join(path, "tmp.gif")):
-                os.remove(f)
+                os.remove(os.path.join(path, "tmp.gif"))
 
     def _get_cmd_cleanup_lower_region(self):
         offsetxy = BOX_DIMENSIONS[0] - 0.20

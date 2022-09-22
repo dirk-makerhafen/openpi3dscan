@@ -15,6 +15,7 @@ from pyhtmlgui import ObservableList
 
 from app.files.modelFile import ModelFile
 
+SyncThreadPool = ThreadPool(20)
 
 class Shot(Observable):
     def __init__(self, shot_dir, shot_id):
@@ -123,9 +124,7 @@ class Shot(Observable):
                         tasks.append([device, [self.shot_id, image_type, image_mode, False]])
         if len(tasks) > 0:
             random.shuffle(tasks)
-            with ThreadPool(min([5, len(tasks)])) as p:
-                p.map(lambda task: task[0].camera.shots.download(*task[1]), tasks)
-            p.join()
+            SyncThreadPool.map(lambda task: task[0].camera.shots.download(*task[1]), tasks)
             self.count_number_of_files()
 
         for image_type in ["normal", "projection"]:

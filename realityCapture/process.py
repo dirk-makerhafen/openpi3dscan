@@ -413,7 +413,7 @@ class RealityCapture():
                 "PrincipalPointV"      : float(data.split("PrincipalPointV=")[1].split('"')[1]),
                 "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
                 "Rotation"             : [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")],
-                "CalibrationPrior"     : float(data.split("CalibrationPrior=")[1].split('"')[1]),
+                "CalibrationPrior"     : data.split("CalibrationPrior=")[1].split('"')[1],
             }
             try:
                 cam_data["Position"] = [float(x) for x in data.split("Position>")[1].split('<')[0].split(" ")]

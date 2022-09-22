@@ -110,7 +110,7 @@ XMP_TEMPLATE = '''
        xcr:DistortionModel="brown3" xcr:FocalLength35mm="%(FocalLength35mm)s"
        xcr:Skew="0" xcr:AspectRatio="1" xcr:PrincipalPointU="%(PrincipalPointU)s"
        xcr:PrincipalPointV="%(PrincipalPointV)s" xcr:CalibrationPrior="initial"
-       xcr:CalibrationGroup="-1" xcr:DistortionGroup="-1"
+       xcr:CalibrationGroup="%(Group)s" xcr:DistortionGroup="%(Group)s"
        xmlns:xcr="http://www.capturingreality.com/ns/xcr/1.1#">
       <xcr:DistortionCoeficients>%(DistortionCoeficients)s</xcr:DistortionCoeficients>
     </rdf:Description>
@@ -227,8 +227,6 @@ class RealityCapture():
 
         if CLEAN_MISALIGNED is True:
             self.clean_misaligned_images()
-            
-        self.load_xmp()
 
         self.create_raw_model()
         while not os.path.exists(os.path.join(self.source_folder, "%s.raw_exists" % self.realityCapture_filename)):
@@ -243,7 +241,9 @@ class RealityCapture():
                 self.create_export_model(force_reload=True)
             else:
                 return None
-                
+
+        self.load_xmp()
+
         if DEBUG is False:
             try:
                 shutil.rmtree(os.path.join(self.source_folder, self.export_foldername))
@@ -504,7 +504,7 @@ class RealityCapture():
             try:
                 cam_data["Position"] = [float(x) for x in data.split("Position>")[1].split('<')[0].split(" ")]
             except:
-                cam_data["Position"] =  [float(x) for x in data.split("Position=")[1].split('"')[1].split(" ")]
+                cam_data["Position"] = [float(x) for x in data.split("Position=")[1].split('"')[1].split(" ")]
             camera_data.append(cam_data)
         return camera_data
 
@@ -516,16 +516,18 @@ class RealityCapture():
         for mode in ["normal", "projection"]:
             for cam_id in calibrationData.get_camera_ids():
                 segment, row = cam_id.split("-")
+                group_id = (int(segment.replace("seg",""))*100 ) + int(row.replace("cam",""))
                 try:
                     s = XMP_TEMPLATE % {
                         "FocalLength35mm" : calibrationData.get(segment, row, "FocalLength35mm"),
                         "PrincipalPointU" : calibrationData.get(segment, row, "PrincipalPointU"),
                         "PrincipalPointV" : calibrationData.get(segment, row, "PrincipalPointV"),
-                        "DistortionCoeficients" : " ".join(calibrationData.get(segment, row, "DistortionCoeficients")),
+                        "DistortionCoeficients" : " ".join(["%s" % x for x in calibrationData.get(segment, row, "DistortionCoeficients")] ),
                         #"Rotation" : " ".join(calibrationData.get(cam_id, "Rotation")),
                         #"Position" : " ".join(calibrationData.get(cam_id, "Position")),
                         #"InTexturing" : "1" if mode == "normal" and self.create_textures is True else "0",
                         #"InMeshing" :   "0" if mode == "normal" and self.create_mesh_from == "projection" else "1",
+                        "Group": group_id,
                     }
                     with open(os.path.join(self.source_folder, "images", mode, "%s-%s-%s.xmp" % (segment, row, mode[0])), "w") as f:
                         f.write(s)
@@ -646,22 +648,6 @@ class RealityCapture():
             else:
                 print("Model zip created")
                 self.model_path = model_file_zip
-
-    def process_lens_calibration(self):
-        self.prepare_folders()
-        self.load_markers()
-        self.load_alignments()
-
-        self._export_xmp_files()
-        cam_data = self._read_xmp_files()
-        self._delete_xmp_files()
-        for key in cam_data:
-            calibrationData.add_data(key, "FocalLength35mm", cam_data[key]["FocalLength35mm"])
-            calibrationData.add_data(key, "PrincipalPointU", cam_data[key]["PrincipalPointU"])
-            calibrationData.add_data(key, "PrincipalPointV", cam_data[key]["PrincipalPointV"])
-            calibrationData.add_data(key, "DistortionCoeficients", cam_data[key]["DistortionCoeficients"])
-
-        calibrationData.save()     
 
     def _convert_glb_to_images(self, glb_path, output_path):
         options = webdriver.ChromeOptions()

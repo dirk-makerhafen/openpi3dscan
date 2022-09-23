@@ -392,8 +392,10 @@ class RealityCapture():
                     calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
                     calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
                     calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
-                    calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
-                    calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
+                    if "Rotation" in data:
+                        calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
+                    if "Position" in data:
+                        calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
 
             calibrationData.save()
 
@@ -404,16 +406,20 @@ class RealityCapture():
             if not os.path.exists(img_path):
                 continue
             data = open(path, "r").read()
-            cam_data = {
-                "segment"              : path.split('\\')[-1].split("-")[0].replace("seg","").strip(),
-                "row"                  : path.split('\\')[-1].split("-")[1].replace("cam","").strip(),
-                "mode"                 : path.split('\\')[-1].split('-')[2].strip(),
-                "FocalLength35mm"      : float(data.split("FocalLength35mm=")[1].split('"')[1]),
-                "PrincipalPointU"      : float(data.split("PrincipalPointU=")[1].split('"')[1]),
-                "PrincipalPointV"      : float(data.split("PrincipalPointV=")[1].split('"')[1]),
-                "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
-                "CalibrationPrior"     : data.split("CalibrationPrior=")[1].split('"')[1],
-            }
+            try:
+                cam_data = {
+                    "segment"              : path.split('\\')[-1].split("-")[0].replace("seg","").strip(),
+                    "row"                  : path.split('\\')[-1].split("-")[1].replace("cam","").strip(),
+                    "mode"                 : path.split('\\')[-1].split('-')[2].strip(),
+                    "FocalLength35mm"      : float(data.split("FocalLength35mm=")[1].split('"')[1]),
+                    "PrincipalPointU"      : float(data.split("PrincipalPointU=")[1].split('"')[1]),
+                    "PrincipalPointV"      : float(data.split("PrincipalPointV=")[1].split('"')[1]),
+                    "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
+                    "CalibrationPrior"     : data.split("CalibrationPrior=")[1].split('"')[1],
+                }
+            except Exception as e:
+                print("Failed to load %s" % path,e)
+                continue
             try:
                 cam_data["Rotation"]= [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")]
             except:
@@ -421,7 +427,10 @@ class RealityCapture():
             try:
                 cam_data["Position"] = [float(x) for x in data.split("Position>")[1].split('<')[0].split(" ")]
             except:
-                cam_data["Position"] = [float(x) for x in data.split("Position=")[1].split('"')[1].split(" ")]
+                try:
+                    cam_data["Position"] = [float(x) for x in data.split("Position=")[1].split('"')[1].split(" ")]
+                except:
+                    print("failed to read position")
             camera_data.append(cam_data)
         return camera_data
 

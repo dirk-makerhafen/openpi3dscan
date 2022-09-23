@@ -115,8 +115,6 @@ XMP_TEMPLATE = '''
        xcr:CalibrationGroup="%(Group)s" 
        xcr:DistortionGroup="%(Group)s" 
        xmlns:xcr="http://www.capturingreality.com/ns/xcr/1.1#">
-      <xcr:Rotation>%(Rotation)s</xcr:Rotation>
-      <xcr:Position>%(Position)s</xcr:Position>
       <xcr:DistortionCoeficients>%(DistortionCoeficients)s</xcr:DistortionCoeficients>
     </rdf:Description>
   </rdf:RDF>
@@ -433,7 +431,7 @@ class RealityCapture():
 
             CalibrationPrior = "initial"
             if calibrationData.count(segment, row, "FocalLength35mm") > 12 and random.random() > 0.1: # 10% chance to adjust focus even if we already have enough data
-                CalibrationPrior = "fixed"
+                CalibrationPrior = "locked"
 
             try:
                 s = XMP_TEMPLATE % {
@@ -441,8 +439,8 @@ class RealityCapture():
                     "PrincipalPointU"       :                             calibrationData.get(segment, row, "PrincipalPointU"),
                     "PrincipalPointV"       :                             calibrationData.get(segment, row, "PrincipalPointV"),
                     "DistortionCoeficients" : " ".join(["%s" % x for x in calibrationData.get(segment, row, "DistortionCoeficients")] ),
-                    "Rotation"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Rotation")] ),
-                    "Position"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Position")] ),
+                    #"Rotation"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Rotation")] ),
+                    #"Position"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Position")] ),
                     "Group"                 : group_id,
                     "CalibrationPrior"      : CalibrationPrior,
                 }
@@ -459,8 +457,7 @@ class RealityCapture():
             cmd = self._get_cmd_start()
             last_changed = os.path.getmtime(rc_proj_file)
             cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
-            cmd += '-moveReconstructionRegion "%s" "%s" "0" ' % (
-            self.box_center_correction[0], self.box_center_correction[1])  #
+            cmd += '-moveReconstructionRegion "%s" "%s" "0" ' % (self.box_center_correction[0], self.box_center_correction[1])  #
             cmd += '-correctColors '
             if self.reconstruction_quality == "preview":
                 cmd += '-calculatePreviewModel '

@@ -156,7 +156,6 @@ class CalibrationData():
     def get(self, segment, row, key):
         cam_id = "%s-%s" % (segment, row)
         data = self.data[cam_id][key]
-            
         if type(data[0]) == list:
             return [ sum( t[i] for t in data) / len(data) for i in range(0,len(data[0])) ]
         else:
@@ -401,6 +400,9 @@ class RealityCapture():
     def _read_xmp_files(self):
         camera_data = []
         for path in glob.glob(os.path.join(self.source_folder, "images", "*", "*.xmp")):
+            img_path = path.replace(".xmp",".jpg")
+            if not os.path.exists(img_path):
+                continue
             data = open(path, "r").read()
             cam_data = {
                 "segment"              : path.split('\\')[-1].split("-")[0].replace("seg","").strip(),
@@ -410,9 +412,12 @@ class RealityCapture():
                 "PrincipalPointU"      : float(data.split("PrincipalPointU=")[1].split('"')[1]),
                 "PrincipalPointV"      : float(data.split("PrincipalPointV=")[1].split('"')[1]),
                 "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
-                "Rotation"             : [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")],
                 "CalibrationPrior"     : data.split("CalibrationPrior=")[1].split('"')[1],
             }
+            try:
+                cam_data["Rotation"]= [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")]
+            except:
+                print("failed to read rotation")
             try:
                 cam_data["Position"] = [float(x) for x in data.split("Position>")[1].split('<')[0].split(" ")]
             except:
@@ -839,7 +844,10 @@ class WebAPI():
                 MARKERS.append(m2)
                 if m1 not in DISTANCES:
                     DISTANCES[m1] = {}
+                if m2 not in DISTANCES:
+                    DISTANCES[m2] = {}
                 DISTANCES[m1][m2] = distance
+                DISTANCES[m2][m1] = distance
             except:
                 pass
         MARKERS = list(set(MARKERS))
@@ -900,6 +908,7 @@ class Processing():
                 try:
                     model_result_path = rc.process()
                 except Exception as e:
+                    print(e)
                     print("Failed to process", e)
 
                 if model_result_path is not None:

@@ -242,8 +242,6 @@ class RealityCapture():
     def process(self):
         self.prepare_folders()
 
-        self.write_xmp_files()
-
         self.load_markers()
         while len(self.available_markers) < 2:
             if ask("%s markers loaded, repeat?" % len(self.available_markers)):
@@ -304,6 +302,9 @@ class RealityCapture():
             os.mkdir(os.path.join(self.source_folder, self.export_foldername))
         except:
             pass
+        self._delete_xmp_files()
+        self.write_xmp_files()
+
 
     def load_markers(self, force_reload=False):
         markers_csv = os.path.join(self.source_folder, "%s_markers.csv" % self.realityCapture_filename)
@@ -408,7 +409,7 @@ class RealityCapture():
             cam_data = self._read_xmp_files()
             with open(xml_json,"w") as f:
                 f.write(json.dumps(cam_data))
-            self._delete_xmp_files()
+
             for data in cam_data:
                 if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
                     print("No adding", data )
@@ -485,7 +486,7 @@ class RealityCapture():
                continue
 
             CalibrationPrior = "initial"
-            if calibrationData.count(segment, row, "FocalLength35mm") > 15 and random.random() > 0.10: # 10% chance to adjust focus even if we already have enough data
+            if calibrationData.count(segment, row, "FocalLength35mm") > 20 and random.random() > 0.10: # 10% chance to adjust focus even if we already have enough data
                 CalibrationPrior = "locked"
                 self.xmp_exclude.append(cam_id)
 

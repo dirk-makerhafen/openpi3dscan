@@ -150,12 +150,9 @@ def ask(question):
 class CalibrationData():
     def __init__(self):
         self.data = {}
-        self.datapath = os.path.join(CACHE_DIR, "calibrationData.json")
-        self.load()
 
     def reset(self):
         self.data = {}
-        self.save()
 
     def reset_positions(self):
         for key in self.data:
@@ -198,17 +195,6 @@ class CalibrationData():
             self.data[cam_id][key] = []
         self.data[cam_id][key].append(data)
         self.data[cam_id][key] = self.data[cam_id][key][-30:]
-    
-    def load(self):
-        try:
-            with open(self.datapath, "r") as f:
-                self.data = json.loads(f.read())
-        except:
-            pass
-            
-    def save(self):
-        with open(self.datapath, "w") as f:
-            f.write(json.dumps(self.data))
 
 
 class RealityCapture():
@@ -435,7 +421,6 @@ class RealityCapture():
                 print("new center data", center_align)
                 calibrationData.center(center_align)
 
-            calibrationData.save()
 
     def _read_xmp_files(self):
         camera_data = []
@@ -890,7 +875,6 @@ class WebAPI():
 
         try:
             calibrationData.data = json.loads(calibration)
-            calibrationData.save()
         except:
             print("Failed to load calibration data")
 

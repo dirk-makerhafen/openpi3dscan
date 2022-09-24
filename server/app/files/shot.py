@@ -16,6 +16,7 @@ from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
 
 from app.files.modelFile import ModelFile
+from app.settings.settings import SettingsInstance
 
 SyncThreadPool = ThreadPool(8)
 
@@ -143,17 +144,21 @@ class Shot(Observable):
                 preview_path = os.path.join(self.path, "preview_images", image_type, existing_image.split("/")[-1])
                 if preview_path not in existing_previews:
                     previews_to_create.append([existing_image, preview_path])
-        def f(existing_image,preview_path ):
+        def f(existing_image, preview_path, resolution ):
             try:
                 print("creating preview image")
                 img = Image.open(existing_image)
-                img = img.resize([800, 600])
+                img = img.resize(resolution)
                 img.save(preview_path, format="jpeg", quality=85)
             except Exception as e:
                 print(e)
         if previews_to_create  > 0:
+            if SettingsInstance().settingsScanner.camera_rotation in [0, 180]:
+                res = [800, 600]
+            else:
+                res = [600, 800]
             with multiprocessing.Pool(2) as p:
-                p.map(lambda x:f(x[0],x[1]), previews_to_create)
+                p.map(lambda x:f(x[0],x[1], res), previews_to_create)
         self.status = ""
         self.worker = None
         self.notify_observers()

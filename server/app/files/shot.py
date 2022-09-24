@@ -24,6 +24,13 @@ class Shot(Observable):
         self.name = self.shot_id
         self.status = ""
         self.comment = ""
+        #metadata
+        self.meta_location = ""
+        self.meta_max_segments = 16
+        self.meta_max_rows = 7
+        self.meta_rotation = 0
+        self.meta_camera_one_position = "top"
+
         self.nr_of_files = 0
         self.devices = set()
         self.path = os.path.join(shot_dir, self.shot_id)
@@ -245,6 +252,11 @@ class Shot(Observable):
                 f.write(json.dumps({
                     "name": self.name,
                     "comment": self.comment,
+                    "meta_location": self.meta_location,
+                    "meta_max_rows": self.meta_max_rows,
+                    "meta_max_segments": self.meta_max_segments,
+                    "meta_rotation": self.meta_rotation,
+                    "meta_camera_one_position": self.meta_camera_one_position,
                     "models" : [m.to_dict() for m in self.models]
                 }))
         if not os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id):
@@ -255,6 +267,11 @@ class Shot(Observable):
             f.write(json.dumps({
                 "name": self.name,
                 "comment": self.comment,
+                "meta_location": self.meta_location,
+                "meta_max_rows": self.meta_max_rows,
+                "meta_max_segments": self.meta_max_segments,
+                "meta_rotation": self.meta_rotation,
+                "meta_camera_one_position": self.meta_camera_one_position,
             }))
 
     def load(self):
@@ -264,6 +281,14 @@ class Shot(Observable):
                     data = json.loads(f.read())
                     self.name = data["name"]
                     self.comment = data["comment"]
+                    try:
+                        self.meta_location = data["meta_location"]
+                        self.meta_max_rows = data["meta_max_rows"]
+                        self.meta_max_segments = data["meta_max_segments"]
+                        self.meta_rotation = data["meta_rotation"]
+                        self.meta_camera_one_position = data["meta_camera_one_position"]
+                    except:
+                        pass
                     try:
                         self.models = ObservableList([ModelFile(self).from_dict(m) for m in data["models"]])
                     except:
@@ -276,6 +301,14 @@ class Shot(Observable):
                     data = json.loads(f.read())
                     self.name = data["name"]
                     self.comment = data["comment"]
+                    try:
+                        self.meta_location = data["meta_location"]
+                        self.meta_max_rows = data["meta_max_rows"]
+                        self.meta_max_segments = data["meta_max_segments"]
+                        self.meta_rotation = data["meta_rotation"]
+                        self.meta_camera_one_position = data["meta_camera_one_position"]
+                    except:
+                        pass
             except Exception as e:
                 print("failed to load1", e)
         self.path_exists = os.path.exists(self.path)

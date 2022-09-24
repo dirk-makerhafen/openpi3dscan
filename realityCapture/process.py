@@ -387,16 +387,14 @@ class RealityCapture():
                 f.write(json.dumps(cam_data))
             self._delete_xmp_files()
             for data in cam_data:
-                if data["cam_id"] not in self.xmp_for_calibration:
-                    print("Prior calibration, not adding to calibration")
-                    return
                 if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
                     print("No adding", data )
                     continue
-                calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
-                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
-                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
-                calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
+                if data["cam_id"] in self.xmp_for_calibration:
+                    calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
+                    calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
+                    calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
+                    calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
                 if "Rotation" in data:
                     calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
                 if "Position" in data:

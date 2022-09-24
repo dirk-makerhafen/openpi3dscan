@@ -152,6 +152,25 @@ class CalibrationData():
         self.datapath = os.path.join(CACHE_DIR, "calibrationData.json")
         self.load()
 
+    def reset(self):
+        self.data = {}
+        self.save()
+
+    def reset_positions(self):
+        for key in self.data:
+            if "Position" in self.data[key]:
+                del self.data[key]["Position"]
+            if "Rotation" in self.data[key]:
+                del self.data[key]["Rotation"]
+
+    def center(self,center_align):
+        x,y,z = center_align
+        for key in self.data:
+            if "Position" in self.data[key]:
+                for index, pos in enumerate(self.data[key]["Position"]):
+                    pos = [pos[0] - x, pos[1] - y, pos[2] - z, ]
+                    self.data[key]["Position"][index] = pos
+
     def get_camera_ids(self):
         return ["%s" % key for key in self.data.keys()]
 
@@ -386,6 +405,8 @@ class RealityCapture():
             with open(xml_json,"w") as f:
                 f.write(json.dumps(cam_data))
             self._delete_xmp_files()
+            if "calibration_rotate" in self.shot_name:
+                calibrationData.reset_positions()
             for data in cam_data:
                 if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
                     print("No adding", data )
@@ -399,6 +420,12 @@ class RealityCapture():
                     calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
                 if "Position" in data:
                     calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
+
+            if "calibration_reset" in self.shot_name:
+                center_align = [self.box_center_correction[0], self.box_center_correction[1],
+                                self.box_center_correction[2] - (BOX_DIMENSIONS[2] / 2)]
+                print("new center data", center_align)
+                calibrationData.center(center_align)
 
             calibrationData.save()
 
@@ -483,6 +510,12 @@ class RealityCapture():
             last_changed = os.path.getmtime(rc_proj_file)
             cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
             cmd += '-moveReconstructionRegion "%s" "%s" "%s" ' % (self.box_center_correction[0], self.box_center_correction[1], self.box_center_correction[2] - (BOX_DIMENSIONS[2]/2)  )  #
+            if "calibration_rotate" in self.shot_name:
+                try:
+                    angle = int(self.shot_name.split("calibration_rotate_")[1])
+                    cmd += '-rotateReconstructionRegion 0 0 %s ' % angle
+                except Exception as e:
+                    print("Failed to adjust angle", e)
             cmd += '-correctColors '
             if self.reconstruction_quality == "preview":
                 cmd += '-calculatePreviewModel '
@@ -922,6 +955,10 @@ class Processing():
                     create_textures=model["create_textures"]
                 )
 
+                if "calibration_reset" in model["shot_name"]:
+                    print("Resetting Calibration")
+                    calibrationData.reset()
+
                 model_result_path = None
                 try:
                     model_result_path = rc.process()
@@ -941,6 +978,14 @@ class Processing():
                             shutil.rmtree(shot_path)
                         except:
                             print("Failed to delete %s" % shot_path)
+                if "calibration_" in model["shot_name"]:
+                    print("Not caching calibration shot")
+                    if DEBUG is False and os.path.exists(shot_path):
+                        try:
+                            shutil.rmtree(shot_path)
+                        except:
+                            print("Failed to delete %s" % shot_path)
+
     def _clean_shot_dir(self):
         shots = []
         for path in glob.glob(os.path.join(CACHE_DIR, "*")):

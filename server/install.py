@@ -60,12 +60,12 @@ if __name__ == "__main__":
     shell("echo '127.0.0.1      localhost' >> 1")
     shell("sudo mv 1 /etc/hosts")
 
-    # STATIC ETH0
-    shell("cat /etc/dhcpcd.conf | grep -v '#openPi3dScan'  > /tmp/1")
-    s  = '\ninterface eth0 #openPi3dScan \n'
-    s  += 'static ip_address=192.168.99.254/24 #openPi3dScan \n'
-    # s  += 'static routers=192.168.99.254 #openPi3dScan \n'
-    s  += 'static domain_name_servers=8.8.8.8 #openPi3dScan'
+    # NETWORK
+    s  = 'interface eth0 \n'
+    s += 'static ip_address=192.168.99.254/24 \n'
+    s += 'static domain_name_servers=8.8.8.8 \n'
+    s += 'interface wlan0 \n'
+    s += 'static domain_name_servers=8.8.8.8 \n'
     open("/tmp/1", "a").write(s)
     shell("sudo mv /tmp/1 /etc/dhcpcd.conf")
 

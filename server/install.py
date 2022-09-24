@@ -96,6 +96,10 @@ if __name__ == "__main__":
     shell("cat /etc/sysctl.conf | sed s/'#net.ipv4.ip_forward=1'/'net.ipv4.ip_forward=1'/g > 1")
     shell("sudo mv 1 /etc/sysctl.conf")
 
+    # Nameserver
+    shell("echo 'nameserver 8.8.8.8' > 1")
+    shell("sudo mv 1 /etc/resolv.conf")
+
     # AUTOSTART
     shell("cat /etc/rc.local | grep -v 'sudo iptables -' | grep -v openpi3dscan |grep -v 'exit 0' > 1")
     shell("echo 'sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE' >> 1")

@@ -410,6 +410,7 @@ class RealityCapture():
             with open(xml_json,"w") as f:
                 f.write(json.dumps(cam_data))
 
+            first_time_calibration = len(calibrationData.data) == 0
             for data in cam_data:
                 if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
                     print("No adding", data )
@@ -425,7 +426,7 @@ class RealityCapture():
                     calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
 
 
-            if "calibration_reset" in self.shot_name:
+            if first_time_calibration is True:
                 positions = [data["Position"] for data in cam_data if "Position" in data]
                 c_x = (max([x[0] for x in positions]) + min([x[0] for x in positions])) / 2
                 c_y = (max([x[1] for x in positions]) + min([x[1] for x in positions])) / 2
@@ -970,10 +971,6 @@ class Processing():
                     create_mesh_from=model["create_mesh_from"],
                     create_textures=model["create_textures"]
                 )
-
-                if "calibration_reset" in model["shot_name"]:
-                    print("Resetting Calibration")
-                    calibrationData.reset()
 
                 model_result_path = None
                 try:

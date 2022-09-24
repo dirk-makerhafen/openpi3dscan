@@ -105,19 +105,21 @@ XMP_TEMPLATE_full = '''
 '''
 XMP_TEMPLATE = '''
 <x:xmpmeta xmlns:x="adobe:ns:meta/">
-  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-    <rdf:Description xcr:Version="3" xcr:Coordinates="absolute" xcr:DistortionModel="brown3" 
-       xcr:FocalLength35mm="%(FocalLength35mm)s"
-       xcr:PrincipalPointU="%(PrincipalPointU)s"
-       xcr:PrincipalPointV="%(PrincipalPointV)s" 
-       xcr:PosePrior="initial"
-       xcr:CalibrationPrior="%(CalibrationPrior)s"
-       xcr:CalibrationGroup="%(Group)s" 
-       xcr:DistortionGroup="%(Group)s" 
-       xmlns:xcr="http://www.capturingreality.com/ns/xcr/1.1#">
-      <xcr:DistortionCoeficients>%(DistortionCoeficients)s</xcr:DistortionCoeficients>
-    </rdf:Description>
-  </rdf:RDF>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <rdf:Description xcr:Version="3" xcr:Coordinates="absolute" xcr:DistortionModel="brown3" 
+            xcr:FocalLength35mm="%(FocalLength35mm)s"
+            xcr:PrincipalPointU="%(PrincipalPointU)s"
+            xcr:PrincipalPointV="%(PrincipalPointV)s" 
+            xcr:PosePrior="initial"
+            xcr:CalibrationPrior="%(CalibrationPrior)s"
+            xcr:CalibrationGroup="%(Group)s" 
+            xcr:DistortionGroup="%(Group)s" 
+            xmlns:xcr="http://www.capturingreality.com/ns/xcr/1.1#">
+            <xcr:DistortionCoeficients>%(DistortionCoeficients)s</xcr:DistortionCoeficients>
+            <xcr:Rotation>%(Rotation)s</xcr:Rotation>
+            <xcr:Position>%(Position)s</xcr:Position>
+        </rdf:Description>
+</rdf:RDF>
 </x:xmpmeta>
 '''
 XMPSettings_xml = '''
@@ -211,6 +213,7 @@ class RealityCapture():
         self.available_markers = []
         self.alignments = []
         self.alignments_were_recreated = False
+        self.xmp_for_calibration = []
         self.model_path = None
 
     def process(self):
@@ -327,7 +330,6 @@ class RealityCapture():
                 os.remove(rc_proj_file)
             if os.path.exists(raw_exists_file):
                 os.remove(raw_exists_file)
-            self.alignments_were_recreated = True
             cmd = self._get_cmd_start()
             cmd += self._get_cmd_new_scene()
             cmd += '-align '
@@ -341,11 +343,12 @@ class RealityCapture():
             cmd += '-selectComponent "MAIN" '
             cmd += '-setReconstructionRegion "%s\\box.rcbox" ' % self.source_folder
             cmd += '-getLicense "%s" ' % LICENSE_PIN
-            cmd += '-exportRegistration "%s\\%s_alignments.csv" "%s\\exportRegistrationSettings.xml" ' % (
-            self.source_folder, self.realityCapture_filename, self.source_folder)
+            cmd += '-exportRegistration "%s\\%s_alignments.csv" "%s\\exportRegistrationSettings.xml" ' % (self.source_folder, self.realityCapture_filename, self.source_folder)
             cmd += '-save "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
             cmd += '-quit '
             self._run_command(cmd, "load_alignments")
+            if os.path.exists(os.path.join(self.source_folder, "%s_alignments.csv" % self.realityCapture_filename)):
+                self.alignments_were_recreated = True
             self._load_alignments_csv(alignments_csv)
 
     def _load_alignments_csv(self, alignments_csv):
@@ -384,18 +387,20 @@ class RealityCapture():
                 f.write(json.dumps(cam_data))
             self._delete_xmp_files()
             for data in cam_data:
+                if data["cam_id"] not in self.xmp_for_calibration:
+                    print("Prior calibration, not adding to calibration")
+                    return
                 if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
                     print("No adding", data )
                     continue
-                if data["CalibrationPrior"] == "initial":
-                    calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
-                    calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
-                    calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
-                    calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
-                    if "Rotation" in data:
-                        calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
-                    if "Position" in data:
-                        calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
+                calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
+                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
+                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
+                calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
+                if "Rotation" in data:
+                    calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
+                if "Position" in data:
+                    calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
 
             calibrationData.save()
 
@@ -417,20 +422,22 @@ class RealityCapture():
                     "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
                     "CalibrationPrior"     : data.split("CalibrationPrior=")[1].split('"')[1],
                 }
+                cam_data["cam_id"] = "%s-%s" % (cam_data["segment"], cam_data["row"])
             except Exception as e:
-                print("Failed to load %s" % path,e)
+                print("Failed to load",path ,e)
                 continue
             try:
                 cam_data["Rotation"]= [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")]
-            except:
-                print("failed to read rotation")
+            except Exception as e:
+                pass
             try:
                 cam_data["Position"] = [float(x) for x in data.split("Position>")[1].split('<')[0].split(" ")]
-            except:
+            except Exception as e:
                 try:
                     cam_data["Position"] = [float(x) for x in data.split("Position=")[1].split('"')[1].split(" ")]
-                except:
-                    print("failed to read position")
+                except Exception as e:
+                    pass
+
             camera_data.append(cam_data)
         return camera_data
 
@@ -439,13 +446,16 @@ class RealityCapture():
             os.remove(path)
 
     def write_xmp_files(self):
+        self.xmp_for_calibration = []
         for cam_id in calibrationData.get_camera_ids():
             segment, row = cam_id.split("-")
             group_id = ( int(segment) * 100 ) + int(row)
 
             CalibrationPrior = "initial"
-            if calibrationData.count(segment, row, "FocalLength35mm") > 12 and random.random() > 0.1: # 10% chance to adjust focus even if we already have enough data
+            if calibrationData.count(segment, row, "FocalLength35mm") > 15 and random.random() > 0.10: # 10% chance to adjust focus even if we already have enough data
                 CalibrationPrior = "locked"
+            else:
+                self.xmp_for_calibration.append(cam_id)
 
             try:
                 s = XMP_TEMPLATE % {
@@ -453,14 +463,17 @@ class RealityCapture():
                     "PrincipalPointU"       :                             calibrationData.get(segment, row, "PrincipalPointU"),
                     "PrincipalPointV"       :                             calibrationData.get(segment, row, "PrincipalPointV"),
                     "DistortionCoeficients" : " ".join(["%s" % x for x in calibrationData.get(segment, row, "DistortionCoeficients")] ),
-                    #"Rotation"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Rotation")] ),
-                    #"Position"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Position")] ),
+                    "Rotation"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Rotation")] ),
+                    "Position"              : " ".join(["%s" % x for x in calibrationData.get(segment, row, "Position")] ),
                     "Group"                 : group_id,
                     "CalibrationPrior"      : CalibrationPrior,
                 }
                 for mode in ["normal", "projection"]:
-                    with open(os.path.join(self.source_folder, "images", mode, "seg%s-cam%s-%s.xmp" % (segment, row, mode[0])), "w") as f:
-                        f.write(s)
+                    xmp_path = os.path.join(self.source_folder, "images", mode, "seg%s-cam%s-%s.xmp" % (segment, row, mode[0]))
+                    img_path = xmp_path.replace(".xmp", ".jpg")
+                    if os.path.exists(img_path):
+                        with open(xmp_path, "w") as f:
+                            f.write(s)
             except:
                 pass
 
@@ -471,7 +484,7 @@ class RealityCapture():
             cmd = self._get_cmd_start()
             last_changed = os.path.getmtime(rc_proj_file)
             cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
-            cmd += '-moveReconstructionRegion "%s" "%s" "0" ' % (self.box_center_correction[0], self.box_center_correction[1])  #
+            cmd += '-moveReconstructionRegion "%s" "%s" "%s" ' % (self.box_center_correction[0], self.box_center_correction[1], self.box_center_correction[2] - (BOX_DIMENSIONS[2]/2)  )  #
             cmd += '-correctColors '
             if self.reconstruction_quality == "preview":
                 cmd += '-calculatePreviewModel '
@@ -664,15 +677,13 @@ class RealityCapture():
 
     def _get_cmd_defineDistance(self):
         cmd = ''
-        for index1, marker1 in enumerate(MARKERS):
-            if marker1 not in self.available_markers or marker1 not in DISTANCES:
-                continue
-            for index2 in range(index1 + 1, len(MARKERS)):
-                marker2 = MARKERS[index2]
-                if marker2 not in self.available_markers or marker2 not in DISTANCES[marker1]:
+        for index1, marker1 in enumerate(self.available_markers):
+            for marker2 in [self.available_markers[index2] for index2 in range(index1 + 1, len(self.available_markers))]:
+                if marker1 not in DISTANCES:
                     continue
-                cmd += '-defineDistance "%s" "%s" "%s" "D%s%s" ' % (
-                    marker1, marker2, DISTANCES[marker1][marker2], marker1, marker2)
+                if marker2 not in DISTANCES[marker1]:
+                    continue
+                cmd += '-defineDistance "%s" "%s" "%s" "D%s%s" ' % (marker1, marker2, DISTANCES[marker1][marker2], marker1, marker2)
         return cmd
 
     def _get_cmd_new_scene(self):

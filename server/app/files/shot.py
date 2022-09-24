@@ -159,18 +159,10 @@ class Shot(Observable):
             device = [d for d in self.devices if d.name == "SEG%s-CAM%s" % (segment, row) and d.status == "online"][0]
         except:
             return None
-        img = [b'']
-
-        def f():
-            img[0] = device.camera.shots.download(self.shot_id, image_type, image_mode=image_mode)
-
-        t = threading.Thread(target=f, daemon=True)
-        t.start()
-        while t.is_alive():
-            gevent.sleep(0.3)
-        if img[0] is None or len(img[0]) < 1000:
+        img = device.camera.shots.download(self.shot_id, image_type, image_mode=image_mode)
+        if img is None or len(img) < 1000:
             return None
-        return img[0]
+        return img
 
     def list_possible_images(self, image_type, image_mode):
         if image_mode == "normal":

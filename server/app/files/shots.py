@@ -20,11 +20,11 @@ class Shots:
 
     def create(self, shot_id, name):
         s = Shot(SHOT_DIR, shot_id)
-        self.meta_location = ""
-        self.meta_max_segments = SettingsInstance().settingsScanner.segments
-        self.meta_max_rows = SettingsInstance().settingsScanner.cameras_per_segment
-        self.meta_rotation = SettingsInstance().settingsScanner.camera_rotation
-        self.meta_camera_one_position = SettingsInstance().settingsScanner.camera_one_position
+        s.meta_location = ""
+        s.meta_max_segments = SettingsInstance().settingsScanner.segments
+        s.meta_max_rows = SettingsInstance().settingsScanner.cameras_per_segment
+        s.meta_rotation = SettingsInstance().settingsScanner.camera_rotation
+        s.meta_camera_one_position = SettingsInstance().settingsScanner.camera_one_position
         s.create_folders()
         s.set_name(name)
         self.shots.insert(0, s)

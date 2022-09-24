@@ -87,6 +87,7 @@ class HttpEndpoints:
         bottle.route("/windows_pack.zip")(self.download_windows_pack)
         bottle.route("/force_update")(self.force_update)
         bottle.route("/realityCaptureProcess")(self.realityCaptureProcess)
+        bottle.route("/upload_calibration", method="POST")(self.upload_calibration)
 
     def realityCaptureProcess(self):
         data = {
@@ -104,6 +105,7 @@ class HttpEndpoints:
             dia = SettingsInstance().realityCaptureSettings.diameter
             data["box_dimensions"] = [dia, dia, SettingsInstance().realityCaptureSettings.height]
             data["pin"] = SettingsInstance().realityCaptureSettings.pin
+            data["calibration"] = SettingsInstance().realityCaptureSettings.calibration_data
         return json.dumps(data)
 
     def _shot_list(self):
@@ -200,6 +202,15 @@ class HttpEndpoints:
         data = request.json
         DevicesInstance().heartbeat_received(ip, data)
         return "OK"
+
+    def upload_calibration(self):
+        data = request.data
+        try:
+            json.loads(data)
+        except Exception as e:
+            print("Failed to load calibration data", e)
+            return
+        SettingsInstance().realityCaptureSettings.set_calibration_data(data)
 
     def _live(self, device_id):
         headers = {

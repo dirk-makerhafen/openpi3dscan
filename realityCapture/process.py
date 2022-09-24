@@ -785,7 +785,7 @@ class WebAPI():
             data = json.loads(d)
             models = data["models"]
             if len(models) > 0:
-                self._load_settings(data["markers"], data["box_dimensions"], data["pin"])
+                self._load_settings(data["markers"], data["box_dimensions"], data["pin"], data["calibration"])
         except Exception as e:
             print(e)
         if len(models) > 0:
@@ -807,6 +807,14 @@ class WebAPI():
             except:
                 print("failed to reach server while uploading")
                 self.process_failed(shot_id, model_id)
+
+    def upload_calibration_data(self):
+        print("Uploading calibration")
+        try:
+            requests.post("http://%s/upload_calibration" % (SERVER),data=json.dumps(calibrationData.data))
+            print("Upload finished")
+        except:
+            print("failed to reach server while uploading")
 
     def process_failed(self, shot_id, model_id):
         print("Failed to process %s  Model %s" % (shot_id, model_id))
@@ -873,11 +881,17 @@ class WebAPI():
         if os.path.exists(os.path.join(target_dir, "projection")):
             shutil.rmtree(os.path.join(target_dir, "projection"))
 
-    def _load_settings(self, markers_str, box_dimensions, pin ):
+    def _load_settings(self, markers_str, box_dimensions, pin, calibration ):
         global MARKERS
         global DISTANCES
         global BOX_DIMENSIONS
         global LICENSE_PIN
+
+        try:
+            calibrationData.data = json.loads(calibration)
+            calibrationData.save()
+        except:
+            print("Failed to load calibration data")
 
         MARKERS = []
         DISTANCES = {}
@@ -970,6 +984,7 @@ class Processing():
                     print("Failed to process", e)
 
                 if model_result_path is not None:
+                    api.upload_calibration_data()
                     api.upload_model(model["shot_id"], model["model_id"], model_result_path)
                     if DEBUG is False:
                         os.remove(model_result_path)

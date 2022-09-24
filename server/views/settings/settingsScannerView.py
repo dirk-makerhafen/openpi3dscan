@@ -15,6 +15,19 @@ class SettingsScannerView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
+                                <strong class="mb-0">Location</strong>
+                                <p class="text-muted mb-0">Unique scanner location name</p>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="custom-control custom-switch">
+                                    <input style="width:100%;text-align:center" id="scanner_location" type="text" value="{{pyview.subject.location}}" onchange='pyview.subject.set_location($("#scanner_location").val())'>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-10">
                                 <strong class="mb-0">Segments</strong>
                                 <p class="text-muted mb-0">Number of segments installed</p>
                             </div>
@@ -84,8 +97,7 @@ class SettingsScannerView(PyHtmlView):
                                 </div>
                             </div>
                         </div>
-                    </div>               
-                    
+                    </div>                                   
                 </div>
             </div>   
         </div>

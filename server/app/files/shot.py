@@ -1,11 +1,13 @@
 import glob
 import json
+import multiprocessing
 import os
 import random
 import re
 import shutil
 import threading
 from multiprocessing.pool import ThreadPool
+from multiprocessing import Process
 
 import gevent
 from PIL import Image
@@ -133,21 +135,25 @@ class Shot(Observable):
             random.shuffle(tasks)
             SyncThreadPool.map(lambda task: task[0].camera.shots.download(*task[1]), tasks)
             self.count_number_of_files()
-
+        previews_to_create = []
         for image_type in ["normal", "projection"]:
             existing_images = glob.glob(os.path.join(self.path, "images", image_type, "*.jpg"))
             existing_previews = glob.glob(os.path.join(self.path, "preview_images", image_type, "*.jpg"))
             for existing_image in existing_images:
                 preview_path = os.path.join(self.path, "preview_images", image_type, existing_image.split("/")[-1])
                 if preview_path not in existing_previews:
-                    try:
-                        print("creating preview image")
-                        img = Image.open(existing_image)
-                        img = img.resize([800, 600])
-                        img.save(preview_path, format="jpeg", quality=85)
-                    except Exception as e:
-                        print(e)
-
+                    previews_to_create.append([existing_image, preview_path])
+        def f(existing_image,preview_path ):
+            try:
+                print("creating preview image")
+                img = Image.open(existing_image)
+                img = img.resize([800, 600])
+                img.save(preview_path, format="jpeg", quality=85)
+            except Exception as e:
+                print(e)
+        if previews_to_create  > 0:
+            with multiprocessing.Pool(2) as p:
+                p.map(lambda x:f(x[0],x[1]), previews_to_create)
         self.status = ""
         self.worker = None
         self.notify_observers()

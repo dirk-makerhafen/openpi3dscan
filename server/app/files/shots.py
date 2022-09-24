@@ -20,7 +20,7 @@ class Shots:
 
     def create(self, shot_id, name):
         s = Shot(SHOT_DIR, shot_id)
-        s.meta_location = ""
+        s.meta_location = SettingsInstance().settingsScanner.location
         s.meta_max_segments = SettingsInstance().settingsScanner.segments
         s.meta_max_rows = SettingsInstance().settingsScanner.cameras_per_segment
         s.meta_rotation = SettingsInstance().settingsScanner.camera_rotation

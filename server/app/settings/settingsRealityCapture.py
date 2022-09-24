@@ -129,4 +129,10 @@ class SettingsRealityCapture(Observable):
         self.save()
         self.notify_observers()
 
+    def reset_calibration(self):
+        self.calibration_data = "{}"
+        self.save()
+        self.notify_observers()
 
+    def calibration_count(self):
+        return self.calibration_data.count("FocalLength35mm")

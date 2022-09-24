@@ -136,29 +136,20 @@ class Shot(Observable):
             random.shuffle(tasks)
             SyncThreadPool.map(lambda task: task[0].camera.shots.download(*task[1]), tasks)
             self.count_number_of_files()
-        previews_to_create = []
+
+        resolution = [800, 600] if SettingsInstance().settingsScanner.camera_rotation in [0, 180] else [600, 800]
         for image_type in ["normal", "projection"]:
             existing_images = glob.glob(os.path.join(self.path, "images", image_type, "*.jpg"))
             existing_previews = glob.glob(os.path.join(self.path, "preview_images", image_type, "*.jpg"))
             for existing_image in existing_images:
                 preview_path = os.path.join(self.path, "preview_images", image_type, existing_image.split("/")[-1])
                 if preview_path not in existing_previews:
-                    previews_to_create.append([existing_image, preview_path])
-        def f(existing_image, preview_path, resolution ):
-            try:
-                print("creating preview image")
-                img = Image.open(existing_image)
-                img = img.resize(resolution)
-                img.save(preview_path, format="jpeg", quality=85)
-            except Exception as e:
-                print(e)
-        if previews_to_create  > 0:
-            if SettingsInstance().settingsScanner.camera_rotation in [0, 180]:
-                res = [800, 600]
-            else:
-                res = [600, 800]
-            with multiprocessing.Pool(2) as p:
-                p.map(lambda x:f(x[0],x[1], res), previews_to_create)
+                    try:
+                        img = Image.open(existing_image)
+                        img = img.resize(resolution)
+                        img.save(preview_path, format="jpeg", quality=85)
+                    except:
+                        print("Failed to create preview")
         self.status = ""
         self.worker = None
         self.notify_observers()

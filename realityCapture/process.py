@@ -9,6 +9,7 @@ from selenium import webdriver
 import time
 import glob
 import socket
+import traceback
 from multiprocessing.pool import ThreadPool
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -184,7 +185,10 @@ class CalibrationData():
 
     def count(self, segment, row, key):
         cam_id = "%s-%s" % (segment, row)
-        return len(self.data[cam_id][key])
+        try:
+            return len(self.data[cam_id][key])
+        except:
+            return 0
 
     def add_data(self, segment, row, key, data):
         cam_id = "%s-%s" % ( segment, row )
@@ -232,7 +236,7 @@ class RealityCapture():
         self.available_markers = []
         self.alignments = []
         self.alignments_were_recreated = False
-        self.xmp_for_calibration = []
+        self.xmp_exclude = []
         self.model_path = None
 
     def process(self):
@@ -405,13 +409,11 @@ class RealityCapture():
             with open(xml_json,"w") as f:
                 f.write(json.dumps(cam_data))
             self._delete_xmp_files()
-            if "calibration_rotate" in self.shot_name:
-                calibrationData.reset_positions()
             for data in cam_data:
                 if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
                     print("No adding", data )
                     continue
-                if data["cam_id"] in self.xmp_for_calibration:
+                if data["cam_id"] not in self.xmp_exclude:
                     calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
                     calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
                     calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
@@ -421,9 +423,13 @@ class RealityCapture():
                 if "Position" in data:
                     calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
 
+
             if "calibration_reset" in self.shot_name:
-                center_align = [self.box_center_correction[0], self.box_center_correction[1],
-                                self.box_center_correction[2] - (BOX_DIMENSIONS[2] / 2)]
+                positions = [data["Position"] for data in cam_data if "Position" in data]
+                c_x = (max([x[0] for x in positions]) + min([x[0] for x in positions])) / 2
+                c_y = (max([x[1] for x in positions]) + min([x[1] for x in positions])) / 2
+                c_z = (max([x[2] for x in positions]) + min([x[2] for x in positions])) / 2
+                center_align = [c_x, c_y, c_z - (BOX_DIMENSIONS[2] / 2)]
                 print("new center data", center_align)
                 calibrationData.center(center_align)
 
@@ -471,16 +477,17 @@ class RealityCapture():
             os.remove(path)
 
     def write_xmp_files(self):
-        self.xmp_for_calibration = []
+        self.xmp_exclude = []
         for cam_id in calibrationData.get_camera_ids():
             segment, row = cam_id.split("-")
             group_id = ( int(segment) * 100 ) + int(row)
+            if calibrationData.count(segment, row, "FocalLength35mm") == 0:
+               continue
 
             CalibrationPrior = "initial"
             if calibrationData.count(segment, row, "FocalLength35mm") > 15 and random.random() > 0.10: # 10% chance to adjust focus even if we already have enough data
                 CalibrationPrior = "locked"
-            else:
-                self.xmp_for_calibration.append(cam_id)
+                self.xmp_exclude.append(cam_id)
 
             try:
                 s = XMP_TEMPLATE % {
@@ -510,12 +517,6 @@ class RealityCapture():
             last_changed = os.path.getmtime(rc_proj_file)
             cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
             cmd += '-moveReconstructionRegion "%s" "%s" "%s" ' % (self.box_center_correction[0], self.box_center_correction[1], self.box_center_correction[2] - (BOX_DIMENSIONS[2]/2)  )  #
-            if "calibration_rotate" in self.shot_name:
-                try:
-                    angle = int(self.shot_name.split("calibration_rotate_")[1])
-                    cmd += '-rotateReconstructionRegion 0 0 %s ' % angle
-                except Exception as e:
-                    print("Failed to adjust angle", e)
             cmd += '-correctColors '
             if self.reconstruction_quality == "preview":
                 cmd += '-calculatePreviewModel '
@@ -963,6 +964,7 @@ class Processing():
                 try:
                     model_result_path = rc.process()
                 except Exception as e:
+                    traceback.print_exc()
                     print(e)
                     print("Failed to process", e)
 

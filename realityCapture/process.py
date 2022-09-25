@@ -227,37 +227,38 @@ class RealityCapture():
 
     def process(self):
         self.prepare_folders()
+        first_time_calibration = len(calibrationData.data) == 0
 
-        self.load_markers()
+        self.load_markers(force_reload=first_time_calibration)
         while len(self.available_markers) < 2:
             if ask("%s markers loaded, repeat?" % len(self.available_markers)):
                 self.load_markers(force_reload=True)
             else:
                 return None
 
-        self.load_alignments()
+        self.load_alignments(force_reload=first_time_calibration)
         while len(self.alignments) < 2:
             if ask("%s alignments loaded, repeat?" % len(self.alignments) ):
                 self.load_alignments(force_reload=True)
             else:
                 return None
 
-        self.create_raw_model()
+        self.create_raw_model(force_reload=first_time_calibration)
         while not os.path.exists(os.path.join(self.source_folder, "%s.raw_exists" % self.realityCapture_filename)):
             if ask("No model created, repeat?"):
                 self.create_raw_model(force_reload=True)
             else:
                 return None
 
-        self.create_export_model()
+        self.create_export_model(force_reload=first_time_calibration)
         while self.model_path is None:
             if ask("No export model created, repeat?"):
                 self.create_export_model(force_reload=True)
             else:
                 return None
 
-        if self.alignments_were_recreated is True:
-            self.export_xmp_files()
+        if self.alignments_were_recreated is True or first_time_calibration is True:
+            self.load_calibrationdata_via_xmp()
 
         if DEBUG is False:
             try:
@@ -383,43 +384,38 @@ class RealityCapture():
         self.box_center_correction = [c_x, c_y, c_z]
         print("Box center corrections:", c_x, c_y, c_z)
 
-    def export_xmp_files(self):
-        xml_json = os.path.join(self.source_folder, "XMP_%s%s.json" % (self.create_mesh_from_str, self.create_textures_str))
-        if not os.path.exists(xml_json):
-            cmd = self._get_cmd_start()
-            cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
-            cmd += '-exportXMP "%s\\xmp_settings.xml" ' % self.source_folder
-            cmd += '-quit '
-            self._run_command(cmd, "export_xmp")
+    def load_calibrationdata_via_xmp(self):
+        cmd = self._get_cmd_start()
+        cmd += '-load "%s\\%s.rcproj" ' % (self.source_folder, self.realityCapture_filename)
+        cmd += '-exportXMP "%s\\xmp_settings.xml" ' % self.source_folder
+        cmd += '-quit '
+        self._run_command(cmd, "export_xmp")
 
-            cam_data = self._read_xmp_files()
-            with open(xml_json,"w") as f:
-                f.write(json.dumps(cam_data))
+        cam_data = self._read_xmp_files()
+        self._delete_xmp_files()
+        first_time_calibration = len(calibrationData.data) == 0
+        for data in cam_data:
+            if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
+                print("No adding", data )
+                continue
+            if data["cam_id"] not in self.xmp_exclude:
+                calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
+                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
+                calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
+                calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
+            if "Rotation" in data:
+                calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
+            if "Position" in data:
+                calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
 
-            first_time_calibration = len(calibrationData.data) == 0
-            for data in cam_data:
-                if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
-                    print("No adding", data )
-                    continue
-                if data["cam_id"] not in self.xmp_exclude:
-                    calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])
-                    calibrationData.add_data(data["segment"], data["row"], "PrincipalPointU", data["PrincipalPointU"])
-                    calibrationData.add_data(data["segment"], data["row"], "PrincipalPointV", data["PrincipalPointV"])
-                    calibrationData.add_data(data["segment"], data["row"], "DistortionCoeficients", data["DistortionCoeficients"])
-                if "Rotation" in data:
-                    calibrationData.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
-                if "Position" in data:
-                    calibrationData.add_data(data["segment"], data["row"], "Position", data["Position"])
-
-
-            if first_time_calibration is True:
-                positions = [data["Position"] for data in cam_data if "Position" in data]
-                c_x = (max([x[0] for x in positions]) + min([x[0] for x in positions])) / 2
-                c_y = (max([x[1] for x in positions]) + min([x[1] for x in positions])) / 2
-                c_z = (max([x[2] for x in positions]) + min([x[2] for x in positions])) / 2
-                center_align = [c_x, c_y, c_z - (BOX_DIMENSIONS[2] / 2)]
-                print("new center data", center_align)
-                calibrationData.center(center_align)
+        if first_time_calibration is True:
+            positions = [data["Position"] for data in cam_data if "Position" in data]
+            c_x = (max([x[0] for x in positions]) + min([x[0] for x in positions])) / 2
+            c_y = (max([x[1] for x in positions]) + min([x[1] for x in positions])) / 2
+            c_z = (max([x[2] for x in positions]) + min([x[2] for x in positions])) / 2
+            center_align = [c_x, c_y, c_z - (BOX_DIMENSIONS[2] / 2)]
+            print("new center data", center_align)
+            calibrationData.center(center_align)
 
 
     def _read_xmp_files(self):
@@ -797,7 +793,7 @@ class WebAPI():
     def upload_calibration_data(self):
         print("Uploading calibration")
         try:
-            requests.post("http://%s/upload_calibration" % (SERVER),data=json.dumps(calibrationData.data))
+            requests.post("http://%s/upload_calibration" % (SERVER), json= {"data": json.dumps(calibrationData.data)})
             print("Upload finished")
         except:
             print("failed to reach server while uploading")
@@ -977,13 +973,7 @@ class Processing():
                             shutil.rmtree(shot_path)
                         except:
                             print("Failed to delete %s" % shot_path)
-                if "calibration_" in model["shot_name"]:
-                    print("Not caching calibration shot")
-                    if DEBUG is False and os.path.exists(shot_path):
-                        try:
-                            shutil.rmtree(shot_path)
-                        except:
-                            print("Failed to delete %s" % shot_path)
+
 
     def _clean_shot_dir(self):
         shots = []

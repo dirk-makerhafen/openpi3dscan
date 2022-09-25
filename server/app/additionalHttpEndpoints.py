@@ -204,13 +204,17 @@ class HttpEndpoints:
         return "OK"
 
     def upload_calibration(self):
-        data = request.data
+        data = request.json["data"]
         try:
-            json.loads(data)
+            if len(json.loads(data)) < 50:# broken data?
+                print("rejecting data")
+                return
         except Exception as e:
             print("Failed to load calibration data", e)
-            return
+            return "Failed"
+
         SettingsInstance().realityCaptureSettings.set_calibration_data(data)
+        return "OK"
 
     def _live(self, device_id):
         headers = {

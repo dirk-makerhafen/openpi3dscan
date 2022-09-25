@@ -4,7 +4,7 @@ import re
 from pyhtmlgui import Observable
 
 
-class SettingsScanner(Observable):
+class SettingsLocation(Observable):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
@@ -14,25 +14,66 @@ class SettingsScanner(Observable):
         self.cameras_per_segment = 7
         self.camera_rotation = 0  # 0, 90, 180, 270
         self.camera_one_position = "top"  # top, bottom
-        self.flipped_cameras = ""
+        self.calibration_data = "{}" # json dump of rc data
+        self.markers = ""
+        self.diameter = 1.9
+        self.height = 2.5
 
     def to_dict(self):
         return {
+            "markers": self.markers,
+            "diameter": self.diameter,
+            "height": self.height,
             "segments": self.segments,
             "cameras_per_segment": self.cameras_per_segment,
             "camera_rotation": self.camera_rotation,
             "camera_one_position": self.camera_one_position,
-            "flipped_cameras": self.flipped_cameras,
             "location": self.location,
+            "calibration_data": self.calibration_data,
+
         }
 
     def from_dict(self, data):
+        self.markers = data["markers"]
+        self.diameter = data["diameter"]
+        self.height = data["height"]
         self.segments = data["segments"]
         self.cameras_per_segment = data["cameras_per_segment"]
         self.camera_rotation = data["camera_rotation"]
         self.camera_one_position = data["camera_one_position"]
-        self.flipped_cameras = data["flipped_cameras"]
         self.location = data["location"]
+        self.calibration_data = data["calibration_data"]
+
+
+    def set_markers(self, markers):
+        self.markers = markers
+        self.save()
+        self.notify_observers()
+
+    def set_height(self, new_height):
+        try:
+            new_height = float(new_height)
+        except:
+            return
+        if new_height < 1 or  new_height > 5:
+            self.notify_observers()
+            return
+        self.height = new_height
+        self.save()
+        self.notify_observers()
+
+    def set_diameter(self, new_diameter):
+        try:
+            new_diameter = float(new_diameter)
+        except:
+            return
+        if new_diameter < 1 or  new_diameter > 5:
+            self.notify_observers()
+            return
+        self.diameter = new_diameter
+        self.save()
+        self.notify_observers()
+
 
     def set_segments(self, value):
         try:
@@ -74,20 +115,23 @@ class SettingsScanner(Observable):
             self.save()
             self.notify_observers()
 
-
-    def set_flipped_cameras(self, value):
-        if value != self.flipped_cameras:
-            self.flipped_cameras = value
-            self.save()
-            self.notify_observers()
-
     def set_location(self, value):
         if value != self.location:
             self.location = value
             self.save()
             self.notify_observers()
 
+    def set_calibration_data(self, new_calibration_data):
+        self.calibration_data = new_calibration_data
+        self.save()
+        self.notify_observers()
 
+    def reset_calibration(self):
+        self.calibration_data = "{}"
+        self.save()
+        self.notify_observers()
 
+    def calibration_count(self):
+        return self.calibration_data.count("FocalLength35mm")
 
 

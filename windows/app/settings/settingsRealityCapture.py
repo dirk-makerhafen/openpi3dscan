@@ -26,71 +26,30 @@ class SettingsRealityCapture(Observable):
         super().__init__()
         self.parent = parent
         self.save = parent.save
-        self.markers = MARKERS_PRELOAD
-        self.diameter = 1.9
-        self.height = 2.5
         self.pin = ""
         self.default_reconstruction_quality = "normal" # preview, normal, high
         self.default_export_quality = "normal"  # "high", normal, low
         self.default_create_mesh_from = "projection" # normal, projection, all
         self.default_create_textures = True
-        self.calibration_data = "{}" # json dump of rc data
 
     def to_dict(self):
         return {
-            "markers": self.markers,
-            "diameter": self.diameter,
-            "height": self.height,
             "pin": self.pin,
             "default_reconstruction_quality": self.default_reconstruction_quality,
             "default_export_quality": self.default_export_quality,
             "default_create_mesh_from": self.default_create_mesh_from,
             "default_create_textures": self.default_create_textures,
-            "calibration_data": self.calibration_data,
         }
 
     def from_dict(self, data):
-        self.markers = data["markers"]
-        self.diameter = data["diameter"]
-        self.height = data["height"]
         self.pin = data["pin"]
         self.default_reconstruction_quality = data["default_reconstruction_quality"]
         self.default_export_quality = data["default_export_quality"]
         self.default_create_mesh_from = data["default_create_mesh_from"]
         self.default_create_textures = data["default_create_textures"]
-        self.calibration_data = data["calibration_data"]
-
-    def set_markers(self, markers):
-        self.markers = markers
-        self.save()
-        self.notify_observers()
 
     def set_pin(self, pin):
         self.pin = pin.strip()
-        self.save()
-        self.notify_observers()
-
-    def set_height(self, new_height):
-        try:
-            new_height = float(new_height)
-        except:
-            return
-        if new_height < 1 or  new_height > 5:
-            self.notify_observers()
-            return
-        self.height = new_height
-        self.save()
-        self.notify_observers()
-
-    def set_diameter(self, new_diameter):
-        try:
-            new_diameter = float(new_diameter)
-        except:
-            return
-        if new_diameter < 1 or  new_diameter > 5:
-            self.notify_observers()
-            return
-        self.diameter = new_diameter
         self.save()
         self.notify_observers()
 
@@ -101,7 +60,6 @@ class SettingsRealityCapture(Observable):
         self.default_reconstruction_quality = new_default_reconstruction_quality
         self.save()
         self.notify_observers()
-
 
     def set_default_export_quality(self, new_default_export_quality):
         if new_default_export_quality not in ["low", "normal", "high"]:
@@ -124,15 +82,3 @@ class SettingsRealityCapture(Observable):
         self.save()
         self.notify_observers()
 
-    def set_calibration_data(self, new_calibration_data):
-        self.calibration_data = new_calibration_data
-        self.save()
-        self.notify_observers()
-
-    def reset_calibration(self):
-        self.calibration_data = "{}"
-        self.save()
-        self.notify_observers()
-
-    def calibration_count(self):
-        return self.calibration_data.count("FocalLength35mm")

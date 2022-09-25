@@ -1,6 +1,6 @@
 from pyhtmlgui import PyHtmlView
 from views.settings.settingsRealityCaptureView import RealityCaptureView
-from views.settings.settingsScannerView import SettingsScannerView
+from views.settings.settingsLocationsView import SettingsLocationsView
 
 
 class TaskUpdateServerView(PyHtmlView):
@@ -19,7 +19,7 @@ class SettingsView(PyHtmlView):
                       
         {{pyview.realityCaptureView.render()}}  
         
-        {{pyview.scannerSettingsView.render()}}  
+        {{pyview.locationsSettingsView.render()}}  
         
         
     </div> 
@@ -29,4 +29,4 @@ class SettingsView(PyHtmlView):
     def __init__(self, subject, parent):
         super().__init__(subject, parent)
         self.realityCaptureView = RealityCaptureView(self.subject.settings.realityCaptureSettings, self)
-        self.scannerSettingsView = SettingsScannerView(self.subject.settings.settingsScanner, self)
+        self.locationsSettingsView = SettingsLocationsView(self.subject.settings.settingsLocations, self)

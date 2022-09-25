@@ -35,15 +35,10 @@ class Shot(Observable):
         self.meta_camera_one_position = "top"
 
         self.nr_of_files = 0
-        self.devices = set()
         self.path = os.path.join(shot_dir, self.shot_id)
-        self.worker = None
         self.models = ObservableList()
-        self.path_exists = False
         self.load()
-        if os.path.exists(self.path):
-            self.path_exists = True
-            self.count_number_of_files()
+        self.count_number_of_files()
 
     @property
     def nr_of_models(self):

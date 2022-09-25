@@ -292,7 +292,6 @@ class RealityCapture():
         self._delete_xmp_files()
         self.write_xmp_files()
 
-
     def load_markers(self, force_reload=False):
         markers_csv = os.path.join(self.source_folder, "%s_markers.csv" % self.realityCapture_filename)
         if force_reload is True and os.path.exists(markers_csv):
@@ -416,7 +415,6 @@ class RealityCapture():
             center_align = [c_x, c_y, c_z - (BOX_DIMENSIONS[2] / 2)]
             print("new center data", center_align)
             calibrationData.center(center_align)
-
 
     def _read_xmp_files(self):
         camera_data = []

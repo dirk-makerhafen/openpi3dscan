@@ -1,7 +1,7 @@
 import json
 from pyhtmlgui import Observable
 
-from app.settings.settingsScanner import SettingsScanner
+from app.settings.settingsLocations import SettingsLocations
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
 VERSION = "2022.09.24-08.09"
@@ -11,14 +11,14 @@ class Settings(Observable):
     def __init__(self):
         super().__init__()
         self.realityCaptureSettings = SettingsRealityCapture(self)
-        self.settingsScanner = SettingsScanner(self)
+        self.settingsLocations = SettingsLocations(self)
         self.VERSION = VERSION
         self.load()
 
     def save(self):
         data = {
             "realityCaptureSettings" : self.realityCaptureSettings.to_dict(),
-            "settingsScanner" : self.settingsScanner.to_dict()
+            "settingsLocations" : self.settingsLocations.to_dict()
         }
         open("windows.json", "w").write(json.dumps(data))
 
@@ -34,7 +34,7 @@ class Settings(Observable):
         except:
             pass
         try:
-            self.settingsScanner.from_dict(data["settingsScanner"])
+            self.settingsLocations.from_dict(data["settingsLocations"])
         except:
             pass
 

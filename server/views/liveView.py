@@ -141,10 +141,10 @@ class LiveView(PyHtmlView):
                     e.preventDefault();
                     pyview.imageCarousel.rotate_ccw();
                 };
-                if ( e.keyCode ==  190){    // 
-                    e.preventDefault();
-                    pyview.imageCarousel.switch_type();
-                };
+                //if ( e.keyCode ==  190){    // 
+                //    e.preventDefault();
+                //    pyview.imageCarousel.switch_type();
+                //};
             };
         </script>
     </div>   

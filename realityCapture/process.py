@@ -394,8 +394,8 @@ class RealityCapture():
         self._delete_xmp_files()
         first_time_calibration = len(calibrationData.data) == 0
         for data in cam_data:
-            if data["FocalLength35mm"] > 36.2 or data["FocalLength35mm"] < 34.5:
-                print("No adding", data )
+            if data["FocalLength35mm"] > 37 or data["FocalLength35mm"] < 33:
+                #print("No adding", data )
                 continue
             if data["cam_id"] not in self.xmp_exclude:
                 calibrationData.add_data(data["segment"], data["row"], "FocalLength35mm", data["FocalLength35mm"])

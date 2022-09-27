@@ -21,7 +21,6 @@ class SettingsView(PyHtmlView):
         
         {{pyview.locationsSettingsView.render()}}  
         
-        
     </div> 
     
     '''

@@ -18,7 +18,6 @@ from pyhtmlgui import ObservableList
 from app.files.modelFile import ModelFile
 from app.settings.settings import SettingsInstance
 
-SyncThreadPool = ThreadPool(8)
 
 class Shot(Observable):
     def __init__(self, shot_dir, shot_id):

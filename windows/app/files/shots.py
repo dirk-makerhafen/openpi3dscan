@@ -6,13 +6,10 @@ from pyhtmlgui import ObservableList
 from app.files.shot import Shot
 from app.settings.settings import SettingsInstance
 
-SHOT_DIR = "/shots"
-
 # All local and remote Shots
 class Shots:
     def __init__(self):
         self.shots = ObservableList()
-        self.path = "/shots/"
         self.cache = {}
 
     def get(self, shot_id):

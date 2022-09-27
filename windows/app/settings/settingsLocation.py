@@ -43,7 +43,7 @@ class SettingsLocation(Observable):
         self.camera_one_position = data["camera_one_position"]
         self.location = data["location"]
         self.calibration_data = data["calibration_data"]
-
+        return self
 
     def set_markers(self, markers):
         self.markers = markers

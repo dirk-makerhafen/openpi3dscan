@@ -3,7 +3,7 @@ from pyhtmlgui import PyHtmlView
 
 class SettingsScannerView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="SystemRestart">
+    <div class="SettingsScanner">
         <div class="row justify-content-center" style="width:100%">
             <div class="col-md-12">
                 <div class="list-group mb-5 shadow">

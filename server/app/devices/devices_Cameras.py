@@ -19,10 +19,10 @@ class Cameras:
             if device.camera.settings.iso != iso:
                 device.camera.settings.set_iso(iso)
 
-    def set_shutter_speed(self, shutter_speed):
-        for device in self.list():
-            if device.camera.settings.shutter_speed != shutter_speed:
-                device.camera.settings.set_shutter_speed(shutter_speed)
+    #def set_shutter_speed(self, shutter_speed):
+    #    for device in self.list():
+    #        if device.camera.settings.shutter_speed != shutter_speed:
+    #            device.camera.settings.set_shutter_speed(shutter_speed)
 
     def set_meter_mode(self, meter_mode):
         for device in self.list():

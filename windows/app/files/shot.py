@@ -35,6 +35,9 @@ class Shot(Observable):
 
         self.nr_of_files = 0
         self.path = os.path.join(shot_dir, self.shot_id)
+        self.images_path = os.path.join(self.path, "images")
+        if not os.path.exists(os.path.join(self.images_path, "normal")):
+            self.images_path = os.path.join(self.path)
         self.models = ObservableList()
         self.load()
         self.count_number_of_files()
@@ -77,13 +80,30 @@ class Shot(Observable):
     # image_mode = normal | preview , image_type = normal | projection
     def get_image(self, image_type, image_mode, segment, row):
         if image_mode == "normal":
-            folder_name = "images"
+            folder_name = self.images_path
         else:
-            folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+            folder_name = os.path.join(self.path, "preview_images")
+        img_path = os.path.join(folder_name, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+
         if os.path.exists(img_path):
             with open(img_path, "rb") as f:
                 return f.read()
+
+        resolution = [800, 600] if SettingsInstance().settingsScanner.camera_rotation in [0, 180] else [600, 800]
+        if image_mode == "preview":
+            non_preview_img = os.path.join(self.images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+            if os.path.exists(non_preview_img):
+                try:
+                    img = Image.open(non_preview_img)
+                    img = img.resize(resolution)
+                    img.save(img_path, format="jpeg", quality=85)
+                except:
+                    print("Failed to create preview")
+
+        if os.path.exists(img_path):
+            with open(img_path, "rb") as f:
+                return f.read()
+
         return None
 
     def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False):
@@ -121,7 +141,7 @@ class Shot(Observable):
         self.notify_observers()
 
     def count_number_of_files(self):
-        self.nr_of_files = len(glob.glob(os.path.join(self.path, "images", "normal", "*.jpg"))) + len(glob.glob(os.path.join(self.path, "images", "projection", "*.jpg")))
+        self.nr_of_files = len(glob.glob(os.path.join(self.images_path, "normal", "*.jpg"))) + len(glob.glob(os.path.join(self.path, "images", "projection", "*.jpg")))
 
     def save(self):
         if os.path.exists(self.path):

@@ -1,5 +1,6 @@
 from pyhtmlgui import PyHtmlView
 
+from app.settings.settings import SettingsInstance
 from app.tasks.task_CameraBalance import TaskCameraBalanceInstance
 from app.tasks.task_ShutterBalance import TaskShutterBalanceInstance
 from app.tasks.task_Whitebalance import TaskWhitebalanceInstance
@@ -160,7 +161,7 @@ class CameraSettingsView(PyHtmlView):
                         <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Image calibration</div>
                     </div>
                 </div>
-                <div class="list-group-item">
+                <div class="list-group-item" style="display:none">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <strong class="mb-0">Shutter speed (0=Auto)</strong>
@@ -175,7 +176,7 @@ class CameraSettingsView(PyHtmlView):
                         </div>
                     </div>
                 </div> 
-                <div class="list-group-item">
+                <div class="list-group-item" style="display:none">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <strong class="mb-0">Whitebalance gains</strong>
@@ -204,7 +205,44 @@ class CameraSettingsView(PyHtmlView):
                         </div>
                         <div class="col-md-2">{{pyview.camerabalance_view.render()}}</div>
                     </div>
-                </div>                    
+                </div>  
+                <div class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <table id="calibrationtable" class="table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        {% for i in range(pyview.settings_scanner.segments) %}
+                                            <th>SEG{{loop.index}}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Shutter</td>
+                                        {% for i in range(pyview.settings_scanner.segments) %}
+                                            <td> {{ pyview.subject.per_segment_shutter_speeds[i] }} </td>
+                                        {% endfor %}
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td>Red</td>
+                                        {% for i in range(pyview.settings_scanner.segments) %}
+                                            <td> {{ pyview.subject.per_segment_awb_gains[i][0] }} </td>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <td>Blue</td>
+                                        {% for i in range(pyview.settings_scanner.segments) %}
+                                            <td> {{ pyview.subject.per_segment_awb_gains[i][1] }} </td>
+                                        {% endfor %}
+                                    </tr>
+                                </tbody>
+                            </table>  
+                        </div>    
+                    </div>
+                </div>                   
             </div>
         </div>
     </div>
@@ -215,6 +253,7 @@ class CameraSettingsView(PyHtmlView):
         self.whitebalance_view = TaskWhitebalanceView(TaskWhitebalanceInstance(), self)
         self.shutterbalance_view = TaskShutterBalanceView(TaskShutterBalanceInstance(), self)
         self.camerabalance_view = TaskCameraBalanceView(TaskCameraBalanceInstance(), self)
+        self.settings_scanner = SettingsInstance().settingsScanner
 
     def _set_awb_gain_red(self, value):
         gains = self.subject.awb_gains

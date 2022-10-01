@@ -1,3 +1,20 @@
+import glob
+
+try:
+    RCEXE = glob.glob("C:\*\Capturing Reality\RealityCapture\RealityCapture.exe")[0]
+except:
+    print("################")
+    print("RealityCapture.exe not found, install RealityCapture to your Program directory")
+    input('')
+    exit(1)
+
+try:
+    CHROMEXE = glob.glob("C:\*\Google\Chrome\Application")[0]
+except:
+    print("################")
+    print("Google Chrome not found, install Chrome to your Program directory")
+    input('')
+    exit(1)
 
 box_rcbox = '''
 <ReconstructionRegion globalCoordinateSystem="NONE" globalCoordinateSystemWkt="NONE" globalCoordinateSystemName="NONE"

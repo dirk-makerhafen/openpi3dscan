@@ -3,10 +3,12 @@ import json
 import os
 import shutil
 import socket
+import threading
 import time
 import traceback
 
 import requests
+from pyhtmlgui import Observable, ObservableList
 
 
 class WebAPI():
@@ -96,9 +98,29 @@ class WebAPI():
 
 
 
-class Processing():
+class Processing(Observable):
     def __init__(self):
+        super().__init__()
         self._setup()
+        self.status = "idle"
+        self.processing_tasks = ObservableList()
+        self.worker = threading.Thread(target=self.loop, daemon=True)
+        self.worker.start()
+
+    def loop(self):
+        while True:
+            rr = self._request_remote()
+            rl = self._request_local()
+            if rr == False and rl == False:
+                print("no results, waiting some time ")
+                self.set_status("waiting")
+                time.sleep(30)
+
+
+    def set_status(self, status):
+        if self.status != status:
+            self.status = status
+            self.notify_observers()
 
     def _setup(self):
         if not os.path.exists(CACHE_DIR):
@@ -116,13 +138,14 @@ class Processing():
                 print("Failed to resolve server IP")
             time.sleep(1)
 
-    def localloop(self):
-        for model in ShotsInstance().get_unprocessed_models(limit=1):
+    def _request_local(self):
+        self.set_status("requesting_local")
+        models = ShotsInstance().get_unprocessed_models(limit=1)
+        if len(models) == 0:
+            self.set_status("idle")
+            return False
+        for model in models:
             shot = model.parentShot
-            model = model.to_dict()
-            model["shot_id"] = shot.shot_id
-            model["shot_name"] = shot.name
-
             location = SettingsInstance().locations.get_by_location(shot.location)
             calibrationData = json.loads(location.calibration_data)
             markers, distances = self._parse_markers_str(location.markers)
@@ -141,65 +164,78 @@ class Processing():
                 pin=SettingsInstance().realityCaptureSettings.pin,
                 box_dimensions= [location.diameter, location.diameter, location.height]
             )
+            self.set_status("processing")
+            self.processing_tasks.insert(0, rc )
+            model_result_path = None
+            try:
+                model_result_path = rc.process()
+            except Exception as e:
+                traceback.print_exc()
+                print(e)
+                print("Failed to process", e)
+        self.set_status("idle")
+        return True
 
-
-    def loop(self):
+    def _request_remote(self):
+        self.set_status("requesting_remote")
         api = WebAPI()
-        while True:
-            data = api.get_unprocessed_models()
+        data = api.get_unprocessed_models()
 
-            if len(data["models"]) == 0:
-                print("Nothing to do, waiting some time")
-                time.sleep(45)
+        if len(data["models"]) == 0:
+            self.set_status("idle")
+            return False
+
+        calibrationData = json.loads(data["calibration"])
+        markers, distances = self._parse_markers_str(data["markers"])
+
+        for model in data["models"]:
+            api.processing(model["shot_id"], model["model_id"])
+            self._clean_shot_dir()
+            self.set_status("download")
+            shot_path = api.download_shot(model["shot_id"])
+            if shot_path is None:
+                api.process_failed(model["shot_id"], model["model_id"])
                 continue
+            rc = RealityCapture(
+                source_folder=shot_path,
+                shot_name=model["shot_name"],
+                filetype=model["filetype"],
+                reconstruction_quality=model["reconstruction_quality"],
+                quality=model["quality"],
+                create_mesh_from=model["create_mesh_from"],
+                create_textures=model["create_textures"],
+                calibrationData=calibrationData,
+                markers=markers,
+                distances=distances,
+                pin=data["pin"],
+                box_dimensions=data["box_dimensions"]
+            )
+            self.set_status("processing")
+            self.processing_tasks.insert(0, rc)
+            model_result_path = None
+            try:
+                model_result_path = rc.process()
+            except Exception as e:
+                traceback.print_exc()
+                print(e)
+                print("Failed to process", e)
 
-            calibrationData = json.loads(data["calibration"])
-            markers, distances = self._parse_markers_str(data["markers"])
+            if model_result_path is not None:
+                api.upload_calibration_data()
+                api.upload_model(model["shot_id"], model["model_id"], model_result_path)
+                if self.parent.debug is False:
+                    os.remove(model_result_path)
+            else:
+                api.process_failed(model["shot_id"], model["model_id"])
+                if self.parent.debug is False and os.path.exists(shot_path):
+                    print("Not caching shot %s" % shot_path)
+                    try:
+                        shutil.rmtree(shot_path)
+                    except:
+                        print("Failed to delete %s" % shot_path)
+        self.set_status("idle")
+        return True
 
-            for model in data["models"]:
-                api.processing(model["shot_id"], model["model_id"])
-                self._clean_shot_dir()
-                shot_path = api.download_shot(model["shot_id"])
-                if shot_path is None:
-                    api.process_failed(model["shot_id"], model["model_id"])
-                    continue
-
-                rc = RealityCapture(
-                    source_folder=shot_path,
-                    shot_name=model["shot_name"],
-                    filetype=model["filetype"],
-                    reconstruction_quality=model["reconstruction_quality"],
-                    quality=model["quality"],
-                    create_mesh_from=model["create_mesh_from"],
-                    create_textures=model["create_textures"],
-                    calibrationData=calibrationData,
-                    markers=markers,
-                    distances=distances,
-                    pin=data["pin"],
-                    box_dimensions=data["box_dimensions"]
-                )
-
-                model_result_path = None
-                try:
-                    model_result_path = rc.process()
-                except Exception as e:
-                    traceback.print_exc()
-                    print(e)
-                    print("Failed to process", e)
-
-                if model_result_path is not None:
-                    api.upload_calibration_data()
-                    api.upload_model(model["shot_id"], model["model_id"], model_result_path)
-                    if DEBUG is False:
-                        os.remove(model_result_path)
-                else:
-                    api.process_failed(model["shot_id"], model["model_id"])
-                    if DEBUG is False and os.path.exists(shot_path):
-                        print("Not caching shot %s" % shot_path)
-                        try:
-                            shutil.rmtree(shot_path)
-                        except:
-                            print("Failed to delete %s" % shot_path)
 
     def _clean_shot_dir(self):
         shots = []

@@ -1,7 +1,6 @@
 from pyhtmlgui import Observable
 import os, glob
 
-from app.realityCapture.configfiles import XMPSettings_xml
 
 class XMPData(Observable):
     def __init__(self, parent):
@@ -13,6 +12,7 @@ class XMPData(Observable):
     def run(self):
         self._run_rc()
         self._read_xmp_files()
+        return len(self.xmp_data) > 50
 
     def _run_rc(self):
         cmd = self.parent.get_cmd_start()
@@ -56,6 +56,7 @@ class XMPData(Observable):
                     pass
 
             self.xmp_data.append(cam_data)
+
 
     def clear(self):
         for path in glob.glob(os.path.join(self.parent.images_path, "*", "*.xmp")):

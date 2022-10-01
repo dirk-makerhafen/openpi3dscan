@@ -1,7 +1,9 @@
+import time
+
 from pyhtmlgui import Observable
 import os
 
-class Subtask_Alignment(Observable):
+class RC_Alignment(Observable):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
@@ -9,14 +11,20 @@ class Subtask_Alignment(Observable):
         self.box_center_correction = [0,0,0]
         self.alignments_csv = parent.get_workfiles_path("alignments.cvs")
         self.rc_proj_file = parent.get_filepath("realityCapture.rcproj")
+        self.status = "idle" # failed_ask_abort, repeat, success, failed
+        self.alignments_recreated = False
 
     def run(self):
         self._load_alignments_csv()
-        if len(self.alignments) < 10:
-            self._create_alignments()
+        if len(self.alignments) >= 50:
+            self.alignments_recreated = False
+            self.parent.addlog(["alignments", '%s alignments loaded from cached "%s"' % (len(self.alignments), self.alignments_csv)])
+            return True
 
-        if len(self.alignments) > 10:
-            self.parent.subtask_xmp.run()
+        result = self._create_alignments()
+
+        #if len(self.alignments) > 50:
+        #    self.parent.subtask_xmp.run()
 
         # xport xmp
         # list cameras with wrong focal distance
@@ -29,24 +37,36 @@ class Subtask_Alignment(Observable):
         # if new alignemnts created:
         #  addto calibration
         print("%s alignments loaded" % len(self.alignments))
+        return result
 
 
     def _create_alignments(self):
-        while len(self.alignments) < 10:
+        while len(self.alignments) < 50:
             self.clear()
             self._run_rc()
             self._load_alignments_csv()
-            if len(self.alignments) < 10:
+            if len(self.alignments) >= 50:
+                self.alignments_recreated = True
+                self.parent.addlog( ["alignments", '%s alignments loaded from "%s"' % (len(self.alignments), self.alignments_csv)])
+                return True
+            else:
+                self.parent.addlog( ["alignments", 'alignments  failed, %s alignments found in "%s", expecting at least 50' % (len(self.alignments), self.alignments_csv)])
+                self.set_status("failed_ask_abort")
+                while self.status == "failed_ask_abort":
+                    time.sleep(1)
                 self.clear()
-                print("No alignments ask continue, break?")
-                result = False
-                if result == True:
+                if self.status != "repeat":
                     break
+                self.parent.addlog(["alignments", 'Repeating alignment'])
+        self.clear()
+        return False
+
 
     def _run_rc(self):
+        self.parent.addlog(["alignments", 'Starting alignment'])
         cmd = self.parent.get_cmd_start()
         cmd += self.parent.get_cmd_new_scene()
-        cmd += '-align '
+        #cmd += '-align '
         cmd += '-detectMarkers "%s\\tmp\\DetectMarkersParams.xml" ' % self.parent.source_path
         for m1m2d in self.parent.subtask_markers.get_available_distances():
             marker1, marker2, distance = m1m2d
@@ -62,11 +82,13 @@ class Subtask_Alignment(Observable):
         cmd += '-exportRegistration "%s" "%s\\tmp\\exportRegistrationSettings.xml" ' % self.parent.source_path
         cmd += '-save "%s" ' % (self.rc_proj_file)
         cmd += '-quit '
+        self.parent.addlog(["alignments", 'Command: %s' % cmd])
         self.parent.run_command(cmd, "load_alignments")
 
     def _load_alignments_csv(self):
         self.alignments = []
         if os.path.exists(self.alignments_csv):
+            self.parent.addlog(["alignments", 'Loading alignments from "%s"' % self.alignments_csv])
             with open(self.alignments_csv, "r") as f:
                 for line in f.read().split("\n"):
                     if line.startswith("#") or len(line) < 10:
@@ -74,21 +96,31 @@ class Subtask_Alignment(Observable):
                     al = line.split(",")
                     al = [al[0], float(al[1]), float(al[2]), float(al[3]), None]
                     self.alignments.append(al)
-        print("%s alignments loaded" % len(self.alignments))
+        else:
+            self.parent.addlog(["alignments", 'No alignments file exists at "%s"' % self.alignments_csv])
+
         c_x = (max([x[1] for x in self.alignments]) + min([x[1] for x in self.alignments])) / 2
         c_y = (max([x[2] for x in self.alignments]) + min([x[2] for x in self.alignments])) / 2
         c_z = (max([x[3] for x in self.alignments]) + min([x[3] for x in self.alignments])) / 2
 
-        avg_x = sum([x[1] for x in self.alignments]) / len(self.alignments)
-        avg_y = sum([x[2] for x in self.alignments]) / len(self.alignments)
-        avg_z = sum([x[3] for x in self.alignments]) / len(self.alignments)
+        #avg_x = sum([x[1] for x in self.alignments]) / len(self.alignments)
+        #avg_y = sum([x[2] for x in self.alignments]) / len(self.alignments)
+        #avg_z = sum([x[3] for x in self.alignments]) / len(self.alignments)
         # print("avg", avg_x, avg_y, avg_z)
+        c_z = c_z - (self.parent.box_dimensions[2] / 2)
         self.box_center_correction = [c_x, c_y, c_z]
-        print("Box center corrections:", c_x, c_y, c_z)
+        self.parent.addlog(["alignments", "Box center corrections: %s,%s,%s" % (c_x, c_y, c_z)])
 
     def clear(self):
+        self.parent.addlog(["alignments", 'Clearing alignments'])
         if os.path.exists(self.alignments_csv):
             os.remove(self.alignments_csv)
         if os.path.exists(self.rc_proj_file):
             os.remove(self.rc_proj_file)
         self.alignments = []
+        self.box_center_correction = [0, 0, 0]
+
+    def set_status(self, status):
+        if self.status != status:
+            self.status = status
+            self.notify_observers()

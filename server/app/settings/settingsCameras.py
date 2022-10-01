@@ -13,6 +13,8 @@ class SettingsCameras(Observable):
         self._meter_mode = 'backlit'  # 'average','spot','backlit','matrix'
         self._awb_mode = 'auto'  # 'off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         self._awb_gains = [1, 1]
+        self._per_segment_shutter_speeds = []
+        self._per_segment_awb_gains = []
 
     def _get_quality(self):
         return self._quality
@@ -43,8 +45,36 @@ class SettingsCameras(Observable):
         self._shutter_speed = value
         self.save()
         self.notify_observers()
-        self.parent.devicesInstance.cameras.set_shutter_speed(value)
+        #self.parent.devicesInstance.cameras.set_shutter_speed(value)
     shutter_speed = property(_get_shutter_speed, _set_shutter_speed)
+
+    def _get_per_segment_shutter_speeds(self):
+        return self._per_segment_shutter_speeds
+
+    def _set_per_segment_shutter_speeds(self, values):
+        self._per_segment_shutter_speeds = values
+        self.save()
+        self.notify_observers()
+        for i in range(len( self._per_segment_shutter_speeds)):
+            cameras = self.parent.devicesInstance.get_cameras_by_segment(i + 1)
+            for device in cameras:
+                if abs(device.camera.settings.shutter_speed- self._per_segment_shutter_speeds[i]) > 10:
+                     device.camera.settings.set_shutter_speed(self._per_segment_shutter_speeds[i])
+    per_segment_shutter_speeds = property(_get_per_segment_shutter_speeds, _set_per_segment_shutter_speeds)
+
+    def _get_per_segment_awb_gains(self):
+        return self._per_segment_awb_gains
+
+    def _set_per_segment_awb_gains(self, values):
+        self._per_segment_awb_gains = values
+        self.save()
+        self.notify_observers()
+        for i in range(len( self._per_segment_awb_gains)):
+            cameras = self.parent.devicesInstance.get_cameras_by_segment(i + 1)
+            for device in cameras:
+                if abs(device.camera.settings.awb_gains[0]- self._per_segment_awb_gains[i][0]) >  0.01 or abs(device.camera.settings.awb_gains[1]- self._per_segment_awb_gains[i][1]) >  0.01 :
+                     device.camera.settings.set_awb_gains(self._per_segment_awb_gains[i])
+    per_segment_awb_gains = property(_get_per_segment_awb_gains, _set_per_segment_awb_gains)
 
     def _get_exposure_mode(self):
         return self._exposure_mode
@@ -94,6 +124,8 @@ class SettingsCameras(Observable):
             "meter_mode": self.meter_mode,
             "awb_mode": self.awb_mode,
             "awb_gains": self.awb_gains,
+            "per_segment_shutter_speeds": self.per_segment_shutter_speeds,
+            "per_segment_awb_gains": self.per_segment_awb_gains,
         }
 
     def from_dict(self, data):
@@ -105,5 +137,7 @@ class SettingsCameras(Observable):
             self.awb_mode = data["awb_mode"]
             self.awb_gains = data["awb_gains"]
             self.quality = data["quality"]
+            self.per_segment_shutter_speeds = data["per_segment_shutter_speeds"]
+            self.per_segment_awb_gains = data["per_segment_awb_gains"]
         except:
             pass

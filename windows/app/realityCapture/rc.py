@@ -10,18 +10,17 @@ from multiprocessing.pool import ThreadPool
 from pyhtmlgui import Observable
 import os, json
 
-from app.realityCapture.configfiles import DetectMarkersParams_xml, box_rcbox, ExportRegistrationSettings_xml, XMPSettings_xml
-
-from app.realityCapture.data_calibration import CalibrationData
-from app.realityCapture.task_markers import Subtask_Markers
-from app.realityCapture.task_alignments import Subtask_Alignment
-from app.realityCapture.task_reconstruction import Subtask_Reconstruction
-from app.realityCapture.task_export import Subtask_Export
-from app.realityCapture.data_xmp import XMPData
+from .rc_files import DetectMarkersParams_xml, box_rcbox, ExportRegistrationSettings_xml, XMPSettings_xml, RCEXE
+from .data_calibration import CalibrationData
+from .rc_markers import RC_Markers
+from .rc_alignments import RC_Alignment
+from .rc_reconstruction import RC_Reconstruction
+from .rc_export import RC_Export
+from .data_xmp import XMPData
 
 
 class RealityCapture():
-    def __init__(self, source_folder, shot_name, filetype, reconstruction_quality, export_quality, create_mesh_from, create_textures,calibrationData, markers, distances, pin, box_dimensions):
+    def __init__(self, source_folder, shot_name, filetype, reconstruction_quality, export_quality, create_mesh_from, create_textures,calibrationData, markers, distances, pin, box_dimensions, debug=False):
         self.source_folder = os.path.abspath(source_folder)
         self.workfiles_path = os.path.join(self.source_folder, "tmp")
         self.images_path = os.path.join(self.source_folder, "images")
@@ -39,9 +38,9 @@ class RealityCapture():
         self.export_quality = export_quality
         self.create_mesh_from = create_mesh_from
         self.create_textures = create_textures
-        self.calibrationData = calibrationData
         self.pin = pin
         self.box_dimensions = box_dimensions
+        self.debug = debug
 
         self.reconstruction_quality_str = self.reconstruction_quality[0].upper()
         self.quality_str = self.export_quality[0].upper()
@@ -50,13 +49,16 @@ class RealityCapture():
         self.export_filename = "%s_%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.fileextension)
         self.export_foldername = "%s_%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.filetype)
 
-        self.calibrationData = CalibrationData(self, calibrationData)
+        self.calibrationdata = CalibrationData(self, calibrationData)
         self.xmpdata = XMPData(self)
+        self.rc_markers = RC_Markers(self, markers, distances)
+        self.rc_alignment = RC_Alignment(self)
+        self.rc_reconstruction = RC_Reconstruction(self)
+        self.rc_export = RC_Export(self)
+        self.logs = []
 
-        self.subtask_markers = Subtask_Markers(self, markers, distances)
-        self.subtask_alignment = Subtask_Alignment(self)
-        self.subtask_reconstruction = Subtask_Reconstruction(self)
-        self.subtask_export = Subtask_Export(self)
+    def addlog(self, log):
+        self.logs.insert(0, log)
 
     def get_source_path(self, basename):
         return os.path.join(self.source_folder, "%s%s%s_%s" % (self.reconstruction_quality_str, self.create_mesh_from_str, self.create_textures_str, basename))
@@ -68,23 +70,27 @@ class RealityCapture():
         self.prepare_folders()
         #first_time_calibration = len(calibrationData.data) == 0
 
-        if self.subtask_markers.run() is False:
+        if self.rc_markers.run() is False:
             return None
 
-        if self.subtask_alignment.run() is False:
+        if self.calibrationdata.write_as_xmp() is False:
             return None
 
-        if self.subtask_reconstruction.run() is False:
+        if self.rc_alignment.run() is False:
             return None
 
-        if self.subtask_export.run() is False:
+        if self.rc_reconstruction.run() is False:
             return None
 
+        if self.rc_export.run() is False:
+            return None
 
-        if self.alignments_were_recreated is True:
-            self.calibrationData.add_from_xmp(self.xmpdata.xmp_data)
+        if self.rc_alignment.alignments_recreated is True:
+            if self.xmpdata.run() is False:
+                return None
+            self.calibrationdata.add_from_xmp(self.xmpdata.xmp_data)
 
-        if DEBUG is False:
+        if self.debug is False:
             try:
                 shutil.rmtree(os.path.join(self.source_folder, self.export_foldername))
             except:
@@ -113,7 +119,6 @@ class RealityCapture():
         except:
             pass
         self.xmpdata.clear()
-        self.calibrationData.write_as_xmp()
 
 
     def _clean_shot_name(self, name):

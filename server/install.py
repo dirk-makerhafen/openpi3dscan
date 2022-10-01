@@ -88,6 +88,8 @@ if __name__ == "__main__":
     shell("cat /etc/ntp.conf | grep -v 192.168.99.0 |grep -v de.pool.ntp.org > 1")
     shell("echo 'restrict 192.168.99.0 mask 255.255.255.0 nomodify notrap' >> 1")
     shell("echo 'server de.pool.ntp.org prefer' >> 1")
+    shell("echo 'server 127.127.1.0' >> 1")
+    shell("echo 'fudge  127.127.1.0 stratum 10' >> 1")
     shell("sudo mv 1 /etc/ntp.conf")
     shell("sudo systemctl enable ntp")
     shell("sudo service ntp restart")

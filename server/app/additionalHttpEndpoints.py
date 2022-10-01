@@ -127,7 +127,7 @@ class HttpEndpoints:
             return bottle.HTTPResponse(status=404)
         headers = {
             'Content-Type': "application/%s" % filename.split(".")[-1],
-            'Content-Disposition': 'attachment; filename="%s"' % model.filename,
+            'Content-Disposition': 'attachment; filename="%s"' % filename,
             'Cache-Control': "public, max-age=3600"
         }
         with zipfile.ZipFile(model.get_path(), 'r') as zip_ref:

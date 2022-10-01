@@ -1,4 +1,4 @@
-from app.settings.settingsLocation import SettingsLocation
+from .settingsLocation import SettingsLocation
 from pyhtmlgui import Observable, ObservableList
 
 

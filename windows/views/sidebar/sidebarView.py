@@ -17,9 +17,6 @@ class SidebarButtonsView(PyHtmlView):
     <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.devicesView %} selected {% endif %}" onclick='pyview.parent.show_devices();'>
         Tasks
     </div>
-    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.liveView %} selected {% endif %}" onclick='pyview.parent.show_liveview();'>
-       Shots
-    </div>
     <div class="col-md-12 item" style="height:3px"'> </div> 
     '''
 

@@ -107,11 +107,16 @@ class Devices(Observable):
 
                 if data["TYPE"] == "camera":
                     if device.camera.settings.locked is False:
+                        segment = int(device.name.split("-")[0].replace("SEG", ""))
 
                         if "awb_gains" in data:
+                            try:
+                                target_awb_gains = SettingsInstance().cameraSettings.per_segment_awb_gains[segment-1]
+                            except:
+                                target_awb_gains = SettingsInstance().cameraSettings.awb_gains
                             device.camera.settings.awb_gains = data["awb_gains"]
-                            if abs(SettingsInstance().cameraSettings.awb_gains[0] - data["awb_gains"][0]) > 0.01 or abs(SettingsInstance().cameraSettings.awb_gains[1] - data["awb_gains"][1]) > 0.01:
-                                device.camera.settings.set_awb_gains(SettingsInstance().cameraSettings.awb_gains)
+                            if abs(target_awb_gains[0] - data["awb_gains"][0]) > 0.01 or abs(target_awb_gains[1] - data["awb_gains"][1]) > 0.01:
+                                device.camera.settings.set_awb_gains(target_awb_gains)
                         if "analog_gain" in data:
                             device.camera.settings.analog_gain = data["analog_gain"]
                         if "digital_gain" in data:
@@ -120,8 +125,12 @@ class Devices(Observable):
                             device.camera.settings.exposure_speed = data["exposure_speed"]
                         if "quality" in data:
                             device.camera.settings.quality = data["quality"]
-                        if "shutter_speed" in data and abs(data["shutter_speed"] - SettingsInstance().cameraSettings.shutter_speed) > 100:
-                            device.camera.settings.set_shutter_speed(SettingsInstance().cameraSettings.shutter_speed)
+                        try:
+                          target_shutter_speed = SettingsInstance().cameraSettings.per_segment_shutter_speeds[segment-1]
+                        except:
+                            target_shutter_speed = SettingsInstance().cameraSettings.shutter_speed
+                        if "shutter_speed" in data and abs(data["shutter_speed"] - target_shutter_speed) > 100:
+                            device.camera.settings.set_shutter_speed(target_shutter_speed)
                         if "meter_mode" in data and data["meter_mode"] != SettingsInstance().cameraSettings.meter_mode:
                             device.camera.settings.set_meter_mode(SettingsInstance().cameraSettings.meter_mode)
                         if "iso" in data and data["iso"] != SettingsInstance().cameraSettings.iso:

@@ -6,11 +6,14 @@ from pyhtmlgui import ObservableList
 from app.files.shot import Shot
 from app.settings.settings import SettingsInstance
 
+SHOT_DIR = "/Users/1/Downloads/"
+
 # All local and remote Shots
 class Shots:
     def __init__(self):
         self.shots = ObservableList()
         self.cache = {}
+        self.load_shots_from_disk()
 
     def get(self, shot_id):
         try:
@@ -51,8 +54,8 @@ class Shots:
             print("shot not found")
 
     def load_shots_from_disk(self):
-        for path in glob.glob("/shots/*"):
-            if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images")) :
+        for path in glob.glob(os.path.join(SHOT_DIR, "2022*")):
+            if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images")) or os.path.exists(os.path.join(path, "projection")):
                 shot_id = path.split("/")[-1]
                 shot = self.get(shot_id)
                 if shot is None:

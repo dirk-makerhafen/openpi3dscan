@@ -1,21 +1,38 @@
 import os, sys
 from selenium import webdriver
 import time
-import glob
+import glob, shutil
 from multiprocessing.pool import ThreadPool
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+SCRIPT_DIR = os.path.dirname(sys.argv[0])
+
+print(SCRIPT_DIR)
 INPUT_FILE = sys.argv[-1]
 if not INPUT_FILE.endswith(".glb"):
-    print("%s is not a glb file")
+    print("%s is not a glb file" % INPUT_FILE)
+    time.sleep(10)
     exit(1)
 
-OUTPUT_FILE = "%s.gif" % INPUT_FILE[:-4]
 
 class glb2gif():
 
-    def convert(self, glb_path, output_path):
+    def convert(self, input_file):
+        try:
+            path = os.path.dirname(os.path.abspath(input_file))
+            tmp_path = os.path.join(path, "_tmp")
+            if os.path.exists(tmp_path):
+                shutil.rmtree(tmp_path)
+            os.mkdir(tmp_path)
+            self.glb_to_images(input_file, tmp_path)
+            glbfile = "%s.gif" % input_file[:-4]
+            self.screenshots_to_animation(tmp_path,glbfile ,"gif")
+        except Exception as e:
+            print(e)
+        if os.path.exists(tmp_path):
+            shutil.rmtree(tmp_path)
+        
+    def glb_to_images(self, glb_path, output_path):
         options = webdriver.ChromeOptions()
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-web-security")
@@ -38,7 +55,7 @@ class glb2gif():
             time.sleep(0.3)
         browser.close()
 
-    def _screenshots_to_animation(self, path, output_file, filetype):
+    def screenshots_to_animation(self, path, output_file, filetype):
         files = glob.glob(os.path.join(path, "screenshot_*.png"))
         if len(files) == 0:
             print("no screenshots found")
@@ -47,20 +64,20 @@ class glb2gif():
         size = 1100
 
         def f(file):
-            os.system('mogrify.exe -resize %sx "%s"' % (size, file))
-            os.system('mogrify.exe -crop %sx%s+100+100 +repage "%s"' % (size - 130, size - 100, file))
-            os.system('optipng.exe -clobber "%s"' % file)
-            os.system('convert.exe "%s" "%s"' % (file, "%s.gif" % file[:-4]))
+            os.system('%s -resize %sx "%s"' % (os.path.join(SCRIPT_DIR, "mogrify.exe"), size, file))
+            os.system('%s -crop %sx%s+100+100 +repage "%s"' % (os.path.join(SCRIPT_DIR, "mogrify.exe"), size - 130, size - 100, file))
+            os.system('%s -clobber "%s"' % (os.path.join(SCRIPT_DIR, "optipng.exe"), file))
+            os.system('%s "%s" "%s"' % (os.path.join(SCRIPT_DIR, "convert.exe"), file, "%s.gif" % file[:-4]))
 
         ThreadPool(8).map(f, files)
         total_duration = 400  # in 1/100s of seconds
         delay = int(round(total_duration / len(files), 0))
-        os.system('gifsicle.exe --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s\\tmp.gif" ' % (delay, path, path))
+        os.system('%s --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s\\tmp.gif" ' % (os.path.join(SCRIPT_DIR, "gifsicle.exe"), delay, path, path))
         if os.path.exists(os.path.join(path, "tmp.gif")):
             if filetype == "gif":
                 os.rename(os.path.join(path, "tmp.gif"), output_file)
             if filetype == "webp":
-                os.system('convert.exe "%s\\tmp.gif" "%s"' % (path, output_file))
+                os.system('%s "%s\\tmp.gif" "%s"' % (os.path.join(SCRIPT_DIR, "convert.exe"), path, output_file))
 
         for f in glob.glob(os.path.join(path, "screenshot_*.*")):
             os.remove(f)
@@ -69,4 +86,5 @@ class glb2gif():
 
 
 instance = glb2gif()
-instance.convert(INPUT_FILE, OUTPUT_FILE)
+instance.convert(INPUT_FILE)
+

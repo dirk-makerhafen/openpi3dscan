@@ -199,7 +199,7 @@ class CameraSettingsView(PyHtmlView):
                 </div>   
                 <div class="list-group-item">
                     <div class="row align-items-center">
-                        <div class="col-md-8">
+                        <div class="col-md-10">
                             <strong class="mb-0">Auto calibrate</strong>
                             <p class="text-muted mb-0">Automatically set shutter speed and whitebalance gains.</p>
                         </div>

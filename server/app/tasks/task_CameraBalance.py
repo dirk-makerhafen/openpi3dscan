@@ -55,38 +55,48 @@ class Task_CameraBalance(Observable):
         results_awg_gains = []
         cameras_exposure_speed = {}
         cameras_awb_gains = {}
-        with ThreadPool(20) as p:
-            for _ in range(5):
-                results_exposure_speed.append(p.map_async(lambda device: device.camera.settings.get_exposure_speed(), cameras))
-                results_awg_gains.append(p.map_async(lambda device: device.camera.settings.get_awb_gains(), cameras))
-                time.sleep(1)
-        for index, r in enumerate(results_exposure_speed):
-            results_exposure_speed[index] = r.get()
-        for index, r in enumerate(results_awg_gains):
-            results_awg_gains[index] = r.get()
-        for index, camera in enumerate(cameras):
-            r = [r[index] for r in results_exposure_speed if r[index] is not None and r[index] > 0 ]
-            if len(r) == 0: continue
-            cameras_exposure_speed[camera.name] = sum(r) / len(r)
-            r = [r[index] for r in results_awg_gains if r[index] is not None and r[index][0] > 0 and r[index][1] > 0]
-            if len(r) == 0: continue
-            cameras_awb_gains[camera.name] = [sum([g[0] for g in r]) / len(r), sum([g[1] for g in r]) / len(r)]
 
-        per_segment_exposure_speeds, per_segment_awb_gains = self._calculate(cameras_exposure_speed, cameras_awb_gains)
+        try:
+            with ThreadPool(20) as p:
+                for _ in range(5):
+                    results_exposure_speed.append(p.map_async(lambda device: device.camera.settings.get_exposure_speed(), cameras))
+                    results_awg_gains.append(p.map_async(lambda device: device.camera.settings.get_awb_gains(), cameras))
+                    time.sleep(1)
+            for index, r in enumerate(results_exposure_speed):
+                results_exposure_speed[index] = r.get(timeout=30)
+            for index, r in enumerate(results_awg_gains):
+                results_awg_gains[index] = r.get(timeout=30)
+            for index, camera in enumerate(cameras):
+                r = [r[index] for r in results_exposure_speed if r[index] is not None and r[index] > 0 ]
+                if len(r) == 0: continue
+                cameras_exposure_speed[camera.name] = sum(r) / len(r)
+                r = [r[index] for r in results_awg_gains if r[index] is not None and r[index][0] > 0 and r[index][1] > 0]
+                if len(r) == 0: continue
+                cameras_awb_gains[camera.name] = [sum([g[0] for g in r]) / len(r), sum([g[1] for g in r]) / len(r)]
+        except Exception as e:
+            print("Failed1:", e)
+
+        try:
+            per_segment_exposure_speeds, per_segment_awb_gains = self._calculate(cameras_exposure_speed, cameras_awb_gains)
+        except Exception as e:
+            print("Failed2:", e)
 
         # set awb_mode to off
         for device in cameras:
             device.camera.settings.set_exposure_mode("off")
             device.camera.settings.set_awb_mode("off")
 
-        SettingsInstance().cameraSettings.per_segment_shutter_speeds = per_segment_exposure_speeds
-        SettingsInstance().cameraSettings.per_segment_awb_gains = per_segment_awb_gains
+        try:
+            SettingsInstance().cameraSettings.per_segment_shutter_speeds = per_segment_exposure_speeds
+            SettingsInstance().cameraSettings.per_segment_awb_gains = per_segment_awb_gains
 
-        time.sleep(3)
-        for device in cameras:
-            device.camera.settings.locked = False
-        with ThreadPool(10) as p:
-            p.map_async(lambda device: device.camera.settings.get_exposure_speed(), cameras)
+            time.sleep(3)
+            for device in cameras:
+                device.camera.settings.locked = False
+            with ThreadPool(10) as p:
+                p.map_async(lambda device: device.camera.settings.get_exposure_speed(), cameras)
+        except Exception as e:
+            print("Failed2:", e)
         self.set_status("idle")
         self.worker = None
 
@@ -132,8 +142,11 @@ class Task_CameraBalance(Observable):
             badcameras.extend(cameras[:2])
             badcameras.extend(cameras[-2:])
 
-            cameras = [ c for c in cameras if c not in badcameras and (c.status == "online" or c.status == "warmup")]
-
+            cameras1 = [ c for c in cameras if c not in badcameras and (c.status == "online" or c.status == "warmup")]
+            if len(cameras1) == 0:
+                cameras = [c for c in cameras if (c.status == "online" or c.status == "warmup")]
+            else:
+                cameras = cameras1
             avg_exposure_speed = int(sum([cameras_exposure_speed[c.name] for c in cameras] ) / len(cameras))
             per_segment_exposure_speeds.append(avg_exposure_speed)
 

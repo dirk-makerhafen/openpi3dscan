@@ -66,7 +66,7 @@ class RC_Alignment(Observable):
         self.parent.addlog(["alignments", 'Starting alignment'])
         cmd = self.parent.get_cmd_start()
         cmd += self.parent.get_cmd_new_scene()
-        #cmd += '-align '
+        cmd += '-align '
         cmd += '-detectMarkers "%s\\tmp\\DetectMarkersParams.xml" ' % self.parent.source_path
         for m1m2d in self.parent.subtask_markers.get_available_distances():
             marker1, marker2, distance = m1m2d

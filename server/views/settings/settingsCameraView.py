@@ -221,21 +221,21 @@ class CameraSettingsView(PyHtmlView):
                                 <tbody>
                                     <tr>
                                         <td>Shutter</td>
-                                        {% for i in range(pyview.settings_scanner.segments) %}
-                                            <td> {{ pyview.subject.per_segment_shutter_speeds[i] }} </td>
+                                        {% for per_segment_shutter_speed in pyview.subject.per_segment_shutter_speeds %}
+                                            <td> {{ per_segment_shutter_speed }} </td>
                                         {% endfor %}
                                         
                                     </tr>
                                     <tr>
                                         <td>Red</td>
-                                        {% for i in range(pyview.settings_scanner.segments) %}
-                                            <td> {{ pyview.subject.per_segment_awb_gains[i][0] }} </td>
+                                        {% for per_segment_awb_gains_red in pyview.subject.per_segment_awb_gains %}
+                                            <td> {{ per_segment_awb_gains_red[0] }} </td>
                                         {% endfor %}
                                     </tr>
                                     <tr>
                                         <td>Blue</td>
-                                        {% for i in range(pyview.settings_scanner.segments) %}
-                                            <td> {{ pyview.subject.per_segment_awb_gains[i][1] }} </td>
+                                        {% for per_segment_awb_gains_blue in pyview.subject.per_segment_awb_gains %}
+                                            <td> {{ per_segment_awb_gains_blue[1] }} </td>
                                         {% endfor %}
                                     </tr>
                                 </tbody>

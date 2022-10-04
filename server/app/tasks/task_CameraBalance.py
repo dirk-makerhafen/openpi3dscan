@@ -50,7 +50,7 @@ class Task_CameraBalance(Observable):
             device.camera.settings.set_iso(SettingsInstance().cameraSettings.iso)
             device.camera.settings.set_awb_mode(SettingsInstance().cameraSettings.awb_mode)
 
-        time.sleep(5)
+        time.sleep(4)
         results_exposure_speed = []
         results_awg_gains = []
         cameras_exposure_speed = {}
@@ -58,10 +58,10 @@ class Task_CameraBalance(Observable):
 
         try:
             with ThreadPool(20) as p:
-                for _ in range(5):
+                for _ in range(3):
                     results_exposure_speed.append(p.map_async(lambda device: device.camera.settings.get_exposure_speed(), cameras))
                     results_awg_gains.append(p.map_async(lambda device: device.camera.settings.get_awb_gains(), cameras))
-                    time.sleep(1)
+                    time.sleep(2)
             for index, r in enumerate(results_exposure_speed):
                 results_exposure_speed[index] = r.get(timeout=30)
             for index, r in enumerate(results_awg_gains):
@@ -89,10 +89,13 @@ class Task_CameraBalance(Observable):
         try:
             SettingsInstance().cameraSettings.per_segment_shutter_speeds = per_segment_exposure_speeds
             SettingsInstance().cameraSettings.per_segment_awb_gains = per_segment_awb_gains
+        except Exception as e:
+            print("Failed3:", e)
 
-            time.sleep(3)
-            for device in cameras:
-                device.camera.settings.locked = False
+        time.sleep(3)
+        for device in cameras:
+            device.camera.settings.locked = False
+        try:
             with ThreadPool(10) as p:
                 p.map_async(lambda device: device.camera.settings.get_exposure_speed(), cameras)
         except Exception as e:

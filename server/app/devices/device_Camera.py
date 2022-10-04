@@ -133,7 +133,7 @@ class CameraSettings:
 
     def get_awb_gains(self):
         try:
-            self.awb_gains = json.loads(self.camera.device.api_request("/camera/settings/awb_gains").text)
+            self.awb_gains = json.loads(self.camera.device.api_request("/camera/settings/awb_gains", max_time=4, timeout=4).text)
         except Exception as e:
             print("failed to get awb_gains", e)
         self.camera.device.notify_observers()
@@ -141,7 +141,7 @@ class CameraSettings:
 
     def get_shutter_speed(self):
         try:
-            self.shutter_speed = int(self.camera.device.api_request("/camera/settings/shutter_speed").text)
+            self.shutter_speed = int(self.camera.device.api_request("/camera/settings/shutter_speed", max_time=4, timeout=4).text)
         except Exception as e:
             print("failed to get shutter_speed", e)
         self.camera.device.notify_observers()
@@ -149,7 +149,7 @@ class CameraSettings:
 
     def get_exposure_speed(self):
         try:
-            self.exposure_speed = int(self.camera.device.api_request("/camera/settings/exposure_speed").text)
+            self.exposure_speed = int(self.camera.device.api_request("/camera/settings/exposure_speed", max_time=4, timeout=4).text)
         except Exception as e:
             print("failed to get exposure_speed", e)
         self.camera.device.notify_observers()

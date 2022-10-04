@@ -162,7 +162,7 @@ class Processing(Observable):
                 markers=markers,
                 distances=distances,
                 pin=SettingsInstance().realityCaptureSettings.pin,
-                box_dimensions= [location.diameter, location.diameter, location.height]
+                box_dimensions=[location.diameter, location.diameter, location.height]
             )
             self.set_status("processing")
             self.processing_tasks.insert(0, rc )
@@ -235,7 +235,6 @@ class Processing(Observable):
                         print("Failed to delete %s" % shot_path)
         self.set_status("idle")
         return True
-
 
     def _clean_shot_dir(self):
         shots = []

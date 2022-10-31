@@ -135,10 +135,10 @@ class ShotView(PyHtmlView):
     def sync_remote(self):
         self.current_shot.sync_remote()
 
-    def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False):
+    def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
         if create_textures is None:
             create_textures = False
-        self.current_shot.create_model(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures)
+        self.current_shot.create_model(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures, lit=lit)
 
     def switch_type(self):
         self.imageCarousel.switch_type()

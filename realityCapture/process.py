@@ -206,9 +206,7 @@ class RealityCapture():
             self.shot_name = self.source_folder.split('\\')[-1]
         self.shot_name = self._clean_shot_name(self.shot_name)
         self.filetype = filetype
-        self.fileextension = filetype
-        if self.fileextension in ["gif","webp"]:
-            self.fileextension = "glb"
+        self.fileextension = "glb" if self.filetype in ["gif","webp"] else self.filetype
         self.reconstruction_quality = reconstruction_quality
         self.quality = quality
         self.create_mesh_from = create_mesh_from
@@ -654,7 +652,7 @@ class RealityCapture():
             print("no screenshots found")
             return
 
-        size = 1000
+        size = 1100
         if self.quality == "high":
             size = 1400
         elif self.quality == "normal":

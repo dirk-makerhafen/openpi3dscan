@@ -5,7 +5,7 @@ from pyhtmlgui import Observable
 
 
 class ModelFile(Observable):
-    def __init__(self, parentShot, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False):
+    def __init__(self, parentShot, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
         super().__init__()
         self.parentShot = parentShot
         self.model_id = "%s" % uuid.uuid4()
@@ -14,7 +14,7 @@ class ModelFile(Observable):
         self.reconstruction_quality = reconstruction_quality  # preview, normal, high,
         self.quality = quality   # "high", normal, low
         self.create_mesh_from = create_mesh_from  # normal, projection, all
-        self.lit = True # unlit = No shadows, lit = with shadows
+        self.lit = lit # unlit = No shadows, lit = with shadows
         self.filename = ""
         self.filesize = 0
         self.create_textures = create_textures

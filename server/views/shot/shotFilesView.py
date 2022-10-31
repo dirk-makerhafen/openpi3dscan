@@ -67,6 +67,7 @@ class ShotFilesView(PyHtmlView):
                     </td>
                     <td> <input id="create_textures" {% if pyview.settings.realityCaptureSettings.default_create_textures == true %}checked{% endif %} type="checkbox"/> </td>
                     <td> <input id="lit_unlit" {% if pyview.settings.realityCaptureSettings.default_lit == true %}checked{% endif %} type="checkbox"/>  </td>
+                    <td> &nbsp;  </td>
                     <td> <button class="btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked, $("#lit_unlit")[0].checked);'> Create Model </button></td>
                 </tr>
             </table>

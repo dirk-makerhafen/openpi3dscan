@@ -22,7 +22,7 @@ from src.heartbeat import HeartbeatInstance
 # 11    		       12
 #  4      	            3
 # 13                   10
-#     6   15   8   1
+#     6   15   8   1      16, 7 , 14
 channel_offsets = { 0:1, 1:8, 2:15, 3:6, 4:13, 5:4, 6:11, 7:2, 8:9, 9:16, 10:7, 11:14, 12:5, 13:12, 14:3, 15:10}
 
 class Light():

@@ -25,6 +25,7 @@ class ShotFilesView(PyHtmlView):
                     <th style="text-align:center">Export Quality</th>
                     <th style="text-align:center">Mesh from</th>
                     <th style="text-align:center">Textures</th>
+                    <th style="text-align:center">Lit</th>
                     <th style="text-align:center">File</th>
                     <th style="text-align:center">Action</th>
                     </tr>
@@ -65,7 +66,7 @@ class ShotFilesView(PyHtmlView):
                         </select>   
                     </td>
                     <td> <input id="create_textures" {% if pyview.settings.realityCaptureSettings.default_create_textures == true %}checked{% endif %} type="checkbox"/> </td>
-                    <td> &nbsp; </td>
+                    <td> <input id="lit_unlit" {% if pyview.settings.realityCaptureSettings.default_lit == true %}checked{% endif %} type="checkbox"/>  </td>
                     <td> <button class="btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked);'> Create Model </button></td>
                 </tr>
             </table>
@@ -134,6 +135,7 @@ class ModelFileItemView(PyHtmlView):
         <td>{{pyview.subject.quality}}</td>
         <td>{{pyview.subject.create_mesh_from}}</td>
         <td>{{pyview.subject.create_textures}}</td>
+        <td>{{pyview.subject.lit}}</td>
         <td>
             {% if pyview.subject.status == "ready" %} 
                 <a href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}}  </a>({{pyview.subject.filesize}} MB)

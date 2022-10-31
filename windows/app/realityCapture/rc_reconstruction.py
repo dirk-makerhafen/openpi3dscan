@@ -91,10 +91,8 @@ class RC_Reconstruction(Observable):
         cmd += '-moveReconstructionRegion "%s" 0 "%s" ' % (offsetxy, offsetz)  # return to center
         return cmd
 
-
     def clear(self):
         pass
-
 
     def set_status(self, status):
         if self.status != status:

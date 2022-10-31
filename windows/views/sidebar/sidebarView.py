@@ -14,7 +14,7 @@ class SidebarButtonsView(PyHtmlView):
     <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.settingsView %} selected {% endif %}" onclick='pyview.parent.show_settings();'>
         Settings
     </div>
-    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.devicesView %} selected {% endif %}" onclick='pyview.parent.show_devices();'>
+    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.processingView %} selected {% endif %}" onclick='pyview.parent.show_processing();'>
         Tasks
     </div>
     <div class="col-md-12 item" style="height:3px"'> </div> 
@@ -38,9 +38,9 @@ class SidebarView(PyHtmlView):
         self.buttonsView = SidebarButtonsView(subject=subject, parent=self)
         self.current_search = ""
 
-    def show_devices(self):
+    def show_processing(self):
         self.shotsView.select_shot(None)
-        if self.parent.currentView.show_devicesView() is True:
+        if self.parent.currentView.show_processing() is True:
             self.buttonsView.update()
 
     def show_settings(self):

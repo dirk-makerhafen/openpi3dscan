@@ -14,6 +14,7 @@ class ModelFile(Observable):
         self.reconstruction_quality = reconstruction_quality  # preview, normal, high,
         self.quality = quality   # "high", normal, low
         self.create_mesh_from = create_mesh_from  # normal, projection, all
+        self.lit = True # unlit = No shadows, lit = with shadows
         self.filename = ""
         self.filesize = 0
         self.create_textures = create_textures
@@ -30,11 +31,15 @@ class ModelFile(Observable):
         qStr = self.quality[0].upper()
         meshFromStr = self.create_mesh_from[0].upper()
         textureStr = "T" if self.create_textures else ""
-
+        if self.filetype in ["gif", "webp", "glb"]:
+            litUnlitStr = ("L" if self.lit else "U") if self.create_textures else ""
+        else:
+            litUnlitStr = ""
         ext = ".zip"
         if self.filetype in ["gif", "webp"]:
             ext = ""
-        self.filename = "%s_%s%s%s%s.%s%s" % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, self.filetype, ext)
+        self.filename = "%s_%s%s%s%s%s.%s%s" % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, litUnlitStr, self.filetype, ext)
+        #self.filename = "%s_%s%s%s%s.%s%s" % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, self.filetype, ext)
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         with FileObjectThread(os.path.join(self.path, self.filename), "wb") as f:
@@ -74,6 +79,7 @@ class ModelFile(Observable):
             "filesize": self.filesize,
             "create_textures": self.create_textures,
             "reconstruction_quality": self.reconstruction_quality,
+            "lit": self.lit,
         }
 
     def from_dict(self, data):
@@ -105,5 +111,10 @@ class ModelFile(Observable):
             self.reconstruction_quality = data["reconstruction_quality"]
         except:
             pass
+        try:
+            self.lit = data["lit"]
+        except:
+            pass
+
         return self
 

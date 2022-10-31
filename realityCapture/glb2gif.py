@@ -65,7 +65,7 @@ class glb2gif():
 
         def f(file):
             os.system('%s -resize %sx "%s"' % (os.path.join(SCRIPT_DIR, "mogrify.exe"), size, file))
-            os.system('%s -crop %sx%s+100+100 +repage "%s"' % (os.path.join(SCRIPT_DIR, "mogrify.exe"), size - 130, size - 100, file))
+            os.system('%s -crop %sx%s+70+100 +repage "%s"' % (os.path.join(SCRIPT_DIR, "mogrify.exe"), size - 100, size - 100, file))
             os.system('%s -clobber "%s"' % (os.path.join(SCRIPT_DIR, "optipng.exe"), file))
             os.system('%s "%s" "%s"' % (os.path.join(SCRIPT_DIR, "convert.exe"), file, "%s.gif" % file[:-4]))
 

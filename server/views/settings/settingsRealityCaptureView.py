@@ -142,6 +142,19 @@ class RealityCaptureView(PyHtmlView):
                     </div>  
                     <div class="list-group-item">
                         <div class="row align-items-center">
+                            <div class="col-md-10">
+                                <strong class="mb-0">Lit / Unlit</strong>
+                                <p class="text-muted mb-0">GLB, GIF and WEBP default lit. </p>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="custom-control custom-switch">
+                                    <input id="default_lit"  type="checkbox" {% if pyview.subject.default_lit == True %}checked{% endif %} onclick='pyview.subject.set_default_lit($("#default_lit").prop("checked") === true)'>                                 
+                                </div>
+                            </div>         
+                        </div>
+                    </div>  
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
                             <div class="col-md-8">
                                 <strong class="mb-0">Reset calibration</strong>
                                 <p class="text-muted mb-0">Auto calibration learns exact lens parameters over time and gives a high quality initial position estimation. After reset, create 2-3 Models of known good scans where most markers are visible and no cameras are obscured.</p>

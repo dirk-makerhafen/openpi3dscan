@@ -103,6 +103,7 @@ class Processing(Observable):
         super().__init__()
         self._setup()
         self.status = "idle"
+        self.current_task = None
         self.processing_tasks = ObservableList()
         self.worker = threading.Thread(target=self.loop, daemon=True)
         self.worker.start()
@@ -165,7 +166,7 @@ class Processing(Observable):
                 box_dimensions=[location.diameter, location.diameter, location.height]
             )
             self.set_status("processing")
-            self.processing_tasks.insert(0, rc )
+            self.current_task = rc
             model_result_path = None
             try:
                 model_result_path = rc.process()
@@ -173,6 +174,7 @@ class Processing(Observable):
                 traceback.print_exc()
                 print(e)
                 print("Failed to process", e)
+        self.current_task = None
         self.set_status("idle")
         return True
 
@@ -210,8 +212,8 @@ class Processing(Observable):
                 pin=data["pin"],
                 box_dimensions=data["box_dimensions"]
             )
+            self.current_task = rc
             self.set_status("processing")
-            self.processing_tasks.insert(0, rc)
             model_result_path = None
             try:
                 model_result_path = rc.process()
@@ -233,6 +235,7 @@ class Processing(Observable):
                         shutil.rmtree(shot_path)
                     except:
                         print("Failed to delete %s" % shot_path)
+        self.current_task = None
         self.set_status("idle")
         return True
 

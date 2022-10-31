@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
+from .processingView import ProcessingView
+
 if TYPE_CHECKING:
     from app.app import App
 from pyhtmlgui import PyHtmlView
@@ -14,10 +17,14 @@ class CurrentView(PyHtmlView):
         super().__init__(subject, parent)
         self.shotView = ShotView(subject=subject, parent=self)
         self.settingsView = SettingsView(self.subject, self)
+        self.processingView = ProcessingView(self.subject, self)
         self.current_view = self.settingsView
 
     def show_settingsView(self):
         return self.set_view(self.settingsView)
+
+    def show_processing(self):
+        return self.set_view(self.processingView)
 
     def show_shotView(self, shot):
         self.shotView.show_shot(shot)

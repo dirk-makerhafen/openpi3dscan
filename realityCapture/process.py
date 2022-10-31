@@ -11,6 +11,7 @@ import glob
 import socket
 import traceback
 from multiprocessing.pool import ThreadPool
+from pygltflib import GLTF2, TextureInfo
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -198,7 +199,7 @@ class CalibrationData():
 
 
 class RealityCapture():
-    def __init__(self, source_folder, shot_name, filetype, reconstruction_quality, quality, create_mesh_from, create_textures):
+    def __init__(self, source_folder, shot_name, filetype, reconstruction_quality, quality, create_mesh_from, create_textures, lit):
         self.source_folder = os.path.abspath(source_folder)
         self.shot_name = shot_name
         if self.shot_name == "":
@@ -212,13 +213,15 @@ class RealityCapture():
         self.quality = quality
         self.create_mesh_from = create_mesh_from
         self.create_textures = create_textures
+        self.lit = lit
         self.reconstruction_quality_str = self.reconstruction_quality[0].upper()
         self.quality_str = self.quality[0].upper()
         self.create_mesh_from_str = create_mesh_from[0].upper()
         self.create_textures_str = "T" if create_textures is True else ""
+        self.litUnlitStr = "" if self.filetype not in ["gif", "webp", "glb"] else ("L" if self.lit else "U") if self.create_textures else ""
         self.realityCapture_filename = "realityCapture_%s%s%s" % (self.reconstruction_quality_str, self.create_mesh_from_str, self.create_textures_str)
-        self.export_filename   = "%s_%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.fileextension)
-        self.export_foldername = "%s_%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.filetype)
+        self.export_filename   = "%s_%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr ,self.fileextension)
+        self.export_foldername = "%s_%s%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.filetype)
         self.available_markers = []
         self.alignments = []
         self.alignments_were_recreated = False
@@ -291,6 +294,8 @@ class RealityCapture():
             pass
         self._delete_xmp_files()
         self.write_xmp_files()
+        with open(os.path.join(self.source_folder, "last_usage"), "w") as f:
+            f.write("%s" % int(time.time()))
 
     def load_markers(self, force_reload=False):
         markers_csv = os.path.join(self.source_folder, "%s_markers.csv" % self.realityCapture_filename)
@@ -578,6 +583,14 @@ class RealityCapture():
                 print("%s model not found, error" % output_model_path)
                 return
 
+            if self.fileextension == "glb" and self.lit is False:
+                glbf = GLTF2().load(output_model_path)
+                glbf.materials[0].pbrMetallicRoughness.baseColorFactor = [0, 0, 0, 1]
+                glbf.materials[0].emissiveFactor = [1, 1, 1]
+                glbf.materials[0].emissiveTexture = TextureInfo(index=0)
+                glbf.save(output_model_path)
+
+
         if self.filetype == "gif":
             images_path = os.path.join(self.source_folder, self.export_foldername)
             gif_file = os.path.join(self.source_folder, "%s.gif" % self.export_foldername.replace("_gif", ""))
@@ -651,7 +664,6 @@ class RealityCapture():
 
         def f(file):
             os.system('mogrify.exe -resize %sx "%s"' % (size,file))
-            os.system('mogrify.exe -crop %sx%s+100+100 +repage "%s"' % (size-130,size-100,file))
             os.system('optipng.exe -clobber "%s"' % file)
             os.system('convert.exe "%s" "%s"' % (file, "%s.gif" % file[:-4]))
         ThreadPool(8).map(f, files)
@@ -705,7 +717,8 @@ class RealityCapture():
             cmd += '-addFolder "%s\\images\\projection" ' % self.source_folder
             cmd += '-selectAllImages '
             cmd += '-enableTexturingAndColoring false '
-         
+            cmd += '-enableColorNormalization false '
+
         if self.create_mesh_from in ["normal", "all"] or self.create_textures is True:
             cmd += '-addFolder "%s\\images\\normal" ' % self.source_folder
             cmd += '-invertImageSelection '
@@ -947,7 +960,8 @@ class Processing():
                     reconstruction_quality=model["reconstruction_quality"],
                     quality=model["quality"],
                     create_mesh_from=model["create_mesh_from"],
-                    create_textures=model["create_textures"]
+                    create_textures=model["create_textures"],
+                    lit=model["lit"],
                 )
 
                 model_result_path = None
@@ -977,9 +991,14 @@ class Processing():
         shots = []
         for path in glob.glob(os.path.join(CACHE_DIR, "*")):
             shots.append(path)
+
+        for index, path in enumerate(shots):
+            with open(os.path.join(path, "last_usage"), "r") as f:
+                shots[index] = [int(f.read()), path]
+
         shots.sort()
         while len(shots) > CACHE_SIZE:
-            shutil.rmtree(shots[0])
+            shutil.rmtree(shots[0][1])
             del shots[0]
 
 

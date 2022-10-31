@@ -34,6 +34,7 @@ class SettingsRealityCapture(Observable):
         self.default_export_quality = "normal"  # "high", normal, low
         self.default_create_mesh_from = "projection" # normal, projection, all
         self.default_create_textures = True
+        self.default_lit = True
         self.calibration_data = "{}" # json dump of rc data
 
     def to_dict(self):
@@ -46,6 +47,7 @@ class SettingsRealityCapture(Observable):
             "default_export_quality": self.default_export_quality,
             "default_create_mesh_from": self.default_create_mesh_from,
             "default_create_textures": self.default_create_textures,
+            "default_lit": self.default_lit,
             "calibration_data": self.calibration_data,
         }
 
@@ -59,7 +61,10 @@ class SettingsRealityCapture(Observable):
         self.default_create_mesh_from = data["default_create_mesh_from"]
         self.default_create_textures = data["default_create_textures"]
         self.calibration_data = data["calibration_data"]
-
+        try:
+            self.default_lit = data["default_lit"]
+        except:
+            pass
     def set_markers(self, markers):
         self.markers = markers
         self.save()
@@ -121,6 +126,11 @@ class SettingsRealityCapture(Observable):
 
     def set_default_create_textures(self, new_default_create_textures):
         self.default_create_textures = bool(new_default_create_textures)
+        self.save()
+        self.notify_observers()
+
+    def set_default_lit(self, new_default_lit):
+        self.default_lit = bool(new_default_lit)
         self.save()
         self.notify_observers()
 

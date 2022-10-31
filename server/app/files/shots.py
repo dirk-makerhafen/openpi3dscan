@@ -82,9 +82,10 @@ class Shots:
     def get_unprocessed_models(self, limit = None):
         models = []
         for shot in self.shots:
-            models.extend(shot.get_models_by_status("waiting"))
-            if limit is not None and len(models) >= limit:
-                return models
+            for m in shot.get_models_by_status("waiting"):
+                models.append(m)
+                if limit is not None and len(models) >= limit:
+                    return models
         return models
 
     def _add_deleted_shot_id(self, shot_id):

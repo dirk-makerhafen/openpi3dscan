@@ -3,6 +3,76 @@ import time
 from pyhtmlgui import Observable
 import os
 
+
+
+
+class runSteps():
+    def __init__(self):
+        self.steps = []
+        self.automatic = False
+        self.current_step = self.steps[0]
+        self.current_step.prepare()
+        self.work_q = queue.queue()
+
+    def start(self):
+        self.work_q.put(self.current_step)
+
+    def worker(self):
+        while True:
+            step = self.work_q.get()
+            step.run()
+
+    def step_finished_cb(self, step):
+        if step.success is True:
+            step_index = self.steps.index(step)
+            next_step_index = step_index + 1
+            if next_step_index < len(self.steps):
+                self.current_step = self.steps[next_step_index]
+                self.current_step.prepare()
+                if self.automatic is True:
+                    self.work_q.put(self.current_step)
+
+    def run_current_step(self):
+        if self.automatic is False:
+            self.work_q.put(self.current_step)
+
+
+'''
+
+STEPS
+prepare folder
+write xmp calibration data where available
+start new rc instance
+create new scene and load images
+align images
+detect markers and distances
+set distances and realign 
+clean component naming
+export alignments
+find camera center
+insert and center reconstruction region
+correct_colors?
+calbulate model
+cleanup border region by rotation reconstruction region
+clean models and rename finished model
+simplify for export
+texturize export model
+clean and rename export model
+save rcproj
+export and load xmp files
+update calibationdata from xmp data
+if export==rcroj
+  zip rc_proj
+if export==stl,glb,obj
+  zip result
+if export==gif
+  create images
+  optimise images
+  create gif
+  
+
+'''
+
 class RC_Alignment(Observable):
     def __init__(self, parent):
         super().__init__()
@@ -13,6 +83,7 @@ class RC_Alignment(Observable):
         self.rc_proj_file = parent.get_filepath("realityCapture.rcproj")
         self.status = "idle" # failed_ask_abort, repeat, success, failed
         self.alignments_recreated = False
+
 
     def run(self):
         self._load_alignments_csv()

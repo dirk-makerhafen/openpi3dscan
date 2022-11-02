@@ -209,7 +209,7 @@ class CameraSettingsView(PyHtmlView):
                 <div class="list-group-item">
                     <div class="row align-items-center">
                         <div class="col-md-10">
-                            <strong class="mb-0">Shutter speed</strong>
+                            <strong class="mb-0">Adjust shutter speed</strong>
                             <p class="text-muted mb-0">Adjust automatically calibrated shutter speeds up or down</p>
                         </div>
                         <div class="col-md-2">
@@ -232,7 +232,7 @@ class CameraSettingsView(PyHtmlView):
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Shutter, Calibrated</td>
+                                        <td>Shutter, calibrated</td>
                                         {% for per_segment_shutter_speed in pyview.subject.per_segment_shutter_speeds %}
                                             <td> {{ per_segment_shutter_speed }} </td>
                                         {% endfor %}

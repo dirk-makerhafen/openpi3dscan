@@ -214,7 +214,7 @@ class CameraSettingsView(PyHtmlView):
                         </div>
                         <div class="col-md-2">
                             <p id="ssa_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">({{pyview.subject.shutter_speed_adjustment}}%)</p>
-                            <input onchange="pyview._set_shutter_speed_adjustment(this.value)" oninput="document.getElementById('ssa_value').innerHTML = ''+this.value+'%' " type="range" min="0" max="100" value="{{pyview.subject.shutter_speed_adjustment}}" style="min-height:30px;">
+                            <input onchange="pyview.subject._set_shutter_speed_adjustment(this.value)" oninput="document.getElementById('ssa_value').innerHTML = ''+this.value+'%' " type="range" min="0" max="100" value="{{pyview.subject.shutter_speed_adjustment}}" style="min-height:30px;">
                         </div>
                     </div>
                 </div>  

@@ -208,6 +208,18 @@ class CameraSettingsView(PyHtmlView):
                 </div>  
                 <div class="list-group-item">
                     <div class="row align-items-center">
+                        <div class="col-md-10">
+                            <strong class="mb-0">Shutter speed</strong>
+                            <p class="text-muted mb-0">Adjust automatically calibrated shutter speeds up or down</p>
+                        </div>
+                        <div class="col-md-2">
+                            <p id="ssa_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">({{pyview.subject.shutter_speed_adjustment}}%)</p>
+                            <input onchange="pyview._set_shutter_speed_adjustment(this.value)" oninput="document.getElementById('ssa_value').innerHTML = ''+this.value+'%' " type="range" min="0" max="100" value="{{pyview.subject.shutter_speed_adjustment}}" style="min-height:30px;">
+                        </div>
+                    </div>
+                </div>  
+                <div class="list-group-item">
+                    <div class="row align-items-center">
                         <div class="col-md-12">
                             <table id="calibrationtable" class="table">
                                 <thead>
@@ -220,11 +232,16 @@ class CameraSettingsView(PyHtmlView):
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Shutter</td>
+                                        <td>Shutter, Calibrated</td>
                                         {% for per_segment_shutter_speed in pyview.subject.per_segment_shutter_speeds %}
                                             <td> {{ per_segment_shutter_speed }} </td>
                                         {% endfor %}
-                                        
+                                    </tr>
+                                    <tr>
+                                        <td>Shutter, adjusted</td>
+                                        {% for per_segment_shutter_speed in pyview.subject.get_adjusted_shutter_speeds() %}
+                                            <td> {{ per_segment_shutter_speed }} </td>
+                                        {% endfor %}
                                     </tr>
                                     <tr>
                                         <td>Red</td>

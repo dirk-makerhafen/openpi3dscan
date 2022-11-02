@@ -49,6 +49,7 @@ class Task_CameraBalance(Observable):
             device.camera.settings.set_exposure_mode(SettingsInstance().cameraSettings.exposure_mode)
             device.camera.settings.set_iso(SettingsInstance().cameraSettings.iso)
             device.camera.settings.set_awb_mode(SettingsInstance().cameraSettings.awb_mode)
+        SettingsInstance().cameraSettings.shutter_speed_adjustment = 0
 
         time.sleep(4)
         results_exposure_speed = []

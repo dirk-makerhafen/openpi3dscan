@@ -5,6 +5,8 @@ import requests, json, sys
 import os, glob, sys, shutil
 import subprocess, shlex, time
 import re, glob
+
+from PIL import Image
 from selenium import webdriver
 import time
 import glob
@@ -286,6 +288,17 @@ class RealityCapture():
             for file in glob.glob(os.path.join(os.path.join(self.source_folder, "images", mode), "*.jpg")):
                 if os.path.getsize(file) < 100000:
                     os.remove(file)
+                else:
+                    try:
+                        im = Image.open(file)
+                        im.verify()
+                        im.close()
+                        im = Image.open(file)
+                        im.transpose(Image.FLIP_LEFT_RIGHT)
+                        im.close()
+                    except Exception as e:
+                        print("removing broken file", file)
+                        os.remove(file)
         try:
             os.mkdir(os.path.join(self.source_folder, self.export_foldername))
         except:

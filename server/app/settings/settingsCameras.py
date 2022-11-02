@@ -15,6 +15,24 @@ class SettingsCameras(Observable):
         self._awb_gains = [1, 1]
         self._per_segment_shutter_speeds = []
         self._per_segment_awb_gains = []
+        self._shutter_speed_adjustment = 0 # -100% to 100%
+
+    def _get_shutter_speed_adjustment(self):
+        return self._shutter_speed_adjustment
+
+    def _set_shutter_speed_adjustment(self, value):
+        self._shutter_speed_adjustment = value
+        self.save()
+        self.notify_observers()
+        speeds = self.get_adjusted_shutter_speeds()
+        for i in range(len(speeds)):
+            cameras = self.parent.devicesInstance.get_cameras_by_segment(i + 1)
+            for device in cameras:
+                if device.camera.settings.shutter_speed == 0:
+                    continue
+                if abs(device.camera.settings.shutter_speed - speeds[i]) > 10:
+                     device.camera.settings.set_shutter_speed(speeds[i])
+    shutter_speed_adjustment = property(_get_shutter_speed_adjustment, _set_shutter_speed_adjustment)
 
     def _get_quality(self):
         return self._quality
@@ -51,15 +69,28 @@ class SettingsCameras(Observable):
     def _get_per_segment_shutter_speeds(self):
         return self._per_segment_shutter_speeds
 
+    def get_adjusted_shutter_speeds(self):
+        adj = 0
+        if self.shutter_speed_adjustment > 0:
+            maxadj = 65000 - max(self._per_segment_shutter_speeds)
+            if maxadj < 0: maxadj = 0
+            adj = maxadj / 100.0 * self.shutter_speed_adjustment
+        if self.shutter_speed_adjustment < 0:
+            maxadj = min(self._per_segment_shutter_speeds) - 5000
+            if maxadj < 0: maxadj = 0
+            adj = -(maxadj / 100.0 * self.shutter_speed_adjustment)
+        return [x + adj for x in self._per_segment_shutter_speeds]
+
     def _set_per_segment_shutter_speeds(self, values):
         self._per_segment_shutter_speeds = values
         self.save()
         self.notify_observers()
-        for i in range(len( self._per_segment_shutter_speeds)):
+        speeds = self.get_adjusted_shutter_speeds()
+        for i in range(len(speeds)):
             cameras = self.parent.devicesInstance.get_cameras_by_segment(i + 1)
             for device in cameras:
-                if abs(device.camera.settings.shutter_speed- self._per_segment_shutter_speeds[i]) > 10:
-                     device.camera.settings.set_shutter_speed(self._per_segment_shutter_speeds[i])
+                if abs(device.camera.settings.shutter_speed - speeds[i]) > 10:
+                     device.camera.settings.set_shutter_speed(speeds[i])
     per_segment_shutter_speeds = property(_get_per_segment_shutter_speeds, _set_per_segment_shutter_speeds)
 
     def _get_per_segment_awb_gains(self):

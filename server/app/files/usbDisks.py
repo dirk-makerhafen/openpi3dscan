@@ -21,6 +21,7 @@ class UsbDisks(Observable):
             if "/shots" in stdout:
                 break
             time.sleep(10)
+        ShotsInstance().load_shots_from_disk()
 
     def set_status(self, status):
         self.status = status
@@ -34,7 +35,6 @@ class UsbDisks(Observable):
         if "/shots" not in stdout:
             if len(self.disks) > 0:
                 self.disks[0].mount()
-                ShotsInstance().load_shots_from_disk()
         else:
             if len(self.disks) > 0:
                 self.disks[0].get_diskspace()

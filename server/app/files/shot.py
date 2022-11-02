@@ -40,14 +40,11 @@ class Shot(Observable):
         self.worker = None
         self.models = ObservableList()
         self.path_exists = False
-        self.load()
-        self.images_path         = os.path.join(self.path, "images")
+        self.images_path = os.path.join(self.path, "images")
+        if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
+            self.images_path = self.path
         self.preview_images_path = os.path.join(self.path, "preview_images")
-        if os.path.exists(self.path):
-            self.path_exists = True
-            if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
-                self.images_path = self.path
-            self.count_number_of_files()
+        self.load()
 
     @property
     def nr_of_devices(self):

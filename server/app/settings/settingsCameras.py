@@ -21,6 +21,12 @@ class SettingsCameras(Observable):
         return self._shutter_speed_adjustment
 
     def _set_shutter_speed_adjustment(self, value):
+        try:
+            value = float(value)
+        except:
+            return
+        if value < -100 or value > 100:
+            return
         self._shutter_speed_adjustment = value
         self.save()
         self.notify_observers()

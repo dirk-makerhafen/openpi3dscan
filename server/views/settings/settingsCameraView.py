@@ -239,7 +239,7 @@ class CameraSettingsView(PyHtmlView):
                                     </tr>
                                     <tr>
                                         <td>Shutter, adjusted</td>
-                                        {% for per_segment_shutter_speed in pyview.subject.get_adjusted_shutter_speeds() %}
+                                        {% for per_segment_shutter_speed in pyview.subject.adjusted_shutter_speeds %}
                                             <td> {{ per_segment_shutter_speed }} </td>
                                         {% endfor %}
                                     </tr>

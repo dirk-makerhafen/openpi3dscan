@@ -126,7 +126,7 @@ class Devices(Observable):
                         if "quality" in data:
                             device.camera.settings.quality = data["quality"]
                         try:
-                          target_shutter_speed = SettingsInstance().cameraSettings.per_segment_shutter_speeds[segment-1]
+                          target_shutter_speed = SettingsInstance().cameraSettings.adjusted_shutter_speeds[segment-1]
                         except:
                             target_shutter_speed = SettingsInstance().cameraSettings.shutter_speed
                         if "shutter_speed" in data and abs(data["shutter_speed"] - target_shutter_speed) > 100:

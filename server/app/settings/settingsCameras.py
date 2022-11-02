@@ -28,6 +28,8 @@ class SettingsCameras(Observable):
             return
         if value < -100 or value > 100:
             return
+        if self._shutter_speed_adjustment == value:
+            return
         self._shutter_speed_adjustment = value
         self._update_adjusted_shutter_speeds()
         self.save()

@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from pyhtmlgui import PyHtmlView
 
+from app.settings.settings import SettingsInstance
 from app.tasks.task_CameraBalance import TaskCameraBalanceInstance
 
 if TYPE_CHECKING:
@@ -12,6 +13,18 @@ from app.devices.devices import DevicesInstance
 from app.tasks.tasks import TasksInstance
 from app.tasks.task_CreateShot import TaskCreateShotInstance
 
+
+
+class TaskShutterAdjustTopView(PyHtmlView):
+    TEMPLATE_STR = '''
+        <div class="col-md-2 topMenuItem">
+            <p id="ssa_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">Shutter ({{pyview.subject.shutter_speed_adjustment}}%)</p>
+            <input onchange="pyview.subject._set_shutter_speed_adjustment(this.value)" oninput="document.getElementById('ssa_value').innerHTML = 'Shutter ('+this.value+'%)' " type="range" min="-100" max="100" value="{{pyview.subject.shutter_speed_adjustment}}" style="min-height:30px;">
+        </div>
+    '''
+
+    def __init__(self, subject, parent):
+        super().__init__(subject, parent)
 
 class TaskShutterBalanceTopView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -113,11 +126,13 @@ class LiveView(PyHtmlView):
     <div class="main" style="overflow-y:hidden;" >
         <div class="topMenu row" style="height:50px">
             {{ pyview.create_shot_view.render() }}
-            <div class="col-md-4 topMenuItem">&nbsp;</div>
+            <div class="col-md-2 topMenuItem">&nbsp;</div>
+            {{ pyview.shutteradjust_view.render() }}
             <div class="col-md-2 topMenuItem">
                 <p id="light_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">Light ({{pyview.get_light()}}%)</p>
                 <input onchange="pyview.set_light(this.value)" oninput="document.getElementById('light_value').innerHTML = 'Light ('+this.value+'%)' " type="range" min="0" max="100" value="{{pyview.get_light()}}" style="min-height:30px;">
             </div>
+            
             {{ pyview.camerabalance_view.render() }}
         </div>
         <div style="overflow-y:scroll;height:calc(100% - 35px);">
@@ -159,6 +174,7 @@ class LiveView(PyHtmlView):
         #self.whitebalance_view = TaskWhitebalanceTopView(TaskWhitebalanceInstance(), self)
         #self.shutterbalance_view = TaskShutterBalanceTopView(TaskShutterBalanceInstance(), self)
         self.camerabalance_view = TaskCameraBalanceTopView(TaskCameraBalanceInstance(), self)
+        self.shutteradjust_view = TaskShutterAdjustTopView(SettingsInstance().cameraSettings, self)
         self._tasks = TasksInstance()
 
     def whitebalance(self):

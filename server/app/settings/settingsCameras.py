@@ -82,10 +82,10 @@ class SettingsCameras(Observable):
             if maxadj < 0: maxadj = 0
             adj = maxadj / 100.0 * self.shutter_speed_adjustment
         if self.shutter_speed_adjustment < 0:
-            maxadj = min(self._per_segment_shutter_speeds) - 5000
+            maxadj = min(self._per_segment_shutter_speeds) - 10000
             if maxadj < 0: maxadj = 0
             adj = maxadj / 100.0 * self.shutter_speed_adjustment
-        return [x + adj for x in self._per_segment_shutter_speeds]
+        return [int(x + adj) for x in self._per_segment_shutter_speeds]
 
     def _set_per_segment_shutter_speeds(self, values):
         self._per_segment_shutter_speeds = values

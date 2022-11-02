@@ -1,8 +1,5 @@
 import math
-
 from pyhtmlgui import PyHtmlView
-
-from app.settings.settings import SettingsInstance
 
 
 class ImageRowView(PyHtmlView):
@@ -58,10 +55,10 @@ class SegmentView(PyHtmlView):
     def __init__(self, subject, parent, seg_nr):
         super().__init__(subject, parent)
         self.seg_nr = seg_nr
-        if SettingsInstance().settingsScanner.camera_one_position == "top":
-            self.images = [ImageRowView(subject, self, i+1) for i in range(0, SettingsInstance().settingsScanner.cameras_per_segment )]
+        if self.parent._get_settings_camera_one_position() == "top":
+            self.images = [ImageRowView(subject, self, i+1) for i in range(0, self.parent._get_settings_cameras_per_segment() )]
         else:
-            self.images = [ImageRowView(subject, self, i) for i in range(SettingsInstance().settingsScanner.cameras_per_segment, 0, -1 )]
+            self.images = [ImageRowView(subject, self, i) for i in range(self.parent._get_settings_cameras_per_segment(), 0, -1 )]
 
 
 class ImageCarousel(PyHtmlView):
@@ -96,6 +93,19 @@ class ImageCarousel(PyHtmlView):
         self._segments = []
         self.worker = None
 
+
+    def _get_settings_camera_one_position(self):
+        raise NotImplementedError()
+
+    def _get_settings_camera_rotation(self):
+        raise NotImplementedError()
+
+    def _get_settings_segments(self):
+        raise NotImplementedError()
+
+    def _get_settings_cameras_per_segment(self):
+        raise NotImplementedError()
+
     def get_image_source(self, imageRowView):
         raise NotImplementedError()
 
@@ -105,14 +115,14 @@ class ImageCarousel(PyHtmlView):
 
     @property
     def img_height(self):
-        if SettingsInstance().settingsScanner.camera_rotation in [0, 180]:
+        if self._get_settings_camera_rotation() in [0, 180]:
             return 100.0 / self.segments_shown / 4 * 3 * 0.79
         else:
             return 100.0 / self.segments_shown / 3 * 4 * 0.79
 
     @property
     def segments(self):
-        max_segments = SettingsInstance().settingsScanner.segments
+        max_segments = self._get_settings_segments()
         cid = "%s_%s" % (self.center_segment, self.segments_shown)
         if self.cid == cid:
             return self._segments
@@ -144,7 +154,7 @@ class ImageCarousel(PyHtmlView):
         return _segments
 
     def segment_color(self, segment):
-        s = SettingsInstance().settingsScanner.segments
+        s = self._get_settings_segments()
         # colors : 0 - 255 - 0
         colorstep_per_segment = 255 / (s/ 2.0)
         s = abs( segment - (s / 2.0))       # seg8 - 16/2     seg0-8  seg16-8
@@ -157,14 +167,14 @@ class ImageCarousel(PyHtmlView):
 
     def rotate_cw(self):
         self.center_segment = self.center_segment + 1
-        if self.center_segment > SettingsInstance().settingsScanner.segments:
+        if self.center_segment > self._get_settings_segments():
             self.center_segment = 1
         self.update()
 
     def rotate_ccw(self):
         self.center_segment = self.center_segment - 1
         if self.center_segment < 1:
-            self.center_segment = SettingsInstance().settingsScanner.segments
+            self.center_segment = self._get_settings_segments()
         self.update()
 
     def zoom_in(self):
@@ -175,8 +185,8 @@ class ImageCarousel(PyHtmlView):
 
     def zoom_out(self):
         self.segments_shown = self.segments_shown + 1
-        if self.segments_shown > SettingsInstance().settingsScanner.segments:
-            self.segments_shown = SettingsInstance().settingsScanner.segments
+        if self.segments_shown > self._get_settings_segments():
+            self.segments_shown = self._get_settings_segments()
         self.update()
 
     def switch_type(self):

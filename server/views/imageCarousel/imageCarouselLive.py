@@ -113,6 +113,18 @@ class ImageCarouselLive(ImageCarousel):
     def __init__(self, subject, parent):
         super().__init__(subject, parent)
 
+    def _get_settings_camera_one_position(self):
+        return SettingsInstance().settingsScanner.camera_one_position
+
+    def _get_settings_camera_rotation(self):
+        return SettingsInstance().settingsScanner.camera_rotation
+
+    def _get_settings_segments(self):
+        return SettingsInstance().settingsScanner.segments
+
+    def _get_settings_cameras_per_segment(self):
+        return SettingsInstance().settingsScanner.cameras_per_segment
+
     def get_image_source(self, imageRowView):
         device = DevicesInstance().get_camera_by_position(imageRowView.parent.seg_nr, imageRowView.row_nr)
         if device is None or device.is_available is False:

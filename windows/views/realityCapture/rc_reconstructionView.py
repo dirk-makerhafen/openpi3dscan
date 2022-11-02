@@ -16,7 +16,6 @@ class RC_ReconstructionView(PyHtmlView):
                 </div>
             </div>
         </div> 
-        
     '''
 
     def __init__(self, subject, parent, **kwargs):

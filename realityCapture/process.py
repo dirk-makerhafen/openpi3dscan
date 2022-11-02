@@ -232,12 +232,12 @@ class RealityCapture():
         self.prepare_folders()
         first_time_calibration = len(calibrationData.data) == 0
 
-        self.load_markers(force_reload=first_time_calibration)
-        while len(self.available_markers) < 2:
-            if ask("%s markers loaded, repeat?" % len(self.available_markers)):
-                self.load_markers(force_reload=True)
-            else:
-                return None
+        #self.load_markers(force_reload=first_time_calibration)
+        #while len(self.available_markers) < 2:
+        #    if ask("%s markers loaded, repeat?" % len(self.available_markers)):
+        #        self.load_markers(force_reload=True)
+        #    else:
+        #        return None
 
         self.load_alignments(force_reload=first_time_calibration)
         while len(self.alignments) < 2:
@@ -284,6 +284,12 @@ class RealityCapture():
             os.mkdir(os.path.join(self.source_folder, "images"))
             shutil.move(os.path.join(self.source_folder, "normal"), os.path.join(self.source_folder, "images"))
             shutil.move(os.path.join(self.source_folder, "projection"), os.path.join(self.source_folder, "images"))
+        with open(os.path.join(self.source_folder, "marker_distances.csv"), "w") as f:
+            f.write("Name,M1,M2,Distance\n")
+            for m1 in DISTANCES:
+                for m2 in DISTANCES[m1]:
+                    f.write("D%s%s,%s,%s,%s\n" % (m1, m2, m1, m2, DISTANCES[m1][m2]))
+
         for mode in ["normal", "projection"]:
             for file in glob.glob(os.path.join(os.path.join(self.source_folder, "images", mode), "*.jpg")):
                 if os.path.getsize(file) < 100000:
@@ -360,7 +366,8 @@ class RealityCapture():
             cmd += self._get_cmd_new_scene()
             cmd += '-align '
             cmd += '-detectMarkers "%s\\DetectMarkersParams.xml" ' % self.source_folder
-            cmd += self._get_cmd_defineDistance()
+            cmd += '-defineDistance "%s\\marker_distances.csv" ' % self.source_folder
+            #cmd += self._get_cmd_defineDistance()
             cmd += '-selectMaximalComponent '
             cmd += '-align '
             cmd += '-renameSelectedComponent "MAIN" '

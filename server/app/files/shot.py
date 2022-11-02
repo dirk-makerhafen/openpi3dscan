@@ -41,8 +41,12 @@ class Shot(Observable):
         self.models = ObservableList()
         self.path_exists = False
         self.load()
+        self.images_path         = os.path.join(self.path, "images")
+        self.preview_images_path = os.path.join(self.path, "preview_images")
         if os.path.exists(self.path):
             self.path_exists = True
+            if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
+                self.images_path = self.path
             self.count_number_of_files()
 
     @property
@@ -67,13 +71,13 @@ class Shot(Observable):
     def create_folders(self):
         if not os.path.exists(self.path):
             self.path_exists = True
-            os.mkdir(os.path.join(self.path))
-            os.mkdir(os.path.join(self.path, "images"))
-            os.mkdir(os.path.join(self.path, "images", "normal"))
-            os.mkdir(os.path.join(self.path, "images", "projection"))
-            os.mkdir(os.path.join(self.path, "preview_images"))
-            os.mkdir(os.path.join(self.path, "preview_images", "normal"))
-            os.mkdir(os.path.join(self.path, "preview_images", "projection"))
+            os.mkdir(self.path)
+            os.mkdir(self.images_path)
+            os.mkdir(os.path.join(self.images_path, "normal"))
+            os.mkdir(os.path.join(self.images_path, "projection"))
+            os.mkdir(self.preview_images_path)
+            os.mkdir(os.path.join(self.preview_images_path, "normal"))
+            os.mkdir(os.path.join(self.preview_images_path, "projection"))
             self.save()
 
     def set_name(self, name):
@@ -119,17 +123,18 @@ class Shot(Observable):
         self.notify_observers()
         self.create_folders()
         tasks = []
-        existing_images = glob.glob(os.path.join(self.path, "*mages", "*", "*.jpg"))
+        existing_images = glob.glob(os.path.join(self.images_path, "*", "*.jpg"))
+        existing_images.extend(glob.glob(os.path.join(self.preview_images_path, "*", "*.jpg")))
         for device in [d for d in self.devices if d.status == "online"]:
             segment = device.name.split("-")[0].replace("SEG","")
             row = device.name.split("-")[1].replace("CAM","")
             for image_mode in ["normal", "preview"]:
                 for image_type in ["normal", "projection"]:
                     if image_mode == "normal":
-                        folder_name = "images"
+                        img_path = os.path.join(self.images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
                     else:
-                        folder_name = "preview_images"
-                    img_path = os.path.join(self.path, folder_name, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+                        img_path = os.path.join(self.preview_images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+
                     if img_path not in existing_images:
                         tasks.append([device, [self.shot_id, image_type, image_mode, False]])
         if len(tasks) > 0:
@@ -139,10 +144,10 @@ class Shot(Observable):
 
         resolution = [800, 600] if SettingsInstance().settingsScanner.camera_rotation in [0, 180] else [600, 800]
         for image_type in ["normal", "projection"]:
-            existing_images = glob.glob(os.path.join(self.path, "images", image_type, "*.jpg"))
-            existing_previews = glob.glob(os.path.join(self.path, "preview_images", image_type, "*.jpg"))
+            existing_images = glob.glob(os.path.join(self.images_path, image_type, "*.jpg"))
+            existing_previews = glob.glob(os.path.join(self.preview_images_path, image_type, "*.jpg"))
             for existing_image in existing_images:
-                preview_path = os.path.join(self.path, "preview_images", image_type, existing_image.split("/")[-1])
+                preview_path = os.path.join(self.preview_images_path, image_type, existing_image.split("/")[-1])
                 if preview_path not in existing_previews:
                     try:
                         img = Image.open(existing_image)
@@ -157,10 +162,10 @@ class Shot(Observable):
     # image_mode = normal | preview , image_type = normal | projection
     def get_image(self, image_type, image_mode, segment, row):
         if image_mode == "normal":
-            folder_name = "images"
+            img_path = os.path.join(self.images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
         else:
-            folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+            img_path = os.path.join(self.preview_images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+
         if os.path.exists(img_path):
             with open(img_path, "rb") as f:
                 return f.read()
@@ -175,10 +180,10 @@ class Shot(Observable):
 
     def list_possible_images(self, image_type, image_mode):
         if image_mode == "normal":
-            folder_name = "images"
+            files = glob.glob(os.path.join(self.images_path, image_type, "*.jpg"))
         else:
-            folder_name = "preview_images"
-        files = glob.glob(os.path.join(self.path, folder_name, image_type, "*.jpg" ))
+            files = glob.glob(os.path.join(self.preview_images_path, image_type, "*.jpg"))
+
         results = []
         for file in files:
             segment = file.split("/")[-1].split("-")[0].replace("seg","")
@@ -200,10 +205,10 @@ class Shot(Observable):
         if self.path_exists is False:
             return
         if image_mode == "normal":
-            folder_name = "images"
+            img_path = os.path.join(self.images_path, image_type, "%s-%s.jpg" % (device_name.lower(), image_type[0]))
         else:
-            folder_name = "preview_images"
-        img_path = os.path.join(self.path, folder_name, image_type, "%s-%s.jpg" % (device_name.lower(), image_type[0]))
+            img_path = os.path.join(self.preview_images_path, image_type, "%s-%s.jpg" % (device_name.lower(), image_type[0]))
+
         with FileObjectThread(img_path, "wb") as f:
             f.write(image_data)
             if image_mode == "normal":
@@ -246,7 +251,7 @@ class Shot(Observable):
         self.notify_observers()
 
     def count_number_of_files(self):
-        self.nr_of_files = len(glob.glob(os.path.join(self.path, "images", "normal", "*.jpg"))) + len(glob.glob(os.path.join(self.path, "images", "projection", "*.jpg")))
+        self.nr_of_files = len(glob.glob(os.path.join(self.images_path, "normal", "*.jpg"))) + len(glob.glob(os.path.join(self.images_path, "projection", "*.jpg")))
 
     def save(self):
         if os.path.exists(self.path):

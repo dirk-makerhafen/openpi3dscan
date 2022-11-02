@@ -49,6 +49,7 @@ class Shot(Observable):
     @property
     def nr_of_models_waiting(self):
         return len([m for m in self.models if m.status == "waiting"])
+
     @property
     def nr_of_models_waiting_or_processing(self):
         return len([m for m in self.models if m.status == "waiting" or m.status == "processing" ])

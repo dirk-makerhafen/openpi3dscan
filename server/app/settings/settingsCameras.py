@@ -17,6 +17,7 @@ class SettingsCameras(Observable):
         self._per_segment_awb_gains = []
         self._shutter_speed_adjustment = 0 # -100% to 100%
         self.adjusted_shutter_speeds = []
+        self.average_shutter_speed = 0  # read only, in ms
 
     def _get_shutter_speed_adjustment(self):
         return self._shutter_speed_adjustment
@@ -89,6 +90,9 @@ class SettingsCameras(Observable):
             if maxadj < 0: maxadj = 0
             adj = maxadj / 100.0 * self.shutter_speed_adjustment
         self.adjusted_shutter_speeds = [int(x + adj) for x in self._per_segment_shutter_speeds]
+        if len(self.adjusted_shutter_speeds) > 0:
+            self.average_shutter_speed = int((sum(self.adjusted_shutter_speeds) / len(self.adjusted_shutter_speeds)) / 1000)
+        self.notify_observers()
 
     def _set_per_segment_shutter_speeds(self, values):
         self._per_segment_shutter_speeds = values

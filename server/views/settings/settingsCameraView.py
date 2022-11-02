@@ -213,7 +213,7 @@ class CameraSettingsView(PyHtmlView):
                             <p class="text-muted mb-0">Adjust automatically calibrated shutter speeds up or down</p>
                         </div>
                         <div class="col-md-2">
-                            <p id="ssa_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">{{pyview.subject.shutter_speed_adjustment}}%</p>
+                            <p id="ssa_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">{{pyview.subject.shutter_speed_adjustment}}%, avg {{pyview.subject.average_shutter_speed}}ms</p>
                             <input onchange="pyview.subject._set_shutter_speed_adjustment(this.value)" oninput="document.getElementById('ssa_value').innerHTML = ''+this.value+'%' " type="range" min="-100" max="100" value="{{pyview.subject.shutter_speed_adjustment}}" style="min-height:30px;">
                         </div>
                     </div>

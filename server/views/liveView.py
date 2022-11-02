@@ -18,7 +18,7 @@ from app.tasks.task_CreateShot import TaskCreateShotInstance
 class TaskShutterAdjustTopView(PyHtmlView):
     TEMPLATE_STR = '''
         <div class="col-md-2 topMenuItem">
-            <p id="ssa_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">Shutter adjust ({{pyview.subject.shutter_speed_adjustment}}%)</p>
+            <p id="ssa_value" style="line-height: 15px;margin: 0px;margin-top:5px;text-align: center;">Shutter adjust ({{pyview.subject.shutter_speed_adjustment}}%, avg {{pyview.subject.average_shutter_speed}}ms)</p>
             <input onchange="pyview.subject._set_shutter_speed_adjustment(this.value)" oninput="document.getElementById('ssa_value').innerHTML = 'Shutter adjust ('+this.value+'%)' " type="range" min="-100" max="100" value="{{pyview.subject.shutter_speed_adjustment}}" style="min-height:30px;">
         </div>
     '''

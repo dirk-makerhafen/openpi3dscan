@@ -119,7 +119,7 @@ def ask(question):
 
 
 class RealityCapture():
-    def __init__(self, source_folder, shot_name, filetype, reconstruction_quality, quality, create_mesh_from, create_textures, lit, markers, distances, pin, box_dimensions, debug=False):
+    def __init__(self, source_folder, shot_name, filetype, reconstruction_quality, quality, create_mesh_from, create_textures, lit, markers, distances, pin, box_dimensions, calibration_data, debug=False):
         self.source_folder = os.path.abspath(source_folder)
         self.shot_name = shot_name
         if self.shot_name == "":
@@ -137,6 +137,7 @@ class RealityCapture():
         self.pin = pin
         self.box_dimensions = box_dimensions
         self.debug = debug
+
         self.reconstruction_quality_str = self.reconstruction_quality[0].upper()
         self.quality_str = self.quality[0].upper()
         self.create_mesh_from_str = create_mesh_from[0].upper()
@@ -145,10 +146,10 @@ class RealityCapture():
         self.realityCapture_filename = "rc_%s%s%s" % (self.reconstruction_quality_str, self.create_mesh_from_str, self.create_textures_str)
         self.export_filename   = "%s_%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr ,self.fileextension)
         self.export_foldername = "%s_%s%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.filetype)
-        self.xmp_exclude = []
+
         self.model_path = None
 
-        self.calibrationData = CalibrationData(self)
+        self.calibrationData = CalibrationData(self, calibration_data)
         self.markers = Markers(self)
         self.alignments = Alignment(self)
         self.rawmodel = RawModel(self)

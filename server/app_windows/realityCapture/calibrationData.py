@@ -41,10 +41,11 @@ XMP_TEMPLATE = '''
 '''
 
 class CalibrationData(Observable):
-    def __init__(self, rc_job):
+    def __init__(self, rc_job, initial_data):
         super().__init__()
         self.rc_job = rc_job
-        self.data = {}
+        self.data = initial_data
+        self.xmp_exclude = []
 
     def reset(self):
         self.data = {}

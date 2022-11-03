@@ -10,6 +10,7 @@ import requests
 from pyhtmlgui import Observable, ObservableList
 
 from app.files.shots import ShotsInstance
+from app_windows.realityCapture.realityCapture import RealityCapture
 from app_windows.settings.settings import SettingsInstance
 
 CACHE_DIR = "None"
@@ -69,7 +70,6 @@ class Processing(Observable):
         for model in models:
             shot = model.parentShot
             location = SettingsInstance().locations.get_by_location(shot.location)
-            calibrationData = json.loads(location.calibration_data)
             markers, distances = self._parse_markers_str(location.markers)
 
             rc = RealityCapture(
@@ -80,11 +80,12 @@ class Processing(Observable):
                 quality=model.export_quality,
                 create_mesh_from=model.create_mesh_from,
                 create_textures=model.create_textures,
-                calibrationData=calibrationData,
+                lit=model.lit,
                 markers=markers,
                 distances=distances,
                 pin=SettingsInstance().realityCaptureSettings.pin,
-                box_dimensions=[location.diameter, location.diameter, location.height]
+                box_dimensions=[location.diameter, location.diameter, location.height],
+                calibration_data=json.loads(location.calibration_data),
             )
             self.set_status("processing")
             self.current_task = rc
@@ -128,11 +129,12 @@ class Processing(Observable):
                 quality=model["quality"],
                 create_mesh_from=model["create_mesh_from"],
                 create_textures=model["create_textures"],
-                calibrationData=calibrationData,
+                lit=model["lit"],
                 markers=markers,
                 distances=distances,
                 pin=data["pin"],
-                box_dimensions=data["box_dimensions"]
+                box_dimensions=data["box_dimensions"],
+                calibration_data=calibrationData,
             )
             self.current_task = rc
             self.set_status("processing")

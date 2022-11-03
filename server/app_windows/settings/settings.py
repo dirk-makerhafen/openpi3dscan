@@ -4,7 +4,7 @@ from pyhtmlgui import Observable
 from app_windows.settings.settingsLocations import SettingsLocations
 from app_windows.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2022.09.24-08.09"
+VERSION = "2022.11.24-08.09"
 
 
 class Settings(Observable):

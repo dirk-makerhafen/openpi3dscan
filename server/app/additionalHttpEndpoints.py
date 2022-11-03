@@ -189,7 +189,7 @@ class HttpEndpoints:
 
 
     def _shot_get_images_zip(self, shot_id):
-        shot = self.app.shots_remote.get(shot_id)
+        shot = self.app.shots.get(shot_id)
         if shot is None:
             return bottle.HTTPResponse(status=404)
 

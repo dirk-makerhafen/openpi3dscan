@@ -14,7 +14,7 @@ class App(Observable):
         self.status = "active"
         self.devices = DevicesInstance()
         self.settings = SettingsInstance(DevicesInstance())
-        self.shots_remote = ShotsInstance(self.devices)
+        self.shots = ShotsInstance(self.devices)
         self.usbDisks = UsbDisks()
         self.tasks = TasksInstance()
         self.cardReader = CardReaderInstance()

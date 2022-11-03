@@ -28,7 +28,7 @@ class ShotsView(ObservableListView):
         if shot_id is None:
             return
 
-        self.selected_shot = self.parent.subject.shots_remote.get(shot_id)
+        self.selected_shot = self.parent.subject.shots.get(shot_id)
         if self.is_visible:
             [c.update() for c in self._children if c.subject.shot_id == shot_id]
 

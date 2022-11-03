@@ -119,7 +119,7 @@ class Shots:
                     self.shots.append(Shot(SHOT_DIR, shot_id))
                 else:
                     shot.load()
-        self.shots.sort()
+        self.shots.sort(reverse=True)
 
 
 _shotsInstance = None

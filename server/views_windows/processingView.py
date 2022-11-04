@@ -1,10 +1,9 @@
 from pyhtmlgui import PyHtmlView, ObservableListView
 
-class logView(PyHtmlView):
-    TEMPLATE_STR = '''
-        {{pyview.subject}}
-    '''
-class RealityCaptureView(PyHtmlView):
+from views_windows.realityCapture.realityCaptureView import RealityCaptureView
+
+
+class ProcessingView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="main">
         <div class="RealityCapture">
@@ -13,19 +12,19 @@ class RealityCaptureView(PyHtmlView):
                     <div class="list-group mb-5 shadow">
                         <div class="list-group-item">
                             <div class="row align-items-center">
-                                <div class="col-md-10 h3" style="border-bottom: 1px solid lightgray;">RealityCapture</div>
+                                <div class="col-md-10 h3" style="border-bottom: 1px solid lightgray;">RealityCapture Processing</div>
                                 <div class="col-md-2 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.status}}</div>
                             </div>
                         </div>
-                        
-    
                     </div>
                 </div>   
             </div>
+            {{ pyview.tasks.render() }}   
         </div>
-        {{pyview.foo.render()}}
     </div>
+    
     '''
-    def __init__(self, subject, parent, **kwargs):
-        super().__init__(subject, parent, **kwargs)
-        self.foo = ObservableListView(self.subject.log, self, logView)
+
+    def __init__(self, subject, parent):
+        super().__init__(subject, parent)
+        self.tasks = ObservableListView(subject.rc_tasks, self, RealityCaptureView)

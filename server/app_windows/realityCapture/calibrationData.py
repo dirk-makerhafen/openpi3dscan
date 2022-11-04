@@ -2,7 +2,7 @@ import glob
 import os
 import random
 
-from pyhtmlgui import Observable
+from app_windows.realityCapture.genericTask import GenericTask
 
 XMP_TEMPLATE_full = '''
 <x:xmpmeta xmlns:x="adobe:ns:meta/">
@@ -40,10 +40,9 @@ XMP_TEMPLATE = '''
 </x:xmpmeta>
 '''
 
-class CalibrationData(Observable):
+class CalibrationData(GenericTask):
     def __init__(self, rc_job, initial_data):
-        super().__init__()
-        self.rc_job = rc_job
+        super().__init__(rc_job)
         self.data = initial_data
         self.xmp_exclude = []
 
@@ -94,7 +93,7 @@ class CalibrationData(Observable):
 
     def update_from_xmp(self):
         cmd = self.rc_job._get_cmd_start()
-        cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.source_folder, self.rc_job.realityCapture_filename)
+        cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
         cmd += '-exportXMP "%s" ' %  self.rc_job.get_path("xmp_settings.xml")
         cmd += '-quit '
         self.rc_job._run_command(cmd, "export_xmp")
@@ -151,7 +150,7 @@ class CalibrationData(Observable):
                     "CalibrationPrior"      : CalibrationPrior,
                 }
                 for mode in ["normal", "projection"]:
-                    xmp_path = os.path.join(self.rc_job.source_folder, "images", mode, "seg%s-cam%s-%s.xmp" % (segment, row, mode[0]))
+                    xmp_path = os.path.join(self.rc_job.workingdir, "images", mode, "seg%s-cam%s-%s.xmp" % (segment, row, mode[0]))
                     img_path = xmp_path.replace(".xmp", ".jpg")
                     if os.path.exists(img_path):
                         with open(xmp_path, "w") as f:
@@ -162,7 +161,7 @@ class CalibrationData(Observable):
 
     def _read_xmp_files(self):
         camera_data = []
-        for path in glob.glob(os.path.join(self.rc_job.source_folder, "images", "*", "*.xmp")):
+        for path in glob.glob(os.path.join(self.rc_job.workingdir, "images", "*", "*.xmp")):
             img_path = path.replace(".xmp",".jpg")
             if not os.path.exists(img_path):
                 continue
@@ -198,5 +197,5 @@ class CalibrationData(Observable):
         return camera_data
 
     def delete_xmp_files(self):
-        for path in glob.glob(os.path.join(self.rc_job.source_folder, "images", "*","*.xmp")):
+        for path in glob.glob(os.path.join(self.rc_job.workingdir, "images", "*","*.xmp")):
             os.remove(path)

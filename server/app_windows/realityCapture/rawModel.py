@@ -1,27 +1,21 @@
 import os
 
-from pyhtmlgui import Observable
+from app_windows.realityCapture.genericTask import GenericTask
 
 
-class RawModel(Observable):
+class RawModel(GenericTask):
     def __init__(self, rc_job):
-        super().__init__()
-        self.rc_job = rc_job
-        self.status = "idle"
+        super().__init__(rc_job)
 
-    def set_status(self, new_status):
-        if self.status == new_status:
-            return
-        self.status = new_status
-        self.notify_observers()
-
-    def create(self, force_reload=False):
-        raw_exists_file = os.path.join(self.rc_job.source_folder, "%s.raw_exists" % self.rc_job.realityCapture_filename)
-        rc_proj_file = os.path.join(self.rc_job.source_folder, "%s.rcproj" % self.rc_job.realityCapture_filename)
+    def create(self):
+        force_reload = self.status != "idle"
+        self.set_status("active")
+        raw_exists_file = os.path.join(self.rc_job.workingdir, "%s.raw_exists" % self.rc_job.realityCapture_filename)
+        rc_proj_file = os.path.join(self.rc_job.workingdir, "%s.rcproj" % self.rc_job.realityCapture_filename)
         if (not os.path.exists(raw_exists_file) or force_reload == True) and os.path.exists(rc_proj_file):
             cmd = self.rc_job._get_cmd_start()
             last_changed = os.path.getmtime(rc_proj_file)
-            cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.source_folder, self.rc_job.realityCapture_filename)
+            cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
             #cmd += '-moveReconstructionRegion "%s" "%s" "%s" ' % (self.box_center_correction[0], self.box_center_correction[1], self.box_center_correction[2] - (self.box_dimensions[2]/2)  )  #
             cmd += '-correctColors '
             if self.rc_job.reconstruction_quality == "preview":
@@ -45,12 +39,12 @@ class RawModel(Observable):
             for i in range(1, 19):
                 cmd += '-selectModel "Model %s" ' % i
                 cmd += '-deleteSelectedModel '
-            cmd += '-save "%s\\%s.rcproj" ' % (self.rc_job.source_folder, self.rc_job.realityCapture_filename)
+            cmd += '-save "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
             cmd += '-clearCache '
             cmd += '-quit '
             self.rc_job._run_command(cmd, "create_raw_model")
             if last_changed != os.path.getmtime(rc_proj_file):
-                with open(os.path.join(self.rc_job.source_folder, "%s.raw_exists" % self.rc_job.realityCapture_filename), "w") as f:
+                with open(os.path.join(self.rc_job.workingdir, "%s.raw_exists" % self.rc_job.realityCapture_filename), "w") as f:
                     f.write("raw created")
             else:
                 print("Failed to create raw model, no changes in rcproj")

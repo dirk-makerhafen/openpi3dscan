@@ -1,23 +1,18 @@
 import os
 
-from pyhtmlgui import Observable
+from app_windows.realityCapture.genericTask import GenericTask
 
 
-class Markers(Observable):
+class Markers(GenericTask):
     def __init__(self, rc_job):
-        super().__init__()
-        self.rc_job = rc_job
+        super().__init__(rc_job)
         self.available_markers = []
-        self.status = "idle"
 
-    def set_status(self, new_status):
-        if self.status == new_status:
-            return
-        self.status = new_status
-        self.notify_observers()
-
-    def load(self, force_reload=False):
+    def load(self):
         markers_csv = self.rc_job.get_path("%s_markers.csv")
+        force_reload = self.status != "idle"
+        self.set_status("active")
+
         if force_reload is True and os.path.exists(markers_csv):
             os.remove(markers_csv)
 
@@ -33,6 +28,12 @@ class Markers(Observable):
             cmd += '-quit '
             self.rc_job._run_command(cmd, "load_markers")
             self._load_markers_csv(markers_csv)
+
+        if len(self.available_markers) < 2:
+            self.set_status("failed")
+        else:
+            self.set_status("success")
+
 
     def _load_markers_csv(self, markers_csv):
         markers = set()

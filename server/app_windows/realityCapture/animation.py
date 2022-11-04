@@ -1,25 +1,19 @@
 import os, time, glob
 from multiprocessing.pool import ThreadPool
 
-from pyhtmlgui import Observable
-from selenium import webdriver
+from app_windows.realityCapture.genericTask import GenericTask
+
+#from selenium import webdriver
 
 
-class Animation(Observable):
+class Animation(GenericTask):
     def __init__(self, rc_job):
-        super().__init__()
-        self.rc_job = rc_job
-        self.status = "idle"
-
-    def set_status(self, new_status):
-        if self.status == new_status:
-            return
-        self.status = new_status
-        self.notify_observers()
+        super().__init__(rc_job)
 
     def create(self, output_model_path, filetype):
-        images_path = os.path.join(self.rc_job.source_folder, self.rc_job.export_foldername)
-        a_file = os.path.join(self.rc_job.source_folder, "%s.%s" % (self.rc_job.export_foldername.replace("_gif", ""), filetype))
+        self.set_status("active")
+        images_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername)
+        a_file = os.path.join(self.rc_job.workingdir, "%s.%s" % (self.rc_job.export_foldername.replace("_gif", ""), filetype))
         self._convert_glb_to_images(output_model_path, images_path)
         self._screenshots_to_animation(images_path, a_file, filetype)
         return a_file
@@ -39,11 +33,11 @@ class Animation(Observable):
         time.sleep(5)
         angle = 0
         angle_add = 8
-        if self.rc_job.quality == "high":
+        if self.rc_job.export_quality == "high":
             angle_add = 6
-        elif self.rc_job.quality == "normal":
+        elif self.rc_job.export_quality == "normal":
             angle_add = 8
-        elif self.rc_job.quality == "low":
+        elif self.rc_job.export_quality == "low":
             angle_add = 10
 
         while angle < 360:
@@ -61,11 +55,11 @@ class Animation(Observable):
             return
 
         size = 1100
-        if self.rc_job.quality == "high":
+        if self.rc_job.export_quality == "high":
             size = 1400
-        elif self.rc_job.quality == "normal":
+        elif self.rc_job.export_quality == "normal":
             size = 1100
-        elif self.rc_job.quality == "low":
+        elif self.rc_job.export_quality == "low":
             size = 900
 
         def f(file):

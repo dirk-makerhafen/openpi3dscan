@@ -1,29 +1,24 @@
 import os
 
-from pyhtmlgui import Observable
+from app_windows.realityCapture.genericTask import GenericTask
 
 
-class Alignment(Observable):
-    def __init__(self, rc_job):
-        super().__init__()
-        self.rc_job = rc_job
-        self.alignments_were_recreated = True
+class Alignment(GenericTask):
+    def __init__(self, rc_job, distances):
+        super().__init__(rc_job)
+        self.distances = distances
+        self.alignments_were_recreated = False
         self.alignments = []
         self.box_center_correction = [0,0,0]
-        self.status = "idle"
 
-    def set_status(self, new_status):
-        if self.status == new_status:
-            return
-        self.status = new_status
-        self.notify_observers()
-
-    def load(self, force_reload=False):
+    def load(self):
         alignments_csv = self.rc_job.get_path("%s_alignments.csv")
-        rc_proj_file = os.path.join(self.rc_job.source_folder, "%s.rcproj" % self.rc_job.realityCapture_filename)
-        raw_exists_file = os.path.join(self.rc_job.source_folder, "%s.raw_exists" % self.rc_job.realityCapture_filename)
+        rc_proj_file = os.path.join(self.rc_job.workingdir, "%s.rcproj" % self.rc_job.realityCapture_filename)
+        raw_exists_file = os.path.join(self.rc_job.workingdir, "%s.raw_exists" % self.rc_job.realityCapture_filename)
+        force_reload = self.status != "idle"
+        self.set_status("active")
 
-        if os.path.exists(alignments_csv) and force_reload is True:
+        if force_reload is True and os.path.exists(alignments_csv):
             os.remove(alignments_csv)
 
         if os.path.exists(alignments_csv):
@@ -50,12 +45,16 @@ class Alignment(Observable):
             cmd += '-setReconstructionRegion "%s" ' % self.rc_job.get_path("box.rcbox")
             cmd += '-getLicense "%s" ' % self.rc_job.pin
             cmd += '-exportRegistration "%s" "%s" ' % (self.rc_job.get_path("%s_alignments.csv"), self.rc_job.get_path("exportRegistrationSettings.xml"))
-            cmd += '-save "%s\\%s.rcproj" ' % (self.rc_job.source_folder, self.rc_job.realityCapture_filename)
+            cmd += '-save "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
             cmd += '-quit '
             self.rc_job._run_command(cmd, "load_alignments")
             if os.path.exists(self.rc_job.get_path("%s_alignments.csv")):
                 self.alignments_were_recreated = True
             self._load_alignments_csv(alignments_csv)
+        if len(self.alignments) < 50:
+            self.set_status("failed")
+        else:
+            self.set_status("success")
 
     def _load_alignments_csv(self, alignments_csv):
         self.alignments = []
@@ -84,9 +83,9 @@ class Alignment(Observable):
         cmd = ''
         for index1, marker1 in enumerate(self.rc_job.markers.available_markers):
             for marker2 in [self.rc_job.markers.available_markers[index2] for index2 in range(index1 + 1, len(self.rc_job.markers.available_markers))]:
-                if marker1 not in self.rc_job.distances:
+                if marker1 not in self.distances:
                     continue
-                if marker2 not in self.rc_job.distances[marker1]:
+                if marker2 not in self.distances[marker1]:
                     continue
-                cmd += '-defineDistance "%s" "%s" "%s" "D%s%s" ' % (marker1, marker2, self.rc_job.distances[marker1][marker2], marker1, marker2)
+                cmd += '-defineDistance "%s" "%s" "%s" "D%s%s" ' % (marker1, marker2, self.distances[marker1][marker2], marker1, marker2)
         return cmd

@@ -1,36 +1,35 @@
 import os, shutil
-from pygltflib import GLTF2, TextureInfo
-from pyhtmlgui import Observable
+#from pygltflib import GLTF2, TextureInfo
+from app_windows.realityCapture.genericTask import GenericTask
 
 
-class ExportModel(Observable):
+class ExportModel(GenericTask):
     def __init__(self, rc_job):
-        super().__init__()
-        self.rc_job = rc_job
-        self.output_model_path = os.path.join(self.rc_job.source_folder, self.rc_job.export_foldername, self.rc_job.export_filename.replace(" ","_" if self.rc_job.filetype not in ["3mf","stl", ] else " "))
-        self.status = "idle"
+        super().__init__(rc_job)
+        if self.rc_job.filetype == "rcproj":
+            self.output_model_path = os.path.join(self.rc_job.workingdir, "%s%s.rcproj" % (self.rc_job.realityCapture_filename, self.rc_job.quality_str))
+        else:
+            self.export_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_filename)
+            self.output_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_filename.replace(" ","_" if self.rc_job.filetype not in ["3mf","stl", ] else " "))
 
-    def set_status(self, new_status):
-        if self.status == new_status:
-            return
-        self.status = new_status
-        self.notify_observers()
 
-    def create(self, force_reload=False):
-
+    def create(self):
+        force_reload = self.status != "idle"
+        self.set_status("active")
         if force_reload is True and os.path.exists(self.output_model_path):
             os.remove(self.output_model_path)
 
+
         if not os.path.exists(self.output_model_path):
             cmd = self.rc_job._get_cmd_start()
-            cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.source_folder, self.rc_job.realityCapture_filename)
+            cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
             cmd += '-selectComponent "MAIN" '
             cmd += '-selectModel "RAW" '
-            if self.rc_job.quality == "high":
+            if self.rc_job.export_quality == "high":
                 cmd += '-simplify 4000000 '
-            if self.rc_job.quality == "normal":
+            if self.rc_job.export_quality == "normal":
                 cmd += '-simplify 1000000 '
-            if self.rc_job.quality == "low":
+            if self.rc_job.export_quality == "low":
                 cmd += '-simplify 500000 '
             cmd += '-cleanModel '
             if self.rc_job.create_textures is True:
@@ -39,9 +38,9 @@ class ExportModel(Observable):
             cmd += '-renameSelectedModel "EXPORT" '
             cmd += '-getLicense "%s" ' % self.rc_job.pin
             if self.rc_job.filetype != "rcproj":
-                cmd += '-exportModel "EXPORT" "%s\\%s\\%s" ' % (self.rc_job.source_folder, self.rc_job.export_foldername, self.rc_job.export_filename)
+                cmd += '-exportModel "EXPORT" "%s" ' % self.export_model_path
             else:
-                cmd += '-save "%s\\%s%s.rcproj" ' % (self.rc_job.source_folder, self.rc_job.realityCapture_filename, self.rc_job.quality_str)
+                cmd += '-save "%s" ' % self.output_model_path
             cmd += '-quit '
             self.rc_job._run_command(cmd, "create_export_model")
 
@@ -62,7 +61,7 @@ class ExportModel(Observable):
 
 
     def creasate(self, force_reload=False):
-        self.output_model_path = os.path.join(self.rc_job.source_folder, self.rc_job.export_foldername, self.rc_job.export_filename.replace(" ","_" if self.rc_job.filetype not in ["3mf","stl", ] else " "))
+        self.output_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_filename.replace(" ","_" if self.rc_job.filetype not in ["3mf","stl", ] else " "))
 
         if force_reload is True and os.path.exists(output_model_path):
             os.remove(output_model_path)
@@ -70,10 +69,10 @@ class ExportModel(Observable):
 
 
         if self.rc_job.filetype == "rcproj":
-            rcproj = os.path.join(self.rc_job.source_folder, "%s.rcproj" % self.rc_job.realityCapture_filename)
-            rcprojdir = os.path.join(self.rc_job.source_folder, self.rc_job.realityCapture_filename)
-            imgdir = os.path.join(self.rc_job.source_folder, "images")
-            target_dir = os.path.join(self.rc_job.source_folder, self.rc_job.export_foldername)
+            rcproj = os.path.join(self.rc_job.workingdir, "%s.rcproj" % self.rc_job.realityCapture_filename)
+            rcprojdir = os.path.join(self.rc_job.workingdir, self.rc_job.realityCapture_filename)
+            imgdir = os.path.join(self.rc_job.workingdir, "images")
+            target_dir = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername)
             try:
                 shutil.rmtree(target_dir)
             except:
@@ -86,14 +85,14 @@ class ExportModel(Observable):
 
         elif not os.path.exists(output_model_path):
             cmd = self.rc_job._get_cmd_start()
-            cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.source_folder, self.rc_job.realityCapture_filename)
+            cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
             cmd += '-selectComponent "MAIN" '
             cmd += '-selectModel "RAW" '
-            if self.rc_job.quality == "high":
+            if self.rc_job.export_quality == "high":
                 cmd += '-simplify 4000000 '
-            if self.rc_job.quality == "normal":
+            if self.rc_job.export_quality == "normal":
                 cmd += '-simplify 1000000 '
-            if self.rc_job.quality == "low":
+            if self.rc_job.export_quality == "low":
                 cmd += '-simplify 500000 '
             cmd += '-cleanModel '
             if self.rc_job.create_textures is True:
@@ -101,7 +100,7 @@ class ExportModel(Observable):
                 cmd += '-calculateVertexColors '
             cmd += '-renameSelectedModel "EXPORT" '
             cmd += '-getLicense "%s" ' % self.rc_job.pin
-            cmd += '-exportModel "EXPORT" "%s\\%s\\%s" ' % (self.rc_job.source_folder, self.rc_job.export_foldername, self.rc_job.export_filename)
+            cmd += '-exportModel "EXPORT" "%s\\%s\\%s" ' % (self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_filename)
             cmd += '-quit '
             self.rc_job._run_command(cmd, "create_export_model")
 
@@ -124,10 +123,10 @@ class ExportModel(Observable):
             self.model_path = self.animation.create(output_model_path, "webp")
 
         else:
-            model_file_zip = os.path.join(self.rc_job.source_folder, "%s.zip" % self.rc_job.export_foldername)
+            model_file_zip = os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.export_foldername)
             if os.path.exists(model_file_zip):
                 os.remove(model_file_zip)
-            os.system("cd \"%s\" & powershell -command \"Compress-Archive '%s\\*' '%s.zip'\"" % (self.rc_job.source_folder, self.rc_job.export_foldername, self.rc_job.export_foldername))
+            os.system("cd \"%s\" & powershell -command \"Compress-Archive '%s\\*' '%s.zip'\"" % (self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_foldername))
             if not os.path.exists(model_file_zip):
                 print("Failed to create model zip")
                 self.model_path = None

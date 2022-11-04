@@ -9,15 +9,15 @@ class Upload(GenericTask):
     def __init__(self, rc_job):
         super().__init__(rc_job)
 
-    def upload_model(self, model_path):
+    def run(self, model_path):
         self.set_status("active")
         with open(model_path, 'rb') as f:
             print("Uploading model: %s" % model_path)
             try:
                 requests.post("http://%s/shots/%s/upload/%s" % (self.rc_job.source_ip, self.rc_job.shot_id, self.rc_job.model_id), files={'upload_file': f})
-                print("Upload finished")
+                self.set_status("success")
             except:
-                print("failed to reach server while uploading")
+                self.set_status("failed")
                 self.process_failed(self.rc_job.shot_id, self.rc_job.model_id)
 
     def upload_calibration_data(self, data):

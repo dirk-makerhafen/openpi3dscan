@@ -39,8 +39,10 @@ class RealityCaptureView(PyHtmlView):
                             {{ pyview.downloadView.render() }}
                         {% endif %}
                         {{pyview.verifyImagesView.render()}}
+                        {{pyview.calibrationDataWriteView.render()}}
                         {{pyview.markersView.render()}}
                         {{pyview.alignmentsView.render()}}
+                        {{pyview.calibrationDataUpdateView.render()}}
                         {{pyview.rawmodelView.render()}}
                         {{pyview.exportmodelView.render()}}
                         {% if pyview.animation %}
@@ -52,7 +54,6 @@ class RealityCaptureView(PyHtmlView):
                         {% if pyview.uploadView %}
                             {{ pyview.uploadView.render() }}
                         {% endif %}
-
 
 
                     </div>
@@ -72,8 +73,10 @@ class RealityCaptureView(PyHtmlView):
         if subject.download is not None:
             self.downloadView = DownloadView(subject.download, self)
         self.verifyImagesView = VerifyImagesView(subject.verifyImages, self)
+        self.calibrationDataWriteView = CalibrationDataWriteView(subject.calibrationDataWrite, self)
         self.markersView = MarkersView(subject.markers, self)
         self.alignmentsView = AlignmentsView(subject.alignments, self)
+        self.calibrationDataUpdateView = CalibrationDataUpdateView(subject.calibrationDataUpdate, self)
         self.rawmodelView = RawModelView(subject.rawmodel, self)
         self.exportmodelView = ExportmodelView(subject.exportmodel, self)
         if subject.animation is not None:
@@ -206,6 +209,31 @@ class UploadView(PyHtmlView):
             <div class="row align-items-center">
                 <div class="col-md-3">
                     <p>upload</p>
+                </div>
+                <div class="col-md-2"></div>
+                <div class="col-md-2">idle</div>
+            </div>
+        </div>
+    '''
+
+class CalibrationDataWriteView(PyHtmlView):
+    TEMPLATE_STR = '''
+        <div class="list-group-item">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <p>calibrationDataWrite</p>
+                </div>
+                <div class="col-md-2"></div>
+                <div class="col-md-2">idle</div>
+            </div>
+        </div>
+    '''
+class CalibrationDataUpdateView(PyHtmlView):
+    TEMPLATE_STR = '''
+        <div class="list-group-item">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <p>calibrationDataupdate</p>
                 </div>
                 <div class="col-md-2"></div>
                 <div class="col-md-2">idle</div>

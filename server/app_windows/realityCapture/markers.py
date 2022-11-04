@@ -20,8 +20,8 @@ class Markers(GenericTask):
             self._load_markers_csv(markers_csv)
 
         if len(self.available_markers) < 2 or force_reload is True:
-            cmd = self.rc_job._get_cmd_start()
-            cmd += self.rc_job._get_cmd_new_scene()
+            cmd = self._get_cmd_start()
+            cmd += self._get_cmd_new_scene()
             cmd += '-detectMarkers "%s" ' %  self.rc_job.get_path("DetectMarkersParams.xml")
             cmd += '-getLicense "%s" ' % self.rc_job.pin
             cmd += '-exportControlPointsMeasurements "%s" ' % markers_csv

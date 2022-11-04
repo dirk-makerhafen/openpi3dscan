@@ -1,4 +1,5 @@
 import os, time, glob
+import shutil
 from multiprocessing.pool import ThreadPool
 
 from app_windows.realityCapture.genericTask import GenericTask
@@ -70,35 +71,33 @@ class PrepareFolder(GenericTask):
         super().__init__(rc_job)
 
     def run(self):
+        self.set_status("active")
+        if not os.path.exists(self.rc_job.workingdir):
+            os.mkdir(self.rc_job.workingdir)
+        if not os.path.exists(os.path.join(self.rc_job.workingdir, "tmp")):
+            os.mkdir(os.path.join(self.rc_job.workingdir, "tmp"))
+        if not os.path.exists(os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername)):
+            os.mkdir(os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername))
 
-        if not os.path.exists(self.workingdir):
-            os.mkdir(self.workingdir)
-        if not os.path.exists(os.path.join(self.workingdir, "tmp")):
-            os.mkdir(os.path.join(self.workingdir, "tmp"))
-        if not os.path.exists(os.path.join(self.workingdir, self.export_foldername)):
-            os.mkdir(os.path.join(self.workingdir, self.export_foldername))
-
-        with open(os.path.join(self.workingdir, "last_usage"), "w") as f:
+        with open(os.path.join(self.rc_job.workingdir, "last_usage"), "w") as f:
             f.write("%s" % int(time.time()))
-        with open(self.get_path("DetectMarkersParams.xml"), "w") as f:
+        with open(self.rc_job.get_path("DetectMarkersParams.xml"), "w") as f:
             f.write(DetectMarkersParams_xml)
-        with open(self.get_path("box.rcbox"), "w") as f:
-            f.write(box_rcbox  % (round(self.box_dimensions[0], 2), round(self.box_dimensions[1], 2), round(self.box_dimensions[2], 2), round(self.box_dimensions[2]/2, 2)))
-        with open(self.get_path("exportRegistrationSettings.xml"), "w") as f:
+        with open(self.rc_job.get_path("box.rcbox"), "w") as f:
+            f.write(box_rcbox  % (round(self.rc_job.box_dimensions[0], 2), round(self.rc_job.box_dimensions[1], 2), round(self.rc_job.box_dimensions[2], 2), round(self.rc_job.box_dimensions[2]/2, 2)))
+        with open(self.rc_job.get_path("exportRegistrationSettings.xml"), "w") as f:
             f.write(ExportRegistrationSettings_xml)
-        with open(self.get_path("xmp_settings.xml"), "w") as f:
+        with open(self.rc_job.get_path("xmp_settings.xml"), "w") as f:
             f.write(XMPSettings_xml)
 
-        if self.source_ip is None:
-            if not os.path.exists(os.path.join(self.workingdir, "images")):
-                os.mkdir(os.path.join(self.workingdir, "images"))
+        if self.rc_job.source_ip is None:
+            if not os.path.exists(os.path.join(self.rc_job.workingdir, "images")):
+                os.mkdir(os.path.join(self.rc_job.workingdir, "images"))
             for imgtype in ["normal", "projection"]:
-                if not os.path.exists(os.path.join(self.workingdir, "images", imgtype)):
-                    if os.path.exists(os.path.join(self.source_dir, "images", imgtype)):
-                        shutil.copytree(os.path.join(self.source_dir, "images", imgtype), os.path.join(self.workingdir, "images", imgtype))
-                    elif os.path.exists(os.path.join(self.source_dir, imgtype)):
-                        shutil.copytree(os.path.join(self.source_dir, imgtype), os.path.join(self.workingdir, "images", imgtype))
+                if not os.path.exists(os.path.join(self.rc_job.workingdir, "images", imgtype)):
+                    if os.path.exists(os.path.join(self.rc_job.source_dir, "images", imgtype)):
+                        shutil.copytree(os.path.join(self.rc_job.source_dir, "images", imgtype), os.path.join(self.rc_job.workingdir, "images", imgtype))
+                    elif os.path.exists(os.path.join(self.rc_job.source_dir, imgtype)):
+                        shutil.copytree(os.path.join(self.rc_job.source_dir, imgtype), os.path.join(self.rc_job.workingdir, "images", imgtype))
 
-
-        #self.calibrationData.delete_xmp_files()
-        #self.calibrationData.write_xmp_files()
+        self.set_status("success")

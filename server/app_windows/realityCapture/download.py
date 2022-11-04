@@ -9,21 +9,24 @@ class Download(GenericTask):
     def __init__(self, rc_job):
         super().__init__(rc_job)
 
-    def download(self):
+    def run(self):
         self.set_status("active")
         if os.path.exists(os.path.join(self.rc_job.workingdir, "images")):
-            print("shot '%s' was already downloaded as %s" % (shot_id, self.rc_job.workingdir))
+            print("shot '%s' was already downloaded as %s" % (self.rc_job.shot_id, self.rc_job.workingdir))
         else:
-            print("Download shot id %s" % shot_id)
+            print("Download shot id %s" % self.rc_job.shot_id)
             try:
-                data = requests.get("http://%s/shots/%s.zip" % (self.rc_job.source_ip, shot_id)).content
-                with open(os.path.join(self.rc_job.workingdir, "%s.zip" % shot_id), "wb") as f:
+                data = requests.get("http://%s/shots/%s.zip" % (self.rc_job.source_ip, self.rc_job.shot_id)).content
+                with open(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id), "wb") as f:
                     f.write(data)
             except Exception as e:
-                print("failed to download shot '%s'" % shot_id)
+                print("failed to download shot '%s'" % self.rc_job.shot_id)
+                self.set_status("failed")
                 return None
-            self._unpack_zip(os.path.join(self.rc_job.workingdir, "%s.zip" % shot_id))
-
+            if self._unpack_zip(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id)) is False:
+                self.set_status("failed")
+                return None
+        self.set_status("success")
 
     def _unpack_zip(self, path):
         path = os.path.abspath(path)

@@ -31,12 +31,12 @@ class Processing(Observable):
         self.status = "idle"
         self.rc_tasks = ObservableList()
         rc = RealityCapture(
-            source_dir="TODO",
-            source_ip=None,
+            source_dir=None,
+            source_ip="1.2.3.4",
             shot_id="foobar",
             model_id="foobar",
             shot_name="foobar",
-            filetype="glb",
+            filetype="gif",
             reconstruction_quality="high",
             export_quality="high",
             create_mesh_from="projection",

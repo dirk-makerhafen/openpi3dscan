@@ -46,9 +46,12 @@ class RawModel(GenericTask):
             if last_changed != os.path.getmtime(rc_proj_file):
                 with open(os.path.join(self.rc_job.workingdir, "%s.raw_exists" % self.rc_job.realityCapture_filename), "w") as f:
                     f.write("raw created")
+                self.set_status("success")
             else:
                 print("Failed to create raw model, no changes in rcproj")
+                self.set_status("faild")
         else:
+            self.set_status("success")
             print("raw model already exists")
 
 

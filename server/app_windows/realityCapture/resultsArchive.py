@@ -39,6 +39,8 @@ class ResultsArchive(GenericTask):
         if not os.path.exists(model_file_zip):
             print("Failed to create model zip")
             self.model_path = None
+            self.set_status("failed")
         else:
             print("Model zip created")
             self.model_path = model_file_zip
+            self.set_status("success")

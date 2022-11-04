@@ -16,6 +16,7 @@ class Animation(GenericTask):
         a_file = os.path.join(self.rc_job.workingdir, "%s.%s" % (self.rc_job.export_foldername.replace("_gif", ""), filetype))
         self._convert_glb_to_images(output_model_path, images_path)
         self._screenshots_to_animation(images_path, a_file, filetype)
+        self.set_status("success")
         return a_file
 
     def _convert_glb_to_images(self, glb_path, output_path):

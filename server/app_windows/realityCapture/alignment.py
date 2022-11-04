@@ -31,8 +31,8 @@ class Alignment(GenericTask):
                 os.remove(rc_proj_file)
             if os.path.exists(raw_exists_file):
                 os.remove(raw_exists_file)
-            cmd = self.rc_job._get_cmd_start()
-            cmd += self.rc_job._get_cmd_new_scene()
+            cmd = self._get_cmd_start()
+            cmd += self._get_cmd_new_scene()
             cmd += '-align '
             cmd += '-detectMarkers "%s" ' % self.rc_job.get_path("DetectMarkersParams.xml")
             cmd += self._get_cmd_defineDistance()

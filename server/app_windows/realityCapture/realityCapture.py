@@ -17,6 +17,8 @@ from multiprocessing.pool import ThreadPool
 from app_windows.realityCapture.alignment import Alignment
 from app_windows.realityCapture.animation import Animation
 from app_windows.realityCapture.calibrationData import CalibrationData
+from app_windows.realityCapture.calibrationDataUpdate import CalibrationDataUpdate
+from app_windows.realityCapture.calibrationDataWrite import CalibrationDataWrite
 from app_windows.realityCapture.download import Download
 from app_windows.realityCapture.exportModel import ExportModel
 from app_windows.realityCapture.markers import Markers
@@ -96,6 +98,8 @@ class RealityCapture():
 
         self.calibrationData = CalibrationData(self, calibration_data)
         self.prepareFolder = PrepareFolder(self)
+        self.calibrationDataWrite = CalibrationDataWrite(self)
+        self.calibrationDataUpdate = CalibrationDataUpdate(self)
         self.download = None if self.source_ip is None else Download(self)
         self.upload   = None if self.source_ip is None else Upload(self)
         self.verifyImages = VerifyImages(self)
@@ -119,8 +123,10 @@ class RealityCapture():
         if self.download is not None:
             tasks.append(self.download.run)
         tasks.append(self.verifyImages.run)
+        tasks.append(self.calibrationDataWrite.run)
         tasks.append(self.markers.load)
         tasks.append(self.alignments.load)
+        tasks.append(self.calibrationDataUpdate.run)
         tasks.append(self.rawmodel.create)
         tasks.append(self.exportmodel.create)
         if self.animation is not None:
@@ -138,10 +144,6 @@ class RealityCapture():
                 while self.status == "active" and task.status == "failed":
                     time.sleep(1)
 
-
-        if self.alignments.alignments_were_recreated is True:
-            self.calibrationData.update_from_xmp()
-
         if DEBUG is False:
             try:
                 shutil.rmtree(os.path.join(self.workingdir, self.export_foldername))
@@ -150,41 +152,6 @@ class RealityCapture():
 
         return self.model_path
 
-
-    def get_path(self, fname):
-        if "%s" in fname:
-            fname = fname % self.realityCapture_filename
-        return os.path.join(self.workingdir, "tmp", fname)
-
-
-    def _get_cmd_new_scene(self):
-        cmd = '-newScene '
-        if self.create_mesh_from in ["projection", "all"]:
-            cmd += '-addFolder "%s\\images\\projection" ' % self.workingdir
-            cmd += '-selectAllImages '
-            cmd += '-enableTexturingAndColoring false '
-            cmd += '-enableColorNormalization false '
-
-        if self.create_mesh_from in ["normal", "all"] or self.create_textures is True:
-            cmd += '-addFolder "%s\\images\\normal" ' % self.workingdir
-            cmd += '-invertImageSelection '
-            if self.create_mesh_from == "projection":
-                cmd += '-enableMeshing false '  # don't use normal images for mesh
-        cmd += '-deselectAllImages '
-        return cmd
-
-    def _get_cmd_start(self):
-        cmd = '"%s" ' % RCEXE
-        #cmd += '-silent "%s\\crash_report.txt" ' % self.workingdir
-        #cmd += '-set "appQuitOnError=true" '
-        return cmd
-
-    def _run_command(self, cmd, name):
-        print("Next Command: %s" % name)
-        print(cmd)
-        s = time.time()
-        subprocess.run(shlex.split(cmd))
-        print("Command '%s' took %s seconds" % (name, int(time.time() - s)))
 
     def _clean_shot_name(self, name):
         name = name.replace("ä", "ae").replace("ü", "ue").replace("Ü", "Ue")

@@ -27,10 +27,12 @@ class SettingsRemoteHosts(Observable):
             return
         if host not in self.hosts:
             self.hosts.append(host)
+            self.save()
             self.notify_observers()
 
     def remove_host(self, host):
         host = host.strip()
         if host in self.hosts:
             self.hosts.remove(host)
+            self.save()
             self.notify_observers()

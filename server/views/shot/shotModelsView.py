@@ -1,8 +1,5 @@
 from pyhtmlgui import PyHtmlView, ObservableList, ObservableListView
 
-from app.settings.settings import SettingsInstance
-
-
 class ModelPreviewFileItemView(PyHtmlView):
     DOM_ELEMENT = "tr"
     TEMPLATE_STR = '''
@@ -93,18 +90,18 @@ class ShotModelsView(PyHtmlView):
     {% endif %}
     '''
 
-    def __init__(self, subject, parent):
+    def __init__(self, subject, parent, settingsInstance):
         super().__init__(subject, parent)
+        self.settingsInstance = settingsInstance
         self.current_shot = None
         self.current_models = ObservableList()
         self.selected_model = None
-        self.settings = SettingsInstance()
         self.filesListView = ObservableListView(self.current_models, self, item_class=ModelPreviewFileItemView, dom_element="tbody", filter_function=lambda x: x.subject.filetype != "glb")
 
     def create_model(self, create_mesh_from, create_textures):
         self.parent.create_model(
             filetype="glb",
-            reconstruction_quality=SettingsInstance().realityCaptureSettings.default_reconstruction_quality,
+            reconstruction_quality=self.settingsInstance.realityCaptureSettings.default_reconstruction_quality,
             quality="low",
             create_mesh_from=create_mesh_from,
             create_textures=create_textures)

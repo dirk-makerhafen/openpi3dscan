@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
+from app.settings.settings import SettingsInstance
+
 if TYPE_CHECKING:
     from app.app import App
 from pyhtmlgui import PyHtmlView
@@ -16,7 +19,7 @@ class CurrentView(PyHtmlView):
         super().__init__(subject, parent)
         self.devicesView = DevicesView(subject=subject.devices, parent=self)
         self.liveView = LiveView(subject=subject, parent=self)
-        self.shotView = ShotView(subject=subject, parent=self)
+        self.shotView = ShotView(subject=subject, parent=self, settingsInstance=SettingsInstance())
         self.settingsView = SettingsView(self.subject, self)
         self.current_view = self.devicesView
 

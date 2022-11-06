@@ -14,6 +14,8 @@ import socket
 import traceback
 from multiprocessing.pool import ThreadPool
 
+from pyhtmlgui import Observable
+
 from app_windows.realityCapture.alignment import Alignment
 from app_windows.realityCapture.animation import Animation
 from app_windows.realityCapture.calibrationData import CalibrationData
@@ -27,11 +29,10 @@ from app_windows.realityCapture.rawModel import RawModel
 from app_windows.realityCapture.resultsArchive import ResultsArchive
 from app_windows.realityCapture.upload import Upload
 from app_windows.realityCapture.verifyImages import VerifyImages
+from app_windows.settings.settings import SettingsInstance
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-CACHE_DIR = 'c:\shots'
-CACHE_SIZE = 25
 SERVER = None
 DEBUG = "debug" in sys.argv
 
@@ -40,16 +41,13 @@ try:
 except:
     print("################")
     print("RealityCapture.exe not found, install RealityCapture to your Program directory")
-    input('')
-    #exit(1)
- 
+
 try:
     chromeexe = glob.glob("C:\*\Google\Chrome\Application")[0]
 except:
     print("################")
     print("Google Chrome not found, install Chrome to your Program directory")
-    input('')
-    #exit(1)
+
 
 
 
@@ -63,11 +61,13 @@ def ask(question):
             return True
         if reply == "n":
             return False
-CACHE_DIR = "None"
 
 
-class RealityCapture():
-    def __init__(self, source_ip, source_dir,  shot_id, model_id, shot_name, filetype, reconstruction_quality, export_quality, create_mesh_from, create_textures, lit, distances, pin, box_dimensions, calibration_data, debug=False):
+class RealityCapture(Observable):
+    def __init__(self, source_ip, source_dir, shot_id, model_id, shot_name, filetype, reconstruction_quality,
+                 export_quality, create_mesh_from, create_textures, lit, distances, pin, box_dimensions,
+                 calibration_data, debug=False):
+        super().__init__()
         self.source_ip = source_ip
         self.source_dir = source_dir
         self.shot_id = shot_id
@@ -83,8 +83,8 @@ class RealityCapture():
         self.pin = pin
         self.box_dimensions = box_dimensions
         self.debug = debug
-        self.workingdir = os.path.join(CACHE_DIR, self.shot_name)
-        print("WD", self.workingdir)
+        self.workingdir = os.path.join(SettingsInstance().settingsCache.directory, self.shot_name)
+
         self.reconstruction_quality_str = self.reconstruction_quality[0].upper()
         self.quality_str = self.export_quality[0].upper()
         self.create_mesh_from_str = create_mesh_from[0].upper()
@@ -94,14 +94,13 @@ class RealityCapture():
         self.export_filename   = "%s_%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr ,self.fileextension)
         self.export_foldername = "%s_%s%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.filetype)
 
-        self.model_path = None
+        self.result_file = None
 
         self.calibrationData = CalibrationData(self, calibration_data)
         self.prepareFolder = PrepareFolder(self)
         self.calibrationDataWrite = CalibrationDataWrite(self)
         self.calibrationDataUpdate = CalibrationDataUpdate(self)
         self.download = None if self.source_ip is None else Download(self)
-        self.upload   = None if self.source_ip is None else Upload(self)
         self.verifyImages = VerifyImages(self)
         self.markers = Markers(self, distances)
         self.alignments = Alignment(self, distances)
@@ -113,32 +112,30 @@ class RealityCapture():
         else:
             self.animation = None
             self.resultsArchive = ResultsArchive(self)
+        self.upload   = None if self.source_ip is None else Upload(self)
         self.status = ""
 
     def process(self):
-        first_time_calibration = len(self.calibrationData.data) == 0
         self.status = "active"
-        tasks = []
-        tasks.append(self.prepareFolder.run)
-        if self.download is not None:
-            tasks.append(self.download.run)
-        tasks.append(self.verifyImages.run)
-        tasks.append(self.calibrationDataWrite.run)
-        tasks.append(self.markers.load)
-        tasks.append(self.alignments.load)
-        tasks.append(self.calibrationDataUpdate.run)
-        tasks.append(self.rawmodel.create)
-        tasks.append(self.exportmodel.create)
-        if self.animation is not None:
-            tasks.append(self.animation.create)
-        else:
-            tasks.append(self.resultsArchive.create)
-        if self.upload is not None:
-            tasks.append(self.upload.run)
 
+        tasks = [
+            self.prepareFolder,
+            self.download,
+            self.verifyImages,
+            self.calibrationDataWrite,
+            self.markers,
+            self.alignments,
+            self.calibrationDataUpdate,
+            self.rawmodel,
+            self.exportmodel,
+            self.animation,
+            self.resultsArchive,
+            self.upload,
+        ]
+        tasks = [task for task in tasks if task is not None]
         for task in tasks:
             while self.status == "active":
-                task()
+                task.run()
 
         if DEBUG is False:
             try:
@@ -146,7 +143,6 @@ class RealityCapture():
             except:
                 print("Failed to delete %s" % os.path.join(self.workingdir, self.export_foldername))
         self.status = "idle"
-        return self.model_path
 
 
     def _clean_shot_name(self, name):

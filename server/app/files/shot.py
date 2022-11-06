@@ -268,7 +268,6 @@ class Shot(Observable):
                     "meta_camera_one_position": self.meta_camera_one_position,
                     "models" : [m.to_dict() for m in self.models]
                 }))
-        self.backup_meta()
 
     def backup_meta(self):
         with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "w") as f:

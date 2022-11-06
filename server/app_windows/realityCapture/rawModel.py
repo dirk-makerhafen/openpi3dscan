@@ -7,7 +7,7 @@ class RawModel(GenericTask):
     def __init__(self, rc_job):
         super().__init__(rc_job)
 
-    def create(self):
+    def run(self):
         force_reload = self.status != "idle"
         self.set_status("active")
         raw_exists_file = os.path.join(self.rc_job.workingdir, "%s.raw_exists" % self.rc_job.realityCapture_filename)

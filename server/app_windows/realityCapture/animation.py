@@ -10,14 +10,18 @@ class Animation(GenericTask):
     def __init__(self, rc_job):
         super().__init__(rc_job)
 
-    def create(self, output_model_path, filetype):
+    def run(self):
         self.set_status("active")
         images_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername)
-        a_file = os.path.join(self.rc_job.workingdir, "%s.%s" % (self.rc_job.export_foldername.replace("_gif", ""), filetype))
-        self._convert_glb_to_images(output_model_path, images_path)
-        self._screenshots_to_animation(images_path, a_file, filetype)
-        self.set_status("success")
-        return a_file
+        a_file = os.path.join(self.rc_job.workingdir, "%s.%s" % (self.rc_job.export_foldername.replace("_gif", ""), self.rc_job.filetype))
+        self._convert_glb_to_images(self.rc_job.exportmodel.output_model_path, images_path)
+        self._screenshots_to_animation(images_path, a_file, self.rc_job.filetype)
+        if os.path.exists(a_file):
+            self.rc_job.result_file = a_file
+            self.set_status("success")
+        else:
+            self.log.append("No %s file generated, failed" % self.rc_job.filetype)
+            self.set_status("failed")
 
     def _convert_glb_to_images(self, glb_path, output_path):
         options = webdriver.ChromeOptions()

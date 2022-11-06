@@ -1,5 +1,5 @@
 import os, shutil
-#from pygltflib import GLTF2, TextureInfo
+from pygltflib import GLTF2, TextureInfo
 from app_windows.realityCapture.genericTask import GenericTask
 
 
@@ -13,7 +13,7 @@ class ExportModel(GenericTask):
             self.output_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_filename.replace(" ","_" if self.rc_job.filetype not in ["3mf","stl", ] else " "))
 
 
-    def create(self):
+    def run(self):
         force_reload = self.status != "idle"
         self.set_status("active")
         if force_reload is True and os.path.exists(self.output_model_path):

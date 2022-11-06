@@ -33,7 +33,15 @@ class ShotView(PyHtmlView):
                 </div>
                 <div class="col-md-3 topMenuItem">&nbsp;</div>
                 <div class="col-md-1 topMenuItem">
-                    <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
+                    {% if pyview.subject.can_sync == True %}
+                        <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
+                    {% else %}
+                        <select id="available_locations">
+                            {% for location in pyview.available_locations() %}
+                                <option value="location" {% if location==pyview.subject.meta_location %}selected{% endif %}>{{location}}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
                 </div>
                 <div class="col-md-1 topMenuItem" style="border-right: 0px;">
                     <button class="btn btn-warning" style="margin-right:5px" onclick='$("#confirm_delete").show();'> Delete </button>
@@ -87,14 +95,16 @@ class ShotView(PyHtmlView):
     </div>   
     '''
 
-    def __init__(self, subject: App, parent):
+    def __init__(self, subject: App, parent, settingsInstance):
         super().__init__(subject, parent)
         self.imageCarousel = ImageCarouselStatic(self.subject, self)
-        self.shotModels = ShotModelsView(self.subject, self)
+        self.shotModels = ShotModelsView(self.subject, self, settingsInstance)
         self.comments = ShotCommentsView(self.subject, self)
-        self.shotFiles = ShotFilesView(self.subject, self)
+        self.shotFiles = ShotFilesView(self.subject, self,settingsInstance)
         self.current_shot = None
         self.current_view = self.imageCarousel
+        self.can_sync = True
+
 
     def show_shot(self, shot):
         if self.current_shot != shot:
@@ -142,3 +152,7 @@ class ShotView(PyHtmlView):
 
     def switch_type(self):
         self.imageCarousel.switch_type()
+
+
+    def available_locations(self):
+        raise NotImplementedError()

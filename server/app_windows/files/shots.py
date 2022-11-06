@@ -10,7 +10,7 @@ from app_windows.settings.settings import SettingsInstance
 class Shots:
     def __init__(self):
         self.shots = ObservableList()
-        self.path = "/shots/"
+        self.path = "c:\\my_shots"
         self.cache = {}
         self.load_shots_from_disk()
 

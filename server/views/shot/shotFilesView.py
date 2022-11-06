@@ -1,8 +1,5 @@
 from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
-from app.settings.settings import SettingsInstance
-
-
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="row" style="margin-bottom: 10px;">
@@ -86,12 +83,12 @@ class ShotFilesView(PyHtmlView):
     def DOM_ELEMENT_EXTRAS(self):
         return 'style="display:none;"' if self.is_hidden is True else ""
 
-    def __init__(self, subject, parent, **kwargs):
+    def __init__(self, subject, parent, settingsInstance, **kwargs):
         super().__init__(subject, parent, **kwargs)
+        self.settingsInstance = settingsInstance
         self.is_hidden = True
         self.current_models_list = ObservableList()
         self.current_shot = None
-        self.settings = SettingsInstance()
         self.filesListView = ObservableListView(self.current_models_list, self, item_class=ModelFileItemView, dom_element="tbody")
 
     def show(self):

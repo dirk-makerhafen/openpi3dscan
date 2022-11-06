@@ -11,7 +11,7 @@ class Alignment(GenericTask):
         self.alignments = []
         self.box_center_correction = [0,0,0]
 
-    def load(self):
+    def run(self):
         alignments_csv = self.rc_job.get_path("%s_alignments.csv")
         rc_proj_file = os.path.join(self.rc_job.workingdir, "%s.rcproj" % self.rc_job.realityCapture_filename)
         raw_exists_file = os.path.join(self.rc_job.workingdir, "%s.raw_exists" % self.rc_job.realityCapture_filename)

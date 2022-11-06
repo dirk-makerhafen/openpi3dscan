@@ -11,7 +11,7 @@ class SettingsCache(Observable):
         super().__init__()
         self.parent = parent
         self.save = parent.save
-        self.directory = "c:\shots"
+        self.directory = "c:\\rc_cache"
         self.size = 10
 
     def set_size(self, new_size):
@@ -39,7 +39,10 @@ class SettingsCache(Observable):
         for path in glob.glob(os.path.join(self.directory, "*")):
             if os.path.exists(os.path.join(path, "last_usage")):
                 with open(os.path.join(path, "last_usage"), "r") as f:
-                    shots.append([int(f.read()), path])
+                    try:
+                        shots.append([int(f.read()), path])
+                    except:
+                        pass
         shots.sort()
         while len(shots) > self.size:
             shutil.rmtree(shots[0][1])

@@ -8,7 +8,7 @@ class ResultsArchive(GenericTask):
     def __init__(self, rc_job):
         super().__init__(rc_job)
 
-    def create(self):
+    def run(self):
         force_reload = self.status != "idle"
         self.set_status("active")
 
@@ -38,9 +38,8 @@ class ResultsArchive(GenericTask):
             os.remove(model_file_zip)
         os.system("cd \"%s\" & powershell -command \"Compress-Archive '%s\\*' '%s.zip'\"" % (self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_foldername))
         if not os.path.exists(model_file_zip):
-            self.model_path = None
             self.log.append("Failed to create result zip file")
             self.set_status("failed")
         else:
-            self.model_path = model_file_zip
+            self.rc_job.result_file = model_file_zip
             self.set_status("success")

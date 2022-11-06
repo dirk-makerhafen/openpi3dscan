@@ -13,10 +13,6 @@ from app.files.shots import ShotsInstance
 from app_windows.realityCapture.realityCapture import RealityCapture
 from app_windows.settings.settings import SettingsInstance
 
-CACHE_DIR = "None"
-CACHE_SIZE = 16
-
-SERVER = "127.0.0.1"
 
 class LogItem():
     def __init__(self, log):
@@ -26,8 +22,7 @@ class Processing(Observable):
     def __init__(self):
         super().__init__()
         self.log = ObservableList()
-
-        self._setup()
+        self.dns_cache = {}
         self.status = "idle"
         self.rc_tasks = ObservableList()
         rc = RealityCapture(
@@ -56,33 +51,44 @@ class Processing(Observable):
 
     def loop(self):
         while True:
-            #rr = self._request_remote(["127.0.0.1"])
-            rl = self._request_local()
-            if  rl == False:
+            work_done = False
+
+            for host in SettingsInstance().settingsRemoteHosts.hosts:
+                host = self._resolve_host(host)
+                if host is not None:
+                    if self._request_remote(host) is True:
+                        work_done = True
+
+            if self._request_local() is True:
+                work_done = True
+
+            if work_done is False:
                 print("no results, waiting some time ")
                 self.log.insert(0, LogItem("no results, waiting some time "))
+            else:
+                SettingsInstance().settingsCache.clean()
             time.sleep(5)
 
     def set_status(self, status):
         if self.status != status:
             self.status = status
-            #self.notify_observers()
+            self.notify_observers()
 
-    def _setup(self):
-        if not os.path.exists(CACHE_DIR):
-            os.mkdir(CACHE_DIR)
-        global SERVER
-        while SERVER is None:
-            hostname = open("hostname", "r").read().strip()
-            print("Resolving %s.local" % hostname)
+    def _resolve_host(self, host):
+        if host in self.dns_cache:
+            return self.dns_cache[host]
+        for _ in range(60):
             try:
-                for ip in socket.getaddrinfo("%s.local" % hostname, 80):
+                for ip in socket.getaddrinfo(host, 80):
                     if ":" in ip[4][0]:
                         continue
-                    SERVER = ip[4][0]
+                    self.dns_cache[host] = ip[4][0]
+                    return self.dns_cache[host]
             except Exception as e:
                 print("Failed to resolve server IP")
             time.sleep(1)
+
+        return None
 
     def _request_local(self):
         models = ShotsInstance().get_unprocessed_models(limit=1)
@@ -95,7 +101,7 @@ class Processing(Observable):
             shot.meta_location = "hamburg"
             location = SettingsInstance().settingsLocations.get_by_location(shot.meta_location)
             rc = RealityCapture(
-                source_dir="TODO",
+                source_dir=shot.path,
                 source_ip=None,
                 shot_id=shot.shot_id,
                 model_id=model.model_id,
@@ -113,16 +119,19 @@ class Processing(Observable):
             )
             self.rc_tasks.append(rc)
             self.current_task = rc
-            model_result_path = None
             try:
-                model_result_path = rc.process()
+                rc.process()
             except Exception as e:
                 traceback.print_exc()
                 print(e)
                 print("Failed to process", e)
-            if model_result_path is not None:
+            if rc.result_file is not None:
                 location.calibration_data = json.dumps(rc.calibrationData.data)
-            self.set_status("processing")
+                model.write_file(rc.result_file)
+            else:
+                model.set_status("failed")
+
+            self.set_status("idle")
         self.current_task = None
         return True
 
@@ -136,8 +145,6 @@ class Processing(Observable):
 
         for model in data["models"]:
             self.processing(server_ip, model["shot_id"], model["model_id"])
-            self._clean_shot_dir()
-            self.set_status("download")
             rc = RealityCapture(
                 source_dir=None,
                 source_ip=server_ip,
@@ -167,39 +174,14 @@ class Processing(Observable):
                 print("Failed to process", e)
 
             if model_result_path is not None:
-                self.upload_calibration_data(rc.calibrationData.data)
-                try:
-                    SettingsInstance().locations.get_by_location(shot.location).calibration_data = json.dumps(rc.calibrationData.data)
-                except Exception as e:
-                    print(e)
-                self.upload_model(model["shot_id"], model["model_id"], model_result_path)
-                os.remove(model_result_path)
+                pass
+                #SettingsInstance().locations.get_by_location(shot.location).calibration_data = json.dumps(rc.calibrationData.data)
             else:
-                self.process_failed(model["shot_id"], model["model_id"])
-                if os.path.exists(shot_path):
-                    print("Not caching shot %s" % shot_path)
-                    try:
-                        shutil.rmtree(shot_path)
-                    except:
-                        print("Failed to delete %s" % shot_path)
+                self.process_failed(server_ip, model["shot_id"], model["model_id"])
         self.current_task = None
         self.set_status("idle")
         return True
 
-    def _clean_shot_dir(self):
-        return
-        shots = []
-        for path in glob.glob(os.path.join(CACHE_DIR, "*")):
-            shots.append(path)
-
-        for index, path in enumerate(shots):
-            with open(os.path.join(path, "last_usage"), "r") as f:
-                shots[index] = [int(f.read()), path]
-
-        shots.sort()
-        while len(shots) > CACHE_SIZE:
-            shutil.rmtree(shots[0][1])
-            del shots[0]
 
     def _parse_markers_str(self, markers_str):
         distances = {}

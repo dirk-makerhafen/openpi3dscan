@@ -10,7 +10,7 @@ class Markers(GenericTask):
         self.distances = distances
         self.available_markers = []
 
-    def load(self):
+    def run(self):
         markers_csv = self.rc_job.get_path("%s_markers.csv")
         force_reload = self.status != "idle"
         if len(self.distances) == 0:

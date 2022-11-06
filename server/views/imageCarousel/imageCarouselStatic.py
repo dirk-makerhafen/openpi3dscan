@@ -1,13 +1,10 @@
-from app.settings.settings import SettingsInstance
 from views.imageCarousel.imageCarousel import ImageCarousel
-
 
 class ImageCarouselStatic(ImageCarousel):
     DOM_ELEMENT_CLASS = "ImageCarousel"
 
     def __init__(self, subject, parent):
         super().__init__(subject, parent)
-        self.ss = SettingsInstance().settingsScanner
 
     def _get_settings_camera_one_position(self):
         return self.parent.current_shot.meta_camera_one_position

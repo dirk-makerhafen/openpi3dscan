@@ -15,20 +15,6 @@ class SettingsRealityCaptureView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
-                                <strong class="mb-0">RealityCapture Automation Software</strong>
-                                <p class="text-muted mb-0">Software package to automate RealityCapture. Download, unzip, run <b>start.bat</b> </p>
-                            </div>
-                            <div class="col-auto">
-                                <div class="custom-control custom-switch">
-                                    <a href="/windows_pack.zip">DOWNLOAD</a>
-                                    <span class="custom-control-label"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="row align-items-center">
-                            <div class="col-md-10">
                                 <strong class="mb-0">Pin</strong>
                                 <p class="text-muted mb-0">Setup RealityCapture pin at <a target="blanc" href="https://www.capturingreality.com/my.pin">https://www.capturingreality.com/my.pin</a></p>
                             </div>
@@ -39,8 +25,6 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>
                         </div>
                     </div>
-                    
-                    
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
@@ -108,7 +92,19 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>         
                         </div>
                     </div>  
-                                                 
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-10">
+                                <strong class="mb-0">Lit / Unlit</strong>
+                                <p class="text-muted mb-0">GLB, GIF and WEBP default lit. </p>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="custom-control custom-switch">
+                                    <input id="default_lit"  type="checkbox" {% if pyview.subject.default_lit == True %}checked{% endif %} onclick='pyview.subject.set_default_lit($("#default_lit").prop("checked") === true)'>                                 
+                                </div>
+                            </div>         
+                        </div>
+                    </div>                         
                 </div>
             </div>   
         </div>

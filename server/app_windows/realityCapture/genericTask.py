@@ -5,13 +5,20 @@ import time
 
 from pyhtmlgui import Observable, ObservableList
 
+class LogItem():
+    def __init__(self, value):
+        self.value = value
+class Log(ObservableList):
+    def append(self, value):
+        value = LogItem(value)
+        super().append(value)
 
 class GenericTask(Observable):
     def __init__(self, rc_job):
         super().__init__()
         self.rc_job = rc_job
         self.status = "idle"
-        self.log = ObservableList()
+        self.log = Log()
 
     def set_status(self, new_status):
         if self.status == new_status:

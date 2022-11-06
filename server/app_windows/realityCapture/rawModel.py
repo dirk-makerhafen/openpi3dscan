@@ -48,11 +48,11 @@ class RawModel(GenericTask):
                     f.write("raw created")
                 self.set_status("success")
             else:
-                print("Failed to create raw model, no changes in rcproj")
-                self.set_status("faild")
+                self.log.append("No model created, failed")
+                self.set_status("failed")
         else:
+            self.log.append("Using model from cache")
             self.set_status("success")
-            print("raw model already exists")
 
 
     def _get_cmd_cleanup_lower_region(self):

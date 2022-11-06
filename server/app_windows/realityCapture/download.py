@@ -12,15 +12,15 @@ class Download(GenericTask):
     def run(self):
         self.set_status("active")
         if os.path.exists(os.path.join(self.rc_job.workingdir, "images")):
-            print("shot '%s' was already downloaded as %s" % (self.rc_job.shot_id, self.rc_job.workingdir))
+            self.log.append("Not downloading, exists in cache")
         else:
-            print("Download shot id %s" % self.rc_job.shot_id)
+            self.log.append("Download from %s" % self.rc_job.source_ip)
             try:
                 data = requests.get("http://%s/shots/%s.zip" % (self.rc_job.source_ip, self.rc_job.shot_id)).content
                 with open(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id), "wb") as f:
                     f.write(data)
             except Exception as e:
-                print("failed to download shot '%s'" % self.rc_job.shot_id)
+                self.log.append("Download failed")
                 self.set_status("failed")
                 return None
             if self._unpack_zip(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id)) is False:
@@ -33,12 +33,12 @@ class Download(GenericTask):
         name = path.split("\\")[-1].split(".zip")[0]
         dir = "\\".join(path.split("\\")[0:-1])
         target_dir = os.path.join(dir, name)
-        print("Unpack %s" % path)
+        self.log.append("Unzip download")
         if os.path.exists(target_dir):
             try:
                 shutil.rmtree(target_dir)
             except:
-                print("Failed to delete %s" % target_dir)
+                pass
         os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s.zip'\"" % (dir, name))
         os.remove(path)
         if not os.path.exists(os.path.join(target_dir, "images")):

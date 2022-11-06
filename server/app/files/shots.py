@@ -6,8 +6,6 @@ from pyhtmlgui import ObservableList
 from app.files.shot import Shot
 from app.settings.settings import SettingsInstance
 
-SHOT_DIR = "/shots"
-
 # All local and remote Shots
 class Shots:
     def __init__(self, devices):
@@ -19,7 +17,7 @@ class Shots:
         self.load()
 
     def create(self, shot_id, name):
-        s = Shot(SHOT_DIR, shot_id)
+        s = Shot(self.path, shot_id)
         s.meta_location = SettingsInstance().settingsScanner.location
         s.meta_max_segments = SettingsInstance().settingsScanner.segments
         s.meta_max_rows = SettingsInstance().settingsScanner.cameras_per_segment
@@ -49,7 +47,7 @@ class Shots:
             return
         s = self.get(shot_id)
         if s is None:
-            s = Shot(SHOT_DIR, shot_id)
+            s = Shot(self.path, shot_id)
             index = 0
             for i in range(len(self.shots)):
                 index = i
@@ -111,12 +109,12 @@ class Shots:
             pass
 
     def load_shots_from_disk(self):
-        for path in glob.glob("/shots/*"):
-            if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images")) :
+        for path in glob.glob(os.path.join(self.path, "*")):
+            if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images","normal")) or (os.path.exists(os.path.join(path, "normal")) and os.path.exists(os.path.join(path, "projection"))  ):
                 shot_id = path.split("/")[-1]
                 shot = self.get(shot_id)
                 if shot is None:
-                    self.shots.append(Shot(SHOT_DIR, shot_id))
+                    self.shots.append(Shot(self.path, shot_id))
                 else:
                     shot.load()
         self.shots.sort(reverse=True)

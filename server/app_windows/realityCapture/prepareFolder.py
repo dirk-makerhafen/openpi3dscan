@@ -74,20 +74,25 @@ class PrepareFolder(GenericTask):
         self.set_status("active")
         if not os.path.exists(self.rc_job.workingdir):
             os.mkdir(self.rc_job.workingdir)
+            self.log.append("Cache directory created %s" % self.rc_job.workingdir)
+        else:
+            self.log.append("Cache found at %s" % self.rc_job.workingdir)
+
+        with open(os.path.join(self.rc_job.workingdir, "last_usage"), "w") as f:
+            f.write("%s" % int(time.time()))
+
         if not os.path.exists(os.path.join(self.rc_job.workingdir, "tmp")):
             os.mkdir(os.path.join(self.rc_job.workingdir, "tmp"))
         if not os.path.exists(os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername)):
             os.mkdir(os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername))
 
-        with open(os.path.join(self.rc_job.workingdir, "last_usage"), "w") as f:
-            f.write("%s" % int(time.time()))
-        with open(self.rc_job.get_path("DetectMarkersParams.xml"), "w") as f:
+        with open(self.get_path("DetectMarkersParams.xml"), "w") as f:
             f.write(DetectMarkersParams_xml)
-        with open(self.rc_job.get_path("box.rcbox"), "w") as f:
+        with open(self.get_path("box.rcbox"), "w") as f:
             f.write(box_rcbox  % (round(self.rc_job.box_dimensions[0], 2), round(self.rc_job.box_dimensions[1], 2), round(self.rc_job.box_dimensions[2], 2), round(self.rc_job.box_dimensions[2]/2, 2)))
-        with open(self.rc_job.get_path("exportRegistrationSettings.xml"), "w") as f:
+        with open(self.get_path("exportRegistrationSettings.xml"), "w") as f:
             f.write(ExportRegistrationSettings_xml)
-        with open(self.rc_job.get_path("xmp_settings.xml"), "w") as f:
+        with open(self.get_path("xmp_settings.xml"), "w") as f:
             f.write(XMPSettings_xml)
 
         if self.rc_job.source_ip is None:
@@ -99,5 +104,12 @@ class PrepareFolder(GenericTask):
                         shutil.copytree(os.path.join(self.rc_job.source_dir, "images", imgtype), os.path.join(self.rc_job.workingdir, "images", imgtype))
                     elif os.path.exists(os.path.join(self.rc_job.source_dir, imgtype)):
                         shutil.copytree(os.path.join(self.rc_job.source_dir, imgtype), os.path.join(self.rc_job.workingdir, "images", imgtype))
-
-        self.set_status("success")
+            nr_of_images = len(glob.glob(os.path.join(self.rc_job.workingdir, "images", "*", "*.jpg")))
+            if nr_of_images == 0:
+                self.log.append("No images copied from %s, failed" % self.rc_job.source_dir)
+                self.set_status("failed")
+            else:
+                self.log.append("%s images copied to cache" % (nr_of_images))
+                self.set_status("success")
+        else:
+            self.set_status("success")

@@ -1,5 +1,5 @@
 from pyhtmlgui import Observable
-from app.files.shots import ShotsInstance
+from app_windows.files.shots import ShotsInstance
 from app_windows.settings.settings import SettingsInstance
 from app_windows.processing import Processing
 class App(Observable):
@@ -8,7 +8,7 @@ class App(Observable):
         self.status = "active"
         self.settings = SettingsInstance(None)
         self.processing = Processing()
-        self.shots = ShotsInstance(None)
+        self.shots = ShotsInstance()
 
 _appInstance = None
 

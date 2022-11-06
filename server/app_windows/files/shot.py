@@ -16,7 +16,7 @@ from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
 
 from app.files.modelFile import ModelFile
-from app.settings.settings import SettingsInstance
+from app_windows.settings.settings import SettingsInstance
 
 SyncThreadPool = ThreadPool(8)
 
@@ -65,18 +65,6 @@ class Shot(Observable):
     def nr_of_models_failed(self):
         return len([m for m in self.models if m.status == "failed"])
 
-    def create_folders(self):
-        if not os.path.exists(self.path):
-            self.path_exists = True
-            os.mkdir(self.path)
-            os.mkdir(self.images_path)
-            os.mkdir(os.path.join(self.images_path, "normal"))
-            os.mkdir(os.path.join(self.images_path, "projection"))
-            os.mkdir(self.preview_images_path)
-            os.mkdir(os.path.join(self.preview_images_path, "normal"))
-            os.mkdir(os.path.join(self.preview_images_path, "projection"))
-            self.save()
-
     def set_name(self, name):
         if self.name == name:
             return
@@ -93,69 +81,9 @@ class Shot(Observable):
         self.backup_meta()
         self.notify_observers()
 
-    def add_device(self, device):
-        if device not in self.devices:
-            self.devices.add(device)
-            self.notify_observers()
-
-    def remove_device(self, device):
-        if device in self.devices:
-            self.devices.remove(device)
-            self.notify_observers()
-
     def delete(self):
-        if self.devices is not None:
-            for device in self.devices:
-                device.camera.shots.delete(self.shot_id)
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
-
-    def sync_remote(self):
-        if self.worker is None:
-            self.worker = threading.Thread(target=self._sync_remote, daemon=True)
-            self.worker.start()
-
-    # image_mode = normal | preview, image_type = normal | projection
-    def _sync_remote(self):
-        self.status = "Sync"
-        self.notify_observers()
-        self.create_folders()
-        tasks = []
-        existing_images = glob.glob(os.path.join(self.images_path, "*", "*.jpg"))
-        existing_images.extend(glob.glob(os.path.join(self.preview_images_path, "*", "*.jpg")))
-        for device in [d for d in self.devices if d.status == "online"]:
-            segment = device.name.split("-")[0].replace("SEG","")
-            row = device.name.split("-")[1].replace("CAM","")
-            for image_mode in ["normal", "preview"]:
-                for image_type in ["normal", "projection"]:
-                    if image_mode == "normal":
-                        img_path = os.path.join(self.images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
-                    else:
-                        img_path = os.path.join(self.preview_images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
-
-                    if img_path not in existing_images:
-                        tasks.append([device, [self.shot_id, image_type, image_mode, False]])
-        if len(tasks) > 0:
-            random.shuffle(tasks)
-            SyncThreadPool.map(lambda task: task[0].camera.shots.download(*task[1]), tasks)
-            self.count_number_of_files()
-
-        resolution = [800, 600] if SettingsInstance().settingsScanner.camera_rotation in [0, 180] else [600, 800]
-        for image_type in ["normal", "projection"]:
-            existing_images = glob.glob(os.path.join(self.images_path, image_type, "*.jpg"))
-            existing_previews = glob.glob(os.path.join(self.preview_images_path, image_type, "*.jpg"))
-            for existing_image in existing_images:
-                preview_path = os.path.join(self.preview_images_path, image_type, existing_image.split("/")[-1])
-                if preview_path not in existing_previews:
-                    try:
-                        img = Image.open(existing_image)
-                        img = img.resize(resolution)
-                        img.save(preview_path, format="jpeg", quality=85)
-                    except:
-                        print("Failed to create preview")
-        self.status = ""
-        self.worker = None
-        self.notify_observers()
 
     # image_mode = normal | preview , image_type = normal | projection
     def get_image(self, image_type, image_mode, segment, row):
@@ -167,16 +95,7 @@ class Shot(Observable):
         if os.path.exists(img_path):
             with open(img_path, "rb") as f:
                 return f.read()
-        if self.devices is None:
-            return None
-        try:
-            device = [d for d in self.devices if d.name == "SEG%s-CAM%s" % (segment, row) and d.status == "online"][0]
-        except:
-            return None
-        img = device.camera.shots.download(self.shot_id, image_type, image_mode=image_mode)
-        if img is None or len(img) < 1000:
-            return None
-        return img
+        return None
 
     def list_possible_images(self, image_type, image_mode):
         if image_mode == "normal":
@@ -190,35 +109,9 @@ class Shot(Observable):
             row = file.split("/")[-1].split("-")[1].replace("cam","")
             results.append([image_type, image_mode, segment, row, ])
 
-        if self.devices is not None:
-            for device in self.devices:
-                if device.status != "online":
-                    continue
-                segment = device.name.split("-")[0].replace("SEG","")
-                row = device.name.split("-")[1].replace("CAM","")
-                try:
-                    [x for x in results if x[2] == segment and x[3] == row][0]
-                except: # does not exist, but may
-                    results.append([image_type, image_mode, segment, row ])
-
         return results
 
-    def add_image(self, image_type, image_mode, device_name, image_data):
-        if self.path_exists is False:
-            return
-        if image_mode == "normal":
-            img_path = os.path.join(self.images_path, image_type, "%s-%s.jpg" % (device_name.lower(), image_type[0]))
-        else:
-            img_path = os.path.join(self.preview_images_path, image_type, "%s-%s.jpg" % (device_name.lower(), image_type[0]))
-
-        with FileObjectThread(img_path, "wb") as f:
-            f.write(image_data)
-            if image_mode == "normal":
-                self.nr_of_files += 1
-                self.notify_observers()
-
     def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
-        self.create_folders()
         model = self.get_model(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures, lit=lit)
         if model is not None:
             if model.status == "failed":

@@ -206,6 +206,16 @@ class HttpEndpoints:
         for f in filelist:
             zs.add(ds.get(f[0]), f[0])
 
+        zs.add("metadata.json", json.dumps({
+            "name": shot.name,
+            "comment": shot.comment,
+            "meta_location": shot.meta_location,
+            "meta_max_rows": shot.meta_max_rows,
+            "meta_max_segments": shot.meta_max_segments,
+            "meta_rotation": shot.meta_rotation,
+            "meta_camera_one_position": shot.meta_camera_one_position,
+        }))
+
         headers = {
             'Content-Type': "application/zip",
             'Content-Disposition': 'attachment; filename="%s.zip"' % shot.get_clean_shotname()

@@ -19,10 +19,12 @@ class Alignment(GenericTask):
         self.set_status("active")
 
         if force_reload is True and os.path.exists(alignments_csv):
+            self.log.append("Removing cached alignments file %s" % alignments_csv)
             os.remove(alignments_csv)
 
         if os.path.exists(alignments_csv):
             self._load_alignments_csv(alignments_csv)
+            self.log.append("%s aligned cameras loaded from cache %s" % (len(self.alignments), alignments_csv))
 
         if len(self.alignments) < 12 or force_reload is True:
             if os.path.exists(alignments_csv):
@@ -51,7 +53,10 @@ class Alignment(GenericTask):
             if os.path.exists(self.rc_job.get_path("%s_alignments.csv")):
                 self.alignments_were_recreated = True
             self._load_alignments_csv(alignments_csv)
-        if len(self.alignments) < 50:
+            self.log.append("%s aligned cameras detected" % (len(self.alignments)))
+
+        if len(self.alignments) < 30:
+            self.log.append("less than 30 aligned cameras detected, failed")
             self.set_status("failed")
         else:
             self.set_status("success")
@@ -66,7 +71,6 @@ class Alignment(GenericTask):
                     al = line.split(",")
                     al = [al[0], float(al[1]), float(al[2]), float(al[3]), None]
                     self.alignments.append(al)
-        print("%s alignments loaded" % len(self.alignments))
         c_x = (max([x[1] for x in self.alignments]) + min([x[1] for x in self.alignments])) / 2
         c_y = (max([x[2] for x in self.alignments]) + min([x[2] for x in self.alignments])) / 2
         c_z = (max([x[3] for x in self.alignments]) + min([x[3] for x in self.alignments])) / 2
@@ -76,7 +80,6 @@ class Alignment(GenericTask):
         avg_z = sum([x[3] for x in self.alignments]) / len(self.alignments)
         # print("avg", avg_x, avg_y, avg_z)
         self.box_center_correction = [c_x, c_y, c_z]
-        print("Box center corrections:", c_x, c_y, c_z)
 
 
     def _get_cmd_defineDistance(self):

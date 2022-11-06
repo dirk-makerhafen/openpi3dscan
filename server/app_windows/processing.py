@@ -56,12 +56,12 @@ class Processing(Observable):
 
     def loop(self):
         while True:
-            rr = self._request_remote(["127.0.0.1"])
+            #rr = self._request_remote(["127.0.0.1"])
             rl = self._request_local()
-            if rr == False and rl == False:
+            if  rl == False:
                 print("no results, waiting some time ")
                 self.log.insert(0, LogItem("no results, waiting some time "))
-                time.sleep(3)
+            time.sleep(5)
 
     def set_status(self, status):
         if self.status != status:
@@ -92,7 +92,8 @@ class Processing(Observable):
         self.set_status("processing")
         for model in models:
             shot = model.parentShot
-            location = SettingsInstance().locations.get_by_location(shot.location)
+            shot.meta_location = "hamburg"
+            location = SettingsInstance().settingsLocations.get_by_location(shot.meta_location)
             rc = RealityCapture(
                 source_dir="TODO",
                 source_ip=None,
@@ -101,7 +102,7 @@ class Processing(Observable):
                 shot_name=shot.name,
                 filetype=model.filetype,
                 reconstruction_quality=model.reconstruction_quality,
-                export_quality=model.export_quality,
+                export_quality=model.quality,
                 create_mesh_from=model.create_mesh_from,
                 create_textures=model.create_textures,
                 lit=model.lit,
@@ -186,6 +187,7 @@ class Processing(Observable):
         return True
 
     def _clean_shot_dir(self):
+        return
         shots = []
         for path in glob.glob(os.path.join(CACHE_DIR, "*")):
             shots.append(path)

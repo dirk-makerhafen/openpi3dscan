@@ -84,7 +84,7 @@ class RealityCapture():
         self.box_dimensions = box_dimensions
         self.debug = debug
         self.workingdir = os.path.join(CACHE_DIR, self.shot_name)
-
+        print("WD", self.workingdir)
         self.reconstruction_quality_str = self.reconstruction_quality[0].upper()
         self.quality_str = self.export_quality[0].upper()
         self.create_mesh_from_str = create_mesh_from[0].upper()
@@ -103,7 +103,7 @@ class RealityCapture():
         self.download = None if self.source_ip is None else Download(self)
         self.upload   = None if self.source_ip is None else Upload(self)
         self.verifyImages = VerifyImages(self)
-        self.markers = Markers(self)
+        self.markers = Markers(self, distances)
         self.alignments = Alignment(self, distances)
         self.rawmodel = RawModel(self)
         self.exportmodel = ExportModel(self)
@@ -117,7 +117,7 @@ class RealityCapture():
 
     def process(self):
         first_time_calibration = len(self.calibrationData.data) == 0
-
+        self.status = "active"
         tasks = []
         tasks.append(self.prepareFolder.run)
         if self.download is not None:
@@ -139,17 +139,13 @@ class RealityCapture():
         for task in tasks:
             while self.status == "active":
                 task()
-                if task.success:
-                    break
-                while self.status == "active" and task.status == "failed":
-                    time.sleep(1)
 
         if DEBUG is False:
             try:
                 shutil.rmtree(os.path.join(self.workingdir, self.export_foldername))
             except:
                 print("Failed to delete %s" % os.path.join(self.workingdir, self.export_foldername))
-
+        self.status = "idle"
         return self.model_path
 
 

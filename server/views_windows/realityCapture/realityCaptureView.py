@@ -6,23 +6,7 @@ class logView(PyHtmlView):
     '''
 class RealityCaptureView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="main">
-        <div class="RealityCapture">
-            <div class="row justify-content-center" style="width:100%">
-                <div class="col-md-12">
-                    <div class="list-group mb-5 shadow">
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-10 h3" style="border-bottom: 1px solid lightgray;">RealityCapture</div>
-                                <div class="col-md-2 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.status}}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>   
-            </div>
-            
-        </div>
-        <div class="TAsks">
+    
             <div class="row justify-content-center" style="width:100%">
                 <div class="col-md-12">
                     <div class="list-group mb-5 shadow">
@@ -32,8 +16,31 @@ class RealityCaptureView(PyHtmlView):
                                 <div class="col-md-2 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.status}}</div>
                             </div>
                         </div>
-
-                        
+                        <div class="list-group-item">
+                            <div class="row align-items-center" style="border-bottom: 1px solid lightgray;">
+                                <div class="col-md-3" style="font-size: 1.2em;font-weight:bold">Filetype:</div>
+                                <div class="col-md-1">{{pyview.subject.filetype}}</div>
+                                <div class="col-md-3" style="font-size: 1.2em;font-weight:bold">Reconstruction quality:</div>
+                                <div class="col-md-1">{{pyview.subject.reconstruction_quality}}</div>
+                                <div class="col-md-3 " style="font-size: 1.2em;font-weight:bold">Export quality:</div>
+                                <div class="col-md-1">{{pyview.subject.export_quality}}</div>
+                            </div>
+                            <div class="row align-items-center" style="border-bottom: 1px solid lightgray;">
+                                <div class="col-md-3 " style="font-size: 1.2em;font-weight:bold">Create mesh from:</div>
+                                <div class="col-md-1">{{pyview.subject.create_mesh_from}}</div>
+                                <div class="col-md-3 " style="font-size: 1.2em;font-weight:bold">Create textures:</div>
+                                <div class="col-md-1">{{pyview.subject.create_textures}}</div>
+                                <div class="col-md-3 " style="font-size: 1.2em;font-weight:bold">Lit:</div>
+                                <div class="col-md-1">{{pyview.subject.lit}}</div>
+                            </div>
+                            
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-10 h3" style="border-bottom: 1px solid lightgray;">Processing Steps</div>
+                                <div class="col-md-2 h3" style="border-bottom: 1px solid lightgray;">button?</div>
+                            </div>
+                        </div>
                         {{pyview.prepareFolderView.render()}}
                         {% if pyview.downloadView %}
                             {{ pyview.downloadView.render() }}
@@ -60,11 +67,7 @@ class RealityCaptureView(PyHtmlView):
                 </div>   
                 
             </div>
-            
-        </div>  
-
-
-    </div>
+      
     '''
     def __init__(self, subject, parent, **kwargs):
         super().__init__(subject, parent, **kwargs)
@@ -90,153 +93,171 @@ class RealityCaptureView(PyHtmlView):
         else:
             self.upload = None
 
-class PrepareFolderView(PyHtmlView):
+
+class GenericTaskView(PyHtmlView):
+    def __init__(self, subject, parent, **kwargs):
+        super().__init__(subject, parent, **kwargs)
+        self.logView = ObservableListView(subject.log, self, LogItemView)
+
+class LogItemView(PyHtmlView):
+    TEMPLATE_STR = '''{{pyview.subject.value}}'''
+
+class PrepareFolderView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>prepare</p>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Prepare folders</p>
                 </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
                 <div class="col-md-2"></div>
-                <div class="col-md-2">idle</div>
             </div>
         </div>
     '''
-class DownloadView(PyHtmlView):
+class DownloadView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>downoad</p>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Download</p>
                 </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
                 <div class="col-md-2"></div>
-                <div class="col-md-2">idle</div>
             </div>
         </div>
     '''
-class VerifyImagesView(PyHtmlView):
+class VerifyImagesView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>verifyImages</p>
-                </div>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
                 <div class="col-md-2">
-                    5 images_cleaned 
+                    <p>Verify images</p>
                 </div>
-                <div class="col-md-2">
-                    Idle
-                </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
+                <div class="col-md-2"></div>
             </div>
         </div>
     '''
-class MarkersView(PyHtmlView):
+class MarkersView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>markers</p>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Detect markers</p>
                 </div>
-                <div class="col-md-2">23 markers detected</div>
-                <div class="col-md-2">idle</div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
+                <div class="col-md-2"></div>
             </div>
         </div>
     '''
-class AlignmentsView(PyHtmlView):
+class AlignmentsView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>alignment</p>
-                </div>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
                 <div class="col-md-2">
-                    23 cameras aligned
+                    <p>Align images</p>
                 </div>
-                <div class="col-md-2">idle</div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
+                <div class="col-md-2"></div>
             </div>
         </div> 
     '''
-class RawModelView(PyHtmlView):
+class RawModelView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>rawmodel</p>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Create raw model</p>
                 </div>
-                <div class="col-md-2"></div>
-                <div class="col-md-2">idle</div>
-            </div>
-        </div>
-    '''
-class ExportmodelView(PyHtmlView):
-    TEMPLATE_STR = '''
-        <div class="list-group-item">
-            <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>exportmodel</p>
-                </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
                 <div class="col-md-2"></div>
             </div>
         </div>
     '''
-class AnimationView(PyHtmlView):
+class ExportmodelView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>animate</p>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Create export model</p>
                 </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
                 <div class="col-md-2"></div>
-                <div class="col-md-2">idle</div>
             </div>
         </div>
     '''
-class ResultsArchiveView(PyHtmlView):
+class AnimationView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
-            <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>result</p>
+            <div class="row align-items-center">    
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Create animation</p>
                 </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
                 <div class="col-md-2"></div>
-                <div class="col-md-2">idle</div>
             </div>
         </div>
     '''
-class UploadView(PyHtmlView):
+class ResultsArchiveView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>upload</p>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Create result archive</p>
                 </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
                 <div class="col-md-2"></div>
-                <div class="col-md-2">idle</div>
+            </div>
+        </div>
+    '''
+class UploadView(GenericTaskView):
+    TEMPLATE_STR = '''
+        <div class="list-group-item">
+            <div class="row align-items-center">
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Upload results</p>
+                </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
+                <div class="col-md-2"></div>
             </div>
         </div>
     '''
 
-class CalibrationDataWriteView(PyHtmlView):
+class CalibrationDataWriteView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>calibrationDataWrite</p>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Write calibration data</p>
                 </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
                 <div class="col-md-2"></div>
-                <div class="col-md-2">idle</div>
             </div>
         </div>
     '''
-class CalibrationDataUpdateView(PyHtmlView):
+
+
+class CalibrationDataUpdateView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">
-                <div class="col-md-3">
-                    <p>calibrationDataupdate</p>
+                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-2">
+                    <p>Update calibration data</p>
                 </div>
+                <div class="col-md-7">{{pyview.logView.render()}}</div>
                 <div class="col-md-2"></div>
-                <div class="col-md-2">idle</div>
             </div>
         </div>
     '''

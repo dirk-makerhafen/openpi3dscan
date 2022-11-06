@@ -148,11 +148,11 @@ class LiveView(PyHtmlView):
                     e.preventDefault();
                     pyview.create_shot_view.create_shot( $("#_name_input").val());
                 };
-                if ( e.keyCode ==  33){    // left
+                if ( e.keyCode ==  33 ||  e.keyCode ==  37){    // pageup or left
                     e.preventDefault();
                     pyview.imageCarousel.rotate_cw();
                 };
-                if ( e.keyCode ==  34){    // right
+                if ( e.keyCode ==  34 ||  e.keyCode ==  39){    // pagedown or right
                     e.preventDefault();
                     pyview.imageCarousel.rotate_ccw();
                 };

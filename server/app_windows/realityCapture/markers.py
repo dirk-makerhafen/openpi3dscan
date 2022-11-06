@@ -1,25 +1,34 @@
+import math
 import os
 
 from app_windows.realityCapture.genericTask import GenericTask
 
 
 class Markers(GenericTask):
-    def __init__(self, rc_job):
+    def __init__(self, rc_job, distances):
         super().__init__(rc_job)
+        self.distances = distances
         self.available_markers = []
 
     def load(self):
         markers_csv = self.rc_job.get_path("%s_markers.csv")
         force_reload = self.status != "idle"
+        if len(self.distances) == 0:
+            self.log.append("Not distances loaded, not detecting markers")
+            self.set_status("success")
+            return
+
         self.set_status("active")
 
         if force_reload is True and os.path.exists(markers_csv):
+            self.log.append("Removing cached markers file %s" % markers_csv)
             os.remove(markers_csv)
 
         if os.path.exists(markers_csv):
             self._load_markers_csv(markers_csv)
+            self.log.append("%s of %s Markers loaded from cache %s" % (len(self.available_markers), len(self.distances), markers_csv))
 
-        if len(self.available_markers) < 2 or force_reload is True:
+        if len(self.available_markers) < math.floor(len(self.distances)/4.0) or force_reload is True:
             cmd = self._get_cmd_start()
             cmd += self._get_cmd_new_scene()
             cmd += '-detectMarkers "%s" ' %  self.rc_job.get_path("DetectMarkersParams.xml")
@@ -28,12 +37,13 @@ class Markers(GenericTask):
             cmd += '-quit '
             self.rc_job._run_command(cmd, "load_markers")
             self._load_markers_csv(markers_csv)
+            self.log.append("%s of %s Markers detected" % (len(self.available_markers),  len(self.distances)))
 
-        if len(self.available_markers) < 2:
+        if len(self.available_markers) < math.floor(len(self.distances)/4.0):
+            self.log.append("less than 25% of markers detected, failed")
             self.set_status("failed")
         else:
             self.set_status("success")
-
 
     def _load_markers_csv(self, markers_csv):
         markers = set()
@@ -44,4 +54,3 @@ class Markers(GenericTask):
                         continue
                     markers.add(line.split(",")[1].strip())
         self.available_markers = list(markers)
-        print("%s markers loaded" % len(self.available_markers))

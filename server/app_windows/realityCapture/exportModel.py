@@ -17,6 +17,7 @@ class ExportModel(GenericTask):
         force_reload = self.status != "idle"
         self.set_status("active")
         if force_reload is True and os.path.exists(self.output_model_path):
+            self.log.append("Removing cached export file %s" % self.output_model_path)
             os.remove(self.output_model_path)
 
 
@@ -45,7 +46,7 @@ class ExportModel(GenericTask):
             self.rc_job._run_command(cmd, "create_export_model")
 
             if not os.path.exists(self.output_model_path):
-                print("%s model not found, error" % self.output_model_path)
+                self.log.append("Export model not created, %s not found." % self.output_model_path)
                 self.set_status("failed")
                 return
 

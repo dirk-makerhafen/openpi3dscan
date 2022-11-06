@@ -31,6 +31,7 @@ class SettingsRealityCapture(Observable):
         self.default_export_quality = "normal"  # "high", normal, low
         self.default_create_mesh_from = "projection" # normal, projection, all
         self.default_create_textures = True
+        self.default_lit = True
 
     def to_dict(self):
         return {
@@ -39,6 +40,7 @@ class SettingsRealityCapture(Observable):
             "default_export_quality": self.default_export_quality,
             "default_create_mesh_from": self.default_create_mesh_from,
             "default_create_textures": self.default_create_textures,
+            "default_lit": self.default_create_textures,
         }
 
     def from_dict(self, data):
@@ -47,6 +49,7 @@ class SettingsRealityCapture(Observable):
         self.default_export_quality = data["default_export_quality"]
         self.default_create_mesh_from = data["default_create_mesh_from"]
         self.default_create_textures = data["default_create_textures"]
+        self.default_lit = data["default_lit"]
 
     def set_pin(self, pin):
         self.pin = pin.strip()
@@ -74,6 +77,11 @@ class SettingsRealityCapture(Observable):
             self.notify_observers()
             return
         self.default_create_mesh_from = new_default_create_mesh_from
+        self.save()
+        self.notify_observers()
+
+    def set_default_lit(self, new_default_lit):
+        self.default_lit = bool(new_default_lit)
         self.save()
         self.notify_observers()
 

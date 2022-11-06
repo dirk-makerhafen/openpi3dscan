@@ -92,6 +92,7 @@ class CalibrationData(GenericTask):
         self.data[cam_id][key] = self.data[cam_id][key][-30:]
 
     def update_from_xmp(self):
+        cnt = 0
         cmd = self.rc_job._get_cmd_start()
         cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
         cmd += '-exportXMP "%s" ' %  self.rc_job.get_path("xmp_settings.xml")
@@ -114,7 +115,7 @@ class CalibrationData(GenericTask):
                 self.add_data(data["segment"], data["row"], "Rotation", data["Rotation"])
             if "Position" in data:
                 self.add_data(data["segment"], data["row"], "Position", data["Position"])
-
+            cnt += 1
         if first_time_calibration is True:
             positions = [data["Position"] for data in cam_data if "Position" in data]
             c_x = (max([x[0] for x in positions]) + min([x[0] for x in positions])) / 2
@@ -123,10 +124,11 @@ class CalibrationData(GenericTask):
             center_align = [c_x, c_y, c_z - (self.rc_job.box_dimensions[2] / 2)]
             print("new center data", center_align)
             self.center(center_align)
-
+        return cnt
 
     def write_xmp_files(self):
         self.xmp_exclude = []
+        cnt = 0
         for cam_id in self.get_camera_ids():
             segment, row = cam_id.split("-")
             group_id = ( int(segment) * 100 ) + int(row)
@@ -153,11 +155,12 @@ class CalibrationData(GenericTask):
                     xmp_path = os.path.join(self.rc_job.workingdir, "images", mode, "seg%s-cam%s-%s.xmp" % (segment, row, mode[0]))
                     img_path = xmp_path.replace(".xmp", ".jpg")
                     if os.path.exists(img_path):
+                        cnt += 1
                         with open(xmp_path, "w") as f:
                             f.write(s)
             except:
                 pass
-
+        return cnt
 
     def _read_xmp_files(self):
         camera_data = []

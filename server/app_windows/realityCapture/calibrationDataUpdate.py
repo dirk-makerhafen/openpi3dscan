@@ -6,5 +6,11 @@ class CalibrationDataUpdate(GenericTask):
 
     def run(self):
         self.set_status("active")
-        self.rc_job.calibrationData.update_from_xmp()
+        if self.rc_job.alignment.alignments_were_recreated is False:
+            self.log.append("Alignments from cache, not updating calibrations")
+            self.set_status("success")
+            return
+
+        cnt = self.rc_job.calibrationData.update_from_xmp()
+        self.log.append("%s precalibrations updated" % cnt)
         self.set_status("success")

@@ -2,7 +2,6 @@ import os
 
 from app_windows.realityCapture.genericTask import GenericTask
 
-
 class Alignment(GenericTask):
     def __init__(self, rc_job, distances):
         super().__init__(rc_job)
@@ -12,7 +11,7 @@ class Alignment(GenericTask):
         self.box_center_correction = [0,0,0]
 
     def run(self):
-        alignments_csv = self.rc_job.get_path("%s_alignments.csv")
+        alignments_csv = self.get_path("%s_alignments.csv")
         rc_proj_file = os.path.join(self.rc_job.workingdir, "%s.rcproj" % self.rc_job.realityCapture_filename)
         raw_exists_file = os.path.join(self.rc_job.workingdir, "%s.raw_exists" % self.rc_job.realityCapture_filename)
         force_reload = self.status != "idle"
@@ -25,40 +24,45 @@ class Alignment(GenericTask):
         if os.path.exists(alignments_csv):
             self._load_alignments_csv(alignments_csv)
             self.log.append("%s aligned cameras loaded from cache %s" % (len(self.alignments), alignments_csv))
+            if len(self.alignments) > 30:
+                self.set_status("success")
+                return
+            self.log.append("less than 30 aligned cameras found, must run alignment")
 
-        if len(self.alignments) < 12 or force_reload is True:
-            if os.path.exists(alignments_csv):
-                os.remove(alignments_csv)
-            if os.path.exists(rc_proj_file):
-                os.remove(rc_proj_file)
-            if os.path.exists(raw_exists_file):
-                os.remove(raw_exists_file)
-            cmd = self._get_cmd_start()
-            cmd += self._get_cmd_new_scene()
-            cmd += '-align '
-            cmd += '-detectMarkers "%s" ' % self.rc_job.get_path("DetectMarkersParams.xml")
-            cmd += self._get_cmd_defineDistance()
-            cmd += '-selectMaximalComponent '
-            cmd += '-align '
-            cmd += '-renameSelectedComponent "MAIN" '
-            cmd += '-selectComponent "Component 0" '
-            cmd += '-deleteSelectedComponent '
-            cmd += '-selectComponent "MAIN" '
-            cmd += '-setReconstructionRegion "%s" ' % self.rc_job.get_path("box.rcbox")
-            cmd += '-getLicense "%s" ' % self.rc_job.pin
-            cmd += '-exportRegistration "%s" "%s" ' % (self.rc_job.get_path("%s_alignments.csv"), self.rc_job.get_path("exportRegistrationSettings.xml"))
-            cmd += '-save "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
-            cmd += '-quit '
-            self.rc_job._run_command(cmd, "load_alignments")
-            if os.path.exists(self.rc_job.get_path("%s_alignments.csv")):
-                self.alignments_were_recreated = True
-            self._load_alignments_csv(alignments_csv)
-            self.log.append("%s aligned cameras detected" % (len(self.alignments)))
+        if os.path.exists(alignments_csv):
+            os.remove(alignments_csv)
+        if os.path.exists(rc_proj_file):
+            os.remove(rc_proj_file)
+        if os.path.exists(raw_exists_file):
+            os.remove(raw_exists_file)
+
+        cmd = self._get_cmd_start()
+        cmd += self._get_cmd_new_scene()
+        cmd += '-align '
+        cmd += '-detectMarkers "%s" ' % self.get_path("DetectMarkersParams.xml")
+        cmd += self._get_cmd_defineDistance()
+        cmd += '-selectMaximalComponent '
+        cmd += '-align '
+        cmd += '-renameSelectedComponent "MAIN" '
+        cmd += '-selectComponent "Component 0" '
+        cmd += '-deleteSelectedComponent '
+        cmd += '-selectComponent "MAIN" '
+        cmd += '-setReconstructionRegion "%s" ' % self.get_path("box.rcbox")
+        cmd += '-getLicense "%s" ' % self.rc_job.pin
+        cmd += '-exportRegistration "%s" "%s" ' % (self.get_path("%s_alignments.csv"), self.get_path("exportRegistrationSettings.xml"))
+        cmd += '-save "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
+        cmd += '-quit '
+        self._run_command(cmd, "load_alignments")
+
+        self._load_alignments_csv(alignments_csv)
+        self.log.append("%s aligned cameras detected" % (len(self.alignments)))
 
         if len(self.alignments) < 30:
+            self.alignments_were_recreated = False
             self.log.append("less than 30 aligned cameras detected, failed")
             self.set_status("failed")
         else:
+            self.alignments_were_recreated = True
             self.set_status("success")
 
     def _load_alignments_csv(self, alignments_csv):

@@ -22,10 +22,10 @@ class Download(GenericTask):
             except Exception as e:
                 self.log.append("Download failed")
                 self.set_status("failed")
-                return None
+                return
             if self._unpack_zip(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id)) is False:
                 self.set_status("failed")
-                return None
+                return
         self.set_status("success")
 
     def _unpack_zip(self, path):

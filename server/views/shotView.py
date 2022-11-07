@@ -36,12 +36,12 @@ class ShotView(PyHtmlView):
                     {% if pyview.can_sync == True %}
                         <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
                     {% else %}
-                        <select id="available_locations">
-                            {% if pyview.subject.meta_location == "" %}
+                        <select id="available_locations"  onchange='pyview.set_location($("#available_locations").val())' >
+                            {% if pyview.current_shot.meta_location == "" %}
                                 <option value="" selected>- SELECT A LOCATION -</option>
                             {% endif  %}
                             {% for location in pyview.available_locations() %}
-                                <option value="{{location}}" {% if location==pyview.subject.meta_location %}selected{% endif %}>{{location}}</option>
+                                <option value="{{location}}" {% if location==pyview.current_shot.meta_location %}selected{% endif %}>{{location}}</option>
                             {% endfor %}      
                         </select>
                     {% endif %}
@@ -148,6 +148,9 @@ class ShotView(PyHtmlView):
     def sync_remote(self):
         self.current_shot.sync_remote()
 
+    def set_location(self, location):
+        raise NotImplementedError()
+
     def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
         if create_textures is None:
             create_textures = False
@@ -155,7 +158,6 @@ class ShotView(PyHtmlView):
 
     def switch_type(self):
         self.imageCarousel.switch_type()
-
 
     def available_locations(self):
         raise NotImplementedError()

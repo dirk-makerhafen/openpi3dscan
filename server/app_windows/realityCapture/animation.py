@@ -1,6 +1,7 @@
 import os, time, glob
 from multiprocessing.pool import ThreadPool
 
+from app_windows.files.externalFiles import ExternalFilesInstance
 from app_windows.realityCapture.genericTask import GenericTask
 
 #from selenium import webdriver
@@ -29,11 +30,11 @@ class Animation(GenericTask):
         options.add_argument("--disable-web-security")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--allow-file-access-from-files")
-        browser = webdriver.Chrome(executable_path=os.path.join(SCRIPT_DIR, "chromedriver.exe"), options=options)
+        browser = webdriver.Chrome(executable_path=ExternalFilesInstance().chromedriver_exe, options=options)
         browser.set_window_position(0, 0)
         browser.set_window_size(1200, 1200)
 
-        browser.get("file:\\%s?src=%s" % (os.path.join(SCRIPT_DIR, "modelview.html"), glb_path.replace('\\', '/')))
+        browser.get("file:\\%s?src=%s" % (ExternalFilesInstance().modelview_html, glb_path.replace('\\', '/')))
 
         time.sleep(5)
         angle = 0
@@ -68,19 +69,19 @@ class Animation(GenericTask):
             size = 900
 
         def f(file):
-            os.system('mogrify.exe -resize %sx "%s"' % (size, file))
-            os.system('optipng.exe -clobber "%s"' % file)
-            os.system('convert.exe "%s" "%s"' % (file, "%s.gif" % file[:-4]))
+            os.system('%s -resize %sx "%s"' % (ExternalFilesInstance().mogrify_exe, size, file))
+            os.system('%s -clobber "%s"' % (ExternalFilesInstance().optipng_exe, file))
+            os.system('%s "%s" "%s"' % (ExternalFilesInstance().convert_exe, file, "%s.gif" % file[:-4]))
 
         ThreadPool(8).map(f, files)
         total_duration = 400  # in 1/100s of seconds
         delay = int(round(total_duration / len(files), 0))
-        os.system('gifsicle.exe --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s\\tmp.gif" ' % (delay, path, path))
+        os.system('%s --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s\\tmp.gif" ' % (ExternalFilesInstance().gifsicle_exe, delay, path, path))
         if os.path.exists(os.path.join(path, "tmp.gif")):
             if filetype == "gif":
                 os.rename(os.path.join(path, "tmp.gif"), output_file)
             if filetype == "webp":
-                os.system('convert.exe "%s\\tmp.gif" "%s"' % (path, output_file))
+                os.system('%s "%s\\tmp.gif" "%s"' % (ExternalFilesInstance().convert_exe, path, output_file))
 
         for f in glob.glob(os.path.join(path, "screenshot_*.*")):
             os.remove(f)

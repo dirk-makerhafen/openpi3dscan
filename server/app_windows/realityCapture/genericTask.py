@@ -4,9 +4,11 @@ import subprocess
 import time
 
 from pyhtmlgui import Observable, ObservableList
+from app_windows.files.externalFiles import ExternalFilesInstance
 
-class LogItem():
+class LogItem(Observable):
     def __init__(self, value):
+        super().__init__()
         self.value = value
 class Log(ObservableList):
     def append(self, value):
@@ -48,7 +50,7 @@ class GenericTask(Observable):
         return cmd
 
     def _get_cmd_start(self):
-        cmd = '"%s" ' % RCEXE
+        cmd = '"%s" ' % ExternalFilesInstance().RealityCapture_exe
         #cmd += '-silent "%s\\crash_report.txt" ' % self.workingdir
         #cmd += '-set "appQuitOnError=true" '
         return cmd

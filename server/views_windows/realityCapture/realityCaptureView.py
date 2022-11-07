@@ -12,8 +12,8 @@ class RealityCaptureView(PyHtmlView):
                     <div class="list-group mb-5 shadow">
                         <div class="list-group-item">
                             <div class="row align-items-center">
-                                <div class="col-md-10 h3" style="border-bottom: 1px solid lightgray;">Task shot_id</div>
-                                <div class="col-md-2 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.status}}</div>
+                                <div class="col-md-11 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.shot_name}}, {{pyview.subject.filetype}}</div>
+                                <div class="col-md-1 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.status}}</div>
                             </div>
                         </div>
                         <div class="list-group-item">
@@ -48,7 +48,7 @@ class RealityCaptureView(PyHtmlView):
                         {{pyview.verifyImagesView.render()}}
                         {{pyview.calibrationDataWriteView.render()}}
                         {{pyview.markersView.render()}}
-                        {{pyview.alignmentsView.render()}}
+                        {{pyview.alignmentView.render()}}
                         {{pyview.calibrationDataUpdateView.render()}}
                         {{pyview.rawmodelView.render()}}
                         {{pyview.exportmodelView.render()}}
@@ -78,7 +78,7 @@ class RealityCaptureView(PyHtmlView):
         self.verifyImagesView = VerifyImagesView(subject.verifyImages, self)
         self.calibrationDataWriteView = CalibrationDataWriteView(subject.calibrationDataWrite, self)
         self.markersView = MarkersView(subject.markers, self)
-        self.alignmentsView = AlignmentsView(subject.alignments, self)
+        self.alignmentView = AlignmentView(subject.alignment, self)
         self.calibrationDataUpdateView = CalibrationDataUpdateView(subject.calibrationDataUpdate, self)
         self.rawmodelView = RawModelView(subject.rawmodel, self)
         self.exportmodelView = ExportmodelView(subject.exportmodel, self)
@@ -154,7 +154,7 @@ class MarkersView(GenericTaskView):
             </div>
         </div>
     '''
-class AlignmentsView(GenericTaskView):
+class AlignmentView(GenericTaskView):
     TEMPLATE_STR = '''
         <div class="list-group-item">
             <div class="row align-items-center">

@@ -13,43 +13,26 @@ from app_windows.files.shots import ShotsInstance
 from app_windows.realityCapture.realityCapture import RealityCapture
 from app_windows.settings.settings import SettingsInstance
 
-
-class LogItem():
-    def __init__(self, log):
-        self.log = log
+class LogItem(Observable):
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+class Log(ObservableList):
+    def append(self, value):
+        value = LogItem(value)
+        super().append(value)
 
 class Processing(Observable):
     def __init__(self):
         super().__init__()
-        self.log = ObservableList()
+        self.log = Log()
         self.dns_cache = {}
         self.status = "idle"
         self.rc_tasks = ObservableList()
-        rc = RealityCapture(
-            source_dir=None,
-            source_ip="1.2.3.4",
-            shot_id="foobar",
-            model_id="foobar",
-            shot_name="foobar",
-            filetype="gif",
-            reconstruction_quality="high",
-            export_quality="high",
-            create_mesh_from="projection",
-            create_textures=True,
-            lit=True,
-            distances={},
-            pin="",
-            box_dimensions=[1,2,3],
-            calibration_data={},
-        )
-        self.rc_tasks.append(rc)
-
-        self.current_task = None
-        self.processing_tasks = ObservableList()
-        self.worker = threading.Thread(target=self.loop, daemon=True)
+        self.worker = threading.Thread(target=self._loop, daemon=True)
         self.worker.start()
 
-    def loop(self):
+    def _loop(self):
         while True:
             work_done = False
 
@@ -64,7 +47,7 @@ class Processing(Observable):
 
             if work_done is False:
                 print("no results, waiting some time ")
-                self.log.insert(0, LogItem("no results, waiting some time "))
+                self.log.append("no results, waiting some time ")
             else:
                 SettingsInstance().settingsCache.clean()
             time.sleep(5)
@@ -77,7 +60,7 @@ class Processing(Observable):
     def _resolve_host(self, host):
         if host in self.dns_cache:
             return self.dns_cache[host]
-        for _ in range(60):
+        for _ in range(10):
             try:
                 for ip in socket.getaddrinfo(host, 80):
                     if ":" in ip[4][0]:
@@ -87,7 +70,6 @@ class Processing(Observable):
             except Exception as e:
                 print("Failed to resolve server IP")
             time.sleep(1)
-
         return None
 
     def _request_local(self):
@@ -96,9 +78,9 @@ class Processing(Observable):
             return False
 
         self.set_status("processing")
+
         for model in models:
             shot = model.parentShot
-            shot.meta_location = "hamburg"
             location = SettingsInstance().settingsLocations.get_by_location(shot.meta_location)
             rc = RealityCapture(
                 source_dir=shot.path,
@@ -117,31 +99,28 @@ class Processing(Observable):
                 box_dimensions=[location.diameter, location.diameter, location.height],
                 calibration_data=json.loads(location.calibration_data),
             )
-            self.rc_tasks.append(rc)
-            self.current_task = rc
+            self.rc_tasks.insert(0, rc)
             try:
                 rc.process()
             except Exception as e:
                 traceback.print_exc()
-                print(e)
                 print("Failed to process", e)
+
             if rc.result_file is not None:
                 location.calibration_data = json.dumps(rc.calibrationData.data)
                 model.write_file(rc.result_file)
             else:
                 model.set_status("failed")
 
-            self.set_status("idle")
-        self.current_task = None
+        self.set_status("idle")
         return True
 
     def _request_remote(self, server_ip):
-        self.set_status("requesting_remote")
         data = self.get_unprocessed_models(server_ip)
-
         if len(data["models"]) == 0:
-            self.set_status("idle")
             return False
+
+        self.set_status("processing")
 
         for model in data["models"]:
             self.processing(server_ip, model["shot_id"], model["model_id"])
@@ -162,23 +141,19 @@ class Processing(Observable):
                 box_dimensions=data["box_dimensions"],
                 calibration_data=json.loads(data["calibration"]),
             )
-            self.rc_tasks.append(rc)
-            self.current_task = rc
-            self.set_status("processing")
-            model_result_path = None
+            self.rc_tasks.insert(0, rc)
+
             try:
-                model_result_path = rc.process()
+                rc.process()
             except Exception as e:
                 traceback.print_exc()
-                print(e)
                 print("Failed to process", e)
 
-            if model_result_path is not None:
-                pass
-                #SettingsInstance().locations.get_by_location(shot.location).calibration_data = json.dumps(rc.calibrationData.data)
-            else:
+            if rc.result_file is None:
                 self.process_failed(server_ip, model["shot_id"], model["model_id"])
-        self.current_task = None
+
+            #SettingsInstance().locations.get_by_location(shot.location).calibration_data = json.dumps(rc.calibrationData.data)
+
         self.set_status("idle")
         return True
 

@@ -11,7 +11,7 @@ class Markers(GenericTask):
         self.available_markers = []
 
     def run(self):
-        markers_csv = self.rc_job.get_path("%s_markers.csv")
+        markers_csv = self.get_path("%s_markers.csv")
         force_reload = self.status != "idle"
         if len(self.distances) == 0:
             self.log.append("Not distances loaded, not detecting markers")
@@ -27,17 +27,21 @@ class Markers(GenericTask):
         if os.path.exists(markers_csv):
             self._load_markers_csv(markers_csv)
             self.log.append("%s of %s Markers loaded from cache %s" % (len(self.available_markers), len(self.distances), markers_csv))
+            if len(self.available_markers) >= math.floor(len(self.distances) / 4.0):
+                self.set_status("success")
+                return
+            self.log.append("less than 25% of markers loaded, must run detection")
 
-        if len(self.available_markers) < math.floor(len(self.distances)/4.0) or force_reload is True:
-            cmd = self._get_cmd_start()
-            cmd += self._get_cmd_new_scene()
-            cmd += '-detectMarkers "%s" ' %  self.rc_job.get_path("DetectMarkersParams.xml")
-            cmd += '-getLicense "%s" ' % self.rc_job.pin
-            cmd += '-exportControlPointsMeasurements "%s" ' % markers_csv
-            cmd += '-quit '
-            self.rc_job._run_command(cmd, "load_markers")
-            self._load_markers_csv(markers_csv)
-            self.log.append("%s of %s Markers detected" % (len(self.available_markers),  len(self.distances)))
+        cmd = self._get_cmd_start()
+        cmd += self._get_cmd_new_scene()
+        cmd += '-detectMarkers "%s" ' %  self.get_path("DetectMarkersParams.xml")
+        cmd += '-getLicense "%s" ' % self.rc_job.pin
+        cmd += '-exportControlPointsMeasurements "%s" ' % markers_csv
+        cmd += '-quit '
+        self._run_command(cmd, "load_markers")
+
+        self._load_markers_csv(markers_csv)
+        self.log.append("%s of %s Markers detected" % (len(self.available_markers),  len(self.distances)))
 
         if len(self.available_markers) < math.floor(len(self.distances)/4.0):
             self.log.append("less than 25% of markers detected, failed")

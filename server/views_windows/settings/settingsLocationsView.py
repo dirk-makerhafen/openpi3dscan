@@ -28,7 +28,10 @@ class SettingsLocationView(PyHtmlView):
         <input  style="width:100%;text-align:center" id="region_diameter_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.diameter}}" onchange='pyview.subject.set_diameter($("#region_diameter_{{pyview.uid}}").val())'>
     </td>
     <td> <input  style="width:100%;text-align:center" id="region_height_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.height}}" onchange='pyview.subject.set_height($("#region_height_{{pyview.uid}}").val())'></td>
-    
+    <td>
+        {{pyview.subject.calibration_count()}} calibrated <br>
+        <button onclick="pyview.subject.reset_calibration()">reset</button>
+    <td>
     '''
 
 
@@ -70,6 +73,7 @@ class SettingsLocationsView(PyHtmlView):
                                             <th>Markers</th>
                                             <th>Diameter</th>
                                             <th>Height</th>
+                                            <th>Calibration</th>
                                         </tr>
                                     </thead>
                                    {{ pyview.locations.render() }}  

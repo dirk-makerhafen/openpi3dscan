@@ -7,8 +7,6 @@ from views.shotView import ShotView
 if TYPE_CHECKING:
     from app_windows.app import App
 
-
-
 class ShotView(ShotView):
 
     def __init__(self, subject: App, parent, settingsInstance):
@@ -20,3 +18,7 @@ class ShotView(ShotView):
 
     def available_locations(self):
         return [l.location for l in SettingsInstance().settingsLocations.locations]
+
+    def set_location(self, location):
+        self.current_shot.set_location(location)
+        self.imageCarousel.reset()

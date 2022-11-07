@@ -35,7 +35,7 @@ class Shot(Observable):
         self.meta_camera_one_position = "top"
 
         self.nr_of_files = 0
-        self.devices = set()
+        self.devices = None
         self.path = os.path.join(shot_dir, self.shot_id)
         self.worker = None
         self.models = ObservableList()
@@ -46,9 +46,6 @@ class Shot(Observable):
         self.preview_images_path = os.path.join(self.path, "preview_images")
         self.load()
 
-    @property
-    def nr_of_devices(self):
-        return len(self.devices)
 
     @property
     def nr_of_models(self):
@@ -78,6 +75,22 @@ class Shot(Observable):
         self.comment = comment
         self.save()
         self.notify_observers()
+
+    def set_location(self, location):
+        if self.meta_location == location:
+            return
+        l = SettingsInstance().settingsLocations.get_by_location(location)
+        if l is None:
+            return
+
+        self.meta_location = l.location
+        self.meta_max_segments = l.segments
+        self.meta_max_rows = l.cameras_per_segment
+        self.meta_rotation = l.camera_rotation
+        self.meta_camera_one_position = l.camera_one_position
+        self.save()
+        self.notify_observers()
+
 
     def delete(self):
         if os.path.exists(self.path):

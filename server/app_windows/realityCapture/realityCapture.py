@@ -33,34 +33,7 @@ from app_windows.settings.settings import SettingsInstance
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-SERVER = None
 DEBUG = "debug" in sys.argv
-
-try:
-    RCEXE = glob.glob("C:\*\Capturing Reality\RealityCapture\RealityCapture.exe")[0]
-except:
-    print("################")
-    print("RealityCapture.exe not found, install RealityCapture to your Program directory")
-
-try:
-    chromeexe = glob.glob("C:\*\Google\Chrome\Application")[0]
-except:
-    print("################")
-    print("Google Chrome not found, install Chrome to your Program directory")
-
-
-
-
-
-def ask(question):
-    while True:
-        print("############################")
-        print("")
-        reply = str(input('%s (y/n):\n' % question)).lower().strip()
-        if reply == "y":
-            return True
-        if reply == "n":
-            return False
 
 
 class RealityCapture(Observable):
@@ -103,7 +76,7 @@ class RealityCapture(Observable):
         self.download = None if self.source_ip is None else Download(self)
         self.verifyImages = VerifyImages(self)
         self.markers = Markers(self, distances)
-        self.alignments = Alignment(self, distances)
+        self.alignment = Alignment(self, distances)
         self.rawmodel = RawModel(self)
         self.exportmodel = ExportModel(self)
         if self.filetype in ["gif","webp"]:
@@ -113,10 +86,15 @@ class RealityCapture(Observable):
             self.animation = None
             self.resultsArchive = ResultsArchive(self)
         self.upload   = None if self.source_ip is None else Upload(self)
-        self.status = ""
+        self.status = "idle"
+
+    def set_status(self, status):
+        if self.status != status:
+            self.status = status
+            self.notify_observers()
 
     def process(self):
-        self.status = "active"
+        self.set_status("active")
 
         tasks = [
             self.prepareFolder,
@@ -124,7 +102,7 @@ class RealityCapture(Observable):
             self.verifyImages,
             self.calibrationDataWrite,
             self.markers,
-            self.alignments,
+            self.alignment,
             self.calibrationDataUpdate,
             self.rawmodel,
             self.exportmodel,
@@ -134,15 +112,25 @@ class RealityCapture(Observable):
         ]
         tasks = [task for task in tasks if task is not None]
         for task in tasks:
-            while self.status == "active":
+            try:
                 task.run()
+            except Exception as e:
+                task.log.append("Failed: %s" % e)
+                task.set_status("failed")
+            if task.status != "success":
+                self.set_status("failed")
+                self.notify_observers()
+                break
+
+        if self.status == "active":
+            self.set_status("success")
 
         if DEBUG is False:
             try:
                 shutil.rmtree(os.path.join(self.workingdir, self.export_foldername))
             except:
                 print("Failed to delete %s" % os.path.join(self.workingdir, self.export_foldername))
-        self.status = "idle"
+
 
 
     def _clean_shot_name(self, name):

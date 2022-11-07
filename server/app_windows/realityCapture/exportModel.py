@@ -20,41 +20,46 @@ class ExportModel(GenericTask):
             self.log.append("Removing cached export file %s" % self.output_model_path)
             os.remove(self.output_model_path)
 
+        if os.path.exists(self.output_model_path):
+            self.log.append("Using from cache %s" % (self.output_model_path))
+            self.set_status("success")
+            return
+
+        cmd = self._get_cmd_start()
+        cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
+        cmd += '-selectComponent "MAIN" '
+        cmd += '-selectModel "RAW" '
+        if self.rc_job.export_quality == "high":
+            cmd += '-simplify 4000000 '
+        if self.rc_job.export_quality == "normal":
+            cmd += '-simplify 1000000 '
+        if self.rc_job.export_quality == "low":
+            cmd += '-simplify 500000 '
+        cmd += '-cleanModel '
+        if self.rc_job.create_textures is True:
+            cmd += '-calculateTexture '
+            cmd += '-calculateVertexColors '
+        cmd += '-renameSelectedModel "EXPORT" '
+        cmd += '-getLicense "%s" ' % self.rc_job.pin
+        if self.rc_job.filetype != "rcproj":
+            cmd += '-exportModel "EXPORT" "%s" ' % self.export_model_path
+        else:
+            cmd += '-save "%s" ' % self.output_model_path
+        cmd += '-quit '
+        self._run_command(cmd, "create_export_model")
 
         if not os.path.exists(self.output_model_path):
-            cmd = self.rc_job._get_cmd_start()
-            cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
-            cmd += '-selectComponent "MAIN" '
-            cmd += '-selectModel "RAW" '
-            if self.rc_job.export_quality == "high":
-                cmd += '-simplify 4000000 '
-            if self.rc_job.export_quality == "normal":
-                cmd += '-simplify 1000000 '
-            if self.rc_job.export_quality == "low":
-                cmd += '-simplify 500000 '
-            cmd += '-cleanModel '
-            if self.rc_job.create_textures is True:
-                cmd += '-calculateTexture '
-                cmd += '-calculateVertexColors '
-            cmd += '-renameSelectedModel "EXPORT" '
-            cmd += '-getLicense "%s" ' % self.rc_job.pin
-            if self.rc_job.filetype != "rcproj":
-                cmd += '-exportModel "EXPORT" "%s" ' % self.export_model_path
-            else:
-                cmd += '-save "%s" ' % self.output_model_path
-            cmd += '-quit '
-            self.rc_job._run_command(cmd, "create_export_model")
+            self.log.append("Export model not created, %s not found." % self.output_model_path)
+            self.set_status("failed")
+            return
 
-            if not os.path.exists(self.output_model_path):
-                self.log.append("Export model not created, %s not found." % self.output_model_path)
-                self.set_status("failed")
-                return
+        if self.rc_job.fileextension == "glb" and self.rc_job.lit is False:
+            glbf = GLTF2().load(self.output_model_path)
+            glbf.materials[0].pbrMetallicRoughness.baseColorFactor = [0, 0, 0, 1]
+            glbf.materials[0].emissiveFactor = [1, 1, 1]
+            glbf.materials[0].emissiveTexture = TextureInfo(index=0)
+            glbf.save(self.output_model_path)
 
-            if self.rc_job.fileextension == "glb" and self.rc_job.lit is False:
-                glbf = GLTF2().load(self.output_model_path)
-                glbf.materials[0].pbrMetallicRoughness.baseColorFactor = [0, 0, 0, 1]
-                glbf.materials[0].emissiveFactor = [1, 1, 1]
-                glbf.materials[0].emissiveTexture = TextureInfo(index=0)
-                glbf.save(self.output_model_path)
+        self.log.append("Export model created, %s" % self.output_model_path)
         self.set_status("success")
 

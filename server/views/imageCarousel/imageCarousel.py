@@ -113,6 +113,13 @@ class ImageCarousel(PyHtmlView):
     def segment_width(self):
         return 100.0/self.segments_shown
 
+    def reset(self):
+        self._segments = []
+        if self.segments_shown > self._get_settings_segments():
+            self.segments_shown = self._get_settings_segments()
+        if self.is_visible:
+            self.update()
+
     @property
     def img_height(self):
         if self._get_settings_camera_rotation() in [0, 180]:

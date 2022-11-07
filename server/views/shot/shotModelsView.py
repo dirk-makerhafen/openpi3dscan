@@ -47,13 +47,13 @@ class ShotModelsView(PyHtmlView):
               <tr style="border-top: 1px solid lightgray; line-height: 3em;">
                     <td>
                         <select name="m_create_mesh_from" id="m_create_mesh_from">
-                          <option value="projection" {% if pyview.settings.realityCaptureSettings.default_create_mesh_from == "projection" %}selected{% endif %}>Projection</option>
-                          <option value="normal"     {% if pyview.settings.realityCaptureSettings.default_create_mesh_from == "normal"     %}selected{% endif %}>Normal</option>
-                          <option value="all"        {% if pyview.settings.realityCaptureSettings.default_create_mesh_from == "all"        %}selected{% endif %}>All Images</option>
+                          <option value="projection" {% if pyview.settingsInstance.realityCaptureSettings.default_create_mesh_from == "projection" %}selected{% endif %}>Projection</option>
+                          <option value="normal"     {% if pyview.settingsInstance.realityCaptureSettings.default_create_mesh_from == "normal"     %}selected{% endif %}>Normal</option>
+                          <option value="all"        {% if pyview.settingsInstance.realityCaptureSettings.default_create_mesh_from == "all"        %}selected{% endif %}>All Images</option>
                         </select>   
                     </td>
                     <td>
-                        <input id="m_create_textures" {% if pyview.settings.realityCaptureSettings.default_create_textures == true %}checked{% endif %}  type="checkbox"/>
+                        <input id="m_create_textures" {% if pyview.settingsInstance.realityCaptureSettings.default_create_textures == true %}checked{% endif %}  type="checkbox"/>
                     </td>
                     <td>
                         <button class="btn btn-sm " style="line-height: 1em;    padding-top: 2px;padding-bottom: 2px; margin-bottom: 5px;" onclick='pyview.create_model($("#m_create_mesh_from").val(), $("#m_create_textures")[0].checked);'> Create Model </button>

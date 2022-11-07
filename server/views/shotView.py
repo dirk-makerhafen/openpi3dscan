@@ -33,13 +33,16 @@ class ShotView(PyHtmlView):
                 </div>
                 <div class="col-md-3 topMenuItem">&nbsp;</div>
                 <div class="col-md-1 topMenuItem">
-                    {% if pyview.subject.can_sync == True %}
+                    {% if pyview.can_sync == True %}
                         <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
                     {% else %}
                         <select id="available_locations">
+                            {% if pyview.subject.meta_location == "" %}
+                                <option value="" selected>- SELECT A LOCATION -</option>
+                            {% endif  %}
                             {% for location in pyview.available_locations() %}
-                                <option value="location" {% if location==pyview.subject.meta_location %}selected{% endif %}>{{location}}</option>
-                            {% endfor %}
+                                <option value="{{location}}" {% if location==pyview.subject.meta_location %}selected{% endif %}>{{location}}</option>
+                            {% endfor %}      
                         </select>
                     {% endif %}
                 </div>

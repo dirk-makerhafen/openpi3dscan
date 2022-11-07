@@ -30,7 +30,7 @@ class SettingsCache(Observable):
         }
 
     def from_dict(self, data):
-        self.directory = data["directory"]
+        #self.directory = data["directory"]
         self.size = data["size"]
         return self
 

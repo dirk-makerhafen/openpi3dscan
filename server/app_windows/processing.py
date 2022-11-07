@@ -9,7 +9,7 @@ import socket
 import requests
 from pyhtmlgui import Observable, ObservableList
 
-from app.files.shots import ShotsInstance
+from app_windows.files.shots import ShotsInstance
 from app_windows.realityCapture.realityCapture import RealityCapture
 from app_windows.settings.settings import SettingsInstance
 

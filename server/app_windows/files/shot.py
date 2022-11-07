@@ -85,14 +85,29 @@ class Shot(Observable):
 
     # image_mode = normal | preview , image_type = normal | projection
     def get_image(self, image_type, image_mode, segment, row):
-        if image_mode == "normal":
-            img_path = os.path.join(self.images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
-        else:
-            img_path = os.path.join(self.preview_images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+        img_path = os.path.join(self.images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+        if image_mode == "preview":
+            img_path_preview = os.path.join(self.preview_images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+            if not os.path.exists(img_path_preview) and os.path.exists(img_path):
+                if not os.path.exists(self.preview_images_path):
+                    os.mkdir(self.preview_images_path)
+                if not os.path.exists(os.path.join(self.preview_images_path, image_type)):
+                    os.mkdir(os.path.join(self.preview_images_path, image_type))
+
+                img = Image.open(img_path)
+                width, height = img.size
+                if width > height:
+                    resolution = [800, 600]
+                else:
+                    resolution = [600, 800]
+                img = img.resize(resolution)
+                img.save(img_path_preview, format="jpeg", quality=85)
+            img_path = img_path_preview
 
         if os.path.exists(img_path):
             with open(img_path, "rb") as f:
                 return f.read()
+
         return None
 
     def list_possible_images(self, image_type, image_mode):

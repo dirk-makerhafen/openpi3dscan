@@ -4,7 +4,7 @@ import os
 from pyhtmlgui import PyHtmlGui
 from views_windows.appView import AppView
 from app_windows.app import AppInstance
-from app.additionalHttpEndpoints import HttpEndpoints
+from app_windows.additionalHttpEndpoints import HttpEndpoints
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 

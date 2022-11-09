@@ -21,6 +21,8 @@ class SettingsCache(Observable):
         if self.size == new_size:
             return
         self.size = new_size
+        self.notify_observers()
+        print("set size", self.size)
         self.clean()
 
     def to_dict(self):
@@ -37,6 +39,7 @@ class SettingsCache(Observable):
     def clean(self):
         shots = []
         for path in glob.glob(os.path.join(self.directory, "*")):
+            print(path)
             if os.path.exists(os.path.join(path, "last_usage")):
                 with open(os.path.join(path, "last_usage"), "r") as f:
                     try:

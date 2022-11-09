@@ -116,7 +116,7 @@ class CardReaderCard(Observable):
         self.shell("sudo mv %s/tmp/device.settings  %s/boot/device.settings;" % (mount_dir, mount_dir))
         self.shell("sudo mv %s/tmp/group.txt        %s/boot/group.txt;"       % (mount_dir, mount_dir))
         self.shell("sudo mv %s/tmp/id.txt           %s/boot/id.txt;"          % (mount_dir, mount_dir))
-        self.shell('sudo chroot %s /bin/bash -c "cd /opt/openpi3dscan/client ; python3 install.py"' % mount_dir)
+        self.shell('sudo chroot %s /bin/bash -c "cd /opt/openpi3dscan/client ; python3 run.py install"' % mount_dir)
         self.shell('sudo umount %s/boot ; sudo umount %s ; rm -d %s' % (mount_dir, mount_dir, mount_dir))
 
         self._reload_fs_info()

@@ -14,23 +14,23 @@ class SettingsCacheView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-8">
+                            <div class="col-md-10">
                                 <strong class="mb-0">Directory</strong>
                                 <p class="text-muted mb-0">Cache directory</p>
                             </div>
-                            <div class="col-md-4">
-                            
+                            <div class="col-md-2">
+                                {{pyview.subject.directory}}
                             </div>
                         </div>
                     </div>
                      <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-8">
+                            <div class="col-md-10">
                                 <strong class="mb-0">Size</strong>
                                 <p class="text-muted mb-0">Cache last x tasks</p>
                             </div>
-                            <div class="col-md-4">
-                            
+                            <div class="col-md-2">
+                                <input value={{pyview.subject.size}} id="cache_size" type="number" min="0" max="100" step="1" onchange='pyview.subject.set_size($("#cache_size").val())' ></input>
                             </div>
                         </div>
                     </div>                 

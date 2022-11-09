@@ -117,7 +117,8 @@ class Device(Observable):
                 elif rotation ==  90: rotation = 270
                 elif rotation == 180: rotation = 0
                 elif rotation == 270: rotation = 90
-        self._ssh('cd /home/%s/client ; python3 install.py "%s" "%s" "%s" "%s" "install_after_reboot"' % (self.username, self.device_id, self.device_type, self.name, rotation), timeout=180)
+        self._ssh('cd /home/%s/client ; python3 run.py install "%s" "%s" "%s" "%s" "install_after_reboot"' % (self.username, self.device_id, self.device_type, self.name, rotation), timeout=180)
+        #self._ssh('cd /home/%s/client ; python3 install.py "%s" "%s" "%s" "%s" "install_after_reboot"' % (self.username, self.device_id, self.device_type, self.name, rotation), timeout=180)
         self.latest_heartbeat_time = 0
         self._ssh('sudo reboot & ', timeout=10)
         self.notify_observers()

@@ -91,7 +91,7 @@ class RealityCaptureView(PyHtmlView):
         if subject.upload is not None:
             self.uploadView = UploadView(subject.upload, self)
         else:
-            self.upload = None
+            self.uploadView = None
 
 
 class GenericTaskView(PyHtmlView):

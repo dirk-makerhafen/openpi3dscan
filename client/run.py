@@ -14,7 +14,7 @@ def wait(min_time=20, max_time=60):
         time.sleep(random.randint(min_time, max_time))
 
 if __name__ == "__main__":
-    if sys.argv[1] == "install":
+    if len(sys.argv) > 1 and sys.argv[1] == "install":
         from src.install import Installer
         installer = Installer()
         installer.run()

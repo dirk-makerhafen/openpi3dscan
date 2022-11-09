@@ -67,7 +67,7 @@ class Installer():
 
         if os.path.exists("/proc/uptime") and self.install_after_reboot == False:  # we are not in chroot
             # kill running process
-            self.shell('ps ax|grep -i python |grep -i run.py|cut -d\  -f 1|xargs sudo kill')
+            self.shell('ps ax|grep -i python |grep -i run.py | grep -v "run.py install"|cut -d\  -f 1|xargs sudo kill')
 
             # Fix ROUTING
             self.shell('sudo route add default gw 192.168.99.254')

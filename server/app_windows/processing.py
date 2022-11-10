@@ -86,21 +86,21 @@ class Processing(Observable):
             shot = model.parentShot
             location = self.settings_instance.settingsLocations.get_by_location(shot.meta_location)
             rc = RealityCapture(
-                source_dir=shot.path,
-                source_ip=None,
-                shot_id=shot.shot_id,
-                model_id=model.model_id,
-                shot_name=shot.name,
-                filetype=model.filetype,
-                reconstruction_quality=model.reconstruction_quality,
-                export_quality=model.quality,
-                create_mesh_from=model.create_mesh_from,
-                create_textures=model.create_textures,
-                lit=model.lit,
-                distances=self._parse_markers_str(location.markers),
-                pin=self.settings_instance.realityCaptureSettings.pin,
-                box_dimensions=[location.diameter, location.diameter, location.height],
-                calibration_data=json.loads(location.calibration_data),
+                source_dir             = shot.path,
+                source_ip              = None,
+                shot_id                = shot.shot_id,
+                model_id               = model.model_id,
+                shot_name              = shot.name,
+                filetype               = model.filetype,
+                reconstruction_quality = model.reconstruction_quality,
+                export_quality         = model.quality,
+                create_mesh_from       = model.create_mesh_from,
+                create_textures        = model.create_textures,
+                lit                    = model.lit,
+                distances              = self._parse_markers_str(location.markers),
+                pin                    = self.settings_instance.realityCaptureSettings.pin,
+                box_dimensions         = [location.diameter, location.diameter, location.height],
+                calibration_data       = json.loads(location.calibration_data),
             )
             self.rc_tasks.insert(0, rc)
             try:
@@ -128,21 +128,21 @@ class Processing(Observable):
         for model in data["models"]:
             self.processing(server_ip, model["shot_id"], model["model_id"])
             rc = RealityCapture(
-                source_dir=None,
-                source_ip=server_ip,
-                shot_id=model["shot_id"],
-                model_id=model["model_id"],
-                shot_name=model["shot_name"],
-                filetype=model["filetype"],
-                reconstruction_quality=model["reconstruction_quality"],
-                export_quality=model["quality"],
-                create_mesh_from=model["create_mesh_from"],
-                create_textures=model["create_textures"],
-                lit=model["lit"],
-                distances= self._parse_markers_str(data["markers"]),
-                pin=data["pin"],
-                box_dimensions=data["box_dimensions"],
-                calibration_data=json.loads(data["calibration"]),
+                source_dir             = None,
+                source_ip              = server_ip,
+                shot_id                = model["shot_id"],
+                model_id               = model["model_id"],
+                shot_name              = model["shot_name"],
+                filetype               = model["filetype"],
+                reconstruction_quality = model["reconstruction_quality"],
+                export_quality         = model["quality"],
+                create_mesh_from       = model["create_mesh_from"],
+                create_textures        = model["create_textures"],
+                lit                    = model["lit"],
+                distances              = self._parse_markers_str(data["markers"]),
+                pin                    = data["pin"],
+                box_dimensions         = data["box_dimensions"],
+                calibration_data       = json.loads(data["calibration"]),
             )
             self.rc_tasks.insert(0, rc)
 

@@ -145,7 +145,7 @@ class Shot(Observable):
             existing_images = glob.glob(os.path.join(self.images_path, image_type, "*.jpg"))
             existing_previews = glob.glob(os.path.join(self.preview_images_path, image_type, "*.jpg"))
             for existing_image in existing_images:
-                preview_path = os.path.join(self.preview_images_path, image_type, existing_image.split("/")[-1])
+                preview_path = os.path.join(self.preview_images_path, image_type, os.path.split(existing_image)[1])
                 if preview_path not in existing_previews:
                     try:
                         img = Image.open(existing_image)
@@ -186,8 +186,8 @@ class Shot(Observable):
 
         results = []
         for file in files:
-            segment = file.split("/")[-1].split("-")[0].replace("seg","")
-            row = file.split("/")[-1].split("-")[1].replace("cam","")
+            segment = os.path.split(file)[1].split("-")[0].replace("seg","")
+            row = os.path.split(file)[1].split("-")[1].replace("cam","")
             results.append([image_type, image_mode, segment, row, ])
 
         if self.devices is not None:

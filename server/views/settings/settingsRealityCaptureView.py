@@ -157,7 +157,8 @@ class RealityCaptureView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-8">
                                 <strong class="mb-0">Reset calibration</strong>
-                                <p class="text-muted mb-0">Auto calibration learns exact lens parameters over time and gives a high quality initial position estimation. After reset, create 2-3 Models of known good scans where most markers are visible and no cameras are obscured.</p>
+                                <p class="text-muted mb-0">Auto calibration learns exact lens parameters over time and gives a high quality initial position estimation. 
+                                After reset, create 2-3 Models of known good scans where most markers are visible and no cameras are obscured using "mesh from" -> "all images" </p>
                             </div>
                             <div class="col-md-2">
                                 {{ pyview.subject.calibration_count() }} calibrated

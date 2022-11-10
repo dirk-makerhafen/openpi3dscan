@@ -8,5 +8,5 @@ class CalibrationDataWrite(GenericTask):
         self.set_status("active")
         self.rc_job.calibrationData.delete_xmp_files()
         cnt = self.rc_job.calibrationData.write_xmp_files()
-        self.log.append("%s precalibrations loaded" % cnt)
+        self.log.append("%s images precalibrated" % cnt)
         self.set_status("success")

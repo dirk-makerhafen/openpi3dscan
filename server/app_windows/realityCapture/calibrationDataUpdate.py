@@ -12,5 +12,5 @@ class CalibrationDataUpdate(GenericTask):
             return
 
         cnt = self.rc_job.calibrationData.update_from_xmp()
-        self.log.append("%s precalibrations updated" % cnt)
+        self.log.append("%s calibrations updated" % cnt)
         self.set_status("success")

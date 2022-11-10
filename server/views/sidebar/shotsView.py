@@ -14,6 +14,7 @@ class ShotsView(ObservableListView):
         self.selected_shot = None
 
     def select_shot(self, shot_id):
+        print("select shot", shot_id)
         if self.selected_shot is None and shot_id is None:
             return
         if self.selected_shot is not None and self.selected_shot.shot_id == shot_id:  # no changes

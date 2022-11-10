@@ -131,8 +131,8 @@ class Shot(Observable):
 
         results = []
         for file in files:
-            segment = file.split("/")[-1].split("-")[0].replace("seg","")
-            row = file.split("/")[-1].split("-")[1].replace("cam","")
+            segment = os.path.split(file)[1].split("-")[0].replace("seg","")
+            row = os.path.split(file)[1].split("-")[1].replace("cam","")
             results.append([image_type, image_mode, segment, row, ])
 
         return results

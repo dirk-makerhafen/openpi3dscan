@@ -25,7 +25,7 @@ class RawModel(GenericTask):
         last_changed = os.path.getmtime(rc_proj_file)
         cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
         if len(self.rc_job.calibrationData.data) == 0:
-            cmd += '-moveReconstructionRegion "%s" "%s" "%s" ' % (self.rc_job.alignment.box_center_correction[0], self.rc_job.alignment.box_center_correction[1], self.rc_job.alignment.box_center_correction[2] - (self.rc_job.alignment.box_dimensions[2]/2)  )  #
+            cmd += '-moveReconstructionRegion "%s" "%s" "%s" ' % (self.rc_job.alignment.box_center_correction[0], self.rc_job.alignment.box_center_correction[1], self.rc_job.alignment.box_center_correction[2] - (self.rc_job.box_dimensions[2]/2)  )  #
         cmd += '-correctColors '
         if self.rc_job.reconstruction_quality == "preview":
             cmd += '-calculatePreviewModel '

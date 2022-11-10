@@ -53,7 +53,7 @@ class ExportModel(GenericTask):
             self.set_status("failed")
             return
 
-        if self.rc_job.fileextension == "glb" and self.rc_job.lit is False:
+        if self.rc_job.fileextension == "glb" and self.rc_job.lit is False and self.create_textures is True:
             glbf = GLTF2().load(self.output_model_path)
             glbf.materials[0].pbrMetallicRoughness.baseColorFactor = [0, 0, 0, 1]
             glbf.materials[0].emissiveFactor = [1, 1, 1]

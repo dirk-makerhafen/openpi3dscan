@@ -14,7 +14,7 @@ class Download(GenericTask):
         if os.path.exists(os.path.join(self.rc_job.workingdir, "images")):
             self.log.append("Not downloading, exists in cache")
         else:
-            self.log.append("Download from %s" % self.rc_job.source_ip)
+            self.log.append("Downloading from %s" % self.rc_job.source_ip)
             try:
                 data = requests.get("http://%s/shots/%s.zip" % (self.rc_job.source_ip, self.rc_job.shot_id)).content
                 with open(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id), "wb") as f:
@@ -31,21 +31,22 @@ class Download(GenericTask):
     def _unpack_zip(self, path):
         path = os.path.abspath(path)
         name = path.split("\\")[-1].split(".zip")[0]
-        dir = "\\".join(path.split("\\")[0:-1])
-        target_dir = os.path.join(dir, name)
+        source_dir = "\\".join(path.split("\\")[0:-1])
+        unzip_dir = os.path.join(source_dir, name)
         self.log.append("Unzip download")
-        if os.path.exists(target_dir):
+        if os.path.exists(unzip_dir):
             try:
-                shutil.rmtree(target_dir)
+                shutil.rmtree(unzip_dir)
             except:
                 pass
-        os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s.zip'\"" % (dir, name))
+        os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s.zip'\"" % (source_dir, name))
         os.remove(path)
-        if not os.path.exists(os.path.join(target_dir, "images")):
-            os.mkdir(os.path.join(target_dir, "images"))
-        shutil.move(os.path.join(target_dir, "normal"), os.path.join(target_dir, "images"))
-        shutil.move(os.path.join(target_dir, "projection"), os.path.join(target_dir, "images"))
-        if os.path.exists(os.path.join(target_dir, "normal")):
-            shutil.rmtree(os.path.join(target_dir, "normal"))
-        if os.path.exists(os.path.join(target_dir, "projection")):
-            shutil.rmtree(os.path.join(target_dir, "projection"))
+        if not os.path.exists(os.path.join(source_dir, "images")):
+            os.mkdir(os.path.join(source_dir, "images"))
+        shutil.move(os.path.join(unzip_dir, "normal"), os.path.join(source_dir, "images"))
+        shutil.move(os.path.join(unzip_dir, "projection"), os.path.join(source_dir, "images"))
+        if os.path.exists(unzip_dir):
+            try:
+                shutil.rmtree(unzip_dir)
+            except:
+                pass

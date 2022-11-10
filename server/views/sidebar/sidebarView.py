@@ -57,6 +57,7 @@ class SidebarView(PyHtmlView):
             self.buttonsView.update()
 
     def show_shot(self, shot):
+        print("sidebar view", shot)
         if self.parent.currentView.show_shotView(shot) is True:
             self.buttonsView.update()
 

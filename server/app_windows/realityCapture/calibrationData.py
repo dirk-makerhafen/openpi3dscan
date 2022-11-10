@@ -95,7 +95,7 @@ class CalibrationData(GenericTask):
         cnt = 0
         cmd = self._get_cmd_start()
         cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
-        cmd += '-exportXMP "%s" ' %  self.rc_job.get_path("xmp_settings.xml")
+        cmd += '-exportXMP "%s" ' %  self.get_path("xmp_settings.xml")
         cmd += '-quit '
         self._run_command(cmd, "export_xmp")
 

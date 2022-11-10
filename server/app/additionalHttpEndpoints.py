@@ -165,7 +165,7 @@ class HttpEndpoints:
         files = [f for f in glob.glob("/opt/openpi3dscan/realityCapture/*.*") if not f.endswith(".py")]
         zs = zipstream.ZipStream(compress_type=ZIP_STORED)
         for file in files:
-            name = file.split("/")[-1]
+            name = os.path.split(file)[1]
             zs.add_path(file, "windows_scripts/%s" % name)
         zs.add_path("/etc/hostname", "windows_scripts/hostname")
         headers = {
@@ -178,7 +178,7 @@ class HttpEndpoints:
         files = glob.glob("/opt/openpi3dscan/realityCapture/*.*")
         zs = zipstream.ZipStream(compress_type=ZIP_STORED)
         for file in files:
-            name = file.split("/")[-1]
+            name = os.path.split(file)[1]
             zs.add_path(file, "windows_scripts/%s" % name)
         zs.add_path("/etc/hostname", "windows_scripts/hostname")
         headers = {

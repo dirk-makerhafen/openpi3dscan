@@ -1,3 +1,6 @@
+import traceback
+
+import bottle
 from gevent import monkey
 #monkey.patch_all()
 import os, sys
@@ -5,6 +8,8 @@ import wx
 import platform
 import time
 import tempfile
+import ctypes
+
 from cefpython3 import cefpython as cef
 from pyhtmlgui import PyHtmlGui
 from views_windows.appView import AppView
@@ -19,6 +24,19 @@ MAC = (platform.system() == "Darwin")
 WIDTH = 900
 HEIGHT = 640
 
+def ExceptHook(exc_type, exc_value, exc_trace):
+    msg = "".join(traceback.format_exception(exc_type, exc_value,exc_trace))
+    encoding = cef.GetAppSetting("string_encoding") or "utf-8"
+    if type(msg) == bytes:
+        msg = msg.decode(encoding=encoding, errors="replace")
+    msg = msg.encode("ascii", errors="replace")
+    msg = msg.decode("ascii", errors="replace")
+    print("\n"+msg)
+    cef.QuitMessageLoop()
+    cef.Shutdown()
+    # noinspection PyProtectedMember
+    os._exit(1)
+
 class MainFrame(wx.Frame):
 
     def __init__(self):
@@ -32,7 +50,8 @@ class MainFrame(wx.Frame):
         print("[wxpython.py] wx.GetDisplaySize = %s" % wx.GetDisplaySize())
 
         print("[wxpython.py] MainFrame declared size: %s" % str((WIDTH, HEIGHT)))
-        size = self.scale_window_size_for_high_dpi(WIDTH, HEIGHT)
+        #size = self.scale_window_size_for_high_dpi(WIDTH, HEIGHT)
+        size = (WIDTH, HEIGHT)
         print("[wxpython.py] MainFrame DPI scaled size: %s" % str(size))
 
         wx.Frame.__init__(self, parent=None, id=wx.ID_ANY, title='RC Automation', size=size)
@@ -134,17 +153,19 @@ class CefApp(wx.App):
         return 0
 
 def run_wxcef():
-    sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+    ctypes.windll.shcore.SetProcessDpiAwareness(0)
+    sys.excepthook = ExceptHook  # To shutdown all CEF processes on error
     if WINDOWS:
         # noinspection PyUnresolvedReferences, PyArgumentList
         cef.DpiAware.EnableHighDpiSupport()
-    cef.Initialize(settings={'cache_path': tempfile.gettempdir()})
+    cef.Initialize(settings={'cache_path': tempfile.gettempdir(), "log_severity": cef.LOGSEVERITY_DISABLE})
     capp = CefApp(False)
     capp.MainLoop()
     del capp  # Must destroy before calling Shutdown
     cef.Shutdown()
 
 if __name__ == "__main__":
+
     gui = PyHtmlGui(
         app_instance    = AppInstance(),
         view_class      = AppView,

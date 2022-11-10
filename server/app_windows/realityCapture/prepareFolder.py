@@ -98,8 +98,10 @@ class PrepareFolder(GenericTask):
         if self.rc_job.source_ip is None:
             if not os.path.exists(os.path.join(self.rc_job.workingdir, "images")):
                 os.mkdir(os.path.join(self.rc_job.workingdir, "images"))
+            existed_in_cache = True
             for imgtype in ["normal", "projection"]:
                 if not os.path.exists(os.path.join(self.rc_job.workingdir, "images", imgtype)):
+                    existed_in_cache = False
                     if os.path.exists(os.path.join(self.rc_job.source_dir, "images", imgtype)):
                         shutil.copytree(os.path.join(self.rc_job.source_dir, "images", imgtype), os.path.join(self.rc_job.workingdir, "images", imgtype))
                     elif os.path.exists(os.path.join(self.rc_job.source_dir, imgtype)):
@@ -109,7 +111,10 @@ class PrepareFolder(GenericTask):
                 self.log.append("No images copied from %s, failed" % self.rc_job.source_dir)
                 self.set_status("failed")
             else:
-                self.log.append("%s images copied to cache" % (nr_of_images))
+                if existed_in_cache is False:
+                    self.log.append("%s images copied to cache" % (nr_of_images))
+                else:
+                    self.log.append("%s images exist in cache" % (nr_of_images))
                 self.set_status("success")
         else:
             self.set_status("success")

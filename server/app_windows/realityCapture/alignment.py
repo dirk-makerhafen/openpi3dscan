@@ -23,7 +23,7 @@ class Alignment(GenericTask):
 
         if os.path.exists(alignments_csv):
             self._load_alignments_csv(alignments_csv)
-            self.log.append("%s aligned cameras loaded from cache %s" % (len(self.alignments), alignments_csv))
+            self.log.append("%s aligned cameras loaded from cache" % (len(self.alignments)))
             if len(self.alignments) > 30:
                 self.set_status("success")
                 return
@@ -55,11 +55,11 @@ class Alignment(GenericTask):
         self._run_command(cmd, "load_alignments")
 
         self._load_alignments_csv(alignments_csv)
-        self.log.append("%s aligned cameras detected" % (len(self.alignments)))
+        self.log.append("%s cameras aligned" % (len(self.alignments)))
 
         if len(self.alignments) < 30:
             self.alignments_were_recreated = False
-            self.log.append("less than 30 aligned cameras detected, failed")
+            self.log.append("less than 30 cameras aligned, failed")
             self.set_status("failed")
         else:
             self.alignments_were_recreated = True
@@ -75,15 +75,16 @@ class Alignment(GenericTask):
                     al = line.split(",")
                     al = [al[0], float(al[1]), float(al[2]), float(al[3]), None]
                     self.alignments.append(al)
-        c_x = (max([x[1] for x in self.alignments]) + min([x[1] for x in self.alignments])) / 2
-        c_y = (max([x[2] for x in self.alignments]) + min([x[2] for x in self.alignments])) / 2
-        c_z = (max([x[3] for x in self.alignments]) + min([x[3] for x in self.alignments])) / 2
+        if len(self.alignments) > 2:
+            c_x = (max([x[1] for x in self.alignments]) + min([x[1] for x in self.alignments])) / 2
+            c_y = (max([x[2] for x in self.alignments]) + min([x[2] for x in self.alignments])) / 2
+            c_z = (max([x[3] for x in self.alignments]) + min([x[3] for x in self.alignments])) / 2
 
-        avg_x = sum([x[1] for x in self.alignments]) / len(self.alignments)
-        avg_y = sum([x[2] for x in self.alignments]) / len(self.alignments)
-        avg_z = sum([x[3] for x in self.alignments]) / len(self.alignments)
-        # print("avg", avg_x, avg_y, avg_z)
-        self.box_center_correction = [c_x, c_y, c_z]
+            avg_x = sum([x[1] for x in self.alignments]) / len(self.alignments)
+            avg_y = sum([x[2] for x in self.alignments]) / len(self.alignments)
+            avg_z = sum([x[3] for x in self.alignments]) / len(self.alignments)
+            # print("avg", avg_x, avg_y, avg_z)
+            self.box_center_correction = [c_x, c_y, c_z]
 
 
     def _get_cmd_defineDistance(self):

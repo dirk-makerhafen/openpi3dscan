@@ -111,7 +111,7 @@ class Shots:
     def load_shots_from_disk(self):
         for path in glob.glob(os.path.join(self.path, "*")):
             if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images","normal")) or (os.path.exists(os.path.join(path, "normal")) and os.path.exists(os.path.join(path, "projection"))  ):
-                shot_id = path.split("/")[-1]
+                shot_id = os.path.split(path)[1]
                 shot = self.get(shot_id)
                 if shot is None:
                     self.shots.append(Shot(self.path, shot_id))

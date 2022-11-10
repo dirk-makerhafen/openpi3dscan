@@ -31,7 +31,7 @@ class VerifyImages(GenericTask):
                     cnt_cache += 1
                     continue
                 checked_images.append(file)
-                fname = file.split("/")[-1]
+                fname = os.path.split(file)[1]
                 if os.path.getsize(file) < 500000:
                     os.remove(file)
                     cnt_removed += 1
@@ -55,5 +55,7 @@ class VerifyImages(GenericTask):
 
         with open(self.get_path("checked_images"), "w") as f:
             f.write("\n".join(checked_images))
-
-        self.set_status("success")
+        if cnt > 0:
+            self.set_status("success")
+        else:
+            self.set_status("failed")

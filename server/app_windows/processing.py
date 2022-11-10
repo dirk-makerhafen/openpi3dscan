@@ -29,6 +29,8 @@ class Processing(Observable):
         self.dns_cache = {}
         self.status = "idle"
         self.rc_tasks = ObservableList()
+        self.shots_instance = ShotsInstance()
+        self.settings_instance = SettingsInstance()
         self.worker = threading.Thread(target=self._loop, daemon=True)
         self.worker.start()
 
@@ -36,7 +38,7 @@ class Processing(Observable):
         while True:
             work_done = False
 
-            for host in SettingsInstance().settingsRemoteHosts.hosts:
+            for host in self.settings_instance.settingsRemoteHosts.hosts:
                 host = self._resolve_host(host)
                 if host is not None:
                     if self._request_remote(host) is True:
@@ -49,7 +51,7 @@ class Processing(Observable):
                 print("no results, waiting some time ")
                 self.log.append("no results, waiting some time ")
             else:
-                SettingsInstance().settingsCache.clean()
+                self.settings_instance.settingsCache.clean()
             time.sleep(5)
 
     def set_status(self, status):
@@ -73,15 +75,16 @@ class Processing(Observable):
         return None
 
     def _request_local(self):
-        models = ShotsInstance().get_unprocessed_models(limit=1)
+        models = self.shots_instance.get_unprocessed_models(limit=1)
         if len(models) == 0:
             return False
 
         self.set_status("processing")
 
         for model in models:
+            model.set_status("processing")
             shot = model.parentShot
-            location = SettingsInstance().settingsLocations.get_by_location(shot.meta_location)
+            location = self.settings_instance.settingsLocations.get_by_location(shot.meta_location)
             rc = RealityCapture(
                 source_dir=shot.path,
                 source_ip=None,
@@ -95,7 +98,7 @@ class Processing(Observable):
                 create_textures=model.create_textures,
                 lit=model.lit,
                 distances=self._parse_markers_str(location.markers),
-                pin=SettingsInstance().realityCaptureSettings.pin,
+                pin=self.settings_instance.realityCaptureSettings.pin,
                 box_dimensions=[location.diameter, location.diameter, location.height],
                 calibration_data=json.loads(location.calibration_data),
             )
@@ -152,7 +155,7 @@ class Processing(Observable):
             if rc.result_file is None:
                 self.process_failed(server_ip, model["shot_id"], model["model_id"])
 
-            #SettingsInstance().locations.get_by_location(shot.location).calibration_data = json.dumps(rc.calibrationData.data)
+            #self.settings_instance.locations.get_by_location(shot.location).calibration_data = json.dumps(rc.calibrationData.data)
 
         self.set_status("idle")
         return True

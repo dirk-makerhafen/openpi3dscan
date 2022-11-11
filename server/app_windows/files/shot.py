@@ -138,6 +138,8 @@ class Shot(Observable):
         return results
 
     def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
+        if self.meta_location == "":
+            return
         model = self.get_model(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures, lit=lit)
         if model is not None:
             if model.status == "failed":

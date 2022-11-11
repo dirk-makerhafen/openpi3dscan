@@ -13,6 +13,8 @@ class ExternalFiles(Observable):
         except:
             self.RealityCapture_exe = None
         basepath = os.path.join(SCRIPT_DIR, "..", "..", "..","realityCapture")
+        if not os.path.exists(basepath):
+            basepath = os.path.join(SCRIPT_DIR, "bin")
         self.chromedriver_exe = os.path.join(basepath, "chromedriver.exe")
         self.convert_exe = os.path.join(basepath, "convert.exe")
         self.gifsicle_exe = os.path.join(basepath, "gifsicle.exe")

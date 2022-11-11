@@ -13,24 +13,26 @@ class Download(GenericTask):
         self.set_status("active")
         if os.path.exists(os.path.join(self.rc_job.workingdir, "images")):
             self.log.append("Not downloading, exists in cache")
-        else:
-            self.log.append("Downloading from %s" % self.rc_job.source_ip)
-            try:
-                data = requests.get("http://%s/shots/%s.zip" % (self.rc_job.source_ip, self.rc_job.shot_id)).content
-                with open(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id), "wb") as f:
-                    f.write(data)
-                self.log.append("%sMB downloaded" % (len(data)/1024/1024))
-            except Exception as e:
-                self.log.append("Download failed")
-                self.set_status("failed")
-                return
-            nr_of_images = self._unpack_zip(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id))
-            self.log.append("%s images unpacked" % nr_of_images)
-            if nr_of_images == 0:
-                self.set_status("failed")
-                return
+            self.set_status("success")
+            return
 
+        self.log.append("Downloading from %s" % self.rc_job.source_ip)
+        try:
+            data = requests.get("http://%s/shots/%s.zip" % (self.rc_job.source_ip, self.rc_job.shot_id)).content
+            with open(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id), "wb") as f:
+                f.write(data)
+            self.log.append("%sMB downloaded" % (len(data)/1024/1024))
+        except Exception as e:
+            self.log.append("Download failed")
+            self.set_status("failed")
+            return
+        nr_of_images = self._unpack_zip(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id))
+        self.log.append("%s images unpacked" % nr_of_images)
+        if nr_of_images == 0:
+            self.set_status("failed")
+            return
         self.set_status("success")
+
 
     def _unpack_zip(self, path):
         path = os.path.abspath(path)

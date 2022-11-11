@@ -83,14 +83,13 @@ class Processing(Observable):
 
         for model in models:
             model.set_status("processing")
-            shot = model.parentShot
-            location = self.settings_instance.settingsLocations.get_by_location(shot.meta_location)
+            location = self.settings_instance.settingsLocations.get_by_location(model.parentShot.meta_location)
             rc = RealityCapture(
-                source_dir             = shot.path,
+                source_dir             = model.parentShot.path,
                 source_ip              = None,
-                shot_id                = shot.shot_id,
+                shot_id                = model.parentShot.shot_id,
                 model_id               = model.model_id,
-                shot_name              = shot.name,
+                shot_name              = model.parentShot.name,
                 filetype               = model.filetype,
                 reconstruction_quality = model.reconstruction_quality,
                 export_quality         = model.quality,
@@ -184,7 +183,6 @@ class Processing(Observable):
         return distances
 
     def get_unprocessed_models(self, server_ip):
-        print("Checking Server for work")
         data = {}
         try:
             d = requests.get("http://%s/realityCaptureProcess" % server_ip).text

@@ -53,7 +53,7 @@ class Task_UpdateServer(Observable):
                     time.sleep(10)
                 else:
                     self.set_status("installing")
-                    subprocess.call("cd /home/pi/openpi3dscan/server ; sudo python3 install.py", shell=True)
+                    subprocess.call("cd /home/pi/openpi3dscan/server ; sudo python3 run.py install", shell=True)
                     self.set_status("rebooting")
                     time.sleep(3)
                     AppInstance().reboot()

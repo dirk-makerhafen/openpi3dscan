@@ -257,7 +257,7 @@ class HttpEndpoints:
         else:
             output += subprocess.check_output("cd /home/pi/ ; git clone 'https://github.com/dirk-makerhafen/openpi3dscan.git'", shell=True, stderr=subprocess.STDOUT).decode("utf-8")
         output += "\n"
-        output += subprocess.check_output("cd /home/pi/openpi3dscan/server ; sudo python3 install.py", shell=True, stderr=subprocess.STDOUT).decode("utf-8")
+        output += subprocess.check_output("cd /home/pi/openpi3dscan/server ; sudo python3 run.py install", shell=True, stderr=subprocess.STDOUT).decode("utf-8")
         def f():
             time.sleep(5)
             os.system("sudo reboot &")

@@ -17,9 +17,6 @@ from app_windows.app import AppInstance
 from app_windows.additionalHttpEndpoints import HttpEndpoints
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-WINDOWS = (platform.system() == "Windows")
-LINUX = (platform.system() == "Linux")
-MAC = (platform.system() == "Darwin")
 
 WIDTH = 900
 HEIGHT = 640
@@ -41,24 +38,10 @@ class MainFrame(wx.Frame):
 
     def __init__(self):
         self.browser = None
-
-        if WINDOWS:
-            # noinspection PyUnresolvedReferences, PyArgumentList
-            print("[wxpython.py] System DPI settings: %s" % str(cef.DpiAware.GetSystemDpi()))
-        if hasattr(wx, "GetDisplayPPI"):
-            print("[wxpython.py] wx.GetDisplayPPI = %s" % wx.GetDisplayPPI())
-        print("[wxpython.py] wx.GetDisplaySize = %s" % wx.GetDisplaySize())
-
-        print("[wxpython.py] MainFrame declared size: %s" % str((WIDTH, HEIGHT)))
-        #size = self.scale_window_size_for_high_dpi(WIDTH, HEIGHT)
-        size = (WIDTH, HEIGHT)
-        print("[wxpython.py] MainFrame DPI scaled size: %s" % str(size))
-
-        wx.Frame.__init__(self, parent=None, id=wx.ID_ANY, title='RC Automation', size=size)
-        print("[wxpython.py] MainFrame actual size: %s" % self.GetSize())
-
+        size = self.scale_window_size_for_high_dpi(WIDTH, HEIGHT)
+        #size = (WIDTH, HEIGHT)
+        wx.Frame.__init__(self, parent=None, id=wx.ID_ANY, title='RCAutomation', size=size)
         self.setup_icon()
-        self.create_menu()
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.browser_panel = wx.Panel(self, style=wx.WANTS_CHARS)
         self.browser_panel.Bind(wx.EVT_SET_FOCUS, self.OnSetFocus)
@@ -68,19 +51,9 @@ class MainFrame(wx.Frame):
 
     def setup_icon(self):
         icon_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), "resources", "wxpython.png")
-        # wx.IconFromBitmap is not available on Linux in wxPython 3.0/4.0
         if os.path.exists(icon_file) and hasattr(wx, "IconFromBitmap"):
             icon = wx.IconFromBitmap(wx.Bitmap(icon_file, wx.BITMAP_TYPE_PNG))
             self.SetIcon(icon)
-
-    def create_menu(self):
-        pass
-        #filemenu = wx.Menu()
-        #filemenu.Append(1, "Some option")
-        #filemenu.Append(2, "Another option")
-        #menubar = wx.MenuBar()
-        #menubar.Append(filemenu, "&File")
-        #self.SetMenuBar(menubar)
 
     def embed_browser(self):
         window_info = cef.WindowInfo()
@@ -91,14 +64,12 @@ class MainFrame(wx.Frame):
 
     def OnSetFocus(self, _):
         if not self.browser: return
-        if WINDOWS:
-            cef.WindowUtils.OnSetFocus(self.browser_panel.GetHandle(), 0, 0, 0)
+        cef.WindowUtils.OnSetFocus(self.browser_panel.GetHandle(), 0, 0, 0)
         self.browser.SetFocus(True)
 
     def OnSize(self, _):
         if not self.browser: return
-        if WINDOWS:
-            cef.WindowUtils.OnSize(self.browser_panel.GetHandle(), 0, 0, 0)
+        cef.WindowUtils.OnSize(self.browser_panel.GetHandle(), 0, 0, 0)
         self.browser.NotifyMoveOrResizeStarted()
 
     def OnClose(self, event):
@@ -108,8 +79,6 @@ class MainFrame(wx.Frame):
         self.browser = None
 
     def scale_window_size_for_high_dpi(self, width, height):
-        if not WINDOWS:
-            return width, height
         (_, _, max_width, max_height) = wx.GetClientDisplayRect().Get()
         # noinspection PyUnresolvedReferences
         (width, height) = cef.DpiAware.Scale((width, height))
@@ -120,7 +89,6 @@ class MainFrame(wx.Frame):
         return width, height
 
 class CefApp(wx.App):
-
     def __init__(self, redirect):
         self.timer = None
         self.timer_id = 1
@@ -131,8 +99,7 @@ class CefApp(wx.App):
         super(CefApp, self).OnPreInit()
 
     def OnInit(self):
-        if self.is_initialized:
-            return
+        if self.is_initialized: return
         self.is_initialized = True
         self.create_timer()
         frame = MainFrame()
@@ -155,9 +122,7 @@ class CefApp(wx.App):
 def run_wxcef():
     ctypes.windll.shcore.SetProcessDpiAwareness(0)
     sys.excepthook = ExceptHook  # To shutdown all CEF processes on error
-    if WINDOWS:
-        # noinspection PyUnresolvedReferences, PyArgumentList
-        cef.DpiAware.EnableHighDpiSupport()
+    cef.DpiAware.EnableHighDpiSupport()
     cef.Initialize(settings={'cache_path': tempfile.gettempdir(), "log_severity": cef.LOGSEVERITY_DISABLE})
     capp = CefApp(False)
     capp.MainLoop()

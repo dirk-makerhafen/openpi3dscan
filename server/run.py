@@ -1,16 +1,22 @@
 from gevent import monkey
 monkey.patch_all()
-import os
+import os, sys
 import time
-from pyhtmlgui import PyHtmlGui
-from views.appView import AppView
-from app.app import AppInstance
-from app.additionalHttpEndpoints import HttpEndpoints
-
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "install":
+        from app.installer import Installer
+        installer = Installer()
+        installer.run()
+        exit(0)
+
+    from pyhtmlgui import PyHtmlGui
+    from views.appView import AppView
+    from app.app import AppInstance
+    from app.additionalHttpEndpoints import HttpEndpoints
+
     time.sleep(20)  # wait for system
     os.system("sudo ntpdate -u de.pool.ntp.org")
 

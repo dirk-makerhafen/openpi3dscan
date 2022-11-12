@@ -27,8 +27,8 @@ class SettingsRemoteHostsView(PyHtmlView):
                                 </tr>
                                 {% endfor %}
                                 <tr>
-                                <td><input placeholder="myscanner.local" id="newhost" type="text"></input></td>
-                                <td> <button onclick='pyview.subject.add_host($("#newhost").val())'>add</button> </td>   
+                                <td><input  class="form-control" placeholder="myscanner.local" id="newhost" type="text"></input></td>
+                                <td> <button class="btn" onclick='pyview.subject.add_host($("#newhost").val())'>add</button> </td>   
                                 </tr>
                             </table>
                             </div>

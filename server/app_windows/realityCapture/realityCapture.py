@@ -35,7 +35,6 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 DEBUG = "debug" in sys.argv
 
-
 class RealityCapture(Observable):
     def __init__(self, source_ip, source_dir, shot_id, model_id, shot_name, filetype, reconstruction_quality,
                  export_quality, create_mesh_from, create_textures, lit, distances, pin, box_dimensions,

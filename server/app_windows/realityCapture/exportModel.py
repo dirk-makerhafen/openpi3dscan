@@ -17,11 +17,11 @@ class ExportModel(GenericTask):
         force_reload = self.status != "idle"
         self.set_status("active")
         if force_reload is True and os.path.exists(self.output_model_path):
-            self.log.append("Removing cached export file %s" % self.output_model_path)
+            self.log.append("Removing cached export file")
             os.remove(self.output_model_path)
 
         if os.path.exists(self.output_model_path):
-            self.log.append("Using from cache %s" % (self.output_model_path))
+            self.log.append("Using from cache")
             self.set_status("success")
             return
 
@@ -60,6 +60,6 @@ class ExportModel(GenericTask):
             glbf.materials[0].emissiveTexture = TextureInfo(index=0)
             glbf.save(self.output_model_path)
 
-        self.log.append("Export model created, %s" % self.output_model_path)
+        self.log.append("Export model created")
         self.set_status("success")
 

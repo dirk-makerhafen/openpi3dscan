@@ -20,7 +20,7 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
-                                    <input id="rc_pin" type="text" value="{{pyview.subject.pin}}" onchange='pyview.subject.set_pin($("#rc_pin").val())'>
+                                    <input class="form-control" id="rc_pin" type="text" value="{{pyview.subject.pin}}" onchange='pyview.subject.set_pin($("#rc_pin").val())'>
                                 </div>
                             </div>
                         </div>
@@ -33,7 +33,7 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
-                                     <select name="default_reconstruction_quality" id="default_reconstruction_quality"  onchange='pyview.subject.set_default_reconstruction_quality($("#default_reconstruction_quality").val())'>
+                                     <select class="form-control" name="default_reconstruction_quality" id="default_reconstruction_quality"  onchange='pyview.subject.set_default_reconstruction_quality($("#default_reconstruction_quality").val())'>
                                         <option value="preview" {% if pyview.subject.default_reconstruction_quality == "preview"%}selected{%endif%}>Preview</option>
                                         <option value="normal"  {% if pyview.subject.default_reconstruction_quality == "normal" %}selected{%endif%}>Normal</option>
                                         <option value="high"    {% if pyview.subject.default_reconstruction_quality == "high"    %}selected{%endif%}>High</option>
@@ -51,7 +51,7 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
-                                     <select name="default_export_quality" id="default_export_quality"  onchange='pyview.subject.set_default_export_quality($("#default_export_quality").val())'>
+                                     <select class="form-control" name="default_export_quality" id="default_export_quality"  onchange='pyview.subject.set_default_export_quality($("#default_export_quality").val())'>
                                         <option value="low"    {% if pyview.subject.default_export_quality == "low"    %}selected{%endif%}>Low (500k)</option>
                                         <option value="normal" {% if pyview.subject.default_export_quality == "normal" %}selected{%endif%}>Normal (1M)</option>
                                         <option value="high"   {% if pyview.subject.default_export_quality == "high"    %}selected{%endif%}>High (4M)</option>
@@ -69,7 +69,7 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
-                                     <select name="default_create_mesh_from" id="default_create_mesh_from"  onchange='pyview.subject.set_default_create_mesh_from($("#default_create_mesh_from").val())'>
+                                     <select class="form-control" name="default_create_mesh_from" id="default_create_mesh_from"  onchange='pyview.subject.set_default_create_mesh_from($("#default_create_mesh_from").val())'>
                                         <option value="normal"     {% if pyview.subject.default_create_mesh_from == "normal"     %}selected{%endif%}>Normal</option>
                                         <option value="projection" {% if pyview.subject.default_create_mesh_from == "projection" %}selected{%endif%}>Projection</option>
                                         <option value="all"        {% if pyview.subject.default_create_mesh_from == "all"         %}selected{%endif%}>All</option>
@@ -87,7 +87,7 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
-                                    <input id="default_create_textures"  type="checkbox" {% if pyview.subject.default_create_textures == True %}checked{% endif %} onclick='pyview.subject.set_default_create_textures($("#default_create_textures").prop("checked") === true)'>                                 
+                                    <input class="form-check-input" id="default_create_textures"  type="checkbox" {% if pyview.subject.default_create_textures == True %}checked{% endif %} onclick='pyview.subject.set_default_create_textures($("#default_create_textures").prop("checked") === true)'>                                 
                                 </div>
                             </div>         
                         </div>
@@ -100,7 +100,7 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
-                                    <input id="default_lit"  type="checkbox" {% if pyview.subject.default_lit == True %}checked{% endif %} onclick='pyview.subject.set_default_lit($("#default_lit").prop("checked") === true)'>                                 
+                                    <input class="form-check-input" id="default_lit"  type="checkbox" {% if pyview.subject.default_lit == True %}checked{% endif %} onclick='pyview.subject.set_default_lit($("#default_lit").prop("checked") === true)'>                                 
                                 </div>
                             </div>         
                         </div>

@@ -20,6 +20,12 @@ class SettingsLocations(Observable):
         except :
             return None
 
+    def remove(self, location):
+        if location in self.locations:
+            self.locations.remove(location)
+        self.save()
+        self.notify_observers()
+
     def to_dict(self):
         return {
             "locations": [l.to_dict() for l in self.locations],

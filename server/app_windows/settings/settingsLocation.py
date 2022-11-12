@@ -131,6 +131,10 @@ class SettingsLocation(Observable):
         self.save()
         self.notify_observers()
 
+    def remove(self):
+        self.parent.remove(self)
+        self.notify_observers()
+
     def calibration_count(self):
         return self.calibration_data.count("FocalLength35mm")
 

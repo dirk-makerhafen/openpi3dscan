@@ -30,7 +30,7 @@ class SettingsCacheView(PyHtmlView):
                                 <p class="text-muted mb-0">Cache last x tasks</p>
                             </div>
                             <div class="col-md-2">
-                                <input value={{pyview.subject.size}} id="cache_size" type="number" min="0" max="100" step="1" onchange='pyview.subject.set_size($("#cache_size").val())' ></input>
+                                <input  class="form-control" value={{pyview.subject.size}} id="cache_size" type="number" min="0" max="100" step="1" onchange='pyview.subject.set_size($("#cache_size").val())' ></input>
                             </div>
                         </div>
                     </div>                 

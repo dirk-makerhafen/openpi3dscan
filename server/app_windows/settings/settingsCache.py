@@ -39,7 +39,6 @@ class SettingsCache(Observable):
     def clean(self):
         shots = []
         for path in glob.glob(os.path.join(self.directory, "*")):
-            print(path)
             if os.path.exists(os.path.join(path, "last_usage")):
                 with open(os.path.join(path, "last_usage"), "r") as f:
                     try:

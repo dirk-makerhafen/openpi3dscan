@@ -123,7 +123,14 @@ def run_wxcef():
     ctypes.windll.shcore.SetProcessDpiAwareness(0)
     sys.excepthook = ExceptHook  # To shutdown all CEF processes on error
     cef.DpiAware.EnableHighDpiSupport()
-    cef.Initialize(settings={'cache_path': tempfile.gettempdir(), "log_severity": cef.LOGSEVERITY_DISABLE})
+    settings = {'cache_path': tempfile.gettempdir(), "log_severity": cef.LOGSEVERITY_DISABLE}
+    if hasattr(sys, '_MEIPASS'):
+        settings.update({'locales_dir_path': os.path.join(sys._MEIPASS, 'locales'),
+                    'resources_dir_path': sys._MEIPASS,
+                    'browser_subprocess_path': os.path.join(sys._MEIPASS, 'subprocess.exe'),
+                    'log_file': os.path.join(sys._MEIPASS, 'debug.log')})
+
+    cef.Initialize(settings=settings)
     capp = CefApp(False)
     capp.MainLoop()
     del capp  # Must destroy before calling Shutdown

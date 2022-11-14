@@ -81,13 +81,15 @@ class MainFrame(wx.Frame):
     def scale_window_size_for_high_dpi(self, width, height):
         (_, _, max_width, max_height) = wx.GetClientDisplayRect().Get()
         # noinspection PyUnresolvedReferences
-        (width, height) = cef.DpiAware.Scale((width, height))
-        if width > max_width:
-            width = max_width
-        if height > max_height:
-            height = max_height
+        try:
+            (width, height) = cef.DpiAware.Scale((width, height))
+            if width > max_width:
+                width = max_width
+            if height > max_height:
+                height = max_height
+        except:
+            pass
         return width, height
-
 class CefApp(wx.App):
     def __init__(self, redirect):
         self.timer = None
@@ -120,9 +122,14 @@ class CefApp(wx.App):
         return 0
 
 def run_wxcef():
-    ctypes.windll.shcore.SetProcessDpiAwareness(0)
     sys.excepthook = ExceptHook  # To shutdown all CEF processes on error
-    cef.DpiAware.EnableHighDpiSupport()
+
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(0)
+        cef.DpiAware.EnableHighDpiSupport()
+    except:
+        pass
+
     settings = {'cache_path': tempfile.gettempdir(), "log_severity": cef.LOGSEVERITY_DISABLE}
     if hasattr(sys, '_MEIPASS'):
         settings.update({'locales_dir_path': os.path.join(sys._MEIPASS, 'locales'),

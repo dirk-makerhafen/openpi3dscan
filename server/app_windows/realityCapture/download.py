@@ -21,7 +21,7 @@ class Download(GenericTask):
             data = requests.get("http://%s/shots/%s.zip" % (self.rc_job.source_ip, self.rc_job.shot_id)).content
             with open(os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.shot_id), "wb") as f:
                 f.write(data)
-            self.log.append("%sMB downloaded" % (len(data)/1024/1024))
+            self.log.append("%sMb downloaded" % (int(len(data)/1024/1024)))
         except Exception as e:
             self.log.append("Download failed")
             self.set_status("failed")

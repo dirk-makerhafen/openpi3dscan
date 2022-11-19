@@ -55,7 +55,8 @@ class RealityCaptureView(PyHtmlView):
                         {% if pyview.uploadView %}
                             {{ pyview.uploadView.render() }}
                         {% endif %}
-
+                        <br>
+                        <br>
 
                     </div>
                 </div>   
@@ -89,12 +90,10 @@ class RealityCaptureView(PyHtmlView):
 
 class GenericTaskView(PyHtmlView):
     TEMPLATE_STR = '''
-        <div class="list-group-item">
+        <div class="list-group-item" style="padding: 0.1rem 2.25rem;">
             <div class="row align-items-center">
                 <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
-                <div class="col-md-2">
-                    <p>{{pyview.name}}</p>
-                </div>
+                <div class="col-md-2">{{pyview.name}}</div>
                 <div class="col-md-9">{{pyview.logView.render()}}</div>
             </div>
         </div>

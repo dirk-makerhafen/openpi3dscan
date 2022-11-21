@@ -5,7 +5,6 @@ import glob
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.abspath(sys.argv[0])))
-print("SCRIPT_DIR",SCRIPT_DIR )
 
 class ExternalFiles(Observable):
     def __init__(self):
@@ -19,7 +18,7 @@ class ExternalFiles(Observable):
             basepath = os.path.join(SCRIPT_DIR, "..", "realityCapture")
 
         self.chromedriver_exe = os.path.join(basepath, "chromedriver.exe")
-        self.chromium_exe = os.path.join(basepath, "RCAfrontend.exe")
+        self.chromium_exe = os.path.join(basepath, "chromium.exe")
         self.convert_exe = os.path.join(basepath, "convert.exe")
         self.gifsicle_exe = os.path.join(basepath, "gifsicle.exe")
         #self.optipng_exe = os.path.join(basepath, "optipng.exe")

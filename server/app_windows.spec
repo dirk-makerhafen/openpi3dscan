@@ -13,7 +13,7 @@ a = Analysis(['run_windows.py'],
                 (os.path.join(os.path.split(pyhtmlgui.__file__)[0], "assets"), "pyhtmlgui/assets")
              ],
              hiddenimports=[],
-             hookspath=["app_windows"],
+             hookspath=[],
              runtime_hooks=[],
              excludes=[],
              win_no_prefer_redirects=True,

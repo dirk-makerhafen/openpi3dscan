@@ -5,35 +5,24 @@ class RealityCaptureView(PyHtmlView):
             <div class="row justify-content-center" style="width:100%">
                 <div class="col-md-12">
                     <div class="list-group mb-5 shadow">
-                        <div class="list-group-item">
+                        <div class="list-group-item" style="padding-bottom:0px"> 
                             <div class="row align-items-center">
-                                <div class="col-md-11 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.shot_name}}, {{pyview.subject.filetype}}</div>
-                                <div class="col-md-1 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.status}}</div>
+                                <div class="col-md-11 h3" style="border-bottom: 1px solid lightgray;margin-top:10px;margin-bottom:2px">
+                                    <b>{{pyview.subject.shot_name}}</b>
+                                </div>
+                                <div class="col-md-1 h3" style="border-bottom: 1px solid lightgray;margin-top:10px;margin-bottom:2px">{{pyview.subject.status}}</div>
                             </div>
                         </div>
-                        <div class="list-group-item">
+                        <div class="list-group-item" style="padding-bottom:10px">
                             <div class="row align-items-center" style="border-bottom: 1px solid lightgray;">
-                                <div class="col-md-3" style="font-size: 1.2em;font-weight:bold">Filetype:</div>
-                                <div class="col-md-1">{{pyview.subject.filetype}}</div>
-                                <div class="col-md-3" style="font-size: 1.2em;font-weight:bold">Reconstruction quality:</div>
-                                <div class="col-md-1">{{pyview.subject.reconstruction_quality}}</div>
-                                <div class="col-md-3 " style="font-size: 1.2em;font-weight:bold">Export quality:</div>
-                                <div class="col-md-1">{{pyview.subject.export_quality}}</div>
+                                <div class="col-md-2 " style="font-size: 1.3em"><b style="font-size:0.8em">File:</b> {{pyview.subject.filetype}}</div>
+                                <div class="col-md-2 " style="font-size: 1.3em"><b style="font-size:0.8em">Mesh:</b> {{pyview.subject.create_mesh_from}}</div>
+                                <div class="col-md-2 " style="font-size: 1.3em"><b style="font-size:0.8em">Reconstruction:</b> {{pyview.subject.reconstruction_quality}}</div>
+                                <div class="col-md-2 " style="font-size: 1.3em"><b style="font-size:0.8em">Export:</b> {{pyview.subject.export_quality}}</div>                                
+                                <div class="col-md-2 " style="font-size: 1.3em"><b style="font-size:0.8em">Textures:</b> {{pyview.subject.create_textures}}</div>
+                                <div class="col-md-2 " style="font-size: 1.3em"><b style="font-size:0.8em">Lit:</b> {{pyview.subject.lit}}</div>                                
                             </div>
-                            <div class="row align-items-center" style="border-bottom: 1px solid lightgray;">
-                                <div class="col-md-3 " style="font-size: 1.2em;font-weight:bold">Create mesh from:</div>
-                                <div class="col-md-1">{{pyview.subject.create_mesh_from}}</div>
-                                <div class="col-md-3 " style="font-size: 1.2em;font-weight:bold">Create textures:</div>
-                                <div class="col-md-1">{{pyview.subject.create_textures}}</div>
-                                <div class="col-md-3 " style="font-size: 1.2em;font-weight:bold">Lit:</div>
-                                <div class="col-md-1">{{pyview.subject.lit}}</div>
-                            </div>
-                            
-                        </div>
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Processing Steps</div>
-                            </div>
+              
                         </div>
                         {{pyview.prepareFolderView.render()}}
                         {% if pyview.downloadView %}
@@ -55,9 +44,6 @@ class RealityCaptureView(PyHtmlView):
                         {% if pyview.uploadView %}
                             {{ pyview.uploadView.render() }}
                         {% endif %}
-                        <br>
-                        <br>
-
                     </div>
                 </div>   
                 
@@ -92,7 +78,12 @@ class GenericTaskView(PyHtmlView):
     TEMPLATE_STR = '''
         <div class="list-group-item" style="padding: 0.1rem 2.25rem;">
             <div class="row align-items-center">
-                <div class="col-md-1" style="text-align:center">{{pyview.subject.status}}</div>
+                <div class="col-md-1" style="text-align:center;background-color:
+                {% if pyview.subject.status == "idle" %}#fff{% endif %}
+                {% if pyview.subject.status == "active" %}#ffff0066{% endif %}
+                {% if pyview.subject.status == "success" %}#00ff0066{% endif %}
+                {% if pyview.subject.status == "failed" %}#ff000066{% endif %}
+                ">{{pyview.subject.status}}</div>
                 <div class="col-md-2">{{pyview.name}}</div>
                 <div class="col-md-9">{{pyview.logView.render()}}</div>
             </div>

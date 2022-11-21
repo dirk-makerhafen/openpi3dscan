@@ -4,7 +4,7 @@ from multiprocessing.pool import ThreadPool
 from app_windows.files.externalFiles import ExternalFilesInstance
 from app_windows.realityCapture.genericTask import GenericTask
 
-#from selenium import webdriver
+from selenium import webdriver
 
 
 class Animation(GenericTask):
@@ -26,6 +26,7 @@ class Animation(GenericTask):
 
     def _convert_glb_to_images(self, glb_path, output_path):
         options = webdriver.ChromeOptions()
+        options.binary_location = ExternalFilesInstance().chromium_exe
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-web-security")
         options.add_argument("--disable-dev-shm-usage")

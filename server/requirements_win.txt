@@ -7,3 +7,4 @@ zipstream-ng
 pillow
 wxpython
 cefpython3
+pywinauto

@@ -1,10 +1,12 @@
-import os
+import os, sys
 
 from pyhtmlgui import Observable
 import glob
 
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.abspath(sys.argv[0])))
 print("SCRIPT_DIR",SCRIPT_DIR )
+
 class ExternalFiles(Observable):
     def __init__(self):
         super().__init__()
@@ -12,14 +14,15 @@ class ExternalFiles(Observable):
             self.RealityCapture_exe = glob.glob("C:\*\Capturing Reality\RealityCapture\RealityCapture.exe")[0]
         except:
             self.RealityCapture_exe = None
-        basepath = os.path.join(SCRIPT_DIR, "..", "..", "..","realityCapture")
+        basepath = os.path.join(SCRIPT_DIR, "bin")
         if not os.path.exists(basepath):
-            basepath = os.path.join(SCRIPT_DIR, "bin")
+            basepath = os.path.join(SCRIPT_DIR, "..", "realityCapture")
+
         self.chromedriver_exe = os.path.join(basepath, "chromedriver.exe")
+        self.chromium_exe = os.path.join(basepath, "RCAfrontend.exe")
         self.convert_exe = os.path.join(basepath, "convert.exe")
         self.gifsicle_exe = os.path.join(basepath, "gifsicle.exe")
-        self.mogrify_exe = os.path.join(basepath, "mogrify.exe")
-        self.optipng_exe = os.path.join(basepath, "optipng.exe")
+        #self.optipng_exe = os.path.join(basepath, "optipng.exe")
         self.modelview_html = os.path.join(basepath, "modelview.html")
 
 

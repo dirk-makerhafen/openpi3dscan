@@ -69,8 +69,11 @@ class Animation(GenericTask):
             size = 900
 
         def f(file):
-            os.system('%s -resize %sx "%s"' % (ExternalFilesInstance().mogrify_exe, size, file))
-            os.system('%s -clobber "%s"' % (ExternalFilesInstance().optipng_exe, file))
+            tmpf = "%s_tmp.png" % file[0:-4]
+            os.system('%s -resize %sx "%s" "%s"' % (ExternalFilesInstance().convert_exe, size, file, tmpf))
+            os.remove(file)
+            os.rename(tmpf, file)
+            #os.system('%s -clobber "%s"' % (ExternalFilesInstance().optipng_exe, file))
             os.system('%s "%s" "%s"' % (ExternalFilesInstance().convert_exe, file, "%s.gif" % file[:-4]))
 
         ThreadPool(8).map(f, files)

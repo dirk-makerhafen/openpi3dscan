@@ -8,6 +8,8 @@ from pyhtmlgui import PyHtmlGui
 from views_windows.appView import AppView
 from app_windows.app import AppInstance
 from app_windows.additionalHttpEndpoints import HttpEndpoints
+from app_windows.files.externalFiles import ExternalFilesInstance
+from pywinauto.findwindows    import find_window
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -33,7 +35,13 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
          self.frame.Close()
 
     def OnShow(self, event= None):
-        webbrowser.open("http://127.0.0.1:8081",2)
+        if os.path.exists(ExternalFilesInstance().chromium_exe):
+            find_window(title='RCAfrontend.exe').focus()
+            os.system("\"%s\" --app=http://127.0.0.1:8081" % ExternalFilesInstance().chromium_exe)
+        else:
+            webbrowser.open("http://127.0.0.1:8081",2)
+        print("BROWER EXIT")
+
 
 class MainFrame(wx.Frame):
     def __init__(self):

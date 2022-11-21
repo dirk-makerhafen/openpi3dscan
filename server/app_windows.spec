@@ -29,12 +29,12 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           name='RCautomation',
-          debug=False,
+          debug=True,
           strip=False,
           upx=False,
           bootloader_ignore_signals=False,
           runtime_tmpdir=None,
-          console=False )
+          console=True )
 
 '''
 exe = EXE(pyz,

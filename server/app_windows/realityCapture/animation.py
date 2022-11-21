@@ -35,7 +35,7 @@ class Animation(GenericTask):
         browser.set_window_position(0, 0)
         browser.set_window_size(1200, 1200)
 
-        browser.get("file:\\%s?src=%s" % (ExternalFilesInstance().modelview_html, glb_path.replace('\\', '/')))
+        browser.get("http://127.0.0.1:8081/static/modelview.html?src=%s" % (glb_path.replace('\\', '/')))
 
         time.sleep(5)
         angle = 0

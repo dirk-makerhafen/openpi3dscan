@@ -47,6 +47,7 @@ class MainFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, title="Minimize to Tray")
         self.frame_icon = wx.Icon(os.path.join(SCRIPT_DIR, 'static', 'app.ico'), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.frame_icon)
         self.trayicon = TaskBarIcon(self.frame_icon, "RC Automation", self)
         self.Bind(wx.EVT_ICONIZE, self.on_iconify)
         self.Bind(wx.EVT_ICONIZE, self.onMinimize)

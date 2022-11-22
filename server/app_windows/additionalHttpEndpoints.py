@@ -74,6 +74,35 @@ class HttpEndpoints:
         bottle.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
         bottle.route("/shots/<shot_id>/<image_mode>/<image_type>/<fname>.jpg")(self._shot_get_image)  # return remote shot as jpeg
         bottle.route("/shots/<shot_id>.zip")(self._shot_get_images_zip)
+        bottle.route("/modelview.html")(self._modelview_html)
+        bottle.route("/model-viewer.min.js")(self._modelview_js)
+        bottle.route("/rc_cache/<path:path>")(self.rc_cache)
+
+
+    def rc_cache(self, path):
+        filename = path.split("/")[-1]
+        path = os.path.realpath(os.path.abspath(os.path.join("c:\\rc_cache", path.replace('/',"\\"))))
+        if not os.path.exists(path) or not path.startswith("c:\\rc_cache\\"):
+            return bottle.HTTPResponse(status=404)
+        headers = {
+            'Content-Type': "application/%s" % filename.split(".")[-1],
+            'Content-Disposition': 'attachment; filename="%s"' % filename,
+            'Cache-Control': "public, max-age=3600"
+        }
+        with open(path, "rb") as f:
+            return bottle.HTTPResponse(f.read(), **headers)
+
+    def _modelview_html(self):
+        response = bottle.static_file("modelview.html", root=self.gui.static_dir)
+        response.set_header("Content-Type", "text/html")
+        response.set_header("Cache-Control", "public, max-age=36000")
+        return response
+
+    def _modelview_js(self):
+        response = bottle.static_file("js/model-viewer.min.js", root=self.gui.static_dir)
+        response.set_header("Content-Type", "application/javascript")
+        response.set_header("Cache-Control", "public, max-age=36000")
+        return response
 
 
     def _shot_download_model(self, shot_id, model_id):

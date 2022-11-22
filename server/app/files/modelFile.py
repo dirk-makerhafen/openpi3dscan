@@ -49,7 +49,10 @@ class ModelFile(Observable):
                     f.write(buf)
                     buf = fi.read(32000)
 
-        self.filesize = int(round(os.path.getsize(os.path.join(self.path, self.filename)) / 1024 / 1024, 0))
+        self.filesize = round(os.path.getsize(os.path.join(self.path, self.filename)) / 1024 / 1024, 3)
+        if self.filesize >= 1:
+            self.filesize = int(self.filesize)
+
         self.set_status("ready")
 
     def get_data(self):

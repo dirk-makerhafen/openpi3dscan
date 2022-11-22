@@ -35,8 +35,8 @@ class RealityCaptureView(PyHtmlView):
                         {{pyview.calibrationDataUpdateView.render()}}
                         {{pyview.rawmodelView.render()}}
                         {{pyview.exportmodelView.render()}}
-                        {% if pyview.animation %}
-                            {{ pyview.animation.render() }}
+                        {% if pyview.animationView %}
+                            {{ pyview.animationView.render() }}
                         {% endif %}
                         {% if pyview.resultsArchiveView %}
                             {{ pyview.resultsArchiveView.render() }}

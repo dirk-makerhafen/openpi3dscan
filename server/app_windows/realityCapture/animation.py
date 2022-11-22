@@ -30,12 +30,11 @@ class Animation(GenericTask):
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-web-security")
         options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--allow-file-access-from-files")
         browser = webdriver.Chrome(executable_path=ExternalFilesInstance().chromedriver_exe, options=options)
         browser.set_window_position(0, 0)
         browser.set_window_size(1200, 1200)
 
-        browser.get("http://127.0.0.1:8081/static/modelview.html?src=%s" % (glb_path.replace('\\', '/')))
+        browser.get("http://127.0.0.1:8081/modelview.html?src=http://127.0.0.1:8081/rc_cache/%s" % (glb_path.replace("c:\\rc_cache\\", "").replace("\\","/")))
 
         time.sleep(5)
         angle = 0
@@ -68,6 +67,9 @@ class Animation(GenericTask):
             size = 1100
         elif self.rc_job.export_quality == "low":
             size = 900
+
+        if os.path.exists(output_file):
+            os.remove(output_file)
 
         def f(file):
             tmpf = "%s_tmp.png" % file[0:-4]

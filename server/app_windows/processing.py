@@ -113,7 +113,7 @@ class Processing(Observable):
                 print("Failed to process", e)
 
             if rc.result_file is not None:
-                location.calibration_data = json.dumps(rc.calibrationData.data)
+                location.set_calibration_data(json.dumps(rc.calibrationData.data))
                 model.write_file(rc.result_file)
             else:
                 model.set_status("failed")
@@ -161,7 +161,7 @@ class Processing(Observable):
             if "shot_location" in model:
                 location = self.settings_instance.locations.get_by_location(model["shot_location"])
                 if location is not None:
-                    location.calibration_data = json.dumps(rc.calibrationData.data)
+                    location.set_calibration_data(json.dumps(rc.calibrationData.data))
 
         self.set_status("idle")
         return True

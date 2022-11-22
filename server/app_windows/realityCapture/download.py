@@ -1,9 +1,13 @@
 import os
+import shlex
 import shutil
 import glob
+import subprocess
+
 import requests
 from app_windows.realityCapture.genericTask import GenericTask
 
+CREATE_NO_WINDOW = 0x08000000
 
 class Download(GenericTask):
     def __init__(self, rc_job):
@@ -45,7 +49,11 @@ class Download(GenericTask):
                 shutil.rmtree(unzip_dir)
             except:
                 pass
-        os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s.zip'\"" % (source_dir, name))
+
+        try:
+            subprocess.check_output(shlex.split("powershell -command \"Expand-Archive '%s.zip'\"" % (name)),shell=False, creationflags=CREATE_NO_WINDOW, cwd=source_dir)
+        except:
+            pass
         os.remove(path)
         if not os.path.exists(os.path.join(source_dir, "images")):
             os.mkdir(os.path.join(source_dir, "images"))

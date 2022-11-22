@@ -1,10 +1,14 @@
 import os, time, glob
+import shlex
+import subprocess
 from multiprocessing.pool import ThreadPool
 
 from app_windows.files.externalFiles import ExternalFilesInstance
 from app_windows.realityCapture.genericTask import GenericTask
 
 from selenium import webdriver
+
+CREATE_NO_WINDOW = 0x08000000
 
 
 class Animation(GenericTask):
@@ -73,22 +77,30 @@ class Animation(GenericTask):
 
         def f(file):
             tmpf = "%s_tmp.png" % file[0:-4]
-            os.system('%s -resize %sx "%s" "%s"' % (ExternalFilesInstance().convert_exe, size, file, tmpf))
-            os.remove(file)
-            os.rename(tmpf, file)
-            #os.system('%s -clobber "%s"' % (ExternalFilesInstance().optipng_exe, file))
-            os.system('%s "%s" "%s"' % (ExternalFilesInstance().convert_exe, file, "%s.gif" % file[:-4]))
+            try:
+                subprocess.check_output(shlex.split('"%s" -resize %sx "%s" "%s"' % (ExternalFilesInstance().convert_exe, size, file, tmpf)), shell=False, creationflags=CREATE_NO_WINDOW)
+                os.remove(file)
+                os.rename(tmpf, file)
+                subprocess.check_output(shlex.split('"%s" "%s" "%s"' % (ExternalFilesInstance().convert_exe, file, "%s.gif" % file[:-4])), shell=False, creationflags=CREATE_NO_WINDOW)
+            except:
+                pass
 
         ThreadPool(8).map(f, files)
         total_duration = 400  # in 1/100s of seconds
         delay = int(round(total_duration / len(files), 0))
-        os.system('%s --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" > "%s\\tmp.gif" ' % (ExternalFilesInstance().gifsicle_exe, delay, path, path))
+        try:
+            subprocess.check_output(shlex.split('"%s" --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" -o "%s\\tmp.gif" ' % (ExternalFilesInstance().gifsicle_exe, delay, path, path)), shell=False, creationflags=CREATE_NO_WINDOW)
+        except:
+            pass
+
         if os.path.exists(os.path.join(path, "tmp.gif")):
             if filetype == "gif":
                 os.rename(os.path.join(path, "tmp.gif"), output_file)
             if filetype == "webp":
-                os.system('%s "%s\\tmp.gif" "%s"' % (ExternalFilesInstance().convert_exe, path, output_file))
-
+                try:
+                    subprocess.check_output(shlex.split('"%s" "%s\\tmp.gif" "%s"' % (ExternalFilesInstance().convert_exe, path, output_file)), shell=False, creationflags=CREATE_NO_WINDOW)
+                except:
+                    pass
         for f in glob.glob(os.path.join(path, "screenshot_*.*")):
             os.remove(f)
         if os.path.exists(os.path.join(path, "tmp.gif")):

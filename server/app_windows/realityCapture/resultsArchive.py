@@ -1,7 +1,10 @@
 import os, time, glob, shutil
+import shlex
+import subprocess
 from multiprocessing.pool import ThreadPool
 
 from app_windows.realityCapture.genericTask import GenericTask
+CREATE_NO_WINDOW = 0x08000000
 
 
 class ResultsArchive(GenericTask):
@@ -36,7 +39,14 @@ class ResultsArchive(GenericTask):
         model_file_zip = os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.export_foldername)
         if os.path.exists(model_file_zip):
             os.remove(model_file_zip)
-        os.system("cd \"%s\" & powershell -command \"Compress-Archive '%s\\*' '%s.zip'\"" % (self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_foldername))
+        try:
+            subprocess.check_output(shlex.split(
+                "powershell -command \"Compress-Archive '%s\\*' '%s.zip'\"" % (self.rc_job.export_foldername, self.rc_job.export_foldername)
+            ),shell=False, creationflags=CREATE_NO_WINDOW, cwd=self.rc_job.workingdir)
+        except:
+            pass
+
+
         if not os.path.exists(model_file_zip):
             self.log.append("Failed to create result zip file")
             self.set_status("failed")

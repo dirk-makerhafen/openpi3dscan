@@ -5,6 +5,9 @@
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/jquery-ui.js"></script>
     <script type="module" src="/static/js/model-viewer.min.js"></script>
+    <script>
+        //document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
 {% endblock %}
 
 {% block head_css %}
@@ -19,7 +22,9 @@
 {% block head_meta %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-     <title>RC Automation</title>
+    <title>RCAutomation</title>
+    <link rel="icon" type="image/x-icon" href="/static/app.ico">
+
     <style>
 
     body {
@@ -32,6 +37,7 @@
     html, body {
         min-height: 99% !important;
         height: 99%;
+        user-select: none; /* Standard syntax */
     }
 
 

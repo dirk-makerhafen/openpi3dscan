@@ -84,6 +84,10 @@ class Processing(Observable):
         for model in models:
             model.set_status("processing")
             location = self.settings_instance.settingsLocations.get_by_location(model.parentShot.meta_location)
+            if location is None:
+                model.set_status("failed")
+                continue
+
             rc = RealityCapture(
                 source_dir             = model.parentShot.path,
                 source_ip              = None,
@@ -154,7 +158,10 @@ class Processing(Observable):
             if rc.result_file is None:
                 self.process_failed(server_ip, model["shot_id"], model["model_id"])
 
-            #self.settings_instance.locations.get_by_location(shot.location).calibration_data = json.dumps(rc.calibrationData.data)
+            if "shot_location" in model:
+                location = self.settings_instance.locations.get_by_location(model["shot_location"])
+                if location is not None:
+                    location.calibration_data = json.dumps(rc.calibrationData.data)
 
         self.set_status("idle")
         return True

@@ -2,7 +2,7 @@ import os, shutil
 import requests
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-TARGETFOLDER = os.path.join(SCRIPT_DIR,"dist","bin")
+TARGETFOLDER = os.path.join(SCRIPT_DIR, "build", "bin")
 
 def download(url, filename):
     with open(os.path.join(TARGETFOLDER, filename),"wb") as f:
@@ -28,10 +28,10 @@ if not os.path.exists(os.path.join(TARGETFOLDER,"chromedriver.exe")):
     os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (TARGETFOLDER, "chromedriver.zip"))
     shutil.move(os.path.join(TARGETFOLDER,"chromedriver","chromedriver.exe"), TARGETFOLDER)
 
-if not os.path.exists(os.path.join(TARGETFOLDER,"RCA.exe")):
+if not os.path.exists(os.path.join(TARGETFOLDER,"chromium")):
     download("https://github.com/portapps/ungoogled-chromium-portable/releases/download/103.0.5060.114-15/ungoogled-chromium-portable-win64-103.0.5060.114-15.7z", "chromium.7z")
     os.system("cd \"%s\" & \"c:\\Program Files\\7-Zip\\7z.exe\" x \"%s\"" % (TARGETFOLDER, os.path.join(TARGETFOLDER,"chromium.7z")))
-    shutil.move(os.path.join(TARGETFOLDER,"ungoogled-chromium-portable.exe"),os.path.join(TARGETFOLDER,"RCA.exe"))
+    shutil.move(os.path.join(TARGETFOLDER,"app"), os.path.join(TARGETFOLDER,"chromium"))
 
 filesToRemove = [ os.path.join(TARGETFOLDER, f) for f in [
     "imagemagick",
@@ -42,7 +42,10 @@ filesToRemove = [ os.path.join(TARGETFOLDER, f) for f in [
     "chromedriver.zip",
     "chromium.7z",
     "CHANGELOG.md",
-    "README.md"
+    "README.md",
+    "ungoogled-chromium-portable.exe",
+    "portapp.json",
+    "portapp-prev.json",
 ]]
 
 for fileToRemove in filesToRemove:
@@ -52,3 +55,4 @@ for fileToRemove in filesToRemove:
         else:
             os.remove(fileToRemove)
 
+shutil.copytree(TARGETFOLDER, os.path.join(SCRIPT_DIR, "dist", "RCAutomation", "bin"))

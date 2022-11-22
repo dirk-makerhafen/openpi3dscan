@@ -36,6 +36,10 @@ class SettingsCache(Observable):
         self.size = data["size"]
         return self
 
+
+    def count_items(self):
+        return len(glob.glob(os.path.join(self.directory, "*")))
+
     def clean(self):
         shots = []
         for path in glob.glob(os.path.join(self.directory, "*")):
@@ -49,6 +53,7 @@ class SettingsCache(Observable):
         while len(shots) > self.size:
             shutil.rmtree(shots[0][1])
             del shots[0]
+        self.notify_observers()
 
     def clear_all(self):
         for path in glob.glob(os.path.join(self.directory, "*")):
@@ -57,3 +62,4 @@ class SettingsCache(Observable):
                     shutil.rmtree(path)
                 except:
                     pass
+        self.notify_observers()

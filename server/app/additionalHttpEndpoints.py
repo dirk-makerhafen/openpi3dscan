@@ -100,6 +100,7 @@ class HttpEndpoints:
             model = model.to_dict()
             model["shot_id"] = shot.shot_id
             model["shot_name"] = shot.name
+            model["shot_location"] = shot.meta_location
             data["models"].append(model)
         if len(data["models"]) > 0:
             data["markers"] = SettingsInstance().realityCaptureSettings.markers

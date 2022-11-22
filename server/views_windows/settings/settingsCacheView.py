@@ -22,7 +22,7 @@ class SettingsCacheView(PyHtmlView):
                                 {{pyview.subject.directory}}
                             </div>
                         </div>
-                    </div>
+                    </div>                    
                      <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
@@ -31,6 +31,17 @@ class SettingsCacheView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 <input  class="form-control" value={{pyview.subject.size}} id="cache_size" type="number" min="0" max="100" step="1" onchange='pyview.subject.set_size($("#cache_size").val())' ></input>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-10">
+                                <strong class="mb-0">Clear</strong>
+                                <p class="text-muted mb-0">Clear {{pyview.subject.count_items()}} items from cache directory</p>
+                            </div>
+                            <div class="col-md-2">
+                                <button  class="btn" onclick="pyview.subject.clear_all()">clear</button>
                             </div>
                         </div>
                     </div>                 

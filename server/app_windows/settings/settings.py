@@ -1,4 +1,4 @@
-import json
+import json, os
 from pyhtmlgui import Observable
 
 from app_windows.settings.settingsCache import SettingsCache
@@ -12,6 +12,10 @@ VERSION = "2022.11.24-08.09"
 class Settings(Observable):
     def __init__(self):
         super().__init__()
+        self.save_dir = os.path.join(os.environ["APPDATA"], "RCAutomation")
+        if not os.path.exists(self.save_dir):
+            os.mkdir(self.save_dir)
+        self.save_file = os.path.join(self.save_dir, "settings.json")
         self.realityCaptureSettings = SettingsRealityCapture(self)
         self.settingsLocations = SettingsLocations(self)
         self.settingsRemoteHosts = SettingsRemoteHosts(self)
@@ -26,11 +30,11 @@ class Settings(Observable):
             "settingsRemoteHosts" : self.settingsRemoteHosts.to_dict(),
             "settingsCache" : self.settingsCache.to_dict(),
         }
-        open("windows.json", "w").write(json.dumps(data))
+        open(self.save_file, "w").write(json.dumps(data))
 
     def load(self):
         try:
-            data = open("windows.json", "r").read()
+            data = open(self.save_file, "r").read()
             data = json.loads(data)
         except Exception as e:
             print("error loading settings:", e)

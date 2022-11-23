@@ -107,7 +107,7 @@ if __name__ == "__main__":
         view_class      = AppView,
         template_dir    = os.path.join(SCRIPT_DIR, "templates"),
         static_dir      = os.path.join(SCRIPT_DIR, "static"),
-        base_template   = "base.html",
+        base_template   = "base_windows.html",
         listen_port     = 8081,
         listen_host     = "127.0.0.1",
         auto_reload     = False,

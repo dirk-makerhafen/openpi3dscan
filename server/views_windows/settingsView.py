@@ -6,16 +6,6 @@ from views_windows.settings.settingsLocationsView import SettingsLocationsView
 from views_windows.settings.settingsRemoteHostsView import SettingsRemoteHostsView
 
 
-class TaskUpdateServerView(PyHtmlView):
-    TEMPLATE_STR = '''
-    {% if pyview.subject.status == "idle" %} 
-        <button class="btn" onclick='pyview.subject.run();'> Update Server </button>
-    {% else %}
-        <p style="color:green">{{pyview.subject.status}}</p>
-    {% endif %}
-    '''
-
-
 class SettingsView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="main">

@@ -7,4 +7,5 @@ build/
 dist/
 windows.json
 error.log
-webrtc_event_logs/
+webrtc_event_logs
+blob_storage

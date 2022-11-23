@@ -26,7 +26,7 @@ class ExportModel(GenericTask):
             return
 
         cmd = self._get_cmd_start()
-        cmd += '-load "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
+        cmd += '-load "%s\\%s.rcproj" deleteAutosave ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
         cmd += '-selectComponent "MAIN" '
         cmd += '-selectModel "RAW" '
         if self.rc_job.export_quality == "high":

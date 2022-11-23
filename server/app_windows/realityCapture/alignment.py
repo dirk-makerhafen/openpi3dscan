@@ -42,7 +42,9 @@ class Alignment(GenericTask):
         cmd += '-detectMarkers "%s" ' % self.get_path("DetectMarkersParams.xml")
         cmd += self._get_cmd_defineDistance()
         cmd += '-selectMaximalComponent '
+        cmd += '-detectFeatures '
         cmd += '-align '
+        cmd += '-update '
         cmd += '-renameSelectedComponent "MAIN" '
         cmd += '-selectComponent "Component 0" '
         cmd += '-deleteSelectedComponent '

@@ -67,7 +67,7 @@ class CardReaderView(PyHtmlView):
                                         {% if pyview.subject.status != "idle" %}{{pyview.subject.status}}{%endif%}&nbsp;
                                      </p>
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-md-2">
                                    <button class="btn" {% if pyview.subject.status != "idle" %}disabled{%endif%}style="margin-right:5px" onclick='pyview.subject.reload_task();'> reload </button>
                                 </div>
                             </div>

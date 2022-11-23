@@ -27,7 +27,7 @@ class SettingsScannerView(PyHtmlView):
                     </div> 
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-10">
+                            <div class="col-md-11">
                                 <strong class="mb-0">Segments</strong>
                                 <p class="text-muted mb-0">Number of segments installed</p>
                             </div>
@@ -40,7 +40,7 @@ class SettingsScannerView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-10">
+                            <div class="col-md-11">
                                 <strong class="mb-0">Cameras</strong>
                                 <p class="text-muted mb-0">Number of cameras per segment</p>
                             </div>
@@ -53,7 +53,7 @@ class SettingsScannerView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-10">
+                            <div class="col-md-11">
                                 <strong class="mb-0">Rotation</strong>
                                 <p class="text-muted mb-0">Camera rotation. You must update all cameras for this change to take place!</p>
                             </div>
@@ -71,7 +71,7 @@ class SettingsScannerView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-10">
+                            <div class="col-md-11">
                                 <strong class="mb-0">Camera numbering</strong>
                                 <p class="text-muted mb-0">Position of camera 1</p>
                             </div>

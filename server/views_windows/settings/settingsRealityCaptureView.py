@@ -81,11 +81,11 @@ class SettingsRealityCaptureView(PyHtmlView):
                     </div>        
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-10">
+                            <div class="col-md-11">
                                 <strong class="mb-0">Texture</strong>
                                 <p class="text-muted mb-0">Create textures by default. </p>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <div class="custom-control custom-switch">
                                     <input class="form-check-input" id="default_create_textures"  type="checkbox" {% if pyview.subject.default_create_textures == True %}checked{% endif %} onclick='pyview.subject.set_default_create_textures($("#default_create_textures").prop("checked") === true)'>                                 
                                 </div>
@@ -94,11 +94,11 @@ class SettingsRealityCaptureView(PyHtmlView):
                     </div>  
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-10">
+                            <div class="col-md-11">
                                 <strong class="mb-0">Lit / Unlit</strong>
                                 <p class="text-muted mb-0">GLB, GIF and WEBP default lit. </p>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <div class="custom-control custom-switch">
                                     <input class="form-check-input" id="default_lit"  type="checkbox" {% if pyview.subject.default_lit == True %}checked{% endif %} onclick='pyview.subject.set_default_lit($("#default_lit").prop("checked") === true)'>                                 
                                 </div>

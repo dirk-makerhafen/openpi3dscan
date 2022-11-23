@@ -18,7 +18,7 @@ class RebootShutdownView(PyHtmlView):
                                 <strong class="mb-0">Reboot</strong>
                                 <p class="text-muted mb-0">Reboot server, this will take 2-3 minutes</p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-2">
                                 {% if pyview.subject.status == "active"%}
                                     <button class="btn " style="margin-right:5px" onclick='pyview.subject.reboot()'> Reboot </button>
                                 {% else %}
@@ -33,7 +33,7 @@ class RebootShutdownView(PyHtmlView):
                                 <strong class="mb-0">Shutdown</strong>
                                 <p class="text-muted mb-0">Shutdown Server</p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-2">
                                 {% if pyview.subject.status == "active" %}
                                     <button class="btn " style="margin-right:5px" onclick='pyview.subject.shutdown();'> Shutdown </button>
                                  {% else %}

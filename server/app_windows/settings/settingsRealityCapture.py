@@ -27,20 +27,24 @@ class SettingsRealityCapture(Observable):
         self.parent = parent
         self.save = parent.save
         self.pin = ""
+        self.token = ""
         self.default_reconstruction_quality = "normal" # preview, normal, high
         self.default_export_quality = "normal"  # "high", normal, low
         self.default_create_mesh_from = "projection" # normal, projection, all
         self.default_create_textures = True
         self.default_lit = True
+        self.hide_realitycapture = False
 
     def to_dict(self):
         return {
             "pin": self.pin,
+            "token": self.token,
             "default_reconstruction_quality": self.default_reconstruction_quality,
             "default_export_quality": self.default_export_quality,
             "default_create_mesh_from": self.default_create_mesh_from,
             "default_create_textures": self.default_create_textures,
             "default_lit": self.default_create_textures,
+            "hide_realitycapture": self.hide_realitycapture,
         }
 
     def from_dict(self, data):
@@ -50,6 +54,14 @@ class SettingsRealityCapture(Observable):
         self.default_create_mesh_from = data["default_create_mesh_from"]
         self.default_create_textures = data["default_create_textures"]
         self.default_lit = data["default_lit"]
+        try:
+            self.hide_realitycapture = data["hide_realitycapture"]
+        except:
+            pass
+        try:
+            self.token = data["token"]
+        except:
+            pass
 
     def set_pin(self, pin):
         self.pin = pin.strip()
@@ -89,4 +101,16 @@ class SettingsRealityCapture(Observable):
         self.default_create_textures = bool(new_default_create_textures)
         self.save()
         self.notify_observers()
+
+    def set_hide_realitycapture(self, new_hide_realitycapture):
+        self.hide_realitycapture = bool(new_hide_realitycapture)
+        self.save()
+        self.notify_observers()
+
+    def set_token(self, new_token):
+        self.token = new_token.strip()
+        self.save()
+        self.notify_observers()
+
+
 

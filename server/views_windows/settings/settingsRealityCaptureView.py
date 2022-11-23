@@ -28,6 +28,19 @@ class SettingsRealityCaptureView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
+                                <strong class="mb-0">Activation Token</strong>
+                                <p class="text-muted mb-0">Get RealityCapture activation token at <a target="blanc" href="https://www.capturingreality.com/my.activation#PPI">https://www.capturingreality.com/my.activation#PPI</a></p>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="custom-control custom-switch">
+                                    <input class="form-control" id="rc_token" type="text" value="{{pyview.subject.token}}" onchange='pyview.subject.set_token($("#rc_token").val())'>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-10">
                                 <strong class="mb-0">Reconstruction quality</strong>
                                 <p class="text-muted mb-0">Default reconstruction quality for RealityCapture </p>
                             </div>
@@ -104,7 +117,20 @@ class SettingsRealityCaptureView(PyHtmlView):
                                 </div>
                             </div>         
                         </div>
-                    </div>                         
+                    </div> 
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-11">
+                                <strong class="mb-0">Hide RealityCapture</strong>
+                                <p class="text-muted mb-0">Don't show RealityCapture window during processing</p>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input class="form-check-input" id="hide_realitycapture"  type="checkbox" {% if pyview.subject.hide_realitycapture == True %}checked{% endif %} onclick='pyview.subject.set_hide_realitycapture($("#hide_realitycapture").prop("checked") === true)'>                                 
+                                </div>
+                            </div>         
+                        </div>
+                    </div>                        
                 </div>
             </div>   
         </div>

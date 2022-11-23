@@ -107,6 +107,7 @@ class HttpEndpoints:
             dia = SettingsInstance().realityCaptureSettings.diameter
             data["box_dimensions"] = [dia, dia, SettingsInstance().realityCaptureSettings.height]
             data["pin"] = SettingsInstance().realityCaptureSettings.pin
+            data["token"] = SettingsInstance().realityCaptureSettings.token
             data["calibration"] = SettingsInstance().realityCaptureSettings.calibration_data
         return json.dumps(data)
 

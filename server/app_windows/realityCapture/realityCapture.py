@@ -37,7 +37,7 @@ DEBUG = "debug" in sys.argv
 
 class RealityCapture(Observable):
     def __init__(self, source_ip, source_dir, shot_id, model_id, shot_name, filetype, reconstruction_quality,
-                 export_quality, create_mesh_from, create_textures, lit, distances, pin, box_dimensions,
+                 export_quality, create_mesh_from, create_textures, lit, distances, pin, token, box_dimensions,
                  calibration_data, debug=False):
         super().__init__()
         self.source_ip = source_ip
@@ -53,6 +53,7 @@ class RealityCapture(Observable):
         self.create_textures = create_textures
         self.lit = lit
         self.pin = pin
+        self.token = token
         self.box_dimensions = box_dimensions
         self.debug = debug
         self.workingdir = os.path.join(SettingsInstance().settingsCache.directory, self.shot_name)

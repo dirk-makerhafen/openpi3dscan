@@ -5,6 +5,8 @@ import time
 
 from pyhtmlgui import Observable, ObservableList
 from app_windows.files.externalFiles import ExternalFilesInstance
+from app_windows.settings.settings import SettingsInstance
+
 
 class LogItem(Observable):
     def __init__(self, value):
@@ -51,8 +53,12 @@ class GenericTask(Observable):
 
     def _get_cmd_start(self):
         cmd = '"%s" ' % ExternalFilesInstance().RealityCapture_exe
-        #cmd += '-silent "%s\\crash_report.txt" ' % self.workingdir
-        #cmd += '-set "appQuitOnError=true" '
+        if SettingsInstance().realityCaptureSettings.hide_realitycapture is True:
+            cmd += '-headless '
+            cmd += '-silent "%s\\tmp\\crash_report.txt" ' % self.rc_job.workingdir
+            cmd += '-set "appQuitOnError=true" '
+        if self.rc_job.token != "":
+            cmd += '-activate %s ' % self.rc_job.token
         return cmd
 
     def _run_command(self, cmd, name):

@@ -41,6 +41,19 @@ class RealityCaptureView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
+                            <div class="col-md-10">
+                                <strong class="mb-0">Activation Token</strong>
+                                <p class="text-muted mb-0">Get RealityCapture activation token at <a target="blanc" href="https://www.capturingreality.com/my.activation#PPI">https://www.capturingreality.com/my.activation#PPI</a></p>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="custom-control custom-switch">
+                                    <input class="form-control" id="rc_token" type="text" value="{{pyview.subject.token}}" onchange='pyview.subject.set_token($("#rc_token").val())'>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
                             <div class="col-md-8">
                                 <strong class="mb-0">Marker Distances</strong>
                                 <p class="text-muted mb-0"> Distances of markers for RealityCapture reconstruction scaling</p>

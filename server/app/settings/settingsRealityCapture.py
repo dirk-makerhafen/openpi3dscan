@@ -30,6 +30,7 @@ class SettingsRealityCapture(Observable):
         self.diameter = 1.9
         self.height = 2.5
         self.pin = ""
+        self.token = ""
         self.default_reconstruction_quality = "normal" # preview, normal, high
         self.default_export_quality = "normal"  # "high", normal, low
         self.default_create_mesh_from = "projection" # normal, projection, all
@@ -49,6 +50,7 @@ class SettingsRealityCapture(Observable):
             "default_create_textures": self.default_create_textures,
             "default_lit": self.default_lit,
             "calibration_data": self.calibration_data,
+            "token": self.token,
         }
 
     def from_dict(self, data):
@@ -65,6 +67,11 @@ class SettingsRealityCapture(Observable):
             self.default_lit = data["default_lit"]
         except:
             pass
+        try:
+            self.token = data["token"]
+        except:
+            pass
+
     def set_markers(self, markers):
         self.markers = markers
         self.save()
@@ -146,3 +153,8 @@ class SettingsRealityCapture(Observable):
 
     def calibration_count(self):
         return self.calibration_data.count("FocalLength35mm")
+
+    def set_token(self, new_token):
+        self.token = new_token.strip()
+        self.save()
+        self.notify_observers()

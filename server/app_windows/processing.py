@@ -102,6 +102,7 @@ class Processing(Observable):
                 lit                    = model.lit,
                 distances              = self._parse_markers_str(location.markers),
                 pin                    = self.settings_instance.realityCaptureSettings.pin,
+                token                  = self.settings_instance.realityCaptureSettings.token,
                 box_dimensions         = [location.diameter, location.diameter, location.height],
                 calibration_data       = json.loads(location.calibration_data),
             )
@@ -144,6 +145,7 @@ class Processing(Observable):
                 lit                    = model["lit"],
                 distances              = self._parse_markers_str(data["markers"]),
                 pin                    = data["pin"],
+                token                  = data["token"],
                 box_dimensions         = data["box_dimensions"],
                 calibration_data       = json.loads(data["calibration"]),
             )

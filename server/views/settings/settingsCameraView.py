@@ -58,7 +58,7 @@ class CameraSettingsView(PyHtmlView):
                         </div>
                         <div class="col-auto">
                             <div class="custom-control custom-switch">
-                                <select name="iso" id="iso"  onchange='pyview.subject._set_iso($("#iso").val())'>
+                                <select class="form-control" name="iso" id="iso"  onchange='pyview.subject._set_iso($("#iso").val())'>
                                     <option value="0"   {% if pyview.subject.iso == 0   %}selected{%endif%}>Auto</option>
                                     <option value="100" {% if pyview.subject.iso == 100 %}selected{%endif%}>100</option>
                                     <option value="200" {% if pyview.subject.iso == 200 %}selected{%endif%}>100</option>
@@ -82,7 +82,7 @@ class CameraSettingsView(PyHtmlView):
                         </div>
                         <div class="col-auto">
                             <div class="custom-control custom-switch">
-                                <select name="exposure_mode" id="exposure_mode" onchange='pyview.subject._set_exposure_mode($("#exposure_mode").val())'>
+                                <select class="form-control" name="exposure_mode" id="exposure_mode" onchange='pyview.subject._set_exposure_mode($("#exposure_mode").val())'>
                                   <option value='off'          {% if pyview.subject.exposure_mode == 'off'          %}selected{%endif%}>OFF</option>
                                   <option value='auto'         {% if pyview.subject.exposure_mode == 'auto'         %}selected{%endif%}>Auto</option>
                                   <option value='night'        {% if pyview.subject.exposure_mode == 'night'        %}selected{%endif%}>Night</option>
@@ -114,7 +114,7 @@ class CameraSettingsView(PyHtmlView):
                         </div>
                         <div class="col-auto">
                             <div class="custom-control custom-switch">
-                                <select name="meter_mode" id="meter_mode" onchange='pyview.subject._set_meter_mode($("#meter_mode").val())'>
+                                <select class="form-control" name="meter_mode" id="meter_mode" onchange='pyview.subject._set_meter_mode($("#meter_mode").val())'>
                                   <option value='average'{% if pyview.subject.meter_mode == 'average' %}selected{%endif%}>Average</option>
                                   <option value='spot'   {% if pyview.subject.meter_mode == 'spot'    %}selected{%endif%}>Spot (10%)</option>
                                   <option value='backlit'{% if pyview.subject.meter_mode == 'backlit' %}selected{%endif%}>Backlit (30%)</option>
@@ -134,7 +134,7 @@ class CameraSettingsView(PyHtmlView):
                         </div>
                         <div class="col-auto">
                             <div class="custom-control custom-switch">
-                                <select name="awb_mode" id="awb_mode"  onchange='pyview.subject._set_awb_mode($("#awb_mode").val())'>
+                                <select class="form-control" name="awb_mode" id="awb_mode"  onchange='pyview.subject._set_awb_mode($("#awb_mode").val())'>
                                   <option value='auto'        {% if pyview.subject.awb_mode == 'auto'        %}selected{%endif%}>Auto</option>
                                   <option value='off'         {% if pyview.subject.awb_mode == 'off'         %}selected{%endif%}>Off</option>
                                   <option value='sunlight'    {% if pyview.subject.awb_mode == 'sunlight'    %}selected{%endif%}>Sunlight</option>

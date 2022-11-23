@@ -19,7 +19,7 @@ class HostnameSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Server will be reachable at <a href="http://{{pyview.subject.hostname}}.local">http://{{pyview.subject.hostname}}.local</a></p>
                             </div>
                             <div class="col-auto">
-                                <input id="hostname" value="{{pyview.subject.hostname}}" type="text"/>
+                                <input  class="form-control" id="hostname" value="{{pyview.subject.hostname}}" type="text"/>
                             </div>
                         </div>
                     </div>

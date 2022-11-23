@@ -19,7 +19,7 @@ class WirelessSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Wireless network name. Use <i>name;address</i> if you need to force a specific AP address</p>
                             </div>
                             <div class="col-auto">
-                                <input id="wireless_ssid" value="{{pyview.subject.ssid}}" type="text"/>
+                                <input class="form-control" id="wireless_ssid" value="{{pyview.subject.ssid}}" type="text"/>
                             </div>
                         </div>
                     </div>
@@ -30,7 +30,7 @@ class WirelessSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Wireless network password</p>
                             </div>
                             <div class="col-auto">
-                                <input id="wireless_password" value="{{pyview.subject.password}}" type="text"/>
+                                <input class="form-control" id="wireless_password" value="{{pyview.subject.password}}" type="text"/>
                             </div>
                         </div>
                     </div>

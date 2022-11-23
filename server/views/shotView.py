@@ -36,7 +36,7 @@ class ShotView(PyHtmlView):
                     {% if pyview.can_sync == True %}
                         <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
                     {% else %}
-                        <select id="available_locations"  onchange='pyview.set_location($("#available_locations").val())' >
+                        <select class="form-control" style="display: initial;" id="available_locations"  onchange='pyview.set_location($("#available_locations").val())' >
                             {% if pyview.current_shot.meta_location == "" %}
                                 <option value="" selected>- SELECT A LOCATION -</option>
                             {% endif  %}

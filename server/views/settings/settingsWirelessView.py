@@ -18,7 +18,7 @@ class WirelessSettingsView(PyHtmlView):
                                 <strong class="mb-0">Name</strong>
                                 <p class="text-muted mb-0">Wireless network name. Use <i>name;address</i> if you need to force a specific AP address</p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-2">
                                 <input class="form-control" id="wireless_ssid" value="{{pyview.subject.ssid}}" type="text"/>
                             </div>
                         </div>
@@ -29,7 +29,7 @@ class WirelessSettingsView(PyHtmlView):
                                 <strong class="mb-0">Password</strong>
                                 <p class="text-muted mb-0">Wireless network password</p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-2">
                                 <input class="form-control" id="wireless_password" value="{{pyview.subject.password}}" type="text"/>
                             </div>
                         </div>
@@ -40,7 +40,7 @@ class WirelessSettingsView(PyHtmlView):
                                 <strong class="mb-0">Save changes</strong>
                                 <p class="text-muted mb-0">Apply new wlan settings</p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-2">
                                <button class="btn " style="margin-right:5px" onclick='pyview.subject.apply($("#wireless_ssid").val(), $("#wireless_password").val());'> Apply Changes </button>
                             </div>
                         </div>

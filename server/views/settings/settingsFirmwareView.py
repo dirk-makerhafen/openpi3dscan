@@ -18,7 +18,7 @@ class FirmwareSettingsView(PyHtmlView):
                             <strong class="mb-0">Firmware image</strong>
                             <p class="text-muted mb-0">Select firmware image to install to new SD-Cards</p>
                         </div>
-                        <div class="col-auto">
+                        <div class="col-md-2">
                             <div class="custom-control custom-switch">
                                 <select  class="form-control" name="image" id="image"  onchange='pyview.subject.set_image($("#image").val())'>
                                     {% for image in pyview.subject.image_files %}

@@ -30,7 +30,7 @@ class ShotFilesView(PyHtmlView):
                 {{pyview.filesListView.render()}}
                 <tr style="border-top: 1px solid lightgray;    line-height: 3em;">
                     <td>
-                        <select class="form-control" name="filetype" id="filetype">
+                        <select style="margin-left:10px;margin-right:10px" class="form-control" name="filetype" id="filetype">
                             <option value="obj">OBJ</option>
                             <option value="stl">STL</option>
                             <option value="3mf">3MF</option>
@@ -42,28 +42,28 @@ class ShotFilesView(PyHtmlView):
                         </select>
                     </td>
                     <td>
-                        <select class="form-control" name="reconstruction_quality" id="reconstruction_quality">
+                        <select style="margin-left:10px;margin-right:10px" class="form-control" name="reconstruction_quality" id="reconstruction_quality">
                             <option value="high"   {% if pyview.settingsInstance.realityCaptureSettings.default_reconstruction_quality == "high"    %}selected{% endif %} >High</option>
                             <option value="normal" {% if pyview.settingsInstance.realityCaptureSettings.default_reconstruction_quality == "normal"  %}selected{% endif %}>Normal</option>
                             <option value="preview"{% if pyview.settingsInstance.realityCaptureSettings.default_reconstruction_quality == "preview" %}selected{% endif %} >Preview</option>
                         </select>                            
                     </td>
                     <td>
-                        <select class="form-control" name="quality" id="quality">
+                        <select style="margin-left:10px;margin-right:10px" class="form-control" name="quality" id="quality">
                             <option value="high"  {% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "high"   %}selected{% endif %}>High (4M)</option>
                             <option value="normal"{% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "normal" %}selected{% endif %}>Normal (1M)</option>
                             <option value="low"   {% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "low"    %}selected{% endif %}>Low (500K)</option>
                         </select>                            
                     </td>
                     <td>
-                        <select class="form-control" name="create_mesh_from" id="create_mesh_from">
+                        <select style="margin-left:10px;margin-right:10px" class="form-control" name="create_mesh_from" id="create_mesh_from">
                             <option value="projection" {% if pyview.settingsInstance.realityCaptureSettings.default_create_mesh_from == "projection" %}selected{% endif %}>Projection</option>
                             <option value="normal"     {% if pyview.settingsInstance.realityCaptureSettings.default_create_mesh_from == "normal"     %}selected{% endif %}>Normal</option>
                             <option value="all"        {% if pyview.settingsInstance.realityCaptureSettings.default_create_mesh_from == "all"        %}selected{% endif %}>All Images</option>
                         </select>   
                     </td>
-                    <td> <input class="form-control" id="create_textures" {% if pyview.settingsInstance.realityCaptureSettings.default_create_textures == true %}checked{% endif %} type="checkbox"/> </td>
-                    <td> <input class="form-control  id="lit_unlit" {% if pyview.settingsInstance.realityCaptureSettings.default_lit == true %}checked{% endif %} type="checkbox"/>  </td>
+                    <td> <input id="create_textures" {% if pyview.settingsInstance.realityCaptureSettings.default_create_textures == true %}checked{% endif %} type="checkbox"/> </td>
+                    <td> <input id="lit_unlit" {% if pyview.settingsInstance.realityCaptureSettings.default_lit == true %}checked{% endif %} type="checkbox"/>  </td>
                     <td> &nbsp;  </td>
                     <td> <button class="form-control btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked, $("#lit_unlit")[0].checked);'> Create Model </button></td>
                 </tr>
@@ -141,5 +141,5 @@ class ModelFileItemView(PyHtmlView):
                 {{pyview.subject.status}}
             {% endif %}
         </td>
-        <td><button class="btn form-control" onclick='pyview.subject.delete()'> Delete</button></td>
+        <td><button class="btn" onclick='pyview.subject.delete()'> Delete</button></td>
     '''

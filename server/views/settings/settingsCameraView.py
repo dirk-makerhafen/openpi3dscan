@@ -56,7 +56,7 @@ class CameraSettingsView(PyHtmlView):
                             <strong class="mb-0">ISO</strong>
                             <p class="text-muted mb-0">Select the apparent ISO setting of the cameras. Default: 100</p>
                         </div>
-                        <div class="col-auto">
+                        <div class="col-md-2">
                             <div class="custom-control custom-switch">
                                 <select class="form-control" name="iso" id="iso"  onchange='pyview.subject._set_iso($("#iso").val())'>
                                     <option value="0"   {% if pyview.subject.iso == 0   %}selected{%endif%}>Auto</option>
@@ -80,7 +80,7 @@ class CameraSettingsView(PyHtmlView):
                             <strong class="mb-0">Exposure mode </strong>
                             <p class="text-muted mb-0">Sets the exposure mode of the camera. Default: Backlight</p>
                         </div>
-                        <div class="col-auto">
+                        <div class="col-md-2">
                             <div class="custom-control custom-switch">
                                 <select class="form-control" name="exposure_mode" id="exposure_mode" onchange='pyview.subject._set_exposure_mode($("#exposure_mode").val())'>
                                   <option value='off'          {% if pyview.subject.exposure_mode == 'off'          %}selected{%endif%}>OFF</option>
@@ -112,7 +112,7 @@ class CameraSettingsView(PyHtmlView):
                                 . Default is "Spot"
                             </p>
                         </div>
-                        <div class="col-auto">
+                        <div class="col-md-2">
                             <div class="custom-control custom-switch">
                                 <select class="form-control" name="meter_mode" id="meter_mode" onchange='pyview.subject._set_meter_mode($("#meter_mode").val())'>
                                   <option value='average'{% if pyview.subject.meter_mode == 'average' %}selected{%endif%}>Average</option>
@@ -132,7 +132,7 @@ class CameraSettingsView(PyHtmlView):
                             <strong class="mb-0">AWB mode</strong>
                             <p class="text-muted mb-0">Sets the auto-white-balance mode of the camera. Default: Auto</p>
                         </div>
-                        <div class="col-auto">
+                        <div class="col-md-2">
                             <div class="custom-control custom-switch">
                                 <select class="form-control" name="awb_mode" id="awb_mode"  onchange='pyview.subject._set_awb_mode($("#awb_mode").val())'>
                                   <option value='auto'        {% if pyview.subject.awb_mode == 'auto'        %}selected{%endif%}>Auto</option>

@@ -18,7 +18,7 @@ class HostnameSettingsView(PyHtmlView):
                                 <strong class="mb-0">Hostname</strong>
                                 <p class="text-muted mb-0">Server will be reachable at <a href="http://{{pyview.subject.hostname}}.local">http://{{pyview.subject.hostname}}.local</a></p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-2">
                                 <input  class="form-control" id="hostname" value="{{pyview.subject.hostname}}" type="text"/>
                             </div>
                         </div>
@@ -29,7 +29,7 @@ class HostnameSettingsView(PyHtmlView):
                                 <strong class="mb-0">Save Changes</strong>
                                 <p class="text-muted mb-0">Reboot to apply changes after saving!</p>
                             </div>
-                            <div class="col-auto">
+                            <div class="col-md-2">
                                <button class="btn " style="margin-right:5px" onclick='pyview.subject.set_hostname($("#hostname").val());'> Change hostname </button>
                             </div>
                         </div>

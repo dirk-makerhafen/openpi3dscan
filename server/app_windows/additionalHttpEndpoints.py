@@ -82,7 +82,7 @@ class HttpEndpoints:
     def rc_cache(self, path):
         filename = path.split("/")[-1]
         path = os.path.realpath(os.path.abspath(os.path.join("c:\\rc_cache", path.replace('/',"\\"))))
-        if not os.path.exists(path) or not path.startswith("c:\\rc_cache\\"):
+        if not os.path.exists(path) or not path.startswith("C:\\rc_cache\\"):
             return bottle.HTTPResponse(status=404)
         headers = {
             'Content-Type': "application/%s" % filename.split(".")[-1],

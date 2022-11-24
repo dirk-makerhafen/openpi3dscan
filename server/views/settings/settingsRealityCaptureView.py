@@ -188,4 +188,3 @@ class RealityCaptureView(PyHtmlView):
         </div>
     </div>
     '''
-

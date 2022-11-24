@@ -1,3 +1,5 @@
+import webbrowser
+
 from pyhtmlgui import PyHtmlView
 
 
@@ -16,7 +18,7 @@ class SettingsRealityCaptureView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-10">
                                 <strong class="mb-0">Pin</strong>
-                                <p class="text-muted mb-0">Setup RealityCapture pin at <a target="blanc" href="https://www.capturingreality.com/my.pin">https://www.capturingreality.com/my.pin</a></p>
+                                <p class="text-muted mb-0">Setup RealityCapture pin at <a href="#" onclick="pyview.open_link_pin();">https://www.capturingreality.com/my.pin</a></p>
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
@@ -29,7 +31,7 @@ class SettingsRealityCaptureView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-10">
                                 <strong class="mb-0">Activation Token</strong>
-                                <p class="text-muted mb-0">Get RealityCapture activation token at <a target="blanc" href="https://www.capturingreality.com/my.activation#PPI">https://www.capturingreality.com/my.activation#PPI</a></p>
+                                <p class="text-muted mb-0">Get RealityCapture activation token at <a href="#" onclick="pyview.open_link_token();" >https://www.capturingreality.com/my.activation#PPI</a></p>
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">
@@ -136,4 +138,11 @@ class SettingsRealityCaptureView(PyHtmlView):
         </div>
     </div>
     '''
+
+
+    def open_link_pin(self):
+        webbrowser.open("https://www.capturingreality.com/my.pin")
+
+    def open_link_token(self):
+        webbrowser.open("https://www.capturingreality.com/my.activation#PPI")
 

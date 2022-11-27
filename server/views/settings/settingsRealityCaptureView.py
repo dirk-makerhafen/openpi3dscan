@@ -25,7 +25,7 @@ class RealityCaptureView(PyHtmlView):
                                 </div>
                             </div>         
                         </div>
-                    </div>        
+                    </div>
                     {% if pyview.subject.allow_rc_automation == True %}
                         <div class="list-group-item">
                             <div class="row align-items-center">
@@ -99,8 +99,7 @@ class RealityCaptureView(PyHtmlView):
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
+                        </div> 
                         <div class="list-group-item">
                             <div class="row align-items-center">
                                 <div class="col-md-10">

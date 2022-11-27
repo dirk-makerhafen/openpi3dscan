@@ -26,6 +26,7 @@ class SettingsRealityCapture(Observable):
         super().__init__()
         self.parent = parent
         self.save = parent.save
+        self.allow_rc_automation = True
         self.markers = MARKERS_PRELOAD
         self.diameter = 1.9
         self.height = 2.5
@@ -51,6 +52,7 @@ class SettingsRealityCapture(Observable):
             "default_lit": self.default_lit,
             "calibration_data": self.calibration_data,
             "token": self.token,
+            "allow_rc_automation": self.allow_rc_automation,
         }
 
     def from_dict(self, data):
@@ -69,6 +71,10 @@ class SettingsRealityCapture(Observable):
             pass
         try:
             self.token = data["token"]
+        except:
+            pass
+        try:
+            self.allow_rc_automation = data["allow_rc_automation"]
         except:
             pass
 
@@ -156,5 +162,10 @@ class SettingsRealityCapture(Observable):
 
     def set_token(self, new_token):
         self.token = new_token.strip()
+        self.save()
+        self.notify_observers()
+
+    def set_allow_rc_automation(self, new_allow_rc_automation):
+        self.allow_rc_automation = bool(new_allow_rc_automation)
         self.save()
         self.notify_observers()

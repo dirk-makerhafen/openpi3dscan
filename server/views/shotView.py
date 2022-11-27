@@ -22,9 +22,11 @@ class ShotView(PyHtmlView):
                 <div class="col-md-1 topMenuItem {% if pyview.current_view == pyview.imageCarousel%}selected{%endif%}" onclick='pyview.show_shot_2d();'>
                    Images
                 </div>
-                <div class="col-md-1 topMenuItem {% if pyview.current_view == pyview.shotModels   %}selected{%endif%}" onclick='pyview.show_shot_3d();'>
-                    3D Models 
-                </div>
+                {% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}
+                    <div class="col-md-1 topMenuItem {% if pyview.current_view == pyview.shotModels   %}selected{%endif%}" onclick='pyview.show_shot_3d();'>
+                        3D Models 
+                    </div>
+                {% endif %}
                 <div id="comments_btn" class="col-md-1 topMenuItem" onclick='pyview.toggle_comments();'>
                     Comments
                 </div>        
@@ -32,9 +34,9 @@ class ShotView(PyHtmlView):
                     Files
                 </div>
                 {% if pyview.show_path == True %}
-                    <div class="col-md-3 topMenuItem"> <a href="#" onclick="pyview.open_in_explorer()">{{pyview.current_shot.path}}</a>  </div>
+                    <div class="{% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}col-md-3{% else %}col-md-4{% endif %} topMenuItem"> <a href="#" onclick="pyview.open_in_explorer()">{{pyview.current_shot.path}}</a>  </div>
                 {% else %}
-                    <div class="col-md-3 topMenuItem">&nbsp;</div>
+                    <div class="{% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}col-md-3{% else %}col-md-4{% endif %} topMenuItem"> &nbsp; </div>
                 {% endif %}
                 
                 <div class="col-md-1 topMenuItem">
@@ -113,6 +115,7 @@ class ShotView(PyHtmlView):
         self.current_view = self.imageCarousel
         self.can_sync = True
         self.show_path = False
+        self.settingsInstance = settingsInstance
 
     def open_in_explorer(self):
         if self.current_shot is not None:

@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from views.appView import AppView
 from pyhtmlgui import PyHtmlView
 from views.sidebar.shotsView import ShotsView
+from app.settings.settings import SettingsInstance
 
 
 
@@ -37,7 +38,7 @@ class SidebarView(PyHtmlView):
 
     def __init__(self, subject: App, parent: AppView):
         super().__init__(subject, parent)
-        self.shotsView = ShotsView(subject=subject.shots.shots, parent=self)
+        self.shotsView = ShotsView(subject=subject.shots.shots, parent=self, settingsInstance=SettingsInstance())
         self.buttonsView = SidebarButtonsView(subject=subject, parent=self)
         self.current_search = ""
 
@@ -57,7 +58,6 @@ class SidebarView(PyHtmlView):
             self.buttonsView.update()
 
     def show_shot(self, shot):
-        print("sidebar view", shot)
         if self.parent.currentView.show_shotView(shot) is True:
             self.buttonsView.update()
 

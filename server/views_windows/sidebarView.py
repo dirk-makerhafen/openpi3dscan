@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from views.appView import AppView
 from pyhtmlgui import PyHtmlView
 from views.sidebar.shotsView import ShotsView
+from app_windows.settings.settings import SettingsInstance
 
 
 
@@ -19,7 +20,7 @@ class SidebarButtonsView(PyHtmlView):
     </div>
     <div class="col-md-12 item" style="height:3px"'> </div> 
     '''
-    def __init__(self, subject: App, parent: AppView):
+    def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
         self.add_observable(self.parent.parent.currentView.processingView.subject)
 
@@ -37,7 +38,7 @@ class SidebarView(PyHtmlView):
 
     def __init__(self, subject: App, parent: AppView):
         super().__init__(subject, parent)
-        self.shotsView = ShotsView(subject=subject.shots.shots, parent=self)
+        self.shotsView = ShotsView(subject=subject.shots.shots, parent=self, settingsInstance=SettingsInstance())
         self.buttonsView = SidebarButtonsView(subject=subject, parent=self)
         self.current_search = ""
 

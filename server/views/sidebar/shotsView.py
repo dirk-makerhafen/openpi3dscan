@@ -9,8 +9,9 @@ class ShotsView(ObservableListView):
     {% endfor %}
     '''
 
-    def __init__(self, subject, parent, **kwargs):
+    def __init__(self, subject, parent, settingsInstance, **kwargs):
         super().__init__(subject, parent, item_class=ShotsItemView, sort_key=lambda x: x.subject.shot_id, sort_reverse=True, **kwargs)
+        self.settingsInstance = settingsInstance
         self.selected_shot = None
 
     def select_shot(self, shot_id):
@@ -50,7 +51,7 @@ class ShotsItemView(PyHtmlView):
                 {{pyview.subject.name}} {{pyview.subject.status}}
             </div>
             <div class="info"> 
-                {% if pyview.subject.devices != None %}{{pyview.subject.nr_of_devices}},{% endif %}{{pyview.subject.nr_of_files}},{{pyview.subject.nr_of_models}}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 or pyview.subject.nr_of_models_failed > 0 %}({% if pyview.subject.nr_of_models_waiting_or_processing > 0%}{{pyview.subject.nr_of_models_waiting_or_processing}}{% endif %}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 and pyview.subject.nr_of_models_failed > 0 %},{% endif %}{% if pyview.subject.nr_of_models_failed > 0%}{{pyview.subject.nr_of_models_failed}}!{% endif %}){% endif %} 
+                {% if pyview.subject.devices != None %}{{pyview.subject.nr_of_devices}},{% endif %}{{pyview.subject.nr_of_files}}{% if pyview.parent.settingsInstance.realityCaptureSettings.allow_rc_automation == True %},{{pyview.subject.nr_of_models}}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 or pyview.subject.nr_of_models_failed > 0 %}({% if pyview.subject.nr_of_models_waiting_or_processing > 0%}{{pyview.subject.nr_of_models_waiting_or_processing}}{% endif %}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 and pyview.subject.nr_of_models_failed > 0 %},{% endif %}{% if pyview.subject.nr_of_models_failed > 0%}{{pyview.subject.nr_of_models_failed}}!{% endif %}){% endif %}{% endif %} 
             </div>  
         </div>  
     </div>

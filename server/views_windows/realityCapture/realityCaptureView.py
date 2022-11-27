@@ -60,7 +60,7 @@ class RealityCaptureView(PyHtmlView):
         self.markersView = GenericTaskView(subject.markers, self, "Detect markers")
         self.alignmentView = GenericTaskView(subject.alignment, self, "Align images")
         self.calibrationDataUpdateView = GenericTaskView(subject.calibrationDataUpdate, self, "Update calibration data")
-        self.rawmodelView = GenericTaskView(subject.rawmodel, self, "Create raw model")
+        self.rawmodelView = GenericTaskView(subject.rawmodel, self, "Reconstruction")
         self.exportmodelView = GenericTaskView(subject.exportmodel, self, "Create export model")
         if subject.animation is not None:
             self.animationView = GenericTaskView(subject.animation, self, "Create animation")

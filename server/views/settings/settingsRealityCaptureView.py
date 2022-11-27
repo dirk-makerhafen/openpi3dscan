@@ -21,7 +21,7 @@ class RealityCaptureView(PyHtmlView):
                             </div>
                             <div class="col-md-1">
                                 <div class="custom-control custom-switch">
-                                    <input id="allow_rc_automation"  type="allow_rc_automation" {% if pyview.subject.allow_rc_automation == True %}checked{% endif %} onclick='pyview.subject.set_allow_rc_automation($("#allow_rc_automation").prop("checked") === true)'>                                 
+                                    <input id="allow_rc_automation"  type="checkbox" {% if pyview.subject.allow_rc_automation == True %}checked{% endif %} onclick='pyview.subject.set_allow_rc_automation($("#allow_rc_automation").prop("checked") === true)'>                                 
                                 </div>
                             </div>         
                         </div>

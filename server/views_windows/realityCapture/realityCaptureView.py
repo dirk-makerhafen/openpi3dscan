@@ -52,26 +52,27 @@ class RealityCaptureView(PyHtmlView):
     '''
     def __init__(self, subject, parent, **kwargs):
         super().__init__(subject, parent, **kwargs)
-        self.prepareFolderView = GenericTaskView(subject.prepareFolder, self, "Prepare folders")
+        self.prepareFolderView         = GenericTaskView(subject.prepareFolder, self, "Prepare folders")
         if subject.download is not None:
-            self.downloadView = GenericTaskView(subject.download, self, "Download")
-        self.verifyImagesView = GenericTaskView(subject.verifyImages, self, "Verify images")
-        self.calibrationDataWriteView = GenericTaskView(subject.calibrationDataWrite, self, "Write calibration data")
-        self.markersView = GenericTaskView(subject.markers, self, "Detect markers")
-        self.alignmentView = GenericTaskView(subject.alignment, self, "Align images")
+            self.downloadView          = GenericTaskView(subject.download, self, "Download")
+
+        self.verifyImagesView          = GenericTaskView(subject.verifyImages, self, "Verify images")
+        self.calibrationDataWriteView  = GenericTaskView(subject.calibrationDataWrite, self, "Write calibration data")
+        self.markersView               = GenericTaskView(subject.markers, self, "Detect markers")
+        self.alignmentView             = GenericTaskView(subject.alignment, self, "Align images")
         self.calibrationDataUpdateView = GenericTaskView(subject.calibrationDataUpdate, self, "Update calibration data")
-        self.rawmodelView = GenericTaskView(subject.rawmodel, self, "Reconstruction")
-        self.exportmodelView = GenericTaskView(subject.exportmodel, self, "Create export model")
+        self.rawmodelView              = GenericTaskView(subject.rawmodel, self, "Reconstruction")
+        self.exportmodelView           = GenericTaskView(subject.exportmodel, self, "Create export model")
         if subject.animation is not None:
-            self.animationView = GenericTaskView(subject.animation, self, "Create animation")
-            self.resultsArchiveView = None
+            self.animationView         = GenericTaskView(subject.animation, self, "Create animation")
+            self.resultsArchiveView    = None
         else:
-            self.resultsArchiveView = GenericTaskView(subject.resultsArchive, self, "Create result archive")
-            self.animationView = None
+            self.resultsArchiveView    = GenericTaskView(subject.resultsArchive, self, "Compress results")
+            self.animationView         = None
         if subject.upload is not None:
-            self.uploadView = GenericTaskView(subject.upload, self, "Upload results")
+            self.uploadView            = GenericTaskView(subject.upload, self, "Upload results")
         else:
-            self.uploadView = None
+            self.uploadView            = None
 
 
 class GenericTaskView(PyHtmlView):

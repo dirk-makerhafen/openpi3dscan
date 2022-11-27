@@ -12,7 +12,7 @@ class Upload(GenericTask):
     def run(self):
         self.set_status("active")
         with open(self.rc_job.result_file, 'rb') as f:
-            self.log.append("Upload model to %s" % self.rc_job.source_ip)
+            self.log.append("Uploading model to %s" % self.rc_job.source_ip)
             try:
                 requests.post("http://%s/shots/%s/upload/%s" % (self.rc_job.source_ip, self.rc_job.shot_id, self.rc_job.model_id), files={'upload_file': f})
                 self.set_status("success")
@@ -21,7 +21,7 @@ class Upload(GenericTask):
                 self.set_status("failed")
                 return
 
-        self.log.append("Upload calibration data to %s" % self.rc_job.source_ip)
+        self.log.append("Uploading calibration data to %s" % self.rc_job.source_ip)
         try:
             requests.post("http://%s/upload_calibration" % (self.rc_job.source_ip), json={"data": json.dumps(self.rc_job.calibrationData.data)})
         except:

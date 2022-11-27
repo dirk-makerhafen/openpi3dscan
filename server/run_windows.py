@@ -9,6 +9,7 @@ import wx
 import wx.adv
 import time
 import win32gui
+from screeninfo import get_monitors
 
 from pyhtmlgui import PyHtmlGui
 from views_windows.appView import AppView
@@ -67,7 +68,13 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
             webbrowser.open("http://127.0.0.1:8081",2)
 
     def _browser(self):
-        cmd = "\"%s\" --start-maximized --no-default-browser-check --disable-logging --user-data-dir=\"%s\" --app=http://127.0.0.1:8081" % (ExternalFilesInstance().chromium_exe,  os.path.join(os.environ["APPDATA"], "RCAutomation", "data"))
+        #m = [m for m in get_monitors() if m.is_primary is True][0]
+        #w = int(m.width * 0.5)
+        ##h = int(m.height * 0.5)
+        #ws = "--window-size=%s,%s " % (w,h)
+        #except Exception as e:
+        ws = "--start-maximized"
+        cmd = "\"%s\" %s --no-default-browser-check --disable-logging --user-data-dir=\"%s\" --app=http://127.0.0.1:8081" % (ExternalFilesInstance().chromium_exe, ws,  os.path.join(os.environ["APPDATA"], "RCAutomation", "data"))
         try:
             subprocess.check_output(shlex.split(cmd), shell=False)
         except:

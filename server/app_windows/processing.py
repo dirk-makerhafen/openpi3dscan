@@ -107,11 +107,20 @@ class Processing(Observable):
                 calibration_data       = json.loads(location.calibration_data),
             )
             self.rc_tasks.insert(0, rc)
-            try:
-                rc.process()
-            except Exception as e:
-                traceback.print_exc()
-                print("Failed to process", e)
+            while True:
+                self.set_status("processing")
+                try:
+                    rc.process()
+                except Exception as e:
+                    traceback.print_exc()
+                    print("Failed to process", e)
+                if rc.result_file is not None:
+                    break
+                self.set_status("failed")
+                while self.status == "failed":
+                    time.sleep(2)
+                if self.status != "repeat":
+                    break
 
             if rc.result_file is not None:
                 location.set_calibration_data(json.dumps(rc.calibrationData.data))
@@ -151,19 +160,28 @@ class Processing(Observable):
             )
             self.rc_tasks.insert(0, rc)
 
-            try:
-                rc.process()
-            except Exception as e:
-                traceback.print_exc()
-                print("Failed to process", e)
+            while True:
+                self.set_status("processing")
+                try:
+                    rc.process()
+                except Exception as e:
+                    traceback.print_exc()
+                    print("Failed to process", e)
+                if rc.result_file is not None:
+                    break
+                self.set_status("failed")
+                while self.status == "failed":
+                    time.sleep(2)
+                if self.status != "repeat":
+                    break
 
             if rc.result_file is None:
                 self.process_failed(server_ip, model["shot_id"], model["model_id"])
-
-            if "shot_location" in model:
-                location = self.settings_instance.locations.get_by_location(model["shot_location"])
-                if location is not None:
-                    location.set_calibration_data(json.dumps(rc.calibrationData.data))
+            else:
+                if "shot_location" in model:
+                    location = self.settings_instance.settingsLocations.get_by_location(model["shot_location"])
+                    if location is not None:
+                        location.set_calibration_data(json.dumps(rc.calibrationData.data))
 
         self.set_status("idle")
         return True

@@ -24,6 +24,12 @@ class GenericTask(Observable):
         self.status = "idle"
         self.log = Log()
 
+    def reset(self):
+        while len(self.log) > 0:
+            del self.log[0]
+        if self.status != "idle":
+            self.set_status("repeat")
+
     def set_status(self, new_status):
         if self.status == new_status:
             return

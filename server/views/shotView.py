@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.app import App
-
+import os
 from pyhtmlgui import PyHtmlView
 from views.shot.shotFilesView import ShotFilesView
 from views.shot.shotModelsView import ShotModelsView
@@ -31,7 +31,12 @@ class ShotView(PyHtmlView):
                 <div id="files_btn" class="col-md-1 topMenuItem" onclick='pyview.toggle_files();'>
                     Files
                 </div>
-                <div class="col-md-3 topMenuItem">&nbsp;</div>
+                {% if pyview.show_path == True %}
+                    <div class="col-md-3 topMenuItem"> <a href="#" onclick="pyview.open_in_explorer()">{{pyview.current_shot.path}}</a>  </div>
+                {% else %}
+                    <div class="col-md-3 topMenuItem">&nbsp;</div>
+                {% endif %}
+                
                 <div class="col-md-1 topMenuItem">
                     {% if pyview.can_sync == True %}
                         <button class="btn" style="margin-right:5px" onclick='pyview.sync_remote();'> Sync </button>
@@ -107,7 +112,11 @@ class ShotView(PyHtmlView):
         self.current_shot = None
         self.current_view = self.imageCarousel
         self.can_sync = True
+        self.show_path = False
 
+    def open_in_explorer(self):
+        if self.current_shot is not None:
+            os.startfile( self.current_shot.path)
 
     def show_shot(self, shot):
         if self.current_shot != shot:

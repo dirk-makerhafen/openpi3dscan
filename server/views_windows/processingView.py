@@ -12,8 +12,17 @@ class ProcessingView(PyHtmlView):
                     <div class="list-group mb-5 shadow">
                         <div class="list-group-item">
                             <div class="row align-items-center">
-                                <div class="col-md-10 h3" style="border-bottom: 1px solid lightgray;">RealityCapture Processing</div>
-                                <div class="col-md-2 h3" style="border-bottom: 1px solid lightgray;">{{pyview.subject.status}}</div>
+                                <div class="col-md-4 h3" >RealityCapture Automation Tasks</div>
+                                {% if pyview.subject.status == "failed" %}
+                                    <div class="col-md-6 h4" >Task failed, make sure you have enough credits available</div>
+                                    <div class="col-md-2" >
+                                        <button class="btn btn-success" onclick="pyview.subject.set_status('repeat')">Repeat Task</button><br>
+                                        <button class="btn btn-warning" onclick="pyview.subject.set_status('continue')" style="margin-top:3px;">Fail task and Continue</button>
+                                    </div> 
+                                {% else %}
+                                    <div class="col-md-6" >&nbsp;</div>
+                                    <div class="col-md-2 h3" >{{pyview.subject.status}}</div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

@@ -40,14 +40,18 @@ class Markers(GenericTask):
         cmd += '-quit '
         self._run_command(cmd, "load_markers")
 
-        self._load_markers_csv(markers_csv)
-        self.log.append("%s of %s Markers detected" % (len(self.available_markers),  len(self.distances)))
+        if os.path.exists(markers_csv):
+            self._load_markers_csv(markers_csv)
+            self.log.append("%s of %s Markers detected" % (len(self.available_markers),  len(self.distances)))
 
-        if len(self.available_markers) < math.floor(len(self.distances)/10.0):
-            self.log.append("less than 10% of markers detected, failed")
-            self.set_status("failed")
+            if len(self.available_markers) < math.floor(len(self.distances)/10.0):
+                self.log.append("less than 10% of markers detected, failed")
+                self.set_status("failed")
+            else:
+                self.set_status("success")
         else:
-            self.set_status("success")
+            self.log.append("No markers exported, failed")
+            self.set_status("failed")
 
     def _load_markers_csv(self, markers_csv):
         markers = set()

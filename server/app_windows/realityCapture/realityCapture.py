@@ -111,6 +111,7 @@ class RealityCapture(Observable):
             self.upload,
         ]
         tasks = [task for task in tasks if task is not None]
+        [task.reset() for task in tasks]
         for task in tasks:
             try:
                 task.run()

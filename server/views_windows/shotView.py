@@ -12,6 +12,7 @@ class ShotView(ShotView):
     def __init__(self, subject: App, parent, settingsInstance):
         super().__init__(subject, parent, settingsInstance)
         self.can_sync = False
+        self.show_path = True
 
     def sync_remote(self):
         raise NotImplementedError()

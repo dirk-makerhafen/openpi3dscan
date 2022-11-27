@@ -43,7 +43,6 @@ class Download(GenericTask):
         name = path.split("\\")[-1].split(".zip")[0]
         source_dir = "\\".join(path.split("\\")[0:-1])
         unzip_dir = os.path.join(source_dir, name)
-        self.log.append("Unzip download")
         if os.path.exists(unzip_dir):
             try:
                 shutil.rmtree(unzip_dir)

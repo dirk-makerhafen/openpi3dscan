@@ -17,6 +17,8 @@ class DropboxUploadView(PyHtmlView):
             <p>Uploading, {{pyview.subject.current_progress}}% done</p>
             {% if pyview.subject.current_upload_file != "" %}
                 <p>Current File: {{pyview.subject.current_upload_file}}</p>
+            {% else %}
+                <p>&nbsp;</p>
             {% endif %}
         {% endif %}
     </div>

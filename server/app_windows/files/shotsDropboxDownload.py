@@ -4,7 +4,7 @@ import os,sys, dropbox
 import threading
 import time
 import unicodedata
-
+from dropbox import files, exceptions
 import six
 from pyhtmlgui import Observable
 
@@ -14,9 +14,8 @@ from app_windows.files.shots import ShotsInstance
 
 
 class ShotsDropboxDownload(Observable):
-    def __init__(self, shot):
+    def __init__(self):
         super().__init__()
-        self.shot = shot
         self.dropbox = None
         self.last_success = None
         self.last_failed = None
@@ -50,22 +49,31 @@ class ShotsDropboxDownload(Observable):
             self.notify_observers()
 
     def _sync_thread(self):
+        self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.set_status("downloading")
+        if self.check_apitoken() is False:
+            self.last_success = None
+            self.last_failed = int(time.time())
+            self.set_status("idle")
+            self.dropbox.close()
+            return
         for i in range(3):
             try:
                 self._sync()
             except Exception as e:
                 print("failed sync", e)
+                self.last_success = None
+                self.last_failed = int(time.time())
                 time.sleep(5)
                 continue
             if self.all_in_sync is True:
                 break
             time.sleep(5)
+        self.dropbox.close()
         self.set_status("idle")
         self.worker = None
 
     def _sync(self):
-        self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.last_checked = time.time()
         all_in_sync = True
 
@@ -77,7 +85,7 @@ class ShotsDropboxDownload(Observable):
             sublisting = self._list_folder("%s/%s" % (source_dir, name))
             print(sublisting)
             if "metadata.json" in sublisting:
-                print("metadataa exists")
+                print("metadata exists")
                 files_to_download = []
                 if not os.path.exists(os.path.join(ShotsInstance().path, name, "metadata.json")):
                     files_to_download.append([ "%s/%s/metadata.json" % (source_dir, name) , os.path.join(ShotsInstance().path, name, "metadata.json") ])
@@ -98,36 +106,32 @@ class ShotsDropboxDownload(Observable):
 
                 if all_success is True:
                     ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))
-                    self.dropbox.files_delete_v2("%s/%s" % (source_dir, name))
+                    #self.dropbox.files_delete_v2("%s/%s" % (source_dir, name))
                 else:
                     all_in_sync = False
             else:
                 all_in_sync = False
         self.all_in_sync = all_in_sync
-        self.dropbox.close()
-
 
     def _list_folder(self, path):
         """List a folder.
-        Return a dict mapping unicode filenames to
-        FileMetadata|FolderMetadata entries.
+        Return a dict mapping unicode filenames to FileMetadata|FolderMetadata entries.
         """
-        path = '/%s' % path
-        path = path.replace(os.path.sep, '/')
+        path = '/%s' % path.replace(os.path.sep, '/')
         while '//' in path:
             path = path.replace('//', '/')
         path = path.rstrip('/')
         try:
             res = self.dropbox.files_list_folder(path)
         except Exception as e:
-            print('Folder listing failed for', path, '-- assumed empty:', e)
+            if type(e) == dropbox.exceptions.AuthError:
+                return None
             return {}
         else:
             rv = {}
             for entry in res.entries:
                 rv[entry.name] = entry
             return rv
-
 
     def download(self, source, destination):
         source = source.replace(os.path.sep, '/')
@@ -149,3 +153,21 @@ class ShotsDropboxDownload(Observable):
             f.write(res.content)
 
         return True
+
+    def check_apitoken(self):
+        try:
+            res = self.dropbox.files_list_folder("")
+            return True
+        except Exception as e:
+            print(e)
+        return False
+
+
+
+_shotsDropboxDownloadInstance = None
+
+def ShotsDropboxDownloadInstance():
+    global _shotsDropboxDownloadInstance
+    if _shotsDropboxDownloadInstance is None:
+        _shotsDropboxDownloadInstance = ShotsDropboxDownload()
+    return _shotsDropboxDownloadInstance

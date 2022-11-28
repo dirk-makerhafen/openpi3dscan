@@ -5,6 +5,7 @@ import threading
 import time
 import unicodedata
 import six
+import re
 from dropbox import exceptions, files
 from pyhtmlgui import Observable
 from app.settings.settings import SettingsInstance
@@ -50,6 +51,7 @@ class ShotDropboxUpload(Observable):
             self.notify_observers()
 
     def _sync_thread(self):
+        self.shot._sync_remote()
         self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.set_status("uploading")
         if self.check_apitoken() is False:
@@ -63,6 +65,8 @@ class ShotDropboxUpload(Observable):
                 self._sync()
             except Exception as e:
                 print("failed sync", e)
+                self.last_success = None
+                self.last_failed = int(time.time())
                 time.sleep(5)
                 continue
             if self.all_in_sync is True:
@@ -77,7 +81,7 @@ class ShotDropboxUpload(Observable):
         self.current_progress = 0
         self.notify_observers()
         l = self._clean_for_filesystem(SettingsInstance().settingsScanner.location)
-        n = self._clean_for_filesystem(self.shot.name.replace(self.shot.shot_id,"").replace(self.shot.shot_id.split(" ")[0],"").replace(self.shot.shot_id.split(" ")[-1],""))
+        n = self._clean_for_filesystem(self.shot.name.replace(":","").replace(self.shot.shot_id,"").replace(self.shot.shot_id.split(" ")[0],"").replace(self.shot.shot_id.split(" ")[-1],""))
         if len(l) > 0:
             l = "%s " % l
         target_dir = "/%s%s %s/" % (l, self.shot.shot_id, n)

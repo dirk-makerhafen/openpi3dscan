@@ -4,6 +4,8 @@ import time
 
 from pyhtmlgui import Observable
 
+from app_windows.files.shotsDropboxDownload import ShotsDropboxDownloadInstance
+
 
 class SettingsDropbox(Observable):
     def __init__(self, parent):
@@ -34,7 +36,7 @@ class SettingsDropbox(Observable):
 
     def set_enabled(self, new_enabled):
         if self.enabled != new_enabled:
-            self.token = new_enabled
+            self.enabled = new_enabled
             self.save()
             self.notify_observers()
 
@@ -49,3 +51,4 @@ class SettingsDropbox(Observable):
 
     def set_sync_now(self):
         self.set_next_sync_time( time.time())
+        ShotsDropboxDownloadInstance().sync()

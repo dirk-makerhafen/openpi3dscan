@@ -4,10 +4,9 @@ import os,sys, dropbox
 import threading
 import time
 import unicodedata
-
 import six
+from dropbox import exceptions, files
 from pyhtmlgui import Observable
-
 from app.settings.settings import SettingsInstance
 
 
@@ -22,6 +21,7 @@ class ShotDropboxUpload(Observable):
         self.all_in_sync = False
         self.status = "idle"
         self.current_upload_file = ""
+        self.current_progress = 0
         self.worker = None
 
     def to_dict(self):
@@ -51,6 +51,10 @@ class ShotDropboxUpload(Observable):
 
     def _sync_thread(self):
         self.set_status("uploading")
+        if self.check_apitoken() is False:
+            self.set_status("idle")
+            return
+
         for i in range(3):
             try:
                 self._sync()
@@ -66,38 +70,40 @@ class ShotDropboxUpload(Observable):
 
     def _sync(self):
         self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
-        self.last_checked = time.time()
-        all_in_sync = True
+        self.last_checked = int(time.time())
         target_dir = "/%s/" % self.shot.shot_id
+        files_to_upload = []
         for dn, dirs, files in os.walk(self.shot.images_path):
             subfolder = dn[len(self.shot.images_path):].strip(os.path.sep)
             listing = self._list_folder( "%s/%s" % (target_dir, subfolder))
-            print('Descending into', subfolder)
-            # First do all the files.
+            if listing is None:
+                break
             for name in files:
                 file_to_upload = os.path.join(dn, name)
                 if not isinstance(name, six.text_type):
                     name = name.decode('utf-8')
-                nname = unicodedata.normalize('NFC', name)
                 if name.startswith('.') or name.startswith('@') or name.endswith('~') or name.endswith('.pyc') or name.endswith('.pyo'):
                     continue
-
-                if nname in listing: # file exists in dropbox
-                    mtime_dt = datetime.datetime(*time.gmtime(os.path.getmtime(file_to_upload))[:6])
-                    size = os.path.getsize(file_to_upload)
-                    if (isinstance(listing[nname], dropbox.files.FileMetadata) and mtime_dt == listing[nname].client_modified and size == listing[nname].size):
-                        print(name, 'is already synced [stats match]')
+                nname = unicodedata.normalize('NFC', name)
+                if nname in listing \
+                    and isinstance(listing[nname], dropbox.files.FileMetadata) \
+                    and os.path.getsize(file_to_upload) == listing[nname].size: # file exists in dropbox
                         continue
-                res = self._upload_file(file_to_upload, "%s/%s/%s" % (target_dir, subfolder, name))
-                if res is None:
-                    all_in_sync = False
-            # Then choose which subdirectories to traverse.
+                files_to_upload.append([file_to_upload, "%s/%s/%s" % (target_dir, subfolder, name)])
             keep = []
             for name in dirs:
                 if name.startswith('.') or name.startswith('@') or name.endswith('~') or name == '__pycache__':
                     continue
                 keep.append(name)
             dirs[:] = keep
+
+        all_in_sync = True
+        for index, file_to_upload in enumerate(files_to_upload):
+            self.current_progress = 100 / len(files_to_upload) * (index+1)
+            source, destination = file_to_upload
+            res = self._upload_file(source, destination)
+            if res is None:
+                all_in_sync = False
 
         if all_in_sync is True:
             res = self._upload_data(
@@ -109,7 +115,7 @@ class ShotDropboxUpload(Observable):
                     "meta_max_segments": self.shot.meta_max_segments,
                     "meta_rotation": self.shot.meta_rotation,
                     "meta_camera_one_position": self.shot.meta_camera_one_position,
-                })
+                }).encode("UTF-8")
                 , "%s/%s" % (target_dir, "metadata.json"))
             if res is None:
                 all_in_sync = False
@@ -117,9 +123,11 @@ class ShotDropboxUpload(Observable):
         self.all_in_sync = all_in_sync
         self.dropbox.close()
         if self.all_in_sync is True:
-            self.last_success = time.time()
+            self.last_success = int(time.time())
+            self.last_failed = None
         else:
-            self.last_failed = time.time()
+            self.last_failed = int(time.time())
+            self.last_success = None
         self.shot.save()
 
     def _list_folder(self, path):
@@ -133,7 +141,8 @@ class ShotDropboxUpload(Observable):
         try:
             res = self.dropbox.files_list_folder(path)
         except Exception as e:
-            print('Folder listing failed for', path, '-- assumed empty:', e)
+            if type(e) == dropbox.exceptions.AuthError:
+                return None
             return {}
         else:
             rv = {}
@@ -141,23 +150,33 @@ class ShotDropboxUpload(Observable):
                 rv[entry.name] = entry
             return rv
 
+    def check_apitoken(self):
+        try:
+            res = self.dropbox.files_list_folder("/")
+            return True
+        except Exception as e:
+            print(e)
+        return False
+
     def _upload_file(self, source, destination):
         with open(source, 'rb') as f:
-            return self._upload_data(f.read(), destination)
+            client_modified = datetime.datetime(*time.gmtime(os.path.getmtime(source))[:6])
+            return self._upload_data(f.read(), destination, client_modified)
 
-    def _upload_data(self, data, destination):
+    def _upload_data(self, data, destination, client_modified = None):
+        if client_modified is None:
+            client_modified = datetime.datetime(*time.gmtime(int(time.time()))[:6])
         destination = '/%s' % destination.replace(os.path.sep, '/')
         while '//' in destination:
             destination = destination.replace('//', '/')
         self.current_upload_file = destination.split("/")[-1]
         self.notify_observers()
         try:
-            res = self.dropbox.files_upload(data, destination, dropbox.files.WriteMode.overwrite, client_modified=datetime.datetime(*time.gmtime(time.time())[:6]), mute=True)
+            res = self.dropbox.files_upload(data, destination, dropbox.files.WriteMode.overwrite, client_modified=client_modified, mute=True)
         except Exception as e:
             print('upload error', e)
             return None
         finally:
             self.current_upload_file = ""
             self.notify_observers()
-        print('uploaded as', res.name.encode('utf8'))
         return res

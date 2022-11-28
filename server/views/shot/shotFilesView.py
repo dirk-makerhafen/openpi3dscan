@@ -1,7 +1,43 @@
+import time
+
 from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
-class DropboxView(PyHtmlView):
-    pass
+class DropboxUploadView(PyHtmlView):
+    TEMPLATE_STR = '''
+    <div class="col-md-6">
+        {% if pyview.subject.status == "idle" %}
+            {% if pyview.subject.last_success != None %}
+                <p>Last uploaded {{pyview.get_last_success()}} ago</p>
+            {% endif %}
+            {% if pyview.subject.last_failed != None %}
+                <p>Failed to upload {{pyview.get_last_failed()}} ago</p>
+            {% endif %}
+            <button class="btn" onclick="pyview.subject.sync()">Upload now</button>
+        {% else %}
+            <p>Uploading, {{pyview.subject.current_progress}}% done</p>
+            <p>Current File: {{pyview.subject.current_upload_file}}</p>
+        {% endif %}
+    </div>
+    '''
+    def get_last_success(self):
+        seconds = time.time() - self.subject.last_success
+        return self._convert_time(seconds)
+
+    def get_last_failed(self):
+        seconds = time.time() - self.subject.last_failed
+        return self._convert_time(seconds)
+
+    def _convert_time(self, seconds):
+        minutes = int(seconds / 60 )
+        if minutes < 2:
+            return "%s seconds" % seconds
+        hours = int(seconds / 60 / 60 )
+        if hours < 2:
+            return "%s minutes" % minutes
+        days = int(seconds / 60 / 60 / 24 )
+        if days < 2:
+            return "%s hours" % hours
+        return "%s days" % days
 
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -13,18 +49,8 @@ class ShotFilesView(PyHtmlView):
         <div class="col-md-6">
             <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a>
         </div>
-        {% if pyview.settingsInstance.settingsDropbox.enabled == True %}
-            <div class="col-md-6">
-            {{pyview.parent.current_shot.dropboxUpload.last_success}}
-            {{pyview.parent.current_shot.dropboxUpload.last_checked}}
-            {{pyview.parent.current_shot.dropboxUpload.last_failed}}
-             {% if pyview.parent.current_shot.dropboxUpload.status == "idle" %}
-                <button onclick="pyview.parent.current_shot.dropboxUpload.sync()">Upload now</button>
-            {% else %}
-                {{pyview.parent.current_shot.dropboxUpload.status}}
-                {{pyview.parent.current_shot.dropboxUpload.current_upload_file}}
-            {% endif %}
-            </div>
+        {% if pyview.settingsInstance.settingsDropbox.enabled == True and pyview.dropboxUploadView != None %}
+            {{ pyview.dropboxUploadView.render() }}
         {% endif %}
     </div>
     {% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}
@@ -108,6 +134,7 @@ class ShotFilesView(PyHtmlView):
         self.current_models_list = ObservableList()
         self.current_shot = None
         self.filesListView = ObservableListView(self.current_models_list, self, item_class=ModelFileItemView, dom_element="tbody")
+        self.dropboxUploadView = None
 
     def show(self):
         if self.is_hidden is True and self.is_visible:
@@ -137,6 +164,9 @@ class ShotFilesView(PyHtmlView):
             self.current_shot = self.parent.current_shot
             if self.current_shot is not None:
                 self.current_models_list = self.parent.current_shot.models
+                if self.dropboxUploadView is not None:
+                    self.dropboxUploadView.delete(remove_from_dom=False)
+                self.dropboxUploadView = DropboxUploadView(self.current_shot.dropboxUpload, self)
             else:
                 self.current_models_list = ObservableList()
             self.filesListView = ObservableListView(self.current_models_list, self, item_class=ModelFileItemView, dom_element="tbody")

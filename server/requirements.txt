@@ -6,3 +6,4 @@ whichcraft
 zipstream-ng
 pexpect
 pillow
+dropbox

@@ -30,7 +30,7 @@ class SettingsDropbox(Observable):
 
     def set_enabled(self, new_enabled):
         if self.enabled != new_enabled:
-            self.token = new_enabled
+            self.enabled = new_enabled
             self.save()
             self.notify_observers()
 

@@ -20,7 +20,7 @@ class SettingsDropboxView(PyHtmlView):
                                 </div>
                                 <div class="col-md-1">
                                     <div class="custom-control custom-switch">
-                                        <input id="dropbox_enabled"  type="checkbox" {% if pyview.subject.enabled == True %}checked{% endif %} onclick='pyview.subject.set_enabled($("#dropbox_enabled").prop("checked") === true)'>                                 
+                                        <input id="dropbox_enabled"  type="checkbox" {% if pyview.subject.enabled == True %}checked{% endif %} onchange='pyview.subject.set_enabled($("#dropbox_enabled").prop("checked") === true)'>                                 
                                     </div>
                                 </div>         
                             </div>
@@ -32,7 +32,7 @@ class SettingsDropboxView(PyHtmlView):
                                 <p class="text-muted mb-0">Access token for Dropbox synchronisation</p>
                             </div>
                             <div class="col-md-2">
-                                <input class="form-control" id="dropbox_token" value="{{pyview.subject.token}}" type="text"/  onclick='pyview.subject.set_token($("#dropbox_token").val())'>
+                                <input class="form-control" id="dropbox_token" value="{{pyview.subject.token}}" type="text" onchange='pyview.subject.set_token($("#dropbox_token").val())'>
                             </div>
                         </div>
                     </div>                              

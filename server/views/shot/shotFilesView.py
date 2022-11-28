@@ -2,49 +2,8 @@ import time
 
 from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
-class DropboxUploadView(PyHtmlView):
-    TEMPLATE_STR = '''
-    <div class="col-md-4">
-        {% if pyview.subject.status == "idle" %}
-            {% if pyview.subject.last_success != None %}
-                <p>Last uploaded {{pyview.get_last_success()}} ago</p>
-            {% endif %}
-            {% if pyview.subject.last_failed != None %}
-                <p>Failed to upload {{pyview.get_last_failed()}} ago</p>
-            {% endif %}
-            <button class="btn" onclick="pyview.subject.sync()">Upload now</button>
-        {% else %}
-            <p>Uploading, {{pyview.subject.current_progress}}% done</p>
-            {% if pyview.subject.current_upload_file != "" %}
-                <p>Current File: {{pyview.subject.current_upload_file}}</p>
-            {% else %}
-                <p>&nbsp;</p>
-            {% endif %}
-        {% endif %}
-    </div>
-    '''
-    def get_last_success(self):
-        seconds = time.time() - self.subject.last_success
-        return self._convert_time(seconds)
+from views.shot.shotDropboxUploadView import DropboxUploadView
 
-    def get_last_failed(self):
-        seconds = time.time() - self.subject.last_failed
-        return self._convert_time(seconds)
-
-    def _convert_time(self, seconds):
-        minutes = int(seconds / 60 )
-        if minutes < 2:
-            return "%s seconds" % int(seconds)
-        hours = int(seconds / 60 / 60 )
-        if hours < 2:
-            return "%s minutes" % minutes
-        days = int(seconds / 60 / 60 / 24 )
-        if days < 2:
-            return "%s hours" % hours
-        weeks = int(seconds / 60 / 60 / 24 / 7)
-        if weeks < 5:
-            return "%s days" % days
-        return "%s weeks" % weeks
 
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -171,9 +130,11 @@ class ShotFilesView(PyHtmlView):
             self.current_shot = self.parent.current_shot
             if self.current_shot is not None:
                 self.current_models_list = self.parent.current_shot.models
+
                 if self.dropboxUploadView is not None:
                     self.dropboxUploadView.delete(remove_from_dom=False)
-                self.dropboxUploadView = DropboxUploadView(self.current_shot.dropboxUpload, self)
+                if hasattr(self.current_shot, "dropboxUpload"):
+                    self.dropboxUploadView = DropboxUploadView(self.current_shot.dropboxUpload, self)
             else:
                 self.current_models_list = ObservableList()
             self.filesListView = ObservableListView(self.current_models_list, self, item_class=ModelFileItemView, dom_element="tbody")

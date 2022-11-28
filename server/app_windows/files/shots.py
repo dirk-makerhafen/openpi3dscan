@@ -4,7 +4,6 @@ import os
 from pyhtmlgui import ObservableList
 
 from app_windows.files.shot import Shot
-from app_windows.settings.settings import SettingsInstance
 
 # All local and remote Shots
 class Shots:

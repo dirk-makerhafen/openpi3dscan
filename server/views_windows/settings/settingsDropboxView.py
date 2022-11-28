@@ -1,5 +1,6 @@
 from pyhtmlgui import PyHtmlView
 
+from app_windows.files.shotsDropboxDownload import ShotsDropboxDownloadInstance
 
 class SettingsDropboxView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -43,7 +44,7 @@ class SettingsDropboxView(PyHtmlView):
                                 <p class="text-muted mb-0">Next synchronisation in {{pyview.subject.get_next_sync_minutes()}} Minutes</p>
                             </div>
                             <div class="col-md-2">
-                                <button onclick="pyview.subject.set_sync_now()">Sync now</button<
+                                <button onclick="pyview.run()">Sync now</button<
                             </div>
                         </div>
                     </div>                                  
@@ -52,4 +53,6 @@ class SettingsDropboxView(PyHtmlView):
         </div>
     </div>    
     '''
+    def run(self):
+        ShotsDropboxDownloadInstance().sync()
 

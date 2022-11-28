@@ -2,6 +2,7 @@ from pyhtmlgui import PyHtmlView
 from app.tasks.task_UpdateServer import TaskUpdateServerInstance
 from views.settings.settingsCameraView import CameraSettingsView
 from views.settings.settingsCardReaderView import CardReaderView
+from views.settings.settingsDropboxView import SettingsDropboxView
 from views.settings.settingsFirmwareView import FirmwareSettingsView
 from views.settings.settingsHostnameView import HostnameSettingsView
 from views.settings.settingsRealityCaptureView import RealityCaptureView
@@ -40,7 +41,9 @@ class SettingsView(PyHtmlView):
         
         {{pyview.usbStorageView.render()}}  
         
-        {{pyview.scannerSettingsView.render()}}  
+        {{pyview.scannerSettingsView.render()}} 
+         
+        {{pyview.dropboxSettingsView.render()}}  
         
         <div class="System">
             <div class="row justify-content-center" style="width:100%">
@@ -99,3 +102,4 @@ class SettingsView(PyHtmlView):
         self.cardReaderView = CardReaderView(self.subject.cardReader, self)
         self.hostnameView = HostnameSettingsView(self.subject.settings.hostnameSettings, self)
         self.scannerSettingsView = SettingsScannerView(self.subject.settings.settingsScanner, self)
+        self.dropboxSettingsView = SettingsDropboxView(self.subject.settings.settingsDropbox, self)

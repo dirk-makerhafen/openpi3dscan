@@ -7,6 +7,7 @@ from app.settings.settingsHostname import SettingsHostname
 from app.settings.settingsScanner import SettingsScanner
 from app.settings.settingsSequence import SettingsSequence
 from app.settings.settingsWireless import SettingsWireless
+from app.settings.settingsDropbox import SettingsDropbox
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
 VERSION = "2022.11.27-00.02"
@@ -24,6 +25,7 @@ class Settings(Observable):
         self.hostnameSettings = SettingsHostname(self)
         self.realityCaptureSettings = SettingsRealityCapture(self)
         self.settingsScanner = SettingsScanner(self)
+        self.settingsDropbox = SettingsDropbox(self)
         self.VERSION = VERSION
         self.load()
 
@@ -36,7 +38,8 @@ class Settings(Observable):
             "wirelessSettings" : self.wirelessSettings.to_dict(),
             "hostnameSettings" : self.hostnameSettings.to_dict(),
             "realityCaptureSettings" : self.realityCaptureSettings.to_dict(),
-            "settingsScanner" : self.settingsScanner.to_dict()
+            "settingsScanner" : self.settingsScanner.to_dict(),
+            "settingsDropbox" : self.settingsDropbox.to_dict()
         }
         open("/opt/openpi3dscan/.openpi3dscan.json", "w").write(json.dumps(data))
 
@@ -79,7 +82,10 @@ class Settings(Observable):
             self.settingsScanner.from_dict(data["settingsScanner"])
         except:
             pass
-
+        try:
+            self.settingsDropbox.from_dict(data["settingsDropbox"])
+        except:
+            pass
         self.save()
         self.notify_observers()
 

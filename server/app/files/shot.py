@@ -16,6 +16,7 @@ from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
 
 from app.files.modelFile import ModelFile
+from app.files.shotDropboxUpload import ShotDropboxUpload
 from app.settings.settings import SettingsInstance
 
 SyncThreadPool = ThreadPool(8)
@@ -27,7 +28,6 @@ class Shot(Observable):
         self.name = self.shot_id
         self.status = ""
         self.comment = ""
-        #metadata
         self.meta_location = ""
         self.meta_max_segments = 16
         self.meta_max_rows = 7
@@ -44,6 +44,7 @@ class Shot(Observable):
         if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
             self.images_path = self.path
         self.preview_images_path = os.path.join(self.path, "preview_images")
+        self.dropboxUpload = ShotDropboxUpload(self)
         self.load()
 
     @property
@@ -266,7 +267,8 @@ class Shot(Observable):
                     "meta_max_segments": self.meta_max_segments,
                     "meta_rotation": self.meta_rotation,
                     "meta_camera_one_position": self.meta_camera_one_position,
-                    "models" : [m.to_dict() for m in self.models]
+                    "models" : [m.to_dict() for m in self.models],
+                    "dropbox" : self.dropboxUpload.to_dict(),
                 }))
 
     def backup_meta(self):
@@ -298,6 +300,10 @@ class Shot(Observable):
                         pass
                     try:
                         self.models = ObservableList([ModelFile(self).from_dict(m) for m in data["models"]])
+                    except:
+                        pass
+                    try:
+                        self.dropboxUpload.from_dict(data["dropbox"])
                     except:
                         pass
             except Exception as e:

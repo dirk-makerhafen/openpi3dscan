@@ -1,5 +1,8 @@
 from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
+class DropboxView(PyHtmlView):
+    pass
+
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="row" style="margin-bottom: 10px;">
@@ -7,9 +10,22 @@ class ShotFilesView(PyHtmlView):
         <div class="col-md-1" style="font-weight:bold;cursor: pointer" onclick='pyview.hide()'>
             <a style="text-align: right;float: right;color: gray;"> Close </a>
         </div>
-        <div class="col-md-12">
+        <div class="col-md-6">
             <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a>
         </div>
+        {% if pyview.settingsInstance.settingsDropbox.enabled == True %}
+            <div class="col-md-6">
+            {{pyview.parent.current_shot.dropboxUpload.last_success}}
+            {{pyview.parent.current_shot.dropboxUpload.last_checked}}
+            {{pyview.parent.current_shot.dropboxUpload.last_failed}}
+             {% if pyview.parent.current_shot.dropboxUpload.status == "idle" %}
+                <button onclick="pyview.parent.current_shot.dropboxUpload.sync()">Upload now</button>
+            {% else %}
+                {{pyview.parent.current_shot.dropboxUpload.status}}
+                {{pyview.parent.current_shot.dropboxUpload.current_upload_file}}
+            {% endif %}
+            </div>
+        {% endif %}
     </div>
     {% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}
         <div class="row">

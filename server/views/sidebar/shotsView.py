@@ -38,7 +38,7 @@ class ShotsView(ObservableListView):
             self.parent.show_shot(self.selected_shot)
 
     def search(self, value):
-        self.filter_function = lambda x: x.subject.name.lower().find(value.lower()) == -1
+        self.filter_function = lambda x: True in [x.lower().find(sv) == -1 for sv in value.lower().split(" ")]
         self.update()
 
 

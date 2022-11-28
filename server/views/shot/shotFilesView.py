@@ -4,7 +4,7 @@ from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
 class DropboxUploadView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="col-md-6">
+    <div class="col-md-4">
         {% if pyview.subject.status == "idle" %}
             {% if pyview.subject.last_success != None %}
                 <p>Last uploaded {{pyview.get_last_success()}} ago</p>
@@ -51,7 +51,7 @@ class ShotFilesView(PyHtmlView):
         <div class="col-md-1" style="font-weight:bold;cursor: pointer" onclick='pyview.hide()'>
             <a style="text-align: right;float: right;color: gray;"> Close </a>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
             <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a>
         </div>
         {% if pyview.settingsInstance.settingsDropbox.enabled == True and pyview.dropboxUploadView != None %}

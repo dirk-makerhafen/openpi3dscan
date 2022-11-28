@@ -53,6 +53,8 @@ class ShotDropboxUpload(Observable):
         self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.set_status("uploading")
         if self.check_apitoken() is False:
+            self.last_success = None
+            self.last_failed = int(time.time())
             self.set_status("idle")
             self.dropbox.close()
             return
@@ -74,7 +76,11 @@ class ShotDropboxUpload(Observable):
         self.last_checked = int(time.time())
         self.current_progress = 0
         self.notify_observers()
-        target_dir = "/%s/" % self.shot.shot_id
+        l = self._clean_for_filesystem(SettingsInstance().settingsScanner.location)
+        n = self._clean_for_filesystem(self.shot.name.replace(self.shot.shot_id,"").replace(self.shot.shot_id.split(" ")[0],"").replace(self.shot.shot_id.split(" ")[-1],""))
+        if len(l) > 0:
+            l = "%s " % l
+        target_dir = "/%s%s %s/" % (l, self.shot.shot_id, n)
         files_to_upload = []
         for dn, dirs, files in os.walk(self.shot.images_path):
             subfolder = dn[len(self.shot.images_path):].strip(os.path.sep)
@@ -132,6 +138,22 @@ class ShotDropboxUpload(Observable):
             self.last_failed = int(time.time())
             self.last_success = None
         self.shot.save()
+
+    def _clean_for_filesystem(self, value):
+        name = value
+        for rp in [["ä", "ae"], ["ö", "oe"], ["ü", "ue"], ["Ä", "Ae"], ["Ö", "Oe"], ["Ü", "Ue"]]:
+            name = name.replace(rp[0], rp[1])
+        name = re.sub('\s+', ' ', name)
+        name = re.sub('[^A-Za-z0-9_. ]+', '', name)
+        for rp in [["..", "."], ["__", "_"], ["  ", " "]]:
+            while rp[0] in name:
+                name = name.replace(rp[0], rp[1]).strip()
+        name = name.strip()
+        while name[-1] in ["_", "."]:
+            name = name[:-1].strip()
+        while name[0] in ["_", "."]:
+            name = name[1:].strip()
+        return name
 
     def _list_folder(self, path):
         """List a folder.

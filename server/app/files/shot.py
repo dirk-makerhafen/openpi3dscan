@@ -331,16 +331,14 @@ class Shot(Observable):
         self.notify_observers()
 
     def get_clean_shotname(self):
-        name = self.name.replace("ä", "ae").replace("ü", "ue").replace("Ü", "Ue")
-        name = name.replace("ö", "oe").replace("Ä", "Ae").replace("Ö", "Oe")
+        name = self.name
+        for rp in [["ä", "ae"], ["ö", "oe"], ["ü", "ue"], ["Ä", "Ae"], ["Ö", "Oe"], ["Ü", "Ue"]]:
+            name = name.replace(rp[0], rp[1])
         name = re.sub('\s+', ' ', name)
         name = re.sub('[^A-Za-z0-9_. ]+', '', name)
-        while ".." in name:
-            name = name.replace("..", ".")
-        while "__" in name:
-            name = name.replace("__", "_")
-        while "  " in name:
-            name = name.replace("  ", " ")
+        for rp in [["..", "."], ["__", "_"], ["  ", " "]]:
+            while rp[0] in name:
+                name = name.replace(rp[0], rp[1]).strip()
         name = name.strip()
         while name[-1] in ["_", "."]:
             name = name[:-1].strip()

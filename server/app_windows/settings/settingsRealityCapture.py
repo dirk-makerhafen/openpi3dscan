@@ -34,6 +34,7 @@ class SettingsRealityCapture(Observable):
         self.default_create_textures = True
         self.default_lit = True
         self.hide_realitycapture = False
+        self.allow_rc_automation = True
 
     def to_dict(self):
         return {

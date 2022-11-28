@@ -41,7 +41,9 @@ class ShotDropboxUpload(Observable):
 
     def sync(self):
         if SettingsInstance().settingsDropbox.enabled is True and SettingsInstance().settingsDropbox.token != "":
+            print("jep")
             if self.worker is None:
+                print("f")
                 self.worker = threading.Thread(target=self._sync_thread, daemon=True)
                 self.worker.start()
 
@@ -59,6 +61,7 @@ class ShotDropboxUpload(Observable):
             self.last_failed = int(time.time())
             self.set_status("idle")
             self.dropbox.close()
+            self.worker = None
             return
         for i in range(3):
             try:

@@ -8,7 +8,7 @@ from dropbox import files, exceptions
 import six
 from pyhtmlgui import Observable
 
-from app.settings.settings import SettingsInstance
+from app_windows.settings.settings import SettingsInstance
 from app_windows.files.shots import ShotsInstance
 
 
@@ -37,6 +37,7 @@ class ShotsDropboxDownload(Observable):
         self.last_checked = data["last_checked"]
 
     def sync(self):
+        print("sync")
         if SettingsInstance().settingsDropbox.enabled is True and SettingsInstance().settingsDropbox.token != "":
             if self.worker is None:
                 self.worker = threading.Thread(target=self._sync_thread, daemon=True)
@@ -48,13 +49,16 @@ class ShotsDropboxDownload(Observable):
             self.notify_observers()
 
     def _sync_thread(self):
+        print("synct")
         self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.set_status("downloading")
         if self.check_apitoken() is False:
+            print("failed token")
             self.last_success = None
             self.last_failed = int(time.time())
             self.set_status("idle")
             self.dropbox.close()
+            self.worker = None
             return
         for i in range(3):
             try:
@@ -99,6 +103,7 @@ class ShotsDropboxDownload(Observable):
                 print(files_to_download)
                 for file_to_download in files_to_download:
                     source, destination = file_to_download
+                    print("download", source)
                     result = self.download(source,destination)
                     if result is False:
                         all_success = False

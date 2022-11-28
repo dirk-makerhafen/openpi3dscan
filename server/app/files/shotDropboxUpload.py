@@ -50,9 +50,11 @@ class ShotDropboxUpload(Observable):
             self.notify_observers()
 
     def _sync_thread(self):
+        self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.set_status("uploading")
         if self.check_apitoken() is False:
             self.set_status("idle")
+            self.dropbox.close()
             return
 
         for i in range(3):
@@ -65,12 +67,14 @@ class ShotDropboxUpload(Observable):
             if self.all_in_sync is True:
                 break
             time.sleep(5)
+        self.dropbox.close()
         self.set_status("idle")
         self.worker = None
 
     def _sync(self):
-        self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.last_checked = int(time.time())
+        self.current_progress = 0
+        self.notify_observers()
         target_dir = "/%s/" % self.shot.shot_id
         files_to_upload = []
         for dn, dirs, files in os.walk(self.shot.images_path):
@@ -121,7 +125,7 @@ class ShotDropboxUpload(Observable):
                 all_in_sync = False
 
         self.all_in_sync = all_in_sync
-        self.dropbox.close()
+
         if self.all_in_sync is True:
             self.last_success = int(time.time())
             self.last_failed = None

@@ -54,12 +54,14 @@ class ShotDropboxUpload(Observable):
         self.shot._sync_remote()
         self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.set_status("uploading")
+
         if self.check_apitoken() is False:
             self.last_success = None
             self.last_failed = int(time.time())
             self.set_status("idle")
             self.dropbox.close()
             return
+
         for i in range(3):
             try:
                 self._sync()
@@ -72,6 +74,14 @@ class ShotDropboxUpload(Observable):
             if self.all_in_sync is True:
                 break
             time.sleep(5)
+
+        if self.all_in_sync is True:
+            self.last_success = int(time.time())
+            self.last_failed = None
+        else:
+            self.last_failed = int(time.time())
+            self.last_success = None
+        self.shot.save()
         self.dropbox.close()
         self.set_status("idle")
         self.worker = None
@@ -134,14 +144,6 @@ class ShotDropboxUpload(Observable):
                 all_in_sync = False
 
         self.all_in_sync = all_in_sync
-
-        if self.all_in_sync is True:
-            self.last_success = int(time.time())
-            self.last_failed = None
-        else:
-            self.last_failed = int(time.time())
-            self.last_success = None
-        self.shot.save()
 
     def _clean_for_filesystem(self, value):
         name = value

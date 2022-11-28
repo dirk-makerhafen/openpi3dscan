@@ -56,7 +56,6 @@ class ShotDropboxUpload(Observable):
             self.set_status("idle")
             self.dropbox.close()
             return
-
         for i in range(3):
             try:
                 self._sync()
@@ -103,7 +102,7 @@ class ShotDropboxUpload(Observable):
 
         all_in_sync = True
         for index, file_to_upload in enumerate(files_to_upload):
-            self.current_progress = 100 / len(files_to_upload) * (index+1)
+            self.current_progress = int(100 / len(files_to_upload) * (index+1))
             source, destination = file_to_upload
             res = self._upload_file(source, destination)
             if res is None:
@@ -156,7 +155,7 @@ class ShotDropboxUpload(Observable):
 
     def check_apitoken(self):
         try:
-            res = self.dropbox.files_list_folder("/")
+            res = self.dropbox.files_list_folder("")
             return True
         except Exception as e:
             print(e)

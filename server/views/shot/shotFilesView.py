@@ -15,7 +15,9 @@ class DropboxUploadView(PyHtmlView):
             <button class="btn" onclick="pyview.subject.sync()">Upload now</button>
         {% else %}
             <p>Uploading, {{pyview.subject.current_progress}}% done</p>
-            <p>Current File: {{pyview.subject.current_upload_file}}</p>
+            {% if pyview.subject.current_upload_file != "" %}
+                <p>Current File: {{pyview.subject.current_upload_file}}</p>
+            {% endif %}
         {% endif %}
     </div>
     '''
@@ -30,14 +32,17 @@ class DropboxUploadView(PyHtmlView):
     def _convert_time(self, seconds):
         minutes = int(seconds / 60 )
         if minutes < 2:
-            return "%s seconds" % seconds
+            return "%s seconds" % int(seconds)
         hours = int(seconds / 60 / 60 )
         if hours < 2:
             return "%s minutes" % minutes
         days = int(seconds / 60 / 60 / 24 )
         if days < 2:
             return "%s hours" % hours
-        return "%s days" % days
+        weeks = int(seconds / 60 / 60 / 24 / 7)
+        if weeks < 5:
+            return "%s days" % days
+        return "%s weeks" % weeks
 
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''

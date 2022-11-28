@@ -9,7 +9,6 @@ import six
 from pyhtmlgui import Observable
 
 from app.settings.settings import SettingsInstance
-from app_windows.files.shot import Shot
 from app_windows.files.shots import ShotsInstance
 
 

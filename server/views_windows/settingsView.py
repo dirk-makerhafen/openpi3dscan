@@ -17,7 +17,9 @@ class SettingsView(PyHtmlView):
         {{pyview.remoteHostsView.render()}}  
         {{pyview.settingsCacheView.render()}}  
         {{pyview.settingsDropboxView.render()}}  
-
+        <br>
+        <br>
+        
     </div> 
     
     '''

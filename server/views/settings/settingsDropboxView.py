@@ -39,35 +39,34 @@ class SettingsDropboxView(PyHtmlView):
                             </div>
                             {% if pyview.subject.authorize_url != None %}
                                  <div class="col-md-3">
-                                     <input class="form-control" id="dropbox_token" value="{{pyview.subject.token}}" type="text" >
+                                     <input class="form-control" id="dropbox_token" type="text" >
                                  </div>
                                  <div class="col-md-1">
                                     <button class="btn" onclick='pyview.subject.set_token($("#dropbox_token").val())'>authorize</button>
                                  </div>
                             {% else %}
-                                {% if pyview.subject.refresh_token != "" and pyview.subject.token != "" %}
-                                    <div class="col-md-3">
-                                         <p class="h5" style="color:#00ff0066">Authorisation successfull</p>
-                                     </div>
-                                     <div class="col-md-1">
-                                        <button class="btn"  onclick='pyview.subject.check_auth()'>check</button>
-                                        <button class="btn btn-warning"  onclick='pyview.subject.start_authflow()'>reset</button>
+                                {% if and pyview.subject.token != ""  and pyview.subject.auth_flow != None %}
+                                     <div class="col-md-3">
+                                         <p class="h5" style="color:#aaaa00">Authorising</p>
                                      </div>
                                 {% else %}
-                                    {% if pyview.subject.refresh_token == "" and pyview.subject.token != ""  and pyview.subject.auth_flow != None %}
-                                         <div class="col-md-3">
-                                             <p class="h5" style="color:#ffff0066">Authorising</p>
+                                    {% if pyview.subject.refresh_token != "" and pyview.subject.token != "" %}
+                                        <div class="col-md-2">
+                                             <p class="h5" style="color:#00aa00">Authorisation successfull</p>
+                                         </div>
+                                         <div class="col-md-2">
+                                            <button class="btn"  onclick='pyview.subject.check_auth()'>check</button>
+                                            <button class="btn btn-warning"  onclick='pyview.subject.start_authflow()'>reset</button>
                                          </div>
                                     {% else %}
                                         <div class="col-md-3">
-                                             <p class="h5" style="color:#ff000066">Authorisation failed</p>
-                                         </div>
-                                         <div class="col-md-1">
+                                             <p class="h5" style="color:#aa0000">Authorisation failed</p>
+                                        </div>
+                                        <div class="col-md-1">
                                             <button class="btn"  onclick='pyview.subject.start_authflow()'>reset</button>
-                                         </div>
+                                        </div>
                                     {% endif %}
                                 {% endif %}
-                            
                             {% endif %}
                             
                         </div>

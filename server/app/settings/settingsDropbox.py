@@ -4,7 +4,7 @@ import re
 import dropbox
 from dropbox import DropboxOAuth2FlowNoRedirect
 from pyhtmlgui import Observable
-
+APP_KEY = "cnjh44n7t8bdsc7"
 
 class SettingsDropbox(Observable):
     def __init__(self, parent):
@@ -49,28 +49,26 @@ class SettingsDropbox(Observable):
             self.notify_observers()
 
     def start_authflow(self):
-        APP_KEY = "cnjh44n7t8bdsc7"
         self.refresh_token = ""
         self.auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, use_pkce=True, token_access_type='offline')
         self.authorize_url = self.auth_flow.start()
         self.notify_observers()
 
     def finish_authflow(self):
-        APP_KEY = "cnjh44n7t8bdsc7"
         self.refresh_token = ""
+        self.authorize_url = None
+        self.notify_observers()
         try:
             oauth_result = self.auth_flow.finish(self.token)
+            with dropbox.Dropbox(oauth2_refresh_token=oauth_result.refresh_token, app_key=APP_KEY) as dbx:
+                dbx.users_get_current_account()
+                print("Successfully set up client!")
+                self.refresh_token = oauth_result.refresh_token
         except Exception as e:
             print('Error: %s' % (e,))
             return
         finally:
-            self.authorize_url = None
             self.auth_flow = None
-            self.notify_observers()
-        with dropbox.Dropbox(oauth2_refresh_token=oauth_result.refresh_token, app_key=APP_KEY) as dbx:
-            dbx.users_get_current_account()
-            print("Successfully set up client!")
-            self.refresh_token = oauth_result.refresh_token
         self.notify_observers()
 
 

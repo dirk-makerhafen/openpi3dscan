@@ -41,12 +41,9 @@ class ShotDropboxUpload(Observable):
         self.notify_observers()
 
     def sync(self):
-        if SettingsInstance().settingsDropbox.enabled is True and SettingsInstance().settingsDropbox.token != "":
-            print("jep")
-            if self.worker is None:
-                print("f")
-                self.worker = threading.Thread(target=self._sync_thread, daemon=True)
-                self.worker.start()
+        if self.worker is None and SettingsInstance().settingsDropbox.enabled is True and SettingsInstance().settingsDropbox.token != "" and SettingsInstance().settingsDropbox.refresh_token != "":
+            self.worker = threading.Thread(target=self._sync_thread, daemon=True)
+            self.worker.start()
 
     def set_status(self, new_status):
         if new_status != self.status:

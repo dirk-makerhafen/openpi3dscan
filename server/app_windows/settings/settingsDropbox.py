@@ -13,7 +13,7 @@ class SettingsDropbox(SettingsDropbox):
             self.notify_observers()
 
     def get_next_sync_minutes(self):
-        return (self.next_sync_time - time.time()) / 60
+        return int((self.next_sync_time - time.time()) / 60)
 
     def set_sync_now(self):
         self.set_next_sync_time( time.time())

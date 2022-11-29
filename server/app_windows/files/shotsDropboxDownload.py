@@ -22,7 +22,10 @@ class ShotsDropboxDownload(Observable):
         self.last_checked = None
         self.all_in_sync = True
         self.status = "idle"
+        self.current_download_shotid = ""
         self.current_download_file = ""
+        self.current_progress = 0
+
         self.worker = None
 
     def to_dict(self):
@@ -77,14 +80,19 @@ class ShotsDropboxDownload(Observable):
     def _sync(self):
         self.last_checked = time.time()
         all_in_sync = True
-
-        source_dir = "/"
+        self.current_progress = 0
+        self.notify_observers()
+        source_dir = ""
         listing = self._list_folder(source_dir)
+        print(listing)
         for name in listing:
             if not isinstance(listing[name], dropbox.files.FolderMetadata):
                 continue
             sublisting = self._list_folder("%s/%s" % (source_dir, name))
+            print(sublisting)
             if "metadata.json" in sublisting:
+                self.current_download_shotid = name
+                self.notify_observers()
                 files_to_download = []
                 if not os.path.exists(os.path.join(ShotsInstance().path, name, "metadata.json")):
                     files_to_download.append([ "%s/%s/metadata.json" % (source_dir, name) , os.path.join(ShotsInstance().path, name, "metadata.json") ])
@@ -96,7 +104,8 @@ class ShotsDropboxDownload(Observable):
                         if not os.path.exists(os.path.join(ShotsInstance().path, name, "images",  imgtype, imagename)):
                             files_to_download.append(["%s/%s/%s/%s" % (source_dir, name, imgtype, imagename), os.path.join(ShotsInstance().path, name, "images", imgtype, imagename) ])
                 all_success = True
-                for file_to_download in files_to_download:
+                for index, file_to_download in enumerate(files_to_download):
+                    self.current_progress = int(100 / len(files_to_download) * (index + 1))
                     source, destination = file_to_download
                     result = self.download(source,destination)
                     if result is False:
@@ -110,6 +119,8 @@ class ShotsDropboxDownload(Observable):
                     all_in_sync = False
             else:
                 all_in_sync = False
+        self.current_download_shotid = ""
+        self.notify_observers()
         self.all_in_sync = all_in_sync
 
     def _list_folder(self, path):

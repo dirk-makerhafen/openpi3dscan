@@ -2,6 +2,61 @@ from pyhtmlgui import PyHtmlView
 
 from app_windows.files.shotsDropboxDownload import ShotsDropboxDownloadInstance
 
+import time
+
+from pyhtmlgui import PyHtmlView
+
+class DropboxDownloadView(PyHtmlView):
+    TEMPLATE_STR = '''
+    <div class="col-md-2">
+        {% if pyview.subject.status == "idle" %}
+            {% if pyview.subject.last_success != None %}
+                <p>Last synchronized {{pyview.get_last_success()}} ago</p>
+            {% endif %}
+            {% if pyview.subject.last_failed != None %}
+                <p>Failed to synchronized {{pyview.get_last_failed()}} ago</p>
+            {% endif %}
+        {% else %}
+            <p>Downloading {{pyview.subject.current_download_shotid}}, {{pyview.subject.current_progress}}% done</p>
+            {% if pyview.subject.current_download_file != "" %}
+                <p>Current File: {{pyview.subject.current_download_file}}</p>
+            {% else %}
+                <p>&nbsp;</p>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="col-md-2">
+        <button class="btn" onclick="pyview.run()">Sync now</button<
+    </div>
+    '''
+    def get_last_success(self):
+        seconds = time.time() - self.subject.last_success
+        return self._convert_time(seconds)
+
+    def get_last_failed(self):
+        seconds = time.time() - self.subject.last_failed
+        return self._convert_time(seconds)
+
+    def _convert_time(self, seconds):
+        minutes = int(seconds / 60 )
+        if minutes < 2:
+            return "%s seconds" % int(seconds)
+        hours = int(seconds / 60 / 60 )
+        if hours < 2:
+            return "%s minutes" % minutes
+        days = int(seconds / 60 / 60 / 24 )
+        if days < 2:
+            return "%s hours" % hours
+        weeks = int(seconds / 60 / 60 / 24 / 7)
+        if weeks < 5:
+            return "%s days" % days
+        return "%s weeks" % weeks
+
+    def run(self):
+        ShotsDropboxDownloadInstance().sync()
+
+
+
 class SettingsDropboxView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="Dropbox">
@@ -78,9 +133,9 @@ class SettingsDropboxView(PyHtmlView):
                                 <strong class="mb-0">Sync</strong>
                                 <p class="text-muted mb-0">Next synchronisation in {{pyview.subject.get_next_sync_minutes()}} Minutes</p>
                             </div>
-                            <div class="col-md-2">
-                                <button class="btn" onclick="pyview.run()">Sync now</button<
-                            </div>
+                           
+                                {{pyview.dropboxDownloadView.render()}}
+                            
                         </div>
                     </div>                                  
                 </div>
@@ -88,6 +143,7 @@ class SettingsDropboxView(PyHtmlView):
         </div>
     </div>    
     '''
-    def run(self):
-        ShotsDropboxDownloadInstance().sync()
+    def __init__(self, subject, parent):
+        super().__init__(subject, parent)
+        self.dropboxDownloadView = DropboxDownloadView(ShotsDropboxDownloadInstance(), self)
 

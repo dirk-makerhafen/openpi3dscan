@@ -157,9 +157,8 @@ class ShotsDropboxDownload(Observable):
         return True
 
     def login(self):
-        APP_KEY = "cnjh44n7t8bdsc7"
         try:
-            with dropbox.Dropbox(oauth2_refresh_token=SettingsInstance().settingsDropbox.refresh_token, app_key=APP_KEY) as dbx:
+            with dropbox.Dropbox(oauth2_refresh_token=SettingsInstance().settingsDropbox.refresh_token, app_key=SettingsInstance().settingsDropbox.app_key) as dbx:
                 dbx.users_get_current_account()
                 self.dropbox = dbx
                 print("Successfully set up client!")

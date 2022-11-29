@@ -192,7 +192,7 @@ class RealityCaptureView(PyHtmlView):
                                 </div>  
                                 <div class="col-md-2">
                                     <div class="custom-control custom-switch">
-                                        <button class="btn " style="margin-right:5px" onclick='pyview.subject.reset_calibration()'> Reset Calibration </button>                                 
+                                        <button class="btn btn-warning" style="margin-right:5px" onclick='pyview.subject.reset_calibration()'> Reset Calibration </button>                                 
                                     </div>
                                 </div>         
                             </div>

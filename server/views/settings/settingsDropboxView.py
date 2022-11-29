@@ -50,7 +50,8 @@ class SettingsDropboxView(PyHtmlView):
                                          <p class="h5" style="color:#00ff0066">Authorisation successfull</p>
                                      </div>
                                      <div class="col-md-1">
-                                        <button class="btn"  onclick='pyview.subject.start_authflow()'>reset</button>
+                                        <button class="btn"  onclick='pyview.subject.check_auth()'>check</button>
+                                        <button class="btn btn-warning"  onclick='pyview.subject.start_authflow()'>reset</button>
                                      </div>
                                 {% else %}
                                     {% if pyview.subject.refresh_token == "" and pyview.subject.token != ""  and pyview.subject.auth_flow != None %}

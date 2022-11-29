@@ -10,6 +10,7 @@ from pyhtmlgui import Observable
 
 from app_windows.settings.settings import SettingsInstance
 from app_windows.files.shots import ShotsInstance
+from dropbox import DropboxOAuth2FlowNoRedirect
 
 
 class ShotsDropboxDownload(Observable):
@@ -37,7 +38,6 @@ class ShotsDropboxDownload(Observable):
         self.last_checked = data["last_checked"]
 
     def sync(self):
-        print("sync")
         if SettingsInstance().settingsDropbox.enabled is True and SettingsInstance().settingsDropbox.token != "":
             if self.worker is None:
                 self.worker = threading.Thread(target=self._sync_thread, daemon=True)
@@ -49,10 +49,8 @@ class ShotsDropboxDownload(Observable):
             self.notify_observers()
 
     def _sync_thread(self):
-        print("synct")
-        self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.set_status("downloading")
-        if self.check_apitoken() is False:
+        if self.login() is False:
             print("failed token")
             self.last_success = None
             self.last_failed = int(time.time())
@@ -158,12 +156,18 @@ class ShotsDropboxDownload(Observable):
 
         return True
 
-    def check_apitoken(self):
+    def login(self):
+        APP_KEY = "cnjh44n7t8bdsc7"
         try:
-            res = self.dropbox.files_list_folder("")
-            return True
+            auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, use_pkce=True, token_access_type='offline')
+            oauth_result = auth_flow.finish(SettingsInstance().settingsDropbox.token)
+            with dropbox.Dropbox(oauth2_refresh_token=oauth_result.refresh_token, app_key=APP_KEY) as dbx:
+                dbx.users_get_current_account()
+                self.dropbox = dbx
+                print("Successfully set up client!")
+                return True
         except Exception as e:
-            print(e)
+            print('Error: %s' % (e,))
         return False
 
 

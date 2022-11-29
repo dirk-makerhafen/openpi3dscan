@@ -9,6 +9,7 @@ import re
 from dropbox import exceptions, files
 from pyhtmlgui import Observable
 from app.settings.settings import SettingsInstance
+from dropbox import DropboxOAuth2FlowNoRedirect
 
 
 class ShotDropboxUpload(Observable):
@@ -53,11 +54,9 @@ class ShotDropboxUpload(Observable):
             self.notify_observers()
 
     def _sync_thread(self):
-        self.shot._sync_remote()
-        self.dropbox = dropbox.Dropbox(SettingsInstance().settingsDropbox.token)
         self.set_status("uploading")
-
-        if self.check_apitoken() is False:
+        self.shot._sync_remote()
+        if self.login() is False:
             self.last_success = None
             self.last_failed = int(time.time())
             self.set_status("idle")
@@ -214,3 +213,18 @@ class ShotDropboxUpload(Observable):
             self.current_upload_file = ""
             self.notify_observers()
         return res
+
+    def login(self):
+        APP_KEY = "cnjh44n7t8bdsc7"
+        try:
+            auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, use_pkce=True, token_access_type='offline')
+            oauth_result = auth_flow.finish(SettingsInstance().settingsDropbox.token)
+            with dropbox.Dropbox(oauth2_refresh_token=oauth_result.refresh_token, app_key=APP_KEY) as dbx:
+                dbx.users_get_current_account()
+                self.dropbox = dbx
+                print("Successfully set up client!")
+                return True
+        except Exception as e:
+            print('Error: %s' % (e,))
+        return False
+

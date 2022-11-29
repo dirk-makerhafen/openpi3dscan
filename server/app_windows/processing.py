@@ -48,11 +48,12 @@ class Processing(Observable):
                 work_done = True
 
             if work_done is False:
-                print("no results, waiting some time ")
-                self.log.append("no results, waiting some time ")
+                #print("no results, waiting some time ")
+                #self.log.append("no results, waiting some time ")
+                time.sleep(5)
             else:
                 self.settings_instance.settingsCache.clean()
-            time.sleep(5)
+
 
     def set_status(self, status):
         if self.status != status:

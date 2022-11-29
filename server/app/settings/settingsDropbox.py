@@ -17,7 +17,6 @@ class SettingsDropbox(Observable):
         self.authorize_url = None
         self.auth_flow = None
         self.app_key = "laqa1f9bjza8viz"
-        self.flow_start_time = 0
 
     def to_dict(self):
         return {

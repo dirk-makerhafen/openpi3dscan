@@ -217,9 +217,7 @@ class ShotDropboxUpload(Observable):
     def login(self):
         APP_KEY = "cnjh44n7t8bdsc7"
         try:
-            auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, use_pkce=True, token_access_type='offline')
-            oauth_result = auth_flow.finish(SettingsInstance().settingsDropbox.token)
-            with dropbox.Dropbox(oauth2_refresh_token=oauth_result.refresh_token, app_key=APP_KEY) as dbx:
+            with dropbox.Dropbox(oauth2_refresh_token=SettingsInstance().settingsDropbox.refresh_token, app_key=APP_KEY) as dbx:
                 dbx.users_get_current_account()
                 self.dropbox = dbx
                 print("Successfully set up client!")
@@ -227,4 +225,5 @@ class ShotDropboxUpload(Observable):
         except Exception as e:
             print('Error: %s' % (e,))
         return False
+
 

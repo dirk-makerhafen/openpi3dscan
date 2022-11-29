@@ -36,7 +36,7 @@ class Shot(Observable):
 
         self.nr_of_files = 0
         self.devices = None
-        self.path = os.path.join(shot_dir, self.shot_id)
+        self.path = shot_dir
         self.worker = None
         self.models = ObservableList()
         self.path_exists = False

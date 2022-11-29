@@ -45,7 +45,7 @@ class SettingsDropboxView(PyHtmlView):
                                     <button class="btn" onclick='pyview.subject.set_token($("#dropbox_token").val())'>authorize</button>
                                  </div>
                             {% else %}
-                                {% if and pyview.subject.token != ""  and pyview.subject.auth_flow != None %}
+                                {% if pyview.subject.token != "" and pyview.subject.auth_flow != None %}
                                      <div class="col-md-3">
                                          <p class="h5" style="color:#aaaa00">Authorising</p>
                                      </div>

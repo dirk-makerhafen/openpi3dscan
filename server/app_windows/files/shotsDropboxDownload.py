@@ -84,9 +84,7 @@ class ShotsDropboxDownload(Observable):
             if not isinstance(listing[name], dropbox.files.FolderMetadata):
                 continue
             sublisting = self._list_folder("%s/%s" % (source_dir, name))
-            print(sublisting)
             if "metadata.json" in sublisting:
-                print("metadata exists")
                 files_to_download = []
                 if not os.path.exists(os.path.join(ShotsInstance().path, name, "metadata.json")):
                     files_to_download.append([ "%s/%s/metadata.json" % (source_dir, name) , os.path.join(ShotsInstance().path, name, "metadata.json") ])
@@ -98,16 +96,15 @@ class ShotsDropboxDownload(Observable):
                         if not os.path.exists(os.path.join(ShotsInstance().path, name, "images",  imgtype, imagename)):
                             files_to_download.append(["%s/%s/%s/%s" % (source_dir, name, imgtype, imagename), os.path.join(ShotsInstance().path, name, "images", imgtype, imagename) ])
                 all_success = True
-                print(files_to_download)
                 for file_to_download in files_to_download:
                     source, destination = file_to_download
-                    print("download", source)
                     result = self.download(source,destination)
                     if result is False:
                         all_success = False
 
                 if all_success is True:
-                    ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))
+                    shot = ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))
+                    shot.create_preview_images()
                     #self.dropbox.files_delete_v2("%s/%s" % (source_dir, name))
                 else:
                     all_in_sync = False

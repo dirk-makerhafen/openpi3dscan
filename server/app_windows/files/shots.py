@@ -59,8 +59,10 @@ class Shots:
                 self.shots.append(Shot(path, shot_id))
             else:
                 shot.load()
-        if do_sort is True:
-            self.shots.sort(reverse=True)
+            if do_sort is True:
+                self.shots.sort(reverse=True)
+            return shot
+        return None
 
 _shotsInstance = None
 

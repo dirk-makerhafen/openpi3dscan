@@ -110,8 +110,10 @@ class SettingsDropboxView(PyHtmlView):
                                         <div class="col-md-2">
                                              <p class="h5" style="color:#00aa00">Authorisation successfull</p>
                                          </div>
-                                         <div class="col-md-2">
+                                         <div class="col-md-1">
                                             <button class="btn"  onclick='pyview.subject.check_auth()'>check</button>
+                                         </div>
+                                         <div class="col-md-1">
                                             <button class="btn btn-warning"  onclick='pyview.subject.start_authflow()'>reset</button>
                                          </div>
                                     {% else %}
@@ -130,12 +132,10 @@ class SettingsDropboxView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
-                                <strong class="mb-0">Sync</strong>
-                                <p class="text-muted mb-0">Next synchronisation in {{pyview.subject.get_next_sync_minutes()}} Minutes</p>
+                                <strong class="mb-0">Download</strong>
+                                <p class="text-muted mb-0">Next automatic download in {{pyview.subject.get_next_sync_minutes()}} Minutes</p>
                             </div>
-                           
                                 {{pyview.dropboxDownloadView.render()}}
-                            
                         </div>
                     </div>                                  
                 </div>

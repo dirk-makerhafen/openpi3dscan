@@ -124,7 +124,13 @@ class Shot(Observable):
         return None
 
     def create_preview_images(self):
+        if not os.path.exists(self.preview_images_path):
+            os.mkdir(self.preview_images_path)
+
         for image_type in ["normal", "projection"]:
+            if not os.path.exists(os.path.join(self.preview_images_path, image_type)):
+                os.mkdir(os.path.join(self.preview_images_path, image_type))
+
             files = glob.glob(os.path.join(self.images_path, image_type, "*.jpg"))
             for image in files:
                 fname = os.path.split(image)[1]

@@ -8,26 +8,26 @@ from pyhtmlgui import PyHtmlView
 
 class DropboxDownloadView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="col-md-2">
         {% if pyview.subject.status == "idle" %}
-            {% if pyview.subject.last_success != None %}
-                <p>Last synchronized {{pyview.get_last_success()}} ago</p>
-            {% endif %}
-            {% if pyview.subject.last_failed != None %}
-                <p>Failed to synchronized {{pyview.get_last_failed()}} ago</p>
-            {% endif %}
+            <div class="col-md-3">
+                {% if pyview.subject.last_success != None %}
+                    <p>Last synchronized {{pyview.get_last_success()}} ago</p>
+                {% endif %}
+                {% if pyview.subject.last_failed != None %}
+                    <p>Failed to synchronized {{pyview.get_last_failed()}} ago</p>
+                {% endif %}
+            </div>
+            <div class="col-md-1">
+                <button class="btn" onclick="pyview.run()">Sync now</button<
+            </div>
         {% else %}
-            <p>Downloading {{pyview.subject.current_download_shotid}}, {{pyview.subject.current_progress}}% done</p>
-            {% if pyview.subject.current_download_file != "" %}
-                <p>Current File: {{pyview.subject.current_download_file}}</p>
-            {% else %}
-                <p>&nbsp;</p>
-            {% endif %}
+            <div class="col-md-4">
+                <p>Downloading: {{pyview.subject.current_download_shotid}}</p>
+                <p>{{pyview.subject.current_progress}}% done</p>
+            </div>
         {% endif %}
     </div>
-    <div class="col-md-2">
-        <button class="btn" onclick="pyview.run()">Sync now</button<
-    </div>
+    
     '''
     def get_last_success(self):
         seconds = time.time() - self.subject.last_success

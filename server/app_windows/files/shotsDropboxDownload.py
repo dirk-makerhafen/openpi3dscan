@@ -73,6 +73,13 @@ class ShotsDropboxDownload(Observable):
             if self.all_in_sync is True:
                 break
             time.sleep(5)
+
+        if self.all_in_sync is True:
+            self.last_success = int(time.time())
+            self.last_failed = None
+        else:
+            self.last_success = None
+            self.last_failed = int(time.time())
         self.dropbox.close()
         self.set_status("idle")
         self.worker = None
@@ -84,12 +91,10 @@ class ShotsDropboxDownload(Observable):
         self.notify_observers()
         source_dir = ""
         listing = self._list_folder(source_dir)
-        print(listing)
         for name in listing:
             if not isinstance(listing[name], dropbox.files.FolderMetadata):
                 continue
             sublisting = self._list_folder("%s/%s" % (source_dir, name))
-            print(sublisting)
             if "metadata.json" in sublisting:
                 self.current_download_shotid = name
                 self.notify_observers()
@@ -117,8 +122,7 @@ class ShotsDropboxDownload(Observable):
                     #self.dropbox.files_delete_v2("%s/%s" % (source_dir, name))
                 else:
                     all_in_sync = False
-            else:
-                all_in_sync = False
+
         self.current_download_shotid = ""
         self.notify_observers()
         self.all_in_sync = all_in_sync

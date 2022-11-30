@@ -10,7 +10,7 @@ from app.tasks.task_Whitebalance import TaskWhitebalanceInstance
 class TaskCameraBalanceView(PyHtmlView):
     TEMPLATE_STR = '''
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn" onclick='pyview.subject.run();'> Calibrate all </button>
+            <button class="btn btnfw" onclick='pyview.subject.run();'> Calibrate all </button>
         {% else %}
             <p class="btn" style="color:green">Calibrating</p>
         {% endif %}
@@ -170,7 +170,7 @@ class CameraSettingsView(PyHtmlView):
                         <div class="col-md-2">{{pyview.shutterbalance_view.render()}}</div>
                         <div class="col-md-2">
                             <div class="custom-control custom-switch">
-                                <input style="width:100%" id="shutter_speed" type=number value="{{pyview.subject.shutter_speed}}" onchange='pyview.subject._set_shutter_speed($("#shutter_speed").val())'>
+                                <input ca="width:100%" id="shutter_speed" type=number value="{{pyview.subject.shutter_speed}}" onchange='pyview.subject._set_shutter_speed($("#shutter_speed").val())'>
                                 <span class="custom-control-label"></span>
                             </div>
                         </div>

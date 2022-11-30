@@ -20,7 +20,7 @@ class RebootShutdownView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 {% if pyview.subject.status == "active"%}
-                                    <button class="btn " style="margin-right:5px" onclick='pyview.subject.reboot()'> Reboot </button>
+                                    <button class="btn btnfw" style="margin-right:5px" onclick='pyview.subject.reboot()'> Reboot </button>
                                 {% else %}
                                     <p>{{pyview.subject.status}} active</p>
                                 {% endif %}
@@ -35,7 +35,7 @@ class RebootShutdownView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 {% if pyview.subject.status == "active" %}
-                                    <button class="btn " style="margin-right:5px" onclick='pyview.subject.shutdown();'> Shutdown </button>
+                                    <button class="btn btnfw" style="margin-right:5px" onclick='pyview.subject.shutdown();'> Shutdown </button>
                                  {% else %}
                                     <p>{{pyview.subject.status}} active</p>
                                 {% endif %}

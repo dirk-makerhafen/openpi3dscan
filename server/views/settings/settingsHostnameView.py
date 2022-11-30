@@ -30,7 +30,7 @@ class HostnameSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Reboot to apply changes after saving!</p>
                             </div>
                             <div class="col-md-2">
-                               <button class="btn " style="margin-right:5px" onclick='pyview.subject.set_hostname($("#hostname").val());'> Change hostname </button>
+                               <button class="btn btnfw" style="margin-right:5px" onclick='pyview.subject.set_hostname($("#hostname").val());'> Save Changes </button>
                             </div>
                         </div>
                     </div>    

@@ -68,12 +68,13 @@ class CardReaderView(PyHtmlView):
                                      </p>
                                 </div>
                                 <div class="col-md-2">
-                                   <button class="btn" {% if pyview.subject.status != "idle" %}disabled{%endif%}style="margin-right:5px" onclick='pyview.subject.reload_task();'> reload </button>
+                                   <button class="btn btnfw" {% if pyview.subject.status != "idle" %}disabled{%endif%}style="margin-right:5px" onclick='pyview.subject.reload_task();'> Reload </button>
                                 </div>
                             </div>
                         </div>
                         <div class="list-group-item">
                             <div class="row align-items-center">
+                                <div class="col-md-1">&nbsp;</div>
                                 <div class="col-md-10">
                                     <strong class="mb-0">Cardreader Slots</strong>
                                     <p class="text-muted mb-0">

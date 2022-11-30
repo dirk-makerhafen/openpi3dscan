@@ -51,37 +51,28 @@ class WirelessSettingsView(PyHtmlView):
                                 <strong class="mb-0">Status</strong>
                                 <p class="text-muted mb-0">Wireless network status</p>
                             </div>
-                            <div class="col-md-2">
-                                {% if pyview.subject.status == "checking" or pyview.subject.status == "configure" or pyview.subject.status == "connecting" %}
-                                    <button class="btn " disabled style="margin-right:5px" > Working </button>
-                                {% else %}
-                                    <button class="btn " style="margin-right:5px" onclick='pyview.subject.get_connection_status();'> Get Status </button>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-2">
+                            
+                            <div class="col-md-2" style="text-align:center">
                                 {% if pyview.subject.status == "not_connected" %}NOT Connected{% endif %}
                                 {% if pyview.subject.status == "connecting" %}Connecting, please wait..{% endif %}
                                 {% if pyview.subject.status == "configure" %}Configuring network..{% endif %}
                                 {% if pyview.subject.status == "connected" %}Connected<br>IP: {{pyview.subject.ip}}{% endif %}
                                 {% if pyview.subject.status == "checking" %}Checking Status{% endif %}
                             </div>
+                            <div class="col-md-2">
+                                {% if pyview.subject.status == "checking" or pyview.subject.status == "configure" or pyview.subject.status == "connecting" %}
+                                    <button class="btn btnfw" disabled style="margin-right:5px" > Working </button>
+                                {% else %}
+                                    <button class="btn btnfw " style="margin-right:5px" onclick='pyview.subject.get_connection_status();'> Get Status </button>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>   
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <strong class="mb-0">Wireless scan</strong>
                                 <p class="text-muted mb-0">Search for available wireless networks.</p>
-                            </div>
-                            <div class="col-md-1">
-                                {% if pyview.subject.scan_worker == None %}
-                                    <button class="btn " style="margin-right:5px" onclick='pyview.subject.scan();'> Scan </button>
-                                    {% if  pyview.subject.wireless_networks|length > 0 %}
-                                        <button class="btn " style="margin-right:5px;margin-top:5px" onclick='pyview.subject.clear();'> Clear </button>
-                                    {% endif %}
-                                {% else %}
-                                    <button class="btn " disabled style="margin-right:5px" > Scanning </button>
-                                {% endif %}
                             </div>
                             <div class="col-md-5">
                                 <div class="custom-control custom-switch">
@@ -107,6 +98,16 @@ class WirelessSettingsView(PyHtmlView):
                                     </table>                 
                                     <span class="custom-control-label"></span>
                                 </div>
+                            </div>
+                            <div class="col-md-2">
+                                {% if pyview.subject.scan_worker == None %}
+                                    <button class="btn btnfw" style="margin-right:5px" onclick='pyview.subject.scan();'> Scan </button>
+                                    {% if  pyview.subject.wireless_networks|length > 0 %}
+                                        <button class="btn btnfw" style="margin-right:5px;margin-top:5px" onclick='pyview.subject.clear();'> Clear </button>
+                                    {% endif %}
+                                {% else %}
+                                    <button class="btn btnfw" disabled style="margin-right:5px" > Scanning </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>                               

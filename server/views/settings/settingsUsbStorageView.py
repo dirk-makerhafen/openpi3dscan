@@ -14,16 +14,9 @@ class UsbStorageView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <strong class="mb-0">USB-Disks</strong>
                                 <p class="text-muted mb-0">List of connected USB Disks</p>
-                            </div>
-                            <div class="col-md-1">
-                                {% if pyview.subject.status == "idle" %}
-                                    <button class="btn" onclick="pyview.subject.load()">Reload</button>
-                                {% else %}
-                                    {{pyview.subject.status }}
-                                {% endif %}
                             </div>
                             <div class="col-md-5">
                                 <table style="width:100%;text-align:center">
@@ -44,6 +37,13 @@ class UsbStorageView(PyHtmlView):
                                         </tr>
                                     {% endfor %}
                                 </table>   
+                            </div>
+                            <div class="col-md-2" style="text-align:center">
+                                {% if pyview.subject.status == "idle" %}
+                                    <button class="btn btnfw" onclick="pyview.subject.load()">Reload</button>
+                                {% else %}
+                                    <p> {{pyview.subject.status }} </p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

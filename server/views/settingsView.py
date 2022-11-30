@@ -16,7 +16,7 @@ from views.settings.settingsWirelessView import WirelessSettingsView
 class TaskUpdateServerView(PyHtmlView):
     TEMPLATE_STR = '''
     {% if pyview.subject.status == "idle" %} 
-        <button class="btn" onclick='pyview.subject.run();'> Update Server </button>
+        <button class="btn btnfw" onclick='pyview.subject.run();'> Update Server </button>
     {% else %}
         <p style="color:green">{{pyview.subject.status}}</p>
     {% endif %}
@@ -60,8 +60,8 @@ class SettingsView(PyHtmlView):
                                     <strong class="mb-0">Version</strong>
                                     <p class="text-muted mb-0">Current server version</p>
                                 </div>
-                                <div class="col-auto">
-                                    {{pyview.subject.settings.VERSION}}
+                                <div class="col-md-2" style="text-align:center">
+                                    <p class="h5">{{pyview.subject.settings.VERSION}}</p>
                                 </div>
                             </div>
                         </div>
@@ -71,7 +71,7 @@ class SettingsView(PyHtmlView):
                                     <strong class="mb-0">Online Updates</strong>
                                     <p class="text-muted mb-0">Check for updates and install if available. Server will reboot after updates are installed.</p>
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-md-2" style="text-align:center">
                                     {{pyview.updateServerView.render()}}
                                 </div>
                             </div>

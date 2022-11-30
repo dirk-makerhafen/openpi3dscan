@@ -15,7 +15,6 @@ class ShotsView(ObservableListView):
         self.selected_shot = None
 
     def select_shot(self, shot_id):
-        print("select shot", shot_id)
         if self.selected_shot is None and shot_id is None:
             return
         if self.selected_shot is not None and self.selected_shot.shot_id == shot_id:  # no changes
@@ -38,7 +37,7 @@ class ShotsView(ObservableListView):
             self.parent.show_shot(self.selected_shot)
 
     def search(self, value):
-        self.filter_function = lambda x: True in [x.lower().find(sv) == -1 for sv in value.lower().split(" ")]
+        self.filter_function = lambda x: True in [ (x.subject.name.lower().find(sv) == -1 and x.subject.meta_location.lower().find(sv) == -1) for sv in value.lower().split(" ")]
         self.update()
 
 
@@ -48,7 +47,7 @@ class ShotsItemView(PyHtmlView):
     <div class="row {% if pyview.parent.selected_shot.shot_id == pyview.subject.shot_id %} selected {% endif %}" onclick='pyview.parent.select_shot("{{pyview.subject.shot_id}}");'>
         <div class="col-md-12">
             <div class="name"> 
-                {{pyview.subject.name}} {{pyview.subject.status}}
+               {% if pyview.subject.devices == None %}{{pyview.subject.meta_location}},{% endif %} {{pyview.subject.name}} {{pyview.subject.status}}
             </div>
             <div class="info"> 
                 {% if pyview.subject.devices != None %}{{pyview.subject.nr_of_devices}},{% endif %}{{pyview.subject.nr_of_files}}{% if pyview.parent.settingsInstance.realityCaptureSettings.allow_rc_automation == True %},{{pyview.subject.nr_of_models}}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 or pyview.subject.nr_of_models_failed > 0 %}({% if pyview.subject.nr_of_models_waiting_or_processing > 0%}{{pyview.subject.nr_of_models_waiting_or_processing}}{% endif %}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 and pyview.subject.nr_of_models_failed > 0 %},{% endif %}{% if pyview.subject.nr_of_models_failed > 0%}{{pyview.subject.nr_of_models_failed}}!{% endif %}){% endif %}{% endif %} 

@@ -10,9 +10,11 @@ class SettingsLocations(Observable):
         self.locations = ObservableList()
 
     def new_location(self):
-        self.locations.append(SettingsLocation(self))
+        l = SettingsLocation(self)
+        self.locations.append()
         self.save()
         self.notify_observers()
+        return l
 
     def get_by_location(self, location):
         try:

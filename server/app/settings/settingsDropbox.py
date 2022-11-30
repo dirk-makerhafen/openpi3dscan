@@ -63,7 +63,6 @@ class SettingsDropbox(Observable):
             oauth_result = self.auth_flow.finish(self.token)
             with dropbox.Dropbox(oauth2_refresh_token=oauth_result.refresh_token, app_key=self.app_key) as dbx:
                 dbx.users_get_current_account()
-                print("Successfully set up client!")
                 self.refresh_token = oauth_result.refresh_token
         except Exception as e:
             print('Error: %s' % (e,))

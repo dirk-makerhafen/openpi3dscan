@@ -25,7 +25,6 @@ class ShotsDropboxDownload(Observable):
         self.current_download_shotid = ""
         self.current_download_file = ""
         self.current_progress = 0
-
         self.worker = None
 
     def to_dict(self):

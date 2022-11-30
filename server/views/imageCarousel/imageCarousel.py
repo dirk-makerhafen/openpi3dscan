@@ -117,8 +117,7 @@ class ImageCarousel(PyHtmlView):
         self._segments = []
         if self.segments_shown > self._get_settings_segments():
             self.segments_shown = self._get_settings_segments()
-        if self.is_visible:
-            self.update()
+        self.update()
 
     @property
     def img_height(self):
@@ -198,6 +197,8 @@ class ImageCarousel(PyHtmlView):
 
     def switch_type(self):
         self.image_type = "projection" if self.image_type == "normal" else "normal"
-        if self.is_visible:
-            self.update()
+        self.update()
 
+    def update(self):
+        if self.is_visible:
+            super().update()

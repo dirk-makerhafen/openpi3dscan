@@ -120,10 +120,7 @@ class SettingsLocationsView(PyHtmlView):
                             </div>
                             
                         </div>
-                    </div> 
-    
-                                     
-                                              
+                    </div>                            
                 </div>
             </div>   
         </div>

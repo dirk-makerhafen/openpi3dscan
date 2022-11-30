@@ -89,7 +89,7 @@ class SettingsDropboxView(PyHtmlView):
                                     <strong class="mb-0">Dropbox authorisation</strong>
                                      {% if pyview.subject.authorize_url != None %}
                                          <p class="text-muted mb-0">
-                                            <a target="blanc" href="{{pyview.subject.authorize_url}}">CLICK HERE TO GET AUTHORISATION TOKEN</a>
+                                            <a onclick="pyview.open_authlink()" href="#">CLICK HERE TO GET AUTHORISATION TOKEN</a>
                                         </p>
                                      {% else %}
                                         <p class="text-muted mb-0">Authorize Dropbox access for this app</p>
@@ -157,4 +157,7 @@ class SettingsDropboxView(PyHtmlView):
         self.dropboxDownloadView = DropboxDownloadView(self.shotsDropboxDownloadInstance, self)
         self.add_observable(self.shotsDropboxDownloadInstance)
 
+    def open_authlink(self):
+        if self.subject.authorize_url != None:
+            webbrowser.open(self.subject.authorize_url)
 

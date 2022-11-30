@@ -202,7 +202,6 @@ class ShotsDropboxDownload(Observable):
         os.makedirs(destination_dir, exist_ok=True)
         with open(destination,"wb") as f:
             f.write(res.content)
-
         return True
 
     def login(self):

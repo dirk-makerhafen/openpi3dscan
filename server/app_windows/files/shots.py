@@ -56,7 +56,8 @@ class Shots:
             shot_id = os.path.split(path)[1]
             shot = self.get(shot_id)
             if shot is None:
-                self.shots.append(Shot(path, shot_id))
+                shot = Shot(path, shot_id)
+                self.shots.append(shot)
             else:
                 shot.load()
             if do_sort is True:

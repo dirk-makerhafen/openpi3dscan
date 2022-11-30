@@ -49,7 +49,7 @@ class SettingsLocationView(PyHtmlView):
     </td>
     <td> 
         <textarea class="form-control" rows=8 id="marker_distances_{{pyview.uid}}"  style="white-space: pre-wrap;width:100%" onchange='pyview.subject.set_markers($("#marker_distances_{{pyview.uid}}").val())'>{{pyview.subject.markers}}</textarea>
-     </td>
+    </td>
     <td>
         <div class="row">
             <div class="col-md-4">
@@ -69,12 +69,12 @@ class SettingsLocationView(PyHtmlView):
         </div>    
     </td>
     <td>
-        {{pyview.subject.calibration_count()}} calibrated <br>
-        <button  class="btn" onclick="pyview.subject.reset_calibration()">reset</button>
+        <button class="btn btnfw" onclick="pyview.subject.reset_calibration()">Reset</button>
+        <p style="text-align:center;"> {{pyview.subject.calibration_count()}} calibrated </p>
+    </td>
     <td>
-    <td>
-        <button  class="btn" onclick="pyview.subject.remove()">delete</button>
-    <td>
+        <button  class="btn btnfw" onclick="pyview.subject.remove()">Delete</button>
+    </td>
     '''
 
 
@@ -91,13 +91,13 @@ class SettingsLocationsView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-10">
+                            <div class="col-md-11">
                                 <strong class="mb-0">Location</strong>
-                                <p class="text-muted mb-0">Unique scanner location name</p>
+                                <p class="text-muted mb-0">Setup multiple locations and add their settings and markers</p>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <div class="custom-control custom-switch">
-                                <button  class="btn" onclick="pyview.subject.new_location()">New Location</button>
+                                <button class="btn btnfw" onclick="pyview.subject.new_location()">New Location</button>
                                 </div>
                             </div>
                         </div>
@@ -113,6 +113,7 @@ class SettingsLocationsView(PyHtmlView):
                                             <th>Markers</th>
                                             <th>Dimensions</th>
                                             <th>Calibration</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                    {{ pyview.locations.render() }}  
@@ -120,10 +121,7 @@ class SettingsLocationsView(PyHtmlView):
                             </div>
                             
                         </div>
-                    </div> 
-    
-                                     
-                                              
+                    </div>                            
                 </div>
             </div>   
         </div>

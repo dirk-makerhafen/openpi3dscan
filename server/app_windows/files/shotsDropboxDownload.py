@@ -25,8 +25,10 @@ class ShotsDropboxDownload(Observable):
         self.current_download_shotid = ""
         self.current_download_file = ""
         self.current_progress = 0
-
         self.worker = None
+
+        self._bg_thread = threading.Thread(target=self.bg_thread, daemon=True)
+        self._bg_thread.start()
 
     def to_dict(self):
         return {
@@ -40,8 +42,19 @@ class ShotsDropboxDownload(Observable):
         self.last_failed = data["last_failed"]
         self.last_checked = data["last_checked"]
 
+    def bg_thread(self):
+        while True:
+            if SettingsInstance().settingsDropbox.enabled \
+            and SettingsInstance().settingsDropbox.refresh_token != "" \
+            and SettingsInstance().settingsDropbox.auth_flow is None \
+            and time.time() > SettingsInstance().settingsDropbox.next_sync_time:
+                SettingsInstance().settingsDropbox.set_next_sync_time(time.time() + 1800)
+                self.sync()
+            time.sleep(60)
+            self.notify_observers()
+
     def sync(self):
-        if SettingsInstance().settingsDropbox.enabled is True and SettingsInstance().settingsDropbox.token != "":
+        if SettingsInstance().settingsDropbox.enabled is True and SettingsInstance().settingsDropbox.refresh_token != "":
             if self.worker is None:
                 self.worker = threading.Thread(target=self._sync_thread, daemon=True)
                 self.worker.start()
@@ -80,6 +93,7 @@ class ShotsDropboxDownload(Observable):
         else:
             self.last_success = None
             self.last_failed = int(time.time())
+        SettingsInstance().settingsDropbox.set_next_sync_time(time.time() + 1800)
         self.dropbox.close()
         self.set_status("idle")
         self.worker = None
@@ -96,11 +110,14 @@ class ShotsDropboxDownload(Observable):
                 continue
             sublisting = self._list_folder("%s/%s" % (source_dir, name))
             if "metadata.json" in sublisting:
+                all_success = True
                 self.current_download_shotid = name
                 self.notify_observers()
                 files_to_download = []
                 if not os.path.exists(os.path.join(ShotsInstance().path, name, "metadata.json")):
-                    files_to_download.append([ "%s/%s/metadata.json" % (source_dir, name) , os.path.join(ShotsInstance().path, name, "metadata.json") ])
+                    result = self.download( "%s/%s/metadata.json" % (source_dir, name) , os.path.join(ShotsInstance().path, name, "metadata.json") )
+                    if result is False:
+                        all_success = False
                 for imgtype in ["normal", "projection"]:
                     imageslisting = self._list_folder("%s/%s/%s" % (source_dir, name, imgtype))
                     for imagename in imageslisting:
@@ -108,18 +125,38 @@ class ShotsDropboxDownload(Observable):
                             continue
                         if not os.path.exists(os.path.join(ShotsInstance().path, name, "images",  imgtype, imagename)):
                             files_to_download.append(["%s/%s/%s/%s" % (source_dir, name, imgtype, imagename), os.path.join(ShotsInstance().path, name, "images", imgtype, imagename) ])
-                all_success = True
+                shot = None
+                if all_success is True:
+                    shot = ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))
+
                 for index, file_to_download in enumerate(files_to_download):
                     self.current_progress = int(100 / len(files_to_download) * (index + 1))
                     source, destination = file_to_download
                     result = self.download(source,destination)
                     if result is False:
                         all_success = False
+                    else:
+                        if shot is not None:
+                            shot.nr_of_files += 1
+                            shot.notify_observers()
 
                 if all_success is True:
-                    shot = ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))
+                    if shot is None:
+                        shot = ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))
+                    shot.count_number_of_files()
+                    shot.notify_observers()
                     shot.create_preview_images()
-                    #self.dropbox.files_delete_v2("%s/%s" % (source_dir, name))
+                    shot.save()
+                    if shot.meta_location != "" and SettingsInstance().settingsLocations.get_by_location(shot.meta_location) == None:
+                        location = SettingsInstance().settingsLocations.new_location()
+                        location.location = shot.meta_location
+                        location.segments = shot.meta_max_segments
+                        location.cameras_per_segment = shot.meta_max_rows
+                        location.camera_rotation = shot.meta_rotation
+                        location.camera_one_position = shot.meta_camera_one_position
+                        location.save()
+                        location.notify_observers()
+                    self.dropbox.files_delete_v2("%s/%s" % (source_dir, name))
                 else:
                     all_in_sync = False
 
@@ -173,7 +210,6 @@ class ShotsDropboxDownload(Observable):
             with dropbox.Dropbox(oauth2_refresh_token=SettingsInstance().settingsDropbox.refresh_token, app_key=SettingsInstance().settingsDropbox.app_key) as dbx:
                 dbx.users_get_current_account()
                 self.dropbox = dbx
-                print("Successfully set up client!")
                 return True
         except Exception as e:
             print('Error: %s' % (e,))

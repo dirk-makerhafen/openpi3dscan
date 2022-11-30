@@ -16,7 +16,7 @@ class SettingsLocation(Observable):
         self.camera_one_position = "top"  # top, bottom
         self.calibration_data = "{}" # json dump of rc data
         self.markers = ""
-        self.diameter = 1.9
+        self.diameter = 1.8
         self.height = 2.5
 
     def to_dict(self):

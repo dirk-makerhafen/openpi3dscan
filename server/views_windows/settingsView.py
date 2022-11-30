@@ -12,11 +12,10 @@ class SettingsView(PyHtmlView):
     <div class="main">
                       
         {{pyview.realityCaptureView.render()}}  
-        
-        {{pyview.locationsSettingsView.render()}}  
+        {{pyview.settingsDropboxView.render()}}          
         {{pyview.remoteHostsView.render()}}  
         {{pyview.settingsCacheView.render()}}  
-        {{pyview.settingsDropboxView.render()}}  
+        {{pyview.locationsSettingsView.render()}}  
         <br>
         <br>
         

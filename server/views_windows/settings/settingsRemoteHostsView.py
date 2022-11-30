@@ -9,7 +9,7 @@ class SettingsRemoteHostsView(PyHtmlView):
                 <div class="list-group mb-5 shadow">
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Network</div>
+                            <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Local Scanner</div>
                         </div>
                     </div>
                     <div class="list-group-item">
@@ -21,14 +21,14 @@ class SettingsRemoteHostsView(PyHtmlView):
                             <div class="col-md-4">
                             <table class="table">
                                 {% for host in  pyview.subject.hosts %}
-                                <tr>
-                                    <td>{{host}}</td>
-                                    <td><button onclick='pyview.subject.remove_host("{{host}}")'>remove</button></td>
-                                </tr>
+                                    <tr>
+                                        <td><p class="h5" style="margin-left: 5px;">{{host}}</p></td>
+                                        <td><button class="btn btnfw" onclick='pyview.subject.remove_host("{{host}}")'>Remove</button></td>
+                                    </tr>
                                 {% endfor %}
                                 <tr>
-                                <td><input  class="form-control" placeholder="myscanner.local" id="newhost" type="text"></input></td>
-                                <td> <button class="btn" onclick='pyview.subject.add_host($("#newhost").val())'>add</button> </td>   
+                                <td> <input  class="form-control" placeholder="myscanner.local" id="newhost" type="text"></input></td>
+                                <td> <button class="btn btnfw" onclick='pyview.subject.add_host($("#newhost").val())'>Add</button> </td>   
                                 </tr>
                             </table>
                             </div>

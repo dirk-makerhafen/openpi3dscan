@@ -16,8 +16,8 @@ class RealityCaptureView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-11">
-                                <strong class="mb-0">Enable RC Automation</strong>
-                                <p class="text-muted mb-0">Enable RC automation for this scanner</p>
+                                <strong class="mb-0">Enable automation</strong>
+                                <p class="text-muted mb-0">Enable RealityCapture automation for this scanner</p>
                             </div>
                             <div class="col-md-1">
                                 <div class="custom-control custom-switch">
@@ -27,20 +27,6 @@ class RealityCaptureView(PyHtmlView):
                         </div>
                     </div>
                     {% if pyview.subject.allow_rc_automation == True %}
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-10">
-                                    <strong class="mb-0">RealityCapture Automation Software</strong>
-                                    <p class="text-muted mb-0">Software package to automate RealityCapture. Download, unzip, run <b>start.bat</b> </p>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="custom-control custom-switch">
-                                        <a href="/windows_pack.zip">DOWNLOAD</a>
-                                        <span class="custom-control-label"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="list-group-item">
                             <div class="row align-items-center">
                                 <div class="col-md-10">

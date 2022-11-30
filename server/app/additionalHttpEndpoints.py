@@ -84,8 +84,6 @@ class HttpEndpoints:
         bottle.route("/shots/<shot_id>.zip")(self._shot_get_images_zip)
         bottle.route("/live/<device_id>.jpg")(self._live)
         bottle.route("/heartbeat", method="POST")(self._heartbeat)
-        bottle.route("/windows_pack.zip")(self.download_windows_pack)
-        bottle.route("/windows_dev_pack.zip")(self.download_windows_dev_pack)
         bottle.route("/force_update")(self.force_update)
         bottle.route("/realityCaptureProcess")(self.realityCaptureProcess)
         bottle.route("/upload_calibration", method="POST")(self.upload_calibration)
@@ -162,33 +160,6 @@ class HttpEndpoints:
             'Cache-Control': "public, max-age=36000"
         }
         return bottle.HTTPResponse(image, **headers)
-
-    def download_windows_pack(self):
-        files = [f for f in glob.glob("/opt/openpi3dscan/realityCapture/*.*") if not f.endswith(".py")]
-        zs = zipstream.ZipStream(compress_type=ZIP_STORED)
-        for file in files:
-            name = os.path.split(file)[1]
-            zs.add_path(file, "windows_scripts/%s" % name)
-        zs.add_path("/etc/hostname", "windows_scripts/hostname")
-        headers = {
-            'Content-Type': "application/zip",
-            'Content-Disposition': 'attachment; filename="windows_scripts.zip"'
-        }
-        return bottle.HTTPResponse(zs, **headers)
-
-    def download_windows_dev_pack(self):
-        files = glob.glob("/opt/openpi3dscan/realityCapture/*.*")
-        zs = zipstream.ZipStream(compress_type=ZIP_STORED)
-        for file in files:
-            name = os.path.split(file)[1]
-            zs.add_path(file, "windows_scripts/%s" % name)
-        zs.add_path("/etc/hostname", "windows_scripts/hostname")
-        headers = {
-            'Content-Type': "application/zip",
-            'Content-Disposition': 'attachment; filename="windows_scripts.zip"'
-        }
-        return bottle.HTTPResponse(zs, **headers)
-
 
     def _shot_get_images_zip(self, shot_id):
         shot = self.app.shots.get(shot_id)

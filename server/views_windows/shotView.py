@@ -7,7 +7,7 @@ from views.shotView import ShotView
 if TYPE_CHECKING:
     from app_windows.app import App
 
-class ShotView(ShotView):
+class ShotWindowsView(ShotView):
 
     def __init__(self, subject: App, parent, settingsInstance):
         super().__init__(subject, parent, settingsInstance)

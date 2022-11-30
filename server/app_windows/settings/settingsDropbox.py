@@ -1,8 +1,7 @@
 import time
 from app.settings.settingsDropbox import SettingsDropbox
 
-
-class SettingsDropbox(SettingsDropbox):
+class SettingsDropboxWindows(SettingsDropbox):
     def __init__(self, parent):
         super().__init__(parent)
         self.next_sync_time = time.time() + 600

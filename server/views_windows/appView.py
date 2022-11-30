@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from app_windows.settings.settings import SettingsInstance
-from views_windows.shotView import ShotView
+from views_windows.shotView import ShotWindowsView
 from views_windows.processingView import ProcessingView
 from views_windows.sidebarView import SidebarView
 from views_windows.settingsView import SettingsView
@@ -16,7 +16,7 @@ class CurrentView(PyHtmlView):
     TEMPLATE_STR = '''{{ pyview.current_view.render()}}'''
     def __init__(self, subject, parent):
         super().__init__(subject, parent)
-        self.shotView = ShotView(subject=subject, parent=self, settingsInstance=SettingsInstance())
+        self.shotView = ShotWindowsView(subject=subject, parent=self, settingsInstance=SettingsInstance())
         self.settingsView = SettingsView(self.subject, self)
         self.processingView = ProcessingView(self.subject.processing, self)
         self.current_view = self.settingsView

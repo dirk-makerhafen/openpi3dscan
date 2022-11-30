@@ -2,38 +2,43 @@ import os, shutil
 import requests
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-TARGETFOLDER = os.path.join(SCRIPT_DIR, "build", "bin")
+BUILDFOLDER = os.path.join(SCRIPT_DIR, "build", "bin")
+TARGETFOLDER = os.path.join(SCRIPT_DIR, "dist", "RCAutomation", "bin")
 
 def download(url, filename):
-    with open(os.path.join(TARGETFOLDER, filename),"wb") as f:
+    with open(os.path.join(BUILDFOLDER, filename),"wb") as f:
         f.write(requests.get(url).content)
 
 os.system("pyinstaller app_windows.spec")
+os.system("pyinstaller --onefile -F app_windows/rc_rebase.py")
 
-if not os.path.exists(TARGETFOLDER):
-    os.mkdir(TARGETFOLDER)
+if not os.path.exists(BUILDFOLDER):
+    os.mkdir(BUILDFOLDER)
 
-if not os.path.exists(os.path.join(TARGETFOLDER,"convert.exe")):
+if not os.path.exists(os.path.join(BUILDFOLDER,"convert.exe")):
     download("https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-portable-Q16-x64.zip", "imagemagick.zip")
-    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (TARGETFOLDER, "imagemagick.zip"))
-    shutil.move(os.path.join(TARGETFOLDER,"imagemagick","convert.exe"), TARGETFOLDER)
+    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (BUILDFOLDER, "imagemagick.zip"))
+    shutil.move(os.path.join(BUILDFOLDER,"imagemagick","convert.exe"), BUILDFOLDER)
 
-if not os.path.exists(os.path.join(TARGETFOLDER,"gifsicle.exe")):
+if not os.path.exists(os.path.join(BUILDFOLDER,"gifsicle.exe")):
     download("https://eternallybored.org/misc/gifsicle/releases/gifsicle-1.92-win64.zip", "gifsicle.zip")
-    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (TARGETFOLDER, "gifsicle.zip"))
-    shutil.move(os.path.join(TARGETFOLDER,"gifsicle","gifsicle-1.92","gifsicle.exe"), TARGETFOLDER)
+    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (BUILDFOLDER, "gifsicle.zip"))
+    shutil.move(os.path.join(BUILDFOLDER,"gifsicle","gifsicle-1.92","gifsicle.exe"), BUILDFOLDER)
 
-if not os.path.exists(os.path.join(TARGETFOLDER,"chromedriver.exe")):
+if not os.path.exists(os.path.join(BUILDFOLDER,"chromedriver.exe")):
     download("https://chromedriver.storage.googleapis.com/103.0.5060.134/chromedriver_win32.zip", "chromedriver.zip")
-    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (TARGETFOLDER, "chromedriver.zip"))
-    shutil.move(os.path.join(TARGETFOLDER,"chromedriver","chromedriver.exe"), TARGETFOLDER)
+    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (BUILDFOLDER, "chromedriver.zip"))
+    shutil.move(os.path.join(BUILDFOLDER,"chromedriver","chromedriver.exe"), BUILDFOLDER)
 
-if not os.path.exists(os.path.join(TARGETFOLDER,"chromium")):
+if not os.path.exists(os.path.join(BUILDFOLDER,"chromium")):
     download("https://github.com/portapps/ungoogled-chromium-portable/releases/download/103.0.5060.114-15/ungoogled-chromium-portable-win64-103.0.5060.114-15.7z", "chromium.7z")
-    os.system("cd \"%s\" & \"c:\\Program Files\\7-Zip\\7z.exe\" x \"%s\"" % (TARGETFOLDER, os.path.join(TARGETFOLDER,"chromium.7z")))
-    shutil.move(os.path.join(TARGETFOLDER,"app"), os.path.join(TARGETFOLDER,"chromium"))
+    os.system("cd \"%s\" & \"c:\\Program Files\\7-Zip\\7z.exe\" x \"%s\"" % (BUILDFOLDER, os.path.join(BUILDFOLDER,"chromium.7z")))
+    shutil.move(os.path.join(BUILDFOLDER,"app"), os.path.join(BUILDFOLDER,"chromium"))
 
-filesToRemove = [ os.path.join(TARGETFOLDER, f) for f in [
+if not os.path.exists(os.path.join(TARGETFOLDER, "rc_rebase.exe")):
+    shutil.move(os.path.join(SCRIPT_DIR, "dist", "rc_rebase.exe"), os.path.join(TARGETFOLDER, "rc_rebase.exe"))
+
+filesToRemove = [ os.path.join(BUILDFOLDER, f) for f in [
     "imagemagick",
     "imagemagick.zip",
     "gifsicle",
@@ -55,4 +60,4 @@ for fileToRemove in filesToRemove:
         else:
             os.remove(fileToRemove)
 
-shutil.copytree(TARGETFOLDER, os.path.join(SCRIPT_DIR, "dist", "RCAutomation", "bin"))
+shutil.copytree(BUILDFOLDER, TARGETFOLDER)

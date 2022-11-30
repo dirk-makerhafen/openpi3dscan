@@ -2,12 +2,12 @@ import json, os
 from pyhtmlgui import Observable
 
 from app_windows.settings.settingsCache import SettingsCache
-from app_windows.settings.settingsDropbox import SettingsDropbox
+from app_windows.settings.settingsDropbox import SettingsDropboxWindows
 from app_windows.settings.settingsLocations import SettingsLocations
 from app_windows.settings.settingsRealityCapture import SettingsRealityCapture
 from app_windows.settings.settingsRemoteHosts import SettingsRemoteHosts
 
-VERSION = "2022.11.24-08.09"
+VERSION = "2022.11.30-20.00"
 
 
 class Settings(Observable):
@@ -21,7 +21,7 @@ class Settings(Observable):
         self.settingsLocations = SettingsLocations(self)
         self.settingsRemoteHosts = SettingsRemoteHosts(self)
         self.settingsCache = SettingsCache(self)
-        self.settingsDropbox = SettingsDropbox(self)
+        self.settingsDropbox = SettingsDropboxWindows(self)
         self.VERSION = VERSION
         self.load()
 

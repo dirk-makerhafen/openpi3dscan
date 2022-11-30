@@ -41,7 +41,7 @@ class SettingsCacheView(PyHtmlView):
                                 <p class="text-muted mb-0">Clear {{pyview.subject.count_items()}} items from cache directory</p>
                             </div>
                             <div class="col-md-1">
-                                <button  class="btn btnfw" onclick="pyview.subject.clear_all()">clear</button>
+                                <button  class="btn btnfw" onclick="pyview.subject.clear_all()">Clear</button>
                             </div>
                         </div>
                     </div>                 

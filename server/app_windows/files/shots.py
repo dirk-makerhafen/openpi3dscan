@@ -10,6 +10,8 @@ class Shots:
     def __init__(self):
         self.shots = ObservableList()
         self.path = "c:\\my_shots"
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
         self.cache = {}
         self.load_shots_from_disk()
 

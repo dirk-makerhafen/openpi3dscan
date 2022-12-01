@@ -9,6 +9,7 @@ import time
 import bottle
 import gevent
 import zipstream
+from zipfile import ZIP_STORED
 
 from app_windows.files.shots import ShotsInstance
 

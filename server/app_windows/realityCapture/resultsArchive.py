@@ -3,6 +3,7 @@ import shlex
 import subprocess
 from multiprocessing.pool import ThreadPool
 
+from app_windows.files.externalFiles import ExternalFilesInstance
 from app_windows.realityCapture.genericTask import GenericTask
 CREATE_NO_WINDOW = 0x08000000
 
@@ -32,7 +33,7 @@ class ResultsArchive(GenericTask):
                 print("Failed to delete %s" % target_dir)
             os.mkdir(target_dir)
             shutil.copy(rcproj, target_dir)
-            shutil.copy("rc_rebase.exe", target_dir)
+            shutil.copy(ExternalFilesInstance().rc_rebase_exe, target_dir)
             shutil.copytree(rcprojdir, os.path.join(target_dir, self.rc_job.realityCapture_filename))
             shutil.copytree(imgdir, os.path.join(target_dir, "images"))
 

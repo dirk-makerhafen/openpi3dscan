@@ -87,18 +87,15 @@ class ShotView(PyHtmlView):
         {% endif %}
         <script>
             document.onkeydown = function (e) {
-                if ( e.keyCode ==  33 ||  e.keyCode ==  37){    // pageup or  left
+                if ( e.keyCode ==  33 ||  e.keyCode ==  34){ 
                     e.preventDefault();
+                };
+                if ( e.keyCode ==  33 ||  e.keyCode ==  37){    // pageup or  left
                     pyview.imageCarousel.rotate_cw();
                 };
                 if ( e.keyCode ==  34 ||  e.keyCode ==  39){    // pagedown or  right
-                    e.preventDefault();
                     pyview.imageCarousel.rotate_ccw();
                 };
-                //if ( e.keyCode ==  190){    // 
-                //    e.preventDefault();
-                //    pyview.imageCarousel.switch_type();
-                //};
             };
         </script>
         

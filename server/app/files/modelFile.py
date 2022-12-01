@@ -39,7 +39,6 @@ class ModelFile(Observable):
         if self.filetype in ["gif", "webp"]:
             ext = ""
         self.filename = "%s_%s%s%s%s%s.%s%s" % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, litUnlitStr, self.filetype, ext)
-        #self.filename = "%s_%s%s%s%s.%s%s" % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, self.filetype, ext)
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         with FileObjectThread(os.path.join(self.path, self.filename), "wb") as f:

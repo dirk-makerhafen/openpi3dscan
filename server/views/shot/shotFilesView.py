@@ -1,3 +1,4 @@
+import os
 import time
 
 from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
@@ -13,9 +14,12 @@ class ShotFilesView(PyHtmlView):
             <a style="text-align: right;float: right;color: gray;"> Close </a>
         </div>
         <div class="col-md-8">
-            <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a>
+            <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a> <br>
+            {% if pyview.parent.show_path == True %}
+                <a href="#" onclick="pyview.open_images_in_explorer()">{{pyview.current_shot.images_path}}</a>
+            {% endif %}
         </div>
-        {% if pyview.settingsInstance.settingsDropbox.enabled == True and pyview.dropboxUploadView != None %}
+        {% if pyview.settingsInstance.settingsDropbox.refresh_token != "" and pyview.dropboxUploadView != None %}
             {{ pyview.dropboxUploadView.render() }}
         {% endif %}
     </div>
@@ -38,7 +42,7 @@ class ShotFilesView(PyHtmlView):
                     </thead>
                     {{pyview.filesListView.render()}}
                     <tr style="border-top: 1px solid lightgray;    line-height: 3em;">
-                        <td>
+                        <td style="padding-left: 5px;padding-right: 5px;">
                             <select style="" class="form-control" name="filetype" id="filetype">
                                 <option value="obj">OBJ</option>
                                 <option value="stl">STL</option>
@@ -50,21 +54,21 @@ class ShotFilesView(PyHtmlView):
                                 <option value="webp">WebP</option>
                             </select>
                         </td>
-                        <td>
+                        <td style="padding-left: 5px;padding-right: 5px;">
                             <select style="" class="form-control" name="reconstruction_quality" id="reconstruction_quality">
                                 <option value="high"   {% if pyview.settingsInstance.realityCaptureSettings.default_reconstruction_quality == "high"    %}selected{% endif %} >High</option>
                                 <option value="normal" {% if pyview.settingsInstance.realityCaptureSettings.default_reconstruction_quality == "normal"  %}selected{% endif %}>Normal</option>
                                 <option value="preview"{% if pyview.settingsInstance.realityCaptureSettings.default_reconstruction_quality == "preview" %}selected{% endif %} >Preview</option>
                             </select>                            
                         </td>
-                        <td>
+                        <td style="padding-left: 5px;padding-right: 5px;">
                             <select style="" class="form-control" name="quality" id="quality">
                                 <option value="high"  {% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "high"   %}selected{% endif %}>High (4M)</option>
                                 <option value="normal"{% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "normal" %}selected{% endif %}>Normal (1M)</option>
                                 <option value="low"   {% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "low"    %}selected{% endif %}>Low (500K)</option>
                             </select>                            
                         </td>
-                        <td>
+                        <td style="padding-left: 5px;padding-right: 5px;">
                             <select style="" class="form-control" name="create_mesh_from" id="create_mesh_from">
                                 <option value="projection" {% if pyview.settingsInstance.realityCaptureSettings.default_create_mesh_from == "projection" %}selected{% endif %}>Projection</option>
                                 <option value="normal"     {% if pyview.settingsInstance.realityCaptureSettings.default_create_mesh_from == "normal"     %}selected{% endif %}>Normal</option>
@@ -138,6 +142,10 @@ class ShotFilesView(PyHtmlView):
             else:
                 self.current_models_list = ObservableList()
             self.filesListView = ObservableListView(self.current_models_list, self, item_class=ModelFileItemView, dom_element="tbody")
+
+    def open_images_in_explorer(self):
+        if self.current_shot is not None:
+            os.startfile( self.current_shot.images_path)
 
 
 class ModelFileItemView(PyHtmlView):

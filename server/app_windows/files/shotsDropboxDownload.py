@@ -108,6 +108,8 @@ class ShotsDropboxDownload(Observable):
         for name in listing:
             if not isinstance(listing[name], dropbox.files.FolderMetadata):
                 continue
+            self.current_progress = 0
+            self.notify_observers()
             sublisting = self._list_folder("%s/%s" % (source_dir, name))
             if "metadata.json" in sublisting:
                 all_success = True
@@ -139,7 +141,8 @@ class ShotsDropboxDownload(Observable):
                         if shot is not None:
                             shot.nr_of_files += 1
                             shot.notify_observers()
-
+                self.current_progress =  100
+                self.notify_observers()
                 if all_success is True:
                     if shot is None:
                         shot = ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))

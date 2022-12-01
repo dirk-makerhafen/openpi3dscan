@@ -126,7 +126,8 @@ class ShotDropboxUpload(Observable):
             res = self._upload_file(source, destination)
             if res is None:
                 all_in_sync = False
-
+        self.current_progress = 0
+        self.notify_observers()
         if all_in_sync is True:
             res = self._upload_data(
                 json.dumps({

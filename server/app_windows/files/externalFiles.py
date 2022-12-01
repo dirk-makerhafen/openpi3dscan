@@ -21,6 +21,7 @@ class ExternalFiles(Observable):
         self.chromium_exe = os.path.join(basepath,"chromium", "chrome.exe")
         self.convert_exe = os.path.join(basepath, "convert.exe")
         self.gifsicle_exe = os.path.join(basepath, "gifsicle.exe")
+        self.rc_rebase_exe = os.path.join(basepath, "rc_rebase.exe")
 
 
 _externalFilesInstance = None

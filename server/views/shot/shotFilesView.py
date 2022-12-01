@@ -161,9 +161,9 @@ class ModelFileItemView(PyHtmlView):
         <td>
             {% if pyview.subject.status == "ready" %} 
                  {% if pyview.parent.parent.parent.show_path == True %}
-                    <p><a href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.filename}}</a></p>
+                    <p><a href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.filename}}</a>({{pyview.subject.filesize}} MB)</p>
                 {% else %}
-                    <a href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}}  </a>({{pyview.subject.filesize}} MB)
+                    <p><a href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}}  </a>({{pyview.subject.filesize}} MB)</p>
                 {% endif %}
             {% else %}
                 {{pyview.subject.status}}

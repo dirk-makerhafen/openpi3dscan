@@ -13,10 +13,10 @@ class ShotFilesView(PyHtmlView):
         <div class="col-md-1" style="font-weight:bold;cursor: pointer" onclick='pyview.hide()'>
             <a style="text-align: right;float: right;color: gray;"> Close </a>
         </div>
-        <div class="col-md-8">
-            <a class="btn" href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a> <br>
+        <div class="col-md-8" style="margin-left:20px">
+            <p><a href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a> </p>
             {% if pyview.parent.show_path == True %}
-                <a href="#" onclick="pyview.open_images_in_explorer()">{{pyview.current_shot.images_path}}</a>
+                <p><a href="#" onclick="pyview.open_images_in_explorer()">{{pyview.current_shot.images_path}}</a></p>
             {% endif %}
         </div>
         {% if pyview.settingsInstance.settingsDropbox.refresh_token != "" and pyview.dropboxUploadView != None %}

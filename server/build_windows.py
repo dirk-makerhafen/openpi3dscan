@@ -9,8 +9,8 @@ def download(url, filename):
     with open(os.path.join(BUILDFOLDER, filename),"wb") as f:
         f.write(requests.get(url).content)
 
-os.system("pyinstaller app_windows.spec")
-os.system("pyinstaller --onefile -F app_windows/rc_rebase.py")
+os.system("pyinstaller --noconfirm app_windows.spec")
+os.system("pyinstaller --noconfirm --onefile app_windows/rc_rebase.py")
 
 if not os.path.exists(BUILDFOLDER):
     os.mkdir(BUILDFOLDER)
@@ -35,9 +35,6 @@ if not os.path.exists(os.path.join(BUILDFOLDER,"chromium")):
     os.system("cd \"%s\" & \"c:\\Program Files\\7-Zip\\7z.exe\" x \"%s\"" % (BUILDFOLDER, os.path.join(BUILDFOLDER,"chromium.7z")))
     shutil.move(os.path.join(BUILDFOLDER,"app"), os.path.join(BUILDFOLDER,"chromium"))
 
-if not os.path.exists(os.path.join(TARGETFOLDER, "rc_rebase.exe")):
-    shutil.move(os.path.join(SCRIPT_DIR, "dist", "rc_rebase.exe"), os.path.join(TARGETFOLDER, "rc_rebase.exe"))
-
 filesToRemove = [ os.path.join(BUILDFOLDER, f) for f in [
     "imagemagick",
     "imagemagick.zip",
@@ -61,3 +58,6 @@ for fileToRemove in filesToRemove:
             os.remove(fileToRemove)
 
 shutil.copytree(BUILDFOLDER, TARGETFOLDER)
+
+if not os.path.exists(os.path.join(TARGETFOLDER, "rc_rebase.exe")):
+    shutil.move(os.path.join(SCRIPT_DIR, "dist", "rc_rebase.exe"), os.path.join(TARGETFOLDER, "rc_rebase.exe"))

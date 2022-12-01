@@ -32,6 +32,7 @@ class SettingsRealityCapture(Observable):
         self.height = 2.5
         self.pin = ""
         self.token = ""
+        self.compress_models = True
         self.default_reconstruction_quality = "normal" # preview, normal, high
         self.default_export_quality = "normal"  # "high", normal, low
         self.default_create_mesh_from = "projection" # normal, projection, all
@@ -167,5 +168,10 @@ class SettingsRealityCapture(Observable):
 
     def set_allow_rc_automation(self, new_allow_rc_automation):
         self.allow_rc_automation = bool(new_allow_rc_automation)
+        self.save()
+        self.notify_observers()
+
+    def set_compress_models(self, new_compress_models):
+        self.compress_models = bool(new_compress_models)
         self.save()
         self.notify_observers()

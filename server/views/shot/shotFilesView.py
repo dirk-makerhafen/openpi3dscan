@@ -160,10 +160,21 @@ class ModelFileItemView(PyHtmlView):
         <td>{{pyview.subject.lit}}</td>
         <td>
             {% if pyview.subject.status == "ready" %} 
-                <a href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}}  </a>({{pyview.subject.filesize}} MB)
+                 {% if pyview.parent.parent.parent.show_path == True %}
+                    <p><a href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.filename}}</a></p>
+                {% else %}
+                    <a href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}}  </a>({{pyview.subject.filesize}} MB)
+                {% endif %}
             {% else %}
                 {{pyview.subject.status}}
             {% endif %}
         </td>
         <td><button class="btn" onclick='pyview.subject.delete()'> Delete</button></td>
     '''
+
+    def open_in_explorer(self):
+        p = self.subject.get_path()
+        if os.path.isdir(p) is False:
+            p = self.subject.path
+        os.startfile(p)
+

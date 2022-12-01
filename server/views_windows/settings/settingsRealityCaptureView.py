@@ -132,7 +132,20 @@ class SettingsRealityCaptureView(PyHtmlView):
                                 </div>
                             </div>         
                         </div>
-                    </div>                        
+                    </div>    
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-11">
+                                <strong class="mb-0">Compress models</strong>
+                                <p class="text-muted mb-0">Compress generated model files to save disk space.</p>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input class="form-check-input" id="compress_models"  type="checkbox" {% if pyview.subject.compress_models == True %}checked{% endif %} onclick='pyview.subject.set_compress_models($("#compress_models").prop("checked") === true)'>                                 
+                                </div>
+                            </div>         
+                        </div>
+                    </div>                    
                 </div>
             </div>   
         </div>

@@ -6,9 +6,6 @@ import random
 import subprocess
 import threading
 import time
-import zipfile
-from zipfile import ZIP_STORED
-
 import bottle
 import gevent
 import zipstream
@@ -58,11 +55,11 @@ class DownloadStreamer:
             gevent.sleep(sleeptime)
             cnt += 1
         try:
-            item = self.results[filename]
+            image = self.results[filename]
             del self.results[filename]
         except:
-            item = b''
-        yield item
+            image = b''
+        yield image
 
 
 class HttpEndpoints:
@@ -82,7 +79,7 @@ class HttpEndpoints:
     def rc_cache(self, path):
         filename = path.split("/")[-1]
         path = os.path.realpath(os.path.abspath(os.path.join("c:\\rc_cache", path.replace('/',"\\"))))
-        if not os.path.exists(path) or not path.startswith("C:\\rc_cache\\"):
+        if not os.path.exists(path) or not path.lower().startswith("c:\\rc_cache\\"):
             return bottle.HTTPResponse(status=404)
         headers = {
             'Content-Type': "application/%s" % filename.split(".")[-1],
@@ -104,28 +101,34 @@ class HttpEndpoints:
         response.set_header("Cache-Control", "public, max-age=36000")
         return response
 
-
     def _shot_download_model(self, shot_id, model_id):
         model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
         if model is None or model.filename == "":
             return bottle.HTTPResponse(status=404)
+        mf = model.get_model_file()
+        if mf is None:
+            return bottle.HTTPResponse(status=404)
+        filename, data = mf
         headers = {
-            'Content-Type': "application/zip",
-            'Content-Disposition': 'attachment; filename="%s"' % model.filename
+            'Content-Type': "application/%s" % filename.split(".")[-1],
+            'Content-Disposition': 'attachment; filename="%s"' % filename
         }
-        return bottle.HTTPResponse(open(model.get_path(), "rb"), **headers)
+        return bottle.HTTPResponse(data, **headers)
 
     def _shot_download_model_file(self, shot_id, model_id, filename):
         model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
         if model is None or model.filename == "":
             return bottle.HTTPResponse(status=404)
+        mf = model.get_model_file(filename)
+        if mf is None:
+            return bottle.HTTPResponse(status=404)
+        filename, data = mf
         headers = {
             'Content-Type': "application/%s" % filename.split(".")[-1],
             'Content-Disposition': 'attachment; filename="%s"' % filename,
             'Cache-Control': "public, max-age=3600"
         }
-        with zipfile.ZipFile(model.get_path(), 'r') as zip_ref:
-            return bottle.HTTPResponse(zip_ref.read(filename), **headers)
+        return bottle.HTTPResponse(data, **headers)
 
     # image_mode = normal | preview , image_type = normal | projection
     def _shot_get_image(self, shot_id, image_mode, image_type, fname):

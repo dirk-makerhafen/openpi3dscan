@@ -38,7 +38,7 @@ DEBUG = "debug" in sys.argv
 class RealityCapture(Observable):
     def __init__(self, source_ip, source_dir, shot_id, model_id, shot_name, filetype, reconstruction_quality,
                  export_quality, create_mesh_from, create_textures, lit, distances, pin, token, box_dimensions,
-                 calibration_data, debug=False):
+                 calibration_data, compress_results = True, debug=False):
         super().__init__()
         self.source_ip = source_ip
         self.source_dir = source_dir
@@ -55,6 +55,7 @@ class RealityCapture(Observable):
         self.pin = pin
         self.token = token
         self.box_dimensions = box_dimensions
+        self.compress_results = compress_results
         self.debug = debug
         self.workingdir = os.path.join(SettingsInstance().settingsCache.directory, self.shot_name)
 
@@ -68,6 +69,7 @@ class RealityCapture(Observable):
         self.export_foldername = "%s_%s%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.filetype)
 
         self.result_file = None
+        self.result_path = None
 
         self.calibrationData = CalibrationData(self, calibration_data)
         self.prepareFolder = PrepareFolder(self)
@@ -79,12 +81,18 @@ class RealityCapture(Observable):
         self.alignment = Alignment(self, distances)
         self.rawmodel = RawModel(self)
         self.exportmodel = ExportModel(self)
+
+        self.rcprojExport = None
+        self.animation = None
+        self.resultsArchive = None
+
+        if self.filetype == "rcproj":
+            self.rcprojExport = RcprojExport(self)
         if self.filetype in ["gif","webp"]:
             self.animation = Animation(self)
-            self.resultsArchive = None
-        else:
-            self.animation = None
+        elif self.compress_results is True:
             self.resultsArchive = ResultsArchive(self)
+
         self.upload   = None if self.source_ip is None else Upload(self)
         self.status = "idle"
 
@@ -106,6 +114,7 @@ class RealityCapture(Observable):
             self.calibrationDataUpdate,
             self.rawmodel,
             self.exportmodel,
+            self.rcprojExport,
             self.animation,
             self.resultsArchive,
             self.upload,
@@ -125,8 +134,9 @@ class RealityCapture(Observable):
 
         if self.status == "active":
             self.set_status("success")
-
-        if DEBUG is False:
+        print(self.result_file)
+        print(self.result_path)
+        if DEBUG is False and self.compress_results is True and os.path.exists(os.path.join(self.workingdir, self.export_foldername)):
             try:
                 shutil.rmtree(os.path.join(self.workingdir, self.export_foldername))
             except:

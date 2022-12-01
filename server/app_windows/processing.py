@@ -106,6 +106,7 @@ class Processing(Observable):
                 token                  = self.settings_instance.realityCaptureSettings.token,
                 box_dimensions         = [location.diameter, location.diameter, location.height],
                 calibration_data       = json.loads(location.calibration_data),
+                compress_results       = self.settings_instance.realityCaptureSettings.compress_models,
             )
             self.rc_tasks.insert(0, rc)
             while True:
@@ -115,7 +116,7 @@ class Processing(Observable):
                 except Exception as e:
                     traceback.print_exc()
                     print("Failed to process", e)
-                if rc.result_file is not None:
+                if rc.result_file is not None or (rc.result_path is not None and rc.compress_results is False):
                     break
                 self.set_status("failed")
                 while self.status == "failed":
@@ -123,9 +124,13 @@ class Processing(Observable):
                 if self.status != "repeat":
                     break
 
-            if rc.result_file is not None:
+            if rc.result_file is not None or rc.result_path is not None:
                 location.set_calibration_data(json.dumps(rc.calibrationData.data))
-                model.write_file(rc.result_file)
+                if rc.result_file is not None:
+                    model.write_file(rc.result_file)
+                else:
+                    model.write_folder(rc.result_path)
+
             else:
                 model.set_status("failed")
 
@@ -158,6 +163,7 @@ class Processing(Observable):
                 token                  = data["token"],
                 box_dimensions         = data["box_dimensions"],
                 calibration_data       = json.loads(data["calibration"]),
+                compress_results       = True,
             )
             self.rc_tasks.insert(0, rc)
 

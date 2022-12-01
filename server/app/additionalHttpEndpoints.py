@@ -116,23 +116,30 @@ class HttpEndpoints:
         model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
         if model is None or model.filename == "":
             return bottle.HTTPResponse(status=404)
+        mf = model.get_model_file()
+        if mf is None:
+            return bottle.HTTPResponse(status=404)
+        filename, data = mf
         headers = {
-            'Content-Type': "application/zip",
-            'Content-Disposition': 'attachment; filename="%s"' % model.filename
+            'Content-Type': "application/%s" % filename.split(".")[-1],
+            'Content-Disposition': 'attachment; filename="%s"' % filename
         }
-        return bottle.HTTPResponse(open(model.get_path(), "rb"), **headers)
+        return bottle.HTTPResponse(data, **headers)
 
     def _shot_download_model_file(self, shot_id, model_id, filename):
         model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
         if model is None or model.filename == "":
             return bottle.HTTPResponse(status=404)
+        mf = model.get_model_file(filename)
+        if mf is None:
+            return bottle.HTTPResponse(status=404)
+        filename, data = mf
         headers = {
             'Content-Type': "application/%s" % filename.split(".")[-1],
             'Content-Disposition': 'attachment; filename="%s"' % filename,
             'Cache-Control': "public, max-age=3600"
         }
-        with zipfile.ZipFile(model.get_path(), 'r') as zip_ref:
-            return bottle.HTTPResponse(zip_ref.read(filename), **headers)
+        return bottle.HTTPResponse(data, **headers)
 
     def _shot_processing_failed(self, shot_id, model_id):
         ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("failed")

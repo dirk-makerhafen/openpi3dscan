@@ -21,6 +21,8 @@ class ExportModel(GenericTask):
             os.remove(self.output_model_path)
 
         if os.path.exists(self.output_model_path):
+            if self.rc_job.compress_results is False and self.rc_job.filetype != "rcproj":
+                self.rc_job.result_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername)
             self.log.append("Using from cache")
             self.set_status("success")
             return
@@ -59,6 +61,9 @@ class ExportModel(GenericTask):
             glbf.materials[0].emissiveFactor = [1, 1, 1]
             glbf.materials[0].emissiveTexture = TextureInfo(index=0)
             glbf.save(self.output_model_path)
+
+        if self.rc_job.compress_results is False and self.rc_job.filetype != "rcproj":
+            self.rc_job.result_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername)
 
         self.log.append("Export model created")
         self.set_status("success")

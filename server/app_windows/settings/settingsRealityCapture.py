@@ -35,6 +35,7 @@ class SettingsRealityCapture(Observable):
         self.default_lit = True
         self.hide_realitycapture = False
         self.allow_rc_automation = True # dummy for frontend rendering
+        self.compress_models = False
 
     def to_dict(self):
         return {
@@ -46,6 +47,7 @@ class SettingsRealityCapture(Observable):
             "default_create_textures": self.default_create_textures,
             "default_lit": self.default_create_textures,
             "hide_realitycapture": self.hide_realitycapture,
+            "compress_models": self.compress_models,
         }
 
     def from_dict(self, data):
@@ -61,6 +63,10 @@ class SettingsRealityCapture(Observable):
             pass
         try:
             self.token = data["token"]
+        except:
+            pass
+        try:
+            self.compress_models = data["compress_models"]
         except:
             pass
 
@@ -113,5 +119,9 @@ class SettingsRealityCapture(Observable):
         self.save()
         self.notify_observers()
 
+    def set_compress_models(self, new_compress_models):
+        self.compress_models = bool(new_compress_models)
+        self.save()
+        self.notify_observers()
 
 

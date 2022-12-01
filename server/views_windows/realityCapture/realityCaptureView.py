@@ -63,16 +63,20 @@ class RealityCaptureView(PyHtmlView):
         self.calibrationDataUpdateView = GenericTaskView(subject.calibrationDataUpdate, self, "Update calibration data")
         self.rawmodelView              = GenericTaskView(subject.rawmodel, self, "Reconstruction")
         self.exportmodelView           = GenericTaskView(subject.exportmodel, self, "Create export model")
+        self.rcprojExportView = None
+        self.animationView = None
+        self.resultsArchiveView = None
+        self.uploadView = None
+
+        if subject.rcprojExport is not None:
+            self.rcprojExportView      = GenericTaskView(subject.rcprojExport, self, "Create rcproj export")
         if subject.animation is not None:
             self.animationView         = GenericTaskView(subject.animation, self, "Create animation")
-            self.resultsArchiveView    = None
-        else:
+        if subject.resultsArchive is not None:
             self.resultsArchiveView    = GenericTaskView(subject.resultsArchive, self, "Compress results")
-            self.animationView         = None
         if subject.upload is not None:
             self.uploadView            = GenericTaskView(subject.upload, self, "Upload results")
-        else:
-            self.uploadView            = None
+
 
 
 class GenericTaskView(PyHtmlView):

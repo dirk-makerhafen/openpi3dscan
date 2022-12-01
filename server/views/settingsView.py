@@ -18,7 +18,7 @@ class TaskUpdateServerView(PyHtmlView):
     {% if pyview.subject.status == "idle" %} 
         <button class="btn btnfw" onclick='pyview.subject.run();'> Update Server </button>
     {% else %}
-        <p style="color:green">{{pyview.subject.status}}</p>
+        <p style="color:green" class="h5">{{pyview.subject.status}}</p>
     {% endif %}
     '''
 

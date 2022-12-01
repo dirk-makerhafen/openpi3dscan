@@ -14,13 +14,13 @@ class FirmwareSettingsView(PyHtmlView):
                 </div>
                 <div class="list-group-item">
                     <div class="row align-items-center">
-                        <div class="col-md-10">
+                        <div class="col-md-9">
                             <strong class="mb-0">Firmware image</strong>
                             <p class="text-muted mb-0">Select firmware image to install to new SD-Cards</p>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <div class="custom-control custom-switch">
-                                <select  class="form-control" name="image" id="image"  onchange='pyview.subject.set_image($("#image").val())'>
+                                <select  class="form-control btnfw" name="image" id="image"  onchange='pyview.subject.set_image($("#image").val())'>
                                     {% for image in pyview.subject.image_files %}
                                         <option value="{{image}}" {% if pyview.subject.current_image == image   %}selected{%endif%}>{{image}}</option>
                                     {% endfor %}

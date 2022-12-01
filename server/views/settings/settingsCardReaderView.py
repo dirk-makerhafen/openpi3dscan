@@ -74,31 +74,26 @@ class CardReaderView(PyHtmlView):
                         </div>
                         <div class="list-group-item">
                             <div class="row align-items-center">
-                                <div class="col-md-1">&nbsp;</div>
-                                <div class="col-md-10">
+                                <div class="col-md-2">
                                     <strong class="mb-0">Cardreader Slots</strong>
-                                    <p class="text-muted mb-0">
-                                   <table style="width:100%;text-align:center">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align:center">Size</th>
-                                            <th style="text-align:center">Status</th>
-                                            <th style="text-align:center">Type</th>
-                                            <th style="text-align:center">ID</th>
-                                            <th style="text-align:center">NAME</th>
-                                            <th style="text-align:center">Action</th>
-                                        </tr>
-                                    </thead>    
-                                        {{pyview.slotsView.render()}}                            
-
-                                    </table>  
-
-                                    </p>
                                 </div>
-
+                                <div class="col-md-10">
+                                   <table style="width:100%;text-align:center">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align:center">Size</th>
+                                                <th style="text-align:center">Status</th>
+                                                <th style="text-align:center">Type</th>
+                                                <th style="text-align:center">ID</th>
+                                                <th style="text-align:center">NAME</th>
+                                                <th style="text-align:center">Action</th>
+                                            </tr>
+                                        </thead>    
+                                        {{pyview.slotsView.render()}}                            
+                                    </table>  
+                                </div>
                             </div>
                         </div>
-
                     </div>
                 </div>   
             </div>

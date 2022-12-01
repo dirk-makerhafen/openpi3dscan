@@ -12,11 +12,11 @@ class DropboxUploadView(PyHtmlView):
             {% if pyview.subject.last_failed != None %}
                 <p>Failed to upload {{pyview.get_last_failed()}} ago</p>
             {% endif %}
-            <button class="btn" onclick="pyview.subject.sync()">Upload now</button>
+            <button class="btn" onclick="pyview.subject.sync()">Upload to Dropbox</button>
         {% else %}
             <p>Uploading, {{pyview.subject.current_progress}}% done</p>
             {% if pyview.subject.current_upload_file != "" %}
-                <p>Current File: {{pyview.subject.current_upload_file}}</p>
+                <i>{{pyview.subject.current_upload_file}}</i>
             {% else %}
                 <p>&nbsp;</p>
             {% endif %}

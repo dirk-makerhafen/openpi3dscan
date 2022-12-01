@@ -10,7 +10,7 @@ from app.tasks.task_Whitebalance import TaskWhitebalanceInstance
 class TaskCameraBalanceView(PyHtmlView):
     TEMPLATE_STR = '''
         {% if pyview.subject.status == "idle" %} 
-            <button class="btn btnfw" onclick='pyview.subject.run();'> Calibrate all </button>
+            <button class="btn btnfw" onclick='pyview.subject.run();'> Calibrate now </button>
         {% else %}
             <p class="btn" style="color:green">Calibrating</p>
         {% endif %}

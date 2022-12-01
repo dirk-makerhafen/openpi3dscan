@@ -112,8 +112,8 @@ class DeviceRowView(PyHtmlView):
         <td> </td>
     {% endif %}
     <td style="color:#000">
-        <button onclick="pyview.install_device()"> Update </button>
-        <button onclick="pyview.reboot_device()"> Reboot </button>
+        <button class="btn" onclick="pyview.install_device()"> Update </button>
+        <button class="btn" onclick="pyview.reboot_device()"> Reboot </button>
     </td>
     '''
 

@@ -41,7 +41,7 @@ class WirelessSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Apply new wlan settings</p>
                             </div>
                             <div class="col-md-2">
-                               <button class="btn " style="margin-right:5px" onclick='pyview.subject.apply($("#wireless_ssid").val(), $("#wireless_password").val());'> Apply Changes </button>
+                               <button class="btn btnfw" onclick='pyview.subject.apply($("#wireless_ssid").val(), $("#wireless_password").val());'> Apply Changes </button>
                             </div>
                         </div>
                     </div>    
@@ -52,7 +52,7 @@ class WirelessSettingsView(PyHtmlView):
                                 <p class="text-muted mb-0">Wireless network status</p>
                             </div>
                             
-                            <div class="col-md-2" style="text-align:center">
+                            <div class="col-md-2 h5" style="text-align:center">
                                 {% if pyview.subject.status == "not_connected" %}NOT Connected{% endif %}
                                 {% if pyview.subject.status == "connecting" %}Connecting, please wait..{% endif %}
                                 {% if pyview.subject.status == "configure" %}Configuring network..{% endif %}
@@ -76,27 +76,28 @@ class WirelessSettingsView(PyHtmlView):
                             </div>
                             <div class="col-md-5">
                                 <div class="custom-control custom-switch">
-                                    <table style="width:100%;text-align:center">
-                                        <thead>
-                                        <tr>
-                                            <td>Name</td>
-                                            <td>Address</td>
-                                            <td>Frequency</td>
-                                            <td>Channel</td>
-                                            <td>Signal</td>
-                                        </tr>
-                                        </thead>
-                                        {% for wireless_network in pyview.subject.wireless_networks %}
-                                            <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
-                                                <td> {{wireless_network.ssid}} </td>
-                                                <td> {{wireless_network.bssid}} </td>
-                                                <td> {{wireless_network.frequency}} </td>
-                                                <td> {{wireless_network.channel}} </td>
-                                                <td> {{wireless_network.signal}}% </td>
+                                    {% if pyview.subject.wireless_networks|length > 0 %}
+                                        <table style="width:100%;text-align:center;margin-top:10px">
+                                            <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                <td>Address</td>
+                                                <td>Frequency</td>
+                                                <td>Channel</td>
+                                                <td>Signal</td>
                                             </tr>
-                                        {% endfor %}
-                                    </table>                 
-                                    <span class="custom-control-label"></span>
+                                            </thead>
+                                            {% for wireless_network in pyview.subject.wireless_networks %}
+                                                <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
+                                                    <td> {{wireless_network.ssid}} </td>
+                                                    <td> {{wireless_network.bssid}} </td>
+                                                    <td> {{wireless_network.frequency}} </td>
+                                                    <td> {{wireless_network.channel}} </td>
+                                                    <td> {{wireless_network.signal}}% </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table> 
+                                    {% endif %}                
                                 </div>
                             </div>
                             <div class="col-md-2">

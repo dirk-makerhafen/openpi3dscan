@@ -19,7 +19,7 @@ class SettingsDropboxView(PyHtmlView):
                                 <p class="text-muted mb-0"> </p>
                             </div>
                             <div class="col-md-1">
-                                <div class="custom-control custom-switch">
+                                <div class="custom-control custom-switch" style="text-align:center">
                                     <input id="dropbox_enabled"  type="checkbox" {% if pyview.subject.enabled == True %}checked{% endif %} onchange='pyview.subject.set_enabled($("#dropbox_enabled").prop("checked") === true)'>                                 
                                 </div>
                             </div>         

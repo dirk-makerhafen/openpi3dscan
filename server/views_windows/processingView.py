@@ -14,14 +14,24 @@ class ProcessingView(PyHtmlView):
                             <div class="row align-items-center">
                                 <div class="col-md-4 h3" >RealityCapture Automation Tasks</div>
                                 {% if pyview.subject.status == "failed" %}
-                                    <div class="col-md-6 h4" >Task failed, make sure you have enough credits available</div>
-                                    <div class="col-md-2" >
-                                        <button class="btn btn-success" onclick="pyview.subject.set_status('repeat')">Repeat Task</button><br>
-                                        <button class="btn btn-warning" onclick="pyview.subject.set_status('continue')" style="margin-top:3px;">Fail task and Continue</button>
+                                    <div class="col-md-6 h4"  style="margin-top:16px;" >Task failed, make sure you have enough credits available</div>
+                                    <div class="col-md-1" >
+                                        <button class="btn btnfw" onclick="pyview.subject.set_status('continue')"  style="margin-top:14px;">Continue</button>
+                                    </div> 
+                                    <div class="col-md-1" >
+                                        <button class="btn btnfw" onclick="pyview.subject.set_status('repeat')"  style="margin-top:14px;">Repeat</button><br>
                                     </div> 
                                 {% else %}
-                                    <div class="col-md-6" >&nbsp;</div>
-                                    <div class="col-md-2 h3" >{{pyview.subject.status}}</div>
+                                    <div class="col-md-4" >  &nbsp; </div>
+                                    <div class="col-md-2 h3" style="margin-top:16px;" > {{ pyview.subject.status }} </div>
+                                    <div class="col-md-2 " >
+                                        {% if pyview.subject.status == "processing" or pyview.subject.status == "idle" %}
+                                            <button class="btn btnfw" onclick="pyview.subject.pause()"  style="margin-top:14px;">Pause</button>
+                                        {% endif %}
+                                        {% if pyview.subject.status == "paused" %}
+                                            <button class="btn btnfw" onclick="pyview.subject.unpause()"  style="margin-top:14px;">Continue</button>
+                                        {% endif %}                                    
+                                    </div>
                                 {% endif %}
                             </div>
                         </div>

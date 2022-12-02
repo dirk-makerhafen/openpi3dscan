@@ -36,10 +36,11 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 DEBUG = "debug" in sys.argv
 
 class RealityCapture(Observable):
-    def __init__(self, source_ip, source_dir, shot_id, model_id, shot_name, filetype, reconstruction_quality,
+    def __init__(self, parent, source_ip, source_dir, shot_id, model_id, shot_name, filetype, reconstruction_quality,
                  export_quality, create_mesh_from, create_textures, lit, distances, pin, token, box_dimensions,
                  calibration_data, compress_results = True, debug=False):
         super().__init__()
+        self.parent = parent
         self.source_ip = source_ip
         self.source_dir = source_dir
         self.shot_id = shot_id
@@ -122,6 +123,7 @@ class RealityCapture(Observable):
         tasks = [task for task in tasks if task is not None]
         [task.reset() for task in tasks]
         for task in tasks:
+            self.check_pause()
             try:
                 task.run()
             except Exception as e:
@@ -134,15 +136,19 @@ class RealityCapture(Observable):
 
         if self.status == "active":
             self.set_status("success")
-        print(self.result_file)
-        print(self.result_path)
-        if DEBUG is False and self.compress_results is True and os.path.exists(os.path.join(self.workingdir, self.export_foldername)):
+
+        if self.compress_results is True and os.path.exists(os.path.join(self.workingdir, self.export_foldername)):
             try:
                 shutil.rmtree(os.path.join(self.workingdir, self.export_foldername))
             except:
                 print("Failed to delete %s" % os.path.join(self.workingdir, self.export_foldername))
 
-
+    def check_pause(self):
+        if self.parent.status == "paused" and self.status == "active":
+            self.set_status("paused")
+            while self.parent.status == "paused":
+                time.sleep(3)
+            self.set_status("active")
 
     def _clean_shot_name(self, name):
         name = name.replace("ä", "ae").replace("ü", "ue").replace("Ü", "Ue")

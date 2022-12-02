@@ -13,19 +13,9 @@ from app_windows.files.shots import ShotsInstance
 from app_windows.realityCapture.realityCapture import RealityCapture
 from app_windows.settings.settings import SettingsInstance
 
-class LogItem(Observable):
-    def __init__(self, value):
-        super().__init__()
-        self.value = value
-class Log(ObservableList):
-    def append(self, value):
-        value = LogItem(value)
-        super().append(value)
-
 class Processing(Observable):
     def __init__(self):
         super().__init__()
-        self.log = Log()
         self.dns_cache = {}
         self.status = "idle"
         self.rc_tasks = ObservableList()
@@ -33,27 +23,35 @@ class Processing(Observable):
         self.settings_instance = SettingsInstance()
         self.worker = threading.Thread(target=self._loop, daemon=True)
         self.worker.start()
+        self.pre_pause_status = ""
 
     def _loop(self):
         while True:
             work_done = False
-
             for host in self.settings_instance.settingsRemoteHosts.hosts:
+                self.check_pause()
+                self.set_status("idle")
                 host = self._resolve_host(host)
                 if host is not None:
                     if self._request_remote(host) is True:
                         work_done = True
 
+            self.check_pause()
+            self.set_status("idle")
             if self._request_local() is True:
                 work_done = True
-
             if work_done is False:
-                #print("no results, waiting some time ")
-                #self.log.append("no results, waiting some time ")
-                time.sleep(5)
+                time.sleep(60)
             else:
                 self.settings_instance.settingsCache.clean()
 
+    def pause(self):
+        if self.status != "paused":
+            self.pre_pause_status = self.status
+            self.set_status("paused")
+
+    def unpause(self):
+        self.set_status(self.pre_pause_status)
 
     def set_status(self, status):
         if self.status != status:
@@ -83,6 +81,7 @@ class Processing(Observable):
         self.set_status("processing")
 
         for model in models:
+            self.check_pause()
             model.set_status("processing")
             location = self.settings_instance.settingsLocations.get_by_location(model.parentShot.meta_location)
             if location is None:
@@ -90,6 +89,7 @@ class Processing(Observable):
                 continue
 
             rc = RealityCapture(
+                parent                 = self,
                 source_dir             = model.parentShot.path,
                 source_ip              = None,
                 shot_id                = model.parentShot.shot_id,
@@ -109,6 +109,9 @@ class Processing(Observable):
                 compress_results       = self.settings_instance.realityCaptureSettings.compress_models,
             )
             self.rc_tasks.insert(0, rc)
+            while len(self.rc_tasks) > 20:
+                del self.rc_tasks[-1]
+
             while True:
                 self.set_status("processing")
                 try:
@@ -145,8 +148,11 @@ class Processing(Observable):
         self.set_status("processing")
 
         for model in data["models"]:
+            self.check_pause()
+            self.set_status("processing")
             self.processing(server_ip, model["shot_id"], model["model_id"])
             rc = RealityCapture(
+                parent                 = self,
                 source_dir             = None,
                 source_ip              = server_ip,
                 shot_id                = model["shot_id"],
@@ -166,6 +172,8 @@ class Processing(Observable):
                 compress_results       = True,
             )
             self.rc_tasks.insert(0, rc)
+            while len(self.rc_tasks) > 20:
+                del self.rc_tasks[-1]
 
             while True:
                 self.set_status("processing")
@@ -215,6 +223,10 @@ class Processing(Observable):
                 pass
         print("%s distances loaded from server" % len(distances))
         return distances
+
+    def check_pause(self):
+        while self.status == "paused":
+            time.sleep(2)
 
     def get_unprocessed_models(self, server_ip):
         data = {}

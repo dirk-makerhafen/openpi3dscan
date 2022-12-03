@@ -50,7 +50,6 @@ class Alignment(GenericTask):
         cmd += '-deleteSelectedComponent '
         cmd += '-selectComponent "MAIN" '
         cmd += '-setReconstructionRegion "%s" ' % self.get_path("box.rcbox")
-        cmd += '-getLicense "%s" ' % self.rc_job.pin
         cmd += '-exportRegistration "%s" "%s" ' % (self.get_path("%s_alignments.csv"), self.get_path("exportRegistrationSettings.xml"))
         cmd += '-save "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
         cmd += '-quit '

@@ -61,7 +61,7 @@ class Processing(Observable):
     def _resolve_host(self, host):
         if host in self.dns_cache:
             return self.dns_cache[host]
-        for _ in range(10):
+        for _ in range(2):
             try:
                 for ip in socket.getaddrinfo(host, 80):
                     if ":" in ip[4][0]:

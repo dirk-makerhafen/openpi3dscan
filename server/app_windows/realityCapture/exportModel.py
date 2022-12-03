@@ -42,7 +42,6 @@ class ExportModel(GenericTask):
             cmd += '-calculateTexture '
             cmd += '-calculateVertexColors '
         cmd += '-renameSelectedModel "EXPORT" '
-        cmd += '-getLicense "%s" ' % self.rc_job.pin
         if self.rc_job.filetype != "rcproj":
             cmd += '-exportModel "EXPORT" "%s" ' % self.export_model_path
         else:

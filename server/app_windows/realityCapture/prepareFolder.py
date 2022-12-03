@@ -94,6 +94,9 @@ class PrepareFolder(GenericTask):
             f.write(ExportRegistrationSettings_xml)
         with open(self.get_path("xmp_settings.xml"), "w") as f:
             f.write(XMPSettings_xml)
+        if len(self.rc_job.license_data) > 0:
+            with open(self.get_path("license.rclicense"), "w") as f:
+                f.write(self.rc_job.license_data)
 
         if self.rc_job.source_ip is None:
             if not os.path.exists(os.path.join(self.rc_job.workingdir, "images")):

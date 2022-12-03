@@ -36,6 +36,7 @@ class Markers(GenericTask):
         cmd += self._get_cmd_new_scene()
         cmd += '-detectMarkers "%s" ' %  self.get_path("DetectMarkersParams.xml")
         cmd += '-getLicense "%s" ' % self.rc_job.pin
+        cmd += '-exportLicense "%s" ' % self.get_path("license.rclicense")
         cmd += '-exportControlPointsMeasurements "%s" ' % markers_csv
         cmd += '-quit '
         self._run_command(cmd, "load_markers")

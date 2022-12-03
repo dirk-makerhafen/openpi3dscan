@@ -33,7 +33,7 @@ class Shot(Observable):
         self.meta_max_rows = 7
         self.meta_rotation = 0
         self.meta_camera_one_position = "top"
-
+        self.license_data = ""
         self.nr_of_files = 0
         self.devices = None
         self.path = shot_dir
@@ -208,6 +208,7 @@ class Shot(Observable):
                     "meta_max_rows": self.meta_max_rows,
                     "meta_max_segments": self.meta_max_segments,
                     "meta_rotation": self.meta_rotation,
+                    "license_data": self.license_data,
                     "meta_camera_one_position": self.meta_camera_one_position,
                     "models" : [m.to_dict() for m in self.models]
                 }))
@@ -225,6 +226,7 @@ class Shot(Observable):
                         self.meta_max_segments = data["meta_max_segments"]
                         self.meta_rotation = data["meta_rotation"]
                         self.meta_camera_one_position = data["meta_camera_one_position"]
+                        self.license_data = data["license_data"]
                     except:
                         pass
                     try:

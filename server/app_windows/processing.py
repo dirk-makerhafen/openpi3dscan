@@ -104,6 +104,7 @@ class Processing(Observable):
                 distances              = self._parse_markers_str(location.markers),
                 pin                    = self.settings_instance.realityCaptureSettings.pin,
                 token                  = self.settings_instance.realityCaptureSettings.token,
+                license_data           = model.parentShot.license_data,
                 box_dimensions         = [location.diameter, location.diameter, location.height],
                 calibration_data       = json.loads(location.calibration_data),
                 compress_results       = self.settings_instance.realityCaptureSettings.compress_models,
@@ -133,7 +134,11 @@ class Processing(Observable):
                     model.write_file(rc.result_file)
                 else:
                     model.write_folder(rc.result_path)
-
+                if os.path.exists(os.path.join(rc.workingdir, "tmp", "license.rclicense")):
+                    data = open(os.path.join(rc.workingdir, "tmp", "license.rclicense"),"r").read()
+                    if len(data) > len(model.parentShot.license_data):
+                        model.parentShot.license_data = data
+                        model.parentShot.save()
             else:
                 model.set_status("failed")
 
@@ -167,6 +172,7 @@ class Processing(Observable):
                 distances              = self._parse_markers_str(data["markers"]),
                 pin                    = data["pin"],
                 token                  = data["token"],
+                license_data           = data["license_data"],
                 box_dimensions         = data["box_dimensions"],
                 calibration_data       = json.loads(data["calibration"]),
                 compress_results       = True,

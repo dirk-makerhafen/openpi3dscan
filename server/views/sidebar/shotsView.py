@@ -37,9 +37,13 @@ class ShotsView(ObservableListView):
             self.parent.show_shot(self.selected_shot)
 
     def search(self, value):
-        self.filter_function = lambda x: True in [ (x.subject.name.lower().find(sv) == -1 and x.subject.meta_location.lower().find(sv) == -1) for sv in value.lower().split(" ")]
+        self.filter_function = lambda x: True in [ (x.subject.name.lower().find(sv) == -1 and x.subject.meta_location.lower().find(sv) == -1 and x.subject.shot_id.lower().find(sv.replace(":","")) == -1) for sv in value.lower().split(" ")]
         self.update()
 
+
+class DropboxUploadView():
+    DOM_ELEMENT = "dummy"
+    TEMPLATE_STR = ''',{{pyview.sbject.current_progress}}%'''
 
 class ShotsItemView(PyHtmlView):
     DOM_ELEMENT_CLASS = "ShotsItemView col-md-12"
@@ -50,8 +54,23 @@ class ShotsItemView(PyHtmlView):
                {% if pyview.subject.devices == None %}{{pyview.subject.meta_location}},{% endif %} {{pyview.subject.name}} {{pyview.subject.status}}
             </div>
             <div class="info"> 
-                {% if pyview.subject.devices != None %}{{pyview.subject.nr_of_devices}},{% endif %}{{pyview.subject.nr_of_files}}{% if pyview.parent.settingsInstance.realityCaptureSettings.allow_rc_automation == True %},{{pyview.subject.nr_of_models}}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 or pyview.subject.nr_of_models_failed > 0 %}({% if pyview.subject.nr_of_models_waiting_or_processing > 0%}{{pyview.subject.nr_of_models_waiting_or_processing}}{% endif %}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 and pyview.subject.nr_of_models_failed > 0 %},{% endif %}{% if pyview.subject.nr_of_models_failed > 0%}{{pyview.subject.nr_of_models_failed}}!{% endif %}){% endif %}{% endif %} 
+                {% if pyview.subject.devices != None %}{{pyview.subject.nr_of_devices}},{% endif %}{{pyview.subject.nr_of_files}}{% if pyview.parent.settingsInstance.realityCaptureSettings.allow_rc_automation == True %},{{pyview.subject.nr_of_models}}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 or pyview.subject.nr_of_models_failed > 0 %}({% if pyview.subject.nr_of_models_waiting_or_processing > 0%}{{pyview.subject.nr_of_models_waiting_or_processing}}{% endif %}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 and pyview.subject.nr_of_models_failed > 0 %},{% endif %}{% if pyview.subject.nr_of_models_failed > 0%}{{pyview.subject.nr_of_models_failed}}!{% endif %}){% endif %}{% endif %}{% if pyview.dropboxUploadView != None %}{{pyview.dropboxUploadView.render()}}{% endif %} 
             </div>  
         </div>  
     </div>
     '''
+    def __init__(self, subject, parent):
+        super().__init__(subject, parent)
+        self.dropboxUploadView = None
+
+    def update(self):
+        if hasattr(self.subject, "dropboxUpload"):
+            if self.subject.dropboxUpload.status == "idle":
+                if self.dropboxUploadView is not None:
+                    self.dropboxUploadView.delete(remove_from_dom = False)
+                    self.dropboxUploadView = None
+            else:
+                if self.dropboxUploadView is None:
+                    self.dropboxUploadView = DropboxUploadView(self.subject.dropboxUpload, self)
+
+        super().update()

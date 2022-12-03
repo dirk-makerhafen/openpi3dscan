@@ -33,7 +33,7 @@ class Shot(Observable):
         self.meta_max_rows = 7
         self.meta_rotation = 0
         self.meta_camera_one_position = "top"
-
+        self.license_data = ""
         self.nr_of_files = 0
         self.devices = set()
         self.path = os.path.join(shot_dir, self.shot_id)
@@ -258,18 +258,23 @@ class Shot(Observable):
 
     def save(self):
         if os.path.exists(self.path):
-            with open(os.path.join(self.path, "metadata.json"), "w") as f:
-                f.write(json.dumps({
-                    "name": self.name,
-                    "comment": self.comment,
-                    "meta_location": self.meta_location,
-                    "meta_max_rows": self.meta_max_rows,
-                    "meta_max_segments": self.meta_max_segments,
-                    "meta_rotation": self.meta_rotation,
-                    "meta_camera_one_position": self.meta_camera_one_position,
-                    "models" : [m.to_dict() for m in self.models],
-                    "dropbox" : self.dropboxUpload.to_dict(),
-                }))
+            try:
+                data = json.dumps({
+                        "name": self.name,
+                        "comment": self.comment,
+                        "meta_location": self.meta_location,
+                        "meta_max_rows": self.meta_max_rows,
+                        "meta_max_segments": self.meta_max_segments,
+                        "meta_rotation": self.meta_rotation,
+                        "meta_camera_one_position": self.meta_camera_one_position,
+                        "license_data": self.license_data,
+                        "models" : [m.to_dict() for m in self.models],
+                        "dropbox" : self.dropboxUpload.to_dict(),
+                    })
+                with open(os.path.join(self.path, "metadata.json"), "w") as f:
+                    f.write(data)
+            except:
+                print("failed to save metadata")
 
     def backup_meta(self):
         with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "w") as f:
@@ -281,6 +286,7 @@ class Shot(Observable):
                 "meta_max_segments": self.meta_max_segments,
                 "meta_rotation": self.meta_rotation,
                 "meta_camera_one_position": self.meta_camera_one_position,
+                "license_data": self.license_data,
             }))
 
     def load(self):
@@ -296,6 +302,7 @@ class Shot(Observable):
                         self.meta_max_segments = data["meta_max_segments"]
                         self.meta_rotation = data["meta_rotation"]
                         self.meta_camera_one_position = data["meta_camera_one_position"]
+                        self.license_data = data["license_data"]
                     except:
                         pass
                     try:
@@ -307,7 +314,8 @@ class Shot(Observable):
                     except:
                         pass
             except Exception as e:
-                print("failed to load", e)
+                print("failed to load %s" % os.path.join(self.path, "metadata.json"), e)
+
         elif os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id):
             try:
                 with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "r") as f:
@@ -320,6 +328,7 @@ class Shot(Observable):
                         self.meta_max_segments = data["meta_max_segments"]
                         self.meta_rotation = data["meta_rotation"]
                         self.meta_camera_one_position = data["meta_camera_one_position"]
+                        self.license_data = data["license_data"]
                     except:
                         pass
             except Exception as e:

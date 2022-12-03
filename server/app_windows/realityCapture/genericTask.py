@@ -65,6 +65,11 @@ class GenericTask(Observable):
             cmd += '-set "appQuitOnError=true" '
         if self.rc_job.token != "":
             cmd += '-activate %s ' % self.rc_job.token
+
+        lp = self.get_path("license.rclicense")
+        if os.path.exists(lp):
+            cmd += '-importLicense "%s" ' % lp
+
         return cmd
 
     def _run_command(self, cmd, name):

@@ -37,7 +37,7 @@ DEBUG = "debug" in sys.argv
 
 class RealityCapture(Observable):
     def __init__(self, parent, source_ip, source_dir, shot_id, model_id, shot_name, filetype, reconstruction_quality,
-                 export_quality, create_mesh_from, create_textures, lit, distances, pin, token, box_dimensions,
+                 export_quality, create_mesh_from, create_textures, lit, distances, pin, token, license_data, box_dimensions,
                  calibration_data, compress_results = True, debug=False):
         super().__init__()
         self.parent = parent
@@ -55,6 +55,7 @@ class RealityCapture(Observable):
         self.lit = lit
         self.pin = pin
         self.token = token
+        self.license_data = license_data
         self.box_dimensions = box_dimensions
         self.compress_results = compress_results
         self.debug = debug

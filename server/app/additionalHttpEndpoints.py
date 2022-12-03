@@ -78,6 +78,7 @@ class HttpEndpoints:
         bottle.route("/shots/<shot_id>/processing/<model_id>")(self._shot_processing)
         bottle.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
         bottle.route("/shots/<shot_id>/upload/<model_id>", method="POST")(self._shot_upload_model)
+        bottle.route("/shots/<shot_id>/upload_license", method="POST")(self._shot_upload_license)
         bottle.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
         bottle.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
         bottle.route("/shots/<shot_id>/<image_mode>/<image_type>/<fname>.jpg")(self._shot_get_image)  # return remote shot as jpeg
@@ -99,6 +100,7 @@ class HttpEndpoints:
             model["shot_id"] = shot.shot_id
             model["shot_name"] = shot.name
             model["shot_location"] = shot.meta_location
+            model["license_data"] = shot.license_data
             data["models"].append(model)
         if len(data["models"]) > 0:
             data["markers"] = SettingsInstance().realityCaptureSettings.markers
@@ -126,6 +128,7 @@ class HttpEndpoints:
         }
         return bottle.HTTPResponse(data, **headers)
 
+
     def _shot_download_model_file(self, shot_id, model_id, filename):
         model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
         if model is None or model.filename == "":
@@ -150,6 +153,12 @@ class HttpEndpoints:
     def _shot_upload_model(self, shot_id, model_id):
         file = request.files.get('upload_file').file
         ShotsInstance().get(shot_id).get_model_by_id(model_id).write_file(file)
+
+    def _shot_upload_license(self, shot_id):
+        shot = ShotsInstance().get(shot_id)
+        if shot is not None and len(shot.license_data) < len(request.json["data"]):
+            shot.license_data = request.json["data"]
+            shot.save()
 
     # image_mode = normal | preview , image_type = normal | projection
     def _shot_get_image(self, shot_id, image_mode, image_type, fname):

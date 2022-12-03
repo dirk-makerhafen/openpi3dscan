@@ -83,6 +83,7 @@ class ShotDropboxUpload(Observable):
         self.shot.save()
         self.dropbox.close()
         self.set_status("idle")
+        self.shot.notify_observers()
         self.worker = None
 
     def _sync(self):

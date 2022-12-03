@@ -41,9 +41,9 @@ class ShotsView(ObservableListView):
         self.update()
 
 
-class DropboxUploadView():
+class SidebarDropboxUploadView(PyHtmlView):
     DOM_ELEMENT = "dummy"
-    TEMPLATE_STR = ''',{{pyview.sbject.current_progress}}%'''
+    TEMPLATE_STR = ''',{{pyview.subject.current_progress}}%'''
 
 class ShotsItemView(PyHtmlView):
     DOM_ELEMENT_CLASS = "ShotsItemView col-md-12"
@@ -71,6 +71,5 @@ class ShotsItemView(PyHtmlView):
                     self.dropboxUploadView = None
             else:
                 if self.dropboxUploadView is None:
-                    self.dropboxUploadView = DropboxUploadView(self.subject.dropboxUpload, self)
-
+                    self.dropboxUploadView = SidebarDropboxUploadView(self.subject.dropboxUpload, self)
         super().update()

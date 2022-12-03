@@ -172,7 +172,7 @@ class Processing(Observable):
                 distances              = self._parse_markers_str(data["markers"]),
                 pin                    = data["pin"],
                 token                  = data["token"],
-                license_data           = data["license_data"],
+                license_data           = model["license_data"],
                 box_dimensions         = data["box_dimensions"],
                 calibration_data       = json.loads(data["calibration"]),
                 compress_results       = True,

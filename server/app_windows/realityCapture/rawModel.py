@@ -39,10 +39,11 @@ class RawModel(GenericTask):
             cmd += self._get_cmd_cleanup_lower_region()
             cmd += '-rotateReconstructionRegion 0 0 30 '  #
         cmd += '-cleanModel '
-        cmd += '-closeHoles '
 
         # cmd += '-smooth '
         cmd += '-simplify 4000000 '
+        cmd += '-closeHoles '
+
         cmd += '-selectLargestModelComponent '
         cmd += '-invertTrianglesSelection '
         cmd += '-removeSelectedTriangles '

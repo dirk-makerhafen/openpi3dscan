@@ -57,7 +57,6 @@ class ShotDropboxUpload(Observable):
             self.last_success = None
             self.last_failed = int(time.time())
             self.set_status("idle")
-            self.dropbox.close()
             self.worker = None
             return
 

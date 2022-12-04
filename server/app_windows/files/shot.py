@@ -234,7 +234,7 @@ class Shot(Observable):
                     except:
                         pass
             except Exception as e:
-                print("failed to load", e)
+                print("failed to load %s" % os.path.join(self.path, "metadata.json"), e)
 
         self.path_exists = os.path.exists(self.path)
         if self.path_exists is True and self.nr_of_files == 0:

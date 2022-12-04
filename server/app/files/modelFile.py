@@ -21,16 +21,6 @@ class ModelFile(Observable):
         self.filename = ""
         self.filesize = 0
         self.create_textures = create_textures
-
-        self.rcStr = self.reconstruction_quality[0].upper()
-        self.qStr = self.quality[0].upper()
-        self.meshFromStr = self.create_mesh_from[0].upper()
-        self.textureStr = "T" if self.create_textures else ""
-        if self.filetype in ["gif", "webp", "glb"]:
-            self.litUnlitStr = ("L" if self.lit else "U") if self.create_textures else ""
-        else:
-            self.litUnlitStr = ""
-
         self.path = os.path.join(self.parentShot.path, "models")
 
     def set_status(self, new_status):
@@ -43,7 +33,8 @@ class ModelFile(Observable):
         ext = ".zip"
         if self.filetype in ["gif", "webp"]:
             ext = ""
-        self.filename = "%s_%s%s%s%s%s.%s%s" % (self.parentShot.get_clean_shotname(), self.rcStr, self.qStr, self.meshFromStr, self.textureStr, self.litUnlitStr, self.filetype, ext)
+        self.filename = self._create_filename("%s_%s%s%s%s%s.%s")
+        self.filename = "%s%s" % (self.filename, ext)
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         with FileObjectThread(os.path.join(self.path, self.filename), "wb") as f:
@@ -59,7 +50,7 @@ class ModelFile(Observable):
         self.set_status("ready")
 
     def write_folder(self, sourcefolder):
-        self.filename = "%s_%s%s%s%s%s_%s" % (self.parentShot.get_clean_shotname(), self.rcStr, self.qStr, self.meshFromStr, self.textureStr, self.litUnlitStr, self.filetype)
+        self.filename = self._create_filename("%s_%s%s%s%s%s_%s")
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         target_dir = os.path.join(self.path, self.filename)
@@ -81,6 +72,18 @@ class ModelFile(Observable):
             self.filesize = int(self.filesize)
 
         self.set_status("ready")
+
+    def _create_filename(self, pattern):
+        rcStr = self.reconstruction_quality[0].upper()
+        qStr = self.quality[0].upper()
+        meshFromStr = self.create_mesh_from[0].upper()
+        textureStr = "T" if self.create_textures else ""
+        if self.filetype in ["gif", "webp", "glb"]:
+            litUnlitStr = ("L" if self.lit else "U") if self.create_textures else ""
+        else:
+            litUnlitStr = ""
+        filename = pattern % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, litUnlitStr, self.filetype)
+        return filename
 
     def get_model_file(self, filename = None):
         if self.filetype in ["gif", "webp"]:

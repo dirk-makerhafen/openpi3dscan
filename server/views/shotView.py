@@ -8,8 +8,6 @@ from views.shot.shotFilesView import ShotFilesView
 from views.shot.shotModelsView import ShotModelsView
 from views.shot.shotComentsView import ShotCommentsView
 from views.imageCarousel.imageCarouselStatic import ImageCarouselStatic
-from app.files.shots import ShotsInstance
-
 
 class ShotView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -102,7 +100,7 @@ class ShotView(PyHtmlView):
     </div>   
     '''
 
-    def __init__(self, subject: App, parent, settingsInstance):
+    def __init__(self, subject: App, parent, settingsInstance, shotsInstance):
         super().__init__(subject, parent)
         self.imageCarousel = ImageCarouselStatic(self.subject, self)
         self.shotModels = ShotModelsView(self.subject, self, settingsInstance)
@@ -113,6 +111,7 @@ class ShotView(PyHtmlView):
         self.can_sync = True
         self.show_path = False
         self.settingsInstance = settingsInstance
+        self.shotsInstance = shotsInstance
 
     def open_in_explorer(self):
         if self.current_shot is not None:
@@ -146,7 +145,7 @@ class ShotView(PyHtmlView):
         self.shotFiles.toggle()
 
     def delete_shot(self):
-        ShotsInstance().delete(self.current_shot)
+        self.shotsInstance.delete(self.current_shot)
         self.current_shot._deleted = True
         if self.is_visible:
             self.update()

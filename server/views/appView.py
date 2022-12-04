@@ -12,6 +12,7 @@ from .shotView import ShotView
 from .devicesView import DevicesView
 from .liveView import LiveView
 from .sidebar.sidebarView import SidebarView
+from app_windows.files.shots import ShotsInstance
 
 class CurrentView(PyHtmlView):
     TEMPLATE_STR = '''{{ pyview.current_view.render()}}'''
@@ -19,7 +20,7 @@ class CurrentView(PyHtmlView):
         super().__init__(subject, parent)
         self.devicesView = DevicesView(subject=subject.devices, parent=self)
         self.liveView = LiveView(subject=subject, parent=self)
-        self.shotView = ShotView(subject=subject, parent=self, settingsInstance=SettingsInstance())
+        self.shotView = ShotView(subject=subject, parent=self, settingsInstance=SettingsInstance(), shotsInstance=ShotsInstance())
         self.settingsView = SettingsView(self.subject, self)
         self.current_view = self.devicesView
 

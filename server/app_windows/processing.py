@@ -128,7 +128,7 @@ class Processing(Observable):
                 if self.status != "repeat":
                     break
 
-            if rc.result_file is not None or rc.result_path is not None:
+            if (rc.result_file is not None or rc.result_path is not None) and rc.status != "failed":
                 location.set_calibration_data(json.dumps(rc.calibrationData.data))
                 if rc.result_file is not None:
                     model.write_file(rc.result_file)
@@ -196,7 +196,7 @@ class Processing(Observable):
                 if self.status != "repeat":
                     break
 
-            if rc.result_file is None:
+            if rc.result_file is None or rc.status == "failed":
                 self.process_failed(server_ip, model["shot_id"], model["model_id"])
             else:
                 if "shot_location" in model:

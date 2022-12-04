@@ -239,6 +239,10 @@ class HttpEndpoints:
         return response
 
     def force_update(self):
+        app_dir_name = "server"
+        if os.path.exists("/home/pi/openpi3dscan/apps"):
+            app_dir_name = "apps"
+
         output = "Update and system reboot triggered, this will take 2-3 minutes!\n\n"
         output += "UPDATE LOG:\n"
         if os.path.exists("/home/pi/openpi3dscan"):
@@ -246,7 +250,7 @@ class HttpEndpoints:
         else:
             output += subprocess.check_output("cd /home/pi/ ; git clone 'https://github.com/dirk-makerhafen/openpi3dscan.git'", shell=True, stderr=subprocess.STDOUT).decode("utf-8")
         output += "\n"
-        output += subprocess.check_output("cd /home/pi/openpi3dscan/server ; sudo python3 run.py install", shell=True, stderr=subprocess.STDOUT).decode("utf-8")
+        output += subprocess.check_output("cd /home/pi/openpi3dscan/%s ; sudo python3 run.py install" % app_dir_name, shell=True, stderr=subprocess.STDOUT).decode("utf-8")
         def f():
             time.sleep(5)
             os.system("sudo reboot &")

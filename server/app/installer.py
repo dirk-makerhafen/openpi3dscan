@@ -8,17 +8,21 @@ class Installer():
 
     def run(self):
         # COPY TO TARGET
-        if SCRIPT_DIR != "/opt/openpi3dscan/server/app":
+        apps_dir_name = "server"
+        if SCRIPT_DIR == "/opt/openpi3dscan/apps/app" or os.path.exists(os.path.join(SCRIPT_DIR, "..", "..", "apps")):
+            apps_dir_name = "apps"
+
+        if SCRIPT_DIR != "/opt/openpi3dscan/%s/app" % apps_dir_name:
             self.shell("sudo mkdir -p /shots")
-            self.shell("sudo mkdir -p /opt/openpi3dscan/server")
+            self.shell("sudo mkdir -p /opt/openpi3dscan/%s" % apps_dir_name)
             self.shell("sudo mkdir -p /opt/openpi3dscan/client")
-            self.shell("sudo mkdir -p /opt/openpi3dscan/realityCapture")
+            if os.path.exists("/opt/openpi3dscan/realityCapture"):
+                self.shell("sudo rm -r /opt/openpi3dscan/realityCapture")
             self.shell("sudo mkdir -p /opt/openpi3dscan/firmware")
             self.shell("sudo mkdir -p /opt/openpi3dscan/meta")  # meta data backup dir
-            self.shell('sudo rsync --delete -rav %s/../*                    /opt/openpi3dscan/server/ ' % SCRIPT_DIR)
+            self.shell('sudo rsync --delete -rav %s/../*                    /opt/openpi3dscan/%s/ ' % (SCRIPT_DIR, apps_dir_name))
             self.shell('sudo rsync --delete -rav %s/../../client/*          /opt/openpi3dscan/client/ ' % SCRIPT_DIR)
-            self.shell('sudo rsync --delete -rav %s/../../realityCapture/*  /opt/openpi3dscan/realityCapture/ ' % SCRIPT_DIR)
-    
+
             for imgzippath in glob.glob("%s/../../firmware/*.img.zip" % SCRIPT_DIR):
                 imgfile = imgzippath.split("/")[-1].replace(".zip", "")
                 if not os.path.exists("/opt/openpi3dscan/firmware/%s" % imgfile):
@@ -26,10 +30,10 @@ class Installer():
                     self.shell("cd /opt/openpi3dscan/firmware/ ; unzip '%s.zip' ; rm '%s.zip'" % (imgfile, imgfile))
     
         # LISTEN ON ALL IPS, PORT 80
-        self.shell("cat /opt/openpi3dscan/server/run.py | sed s/'127.0.0.1'/'0.0.0.0'/g | sed s/'8888'/'80'/g > 1 ; sudo mv 1 /opt/openpi3dscan/server/run.py ")
+        self.shell("cat /opt/openpi3dscan/%s/run.py | sed s/'127.0.0.1'/'0.0.0.0'/g | sed s/'8888'/'80'/g > 1 ; sudo mv 1 /opt/openpi3dscan/%s/run.py " % (apps_dir_name, apps_dir_name))
     
         # REQUIREMENTS
-        self.shell("cd /opt/openpi3dscan/server/ ; sudo pip3 install -r requirements.txt")
+        self.shell("cd /opt/openpi3dscan/%s/ ; sudo pip3 install -r requirements.txt" % apps_dir_name)
         self.shell('sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" update')
         self.shell('sudo DEBIAN_FRONTEND=noninteractive apt-get -y --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install avahi-daemon ntp dnsmasq iptables ntpdate ntp')
     
@@ -103,7 +107,7 @@ class Installer():
         self.shell("echo 'sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE' >> 1")
         self.shell("echo 'sudo iptables -A FORWARD -i wlan0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT' >> 1")
         self.shell("echo 'sudo iptables -A FORWARD -i eth0 -o wlan0 -j ACCEPT' >> 1")
-        self.shell("echo 'sudo python3 /opt/openpi3dscan/server/run.py &' >> 1")
+        self.shell("echo 'sudo python3 /opt/openpi3dscan/%s/run.py &' >> 1" % apps_dir_name)
         self.shell("echo 'exit 0' >> 1")
         self.shell("sudo chown root:root 1 ; sudo chmod +x 1 ; sudo mv 1 /etc/rc.local ")
     

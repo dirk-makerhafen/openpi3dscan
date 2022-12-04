@@ -89,7 +89,7 @@ class SettingsScannerView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-10">
                                 <strong class="mb-0">Flipped cameras</strong>
-                                <p class="text-muted mb-0">In case some cameras are upsite down, add their names as a coma separated list. eg: SEG1-CAM2,SEG23-CAM4. Device must be updated after changes.</p>
+                                <p class="text-muted mb-0">In case some cameras are upsite down, add their names as a comma separated list. eg: SEG1-CAM2,SEG23-CAM4. Device must be updated after changes.</p>
                             </div>
                             <div class="col-md-2">
                                 <div class="custom-control custom-switch">

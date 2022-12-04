@@ -9,6 +9,13 @@ def download(url, filename):
     with open(os.path.join(BUILDFOLDER, filename),"wb") as f:
         f.write(requests.get(url).content)
 
+def unzip(filename):
+    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (BUILDFOLDER, filename))
+
+def un7zip(filename):
+    os.system("cd \"%s\" & \"c:\\Program Files\\7-Zip\\7z.exe\" x \"%s\"" % (BUILDFOLDER, os.path.join(BUILDFOLDER, filename)))
+
+
 os.system("pyinstaller --noconfirm app_windows.spec")
 os.system("pyinstaller --noconfirm --onefile app_windows/rc_rebase.py")
 
@@ -17,22 +24,22 @@ if not os.path.exists(BUILDFOLDER):
 
 if not os.path.exists(os.path.join(BUILDFOLDER,"convert.exe")):
     download("https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-portable-Q16-x64.zip", "imagemagick.zip")
-    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (BUILDFOLDER, "imagemagick.zip"))
+    unzip("imagemagick.zip")
     shutil.move(os.path.join(BUILDFOLDER,"imagemagick","convert.exe"), BUILDFOLDER)
 
 if not os.path.exists(os.path.join(BUILDFOLDER,"gifsicle.exe")):
     download("https://eternallybored.org/misc/gifsicle/releases/gifsicle-1.92-win64.zip", "gifsicle.zip")
-    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (BUILDFOLDER, "gifsicle.zip"))
+    unzip("gifsicle.zip")
     shutil.move(os.path.join(BUILDFOLDER,"gifsicle","gifsicle-1.92","gifsicle.exe"), BUILDFOLDER)
 
 if not os.path.exists(os.path.join(BUILDFOLDER,"chromedriver.exe")):
     download("https://chromedriver.storage.googleapis.com/103.0.5060.134/chromedriver_win32.zip", "chromedriver.zip")
-    os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (BUILDFOLDER, "chromedriver.zip"))
+    unzip("chromedriver.zip")
     shutil.move(os.path.join(BUILDFOLDER,"chromedriver","chromedriver.exe"), BUILDFOLDER)
 
 if not os.path.exists(os.path.join(BUILDFOLDER,"chromium")):
     download("https://github.com/portapps/ungoogled-chromium-portable/releases/download/103.0.5060.114-15/ungoogled-chromium-portable-win64-103.0.5060.114-15.7z", "chromium.7z")
-    os.system("cd \"%s\" & \"c:\\Program Files\\7-Zip\\7z.exe\" x \"%s\"" % (BUILDFOLDER, os.path.join(BUILDFOLDER,"chromium.7z")))
+    un7zip("chromium.7z")
     shutil.move(os.path.join(BUILDFOLDER,"app"), os.path.join(BUILDFOLDER,"chromium"))
 
 filesToRemove = [ os.path.join(BUILDFOLDER, f) for f in [

@@ -1,16 +1,11 @@
-import datetime
-import json
-import os,sys, dropbox
+import os
+import dropbox
 import threading
 import time
-import unicodedata
 from dropbox import files, exceptions
-import six
 from pyhtmlgui import Observable
-
 from app_windows.settings.settings import SettingsInstance
 from app_windows.files.shots import ShotsInstance
-from dropbox import DropboxOAuth2FlowNoRedirect
 
 
 class ShotsDropboxDownload(Observable):

@@ -21,7 +21,7 @@ class Upload(GenericTask):
                 self.set_status("failed")
                 return
 
-        self.log.append("Uploading calibration data" % self.rc_job.source_ip)
+        self.log.append("Uploading calibration data")
         try:
             requests.post("http://%s/upload_calibration" % (self.rc_job.source_ip), json={"data": json.dumps(self.rc_job.calibrationData.data)})
         except:
@@ -30,7 +30,7 @@ class Upload(GenericTask):
             return
 
         if os.path.exists(os.path.join(self.rc_job.workingdir, "tmp", "license.rclicense")):
-            self.log.append("Uploading license data" % self.rc_job.source_ip)
+            self.log.append("Uploading license data")
             try:
                 requests.post("http://%s/shots/%s/upload_license" % (self.rc_job.source_ip, self.rc_job.shot_id) ,json={"data": open(os.path.join(self.rc_job.workingdir, "tmp", "license.rclicense"),"r").read()})
             except:

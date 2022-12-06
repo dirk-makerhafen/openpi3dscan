@@ -12,10 +12,15 @@ from app.settings.settings import SettingsInstance
 from dropbox import DropboxOAuth2FlowNoRedirect
 
 
-class ShotDropboxUpload(Observable):
+class ShotDropboxPublicSharing(Observable):
     def __init__(self, shot):
         super().__init__()
         self.shot = shot
+        self.link = ""
+        self.upload_images = True
+        self.upload_models = []
+        self.compressed = True
+
         self.dropbox = None
         self.last_success = None
         self.last_failed = None

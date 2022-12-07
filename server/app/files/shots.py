@@ -14,10 +14,11 @@ class Shots:
         self.cache = {}
         self.devices = devices
         self.deleted_shot_ids = []
+        self.unprocessed_models = []
         self.load()
 
     def create(self, shot_id, name):
-        s = Shot(self.path, shot_id)
+        s = Shot(self.path, shot_id, self)
         s.meta_location = SettingsInstance().settingsScanner.location
         s.meta_max_segments = SettingsInstance().settingsScanner.segments
         s.meta_max_rows = SettingsInstance().settingsScanner.cameras_per_segment
@@ -47,7 +48,7 @@ class Shots:
             return
         s = self.get(shot_id)
         if s is None:
-            s = Shot(self.path, shot_id)
+            s = Shot(self.path, shot_id, self)
             index = 0
             for i in range(len(self.shots)):
                 index = i
@@ -77,14 +78,18 @@ class Shots:
             if shot.shot_id not in shot_ids:
                 shot.remove_device(device)
 
-    def get_unprocessed_models(self, limit = None):
+    def get_unprocessed_models(self, limit = 1):
         models = []
-        for shot in self.shots:
-            for m in shot.get_models_by_status("waiting"):
-                models.append(m)
-                if limit is not None and len(models) >= limit:
-                    return models
-        return models
+        while True:
+            try:
+                model = self.unprocessed_models[0]
+            except:
+                return models
+            self.unprocessed_models.remove(model)
+            if model.status == "waiting":
+                models.append(model)
+            if len(models) >= limit:
+                return models
 
     def _add_deleted_shot_id(self, shot_id):
         if shot_id not in self.deleted_shot_ids:
@@ -114,9 +119,14 @@ class Shots:
                 shot_id = os.path.split(path)[1]
                 shot = self.get(shot_id)
                 if shot is None:
-                    self.shots.append(Shot(self.path, shot_id))
+                    shot = Shot(self.path, shot_id, self)
+                    self.shots.append(shot)
                 else:
                     shot.load()
+                for model in shot.models:
+                    if model.status == "waiting" and model not in self.unprocessed_models:
+                        self.unprocessed_models.append(model)
+
         self.shots.sort(reverse=True)
 
 

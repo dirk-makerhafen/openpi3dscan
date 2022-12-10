@@ -21,6 +21,7 @@ MARKERS_PRELOAD = '''
 '''
 
 
+
 class SettingsRealityCapture(Observable):
     def __init__(self, parent):
         super().__init__()

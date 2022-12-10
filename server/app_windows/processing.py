@@ -102,6 +102,7 @@ class Processing(Observable):
                 create_textures        = model.create_textures,
                 lit                    = model.lit,
                 distances              = self._parse_markers_str(location.markers),
+                ground_points          = self._parse_groundpoints_str(location.ground_points),
                 pin                    = self.settings_instance.realityCaptureSettings.pin,
                 token                  = self.settings_instance.realityCaptureSettings.token,
                 license_data           = model.parentShot.license_data,
@@ -170,6 +171,7 @@ class Processing(Observable):
                 create_textures        = model["create_textures"],
                 lit                    = model["lit"],
                 distances              = self._parse_markers_str(data["markers"]),
+                ground_points          = self._parse_groundpoints_str(data["ground_points"]),
                 pin                    = data["pin"],
                 token                  = data["token"],
                 license_data           = model["license_data"],
@@ -229,6 +231,16 @@ class Processing(Observable):
                 pass
         print("%s distances loaded from server" % len(distances))
         return distances
+
+    def _parse_groundpoints_str(self, groundpoints_str):
+        ground_points = []
+        for line in sorted(groundpoints_str.split("\n")):
+            while "  " in line:
+                line = line.replace("  ").strip()
+            line = line.split("#")[0].strip()
+            if line.count(" ") == 3:
+                ground_points.append(line.split(" "))
+        return ground_points
 
     def check_pause(self):
         while self.status == "paused":

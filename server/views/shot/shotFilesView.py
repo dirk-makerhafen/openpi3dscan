@@ -6,6 +6,54 @@ from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 from views.shot.shotDropboxUploadView import DropboxUploadView
 
 
+class DropboxSharingView(PyHtmlView):
+    TEMPLATE_STR = '''
+        <div class="row">
+            <div class="col-md-12" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">Sharing</div>
+                {% if pyview.dropboxSharingView is None % }
+                    <div class="col-md-12">
+                        <table style="width:100%;text-align:center">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center">Type</th>
+                                    <th style="text-align:center">Name</th>
+                                    <th style="text-align:center">Expire in Weeks</th>
+                                    <th style="text-align:center">Compress</th>
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tr style="border-top: 1px solid lightgray;    line-height: 3em;">
+                                <td style="padding-left: 5px;padding-right: 5px;">
+                                    <select style="" class="form-control" name="filetype" id="link_type">
+                                        <option value="single">This shot</option>
+                                        <option value="group">Group of shots</option>         
+                                    </select>
+                                </td>
+                                <td> <input id="name" value="remote folder name" />  </td>
+                                <td> <input id="exire_in_weeks" value="23"/>  </td>
+                                <td> <input id="compress" {% if pyview.settingsInstance.realityCaptureSettings.default_lit == true %}checked{% endif %} type="checkbox"/>  </td>
+                                <td> <button class="form-control btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked, $("#lit_unlit")[0].checked);'> Create Link </button></td>
+                            </tr>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="col-md-6">url</div>
+                    <div class="col-md-3">expire in</div>
+                    <div class="col-md-3">delete</div>
+                    <div class="col-md-12">
+                        
+                    </div>
+                {% endif %}
+            
+        </div>
+
+
+
+
+
+
+'''
+
 class ShotFilesView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="row" style="margin-bottom: 10px;">
@@ -13,10 +61,10 @@ class ShotFilesView(PyHtmlView):
         <div class="col-md-1" style="font-weight:bold;cursor: pointer" onclick='pyview.hide()'>
             <a style="text-align: right;float: right;color: gray;"> Close </a>
         </div>
-        <div class="col-md-8" style="padding-left:20px">
-            <p><a href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a> </p>
+        <div class="col-md-7" style="padding-left:20px">
+            <p class="h5"><a href="/shots/{{pyview.parent.current_shot.shot_id}}.zip"><i class="fa fa-download" aria-hidden="true"></i> {{pyview.parent.current_shot.get_clean_shotname()}}.zip </a> </p>
             {% if pyview.parent.show_path == True %}
-                <p><a href="#" onclick="pyview.open_images_in_explorer()">{{pyview.current_shot.images_path}}</a></p>
+                <p class="h5"><a href="#" onclick="pyview.open_images_in_explorer()">{{pyview.current_shot.images_path}}</a></p>
             {% endif %}
         </div>
         {% if pyview.settingsInstance.settingsDropbox.refresh_token != "" and pyview.dropboxUploadView != None %}
@@ -105,6 +153,7 @@ class ShotFilesView(PyHtmlView):
         self.current_shot = None
         self.filesListView = ObservableListView(self.current_models_list, self, item_class=ModelFileItemView, dom_element="tbody")
         self.dropboxUploadView = None
+        self.dropboxSharingView = None
 
     def show(self):
         if self.is_hidden is True and self.is_visible:
@@ -161,9 +210,9 @@ class ModelFileItemView(PyHtmlView):
         <td>
             {% if pyview.subject.status == "ready" %} 
                  {% if pyview.parent.parent.parent.show_path == True %}
-                    <p><a href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.filename}} </a> ({{pyview.subject.filesize}} MB)</p>
+                    <a href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.filename}} </a> ({{pyview.subject.filesize}} MB)
                 {% else %}
-                    <p><a href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}} </a> ({{pyview.subject.filesize}} MB)</p>
+                    <a href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}} </a> ({{pyview.subject.filesize}} MB)
                 {% endif %}
             {% else %}
                 {{pyview.subject.status}}

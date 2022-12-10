@@ -21,8 +21,9 @@ from app_windows.settings.settings import SettingsInstance
 SyncThreadPool = ThreadPool(8)
 
 class Shot(Observable):
-    def __init__(self, shot_dir, shot_id):
+    def __init__(self, shot_dir, shot_id, parent_shots):
         super().__init__()
+        self.parent_shots = parent_shots
         self.shot_id = shot_id
         self.name = self.shot_id
         self.status = ""
@@ -168,7 +169,9 @@ class Shot(Observable):
                 model.delete()
                 model = None
         if model is None:
-            self.models.append(ModelFile(self, filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures, lit=lit))
+            model = ModelFile(self, filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures, lit=lit)
+            self.parent_shots.unprocessed_models.append(model)
+            self.models.append(model)
             self.save()
         self.notify_observers()
 

@@ -12,7 +12,7 @@ from .shotView import ShotView
 from .devicesView import DevicesView
 from .liveView import LiveView
 from .sidebar.sidebarView import SidebarView
-from app_windows.files.shots import ShotsInstance
+from app.files.shots import ShotsInstance
 
 class CurrentView(PyHtmlView):
     TEMPLATE_STR = '''{{ pyview.current_view.render()}}'''

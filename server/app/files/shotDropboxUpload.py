@@ -1,6 +1,7 @@
 import datetime
 import json
 import os,sys, dropbox
+import queue
 import threading
 import time
 import unicodedata
@@ -126,8 +127,7 @@ class ShotDropboxUpload(Observable):
             res = self._upload_file(source, destination)
             if res is None:
                 all_in_sync = False
-        self.current_progress = 0
-        self.notify_observers()
+
         if all_in_sync is True:
             res = self._upload_data(
                 json.dumps({
@@ -144,6 +144,7 @@ class ShotDropboxUpload(Observable):
                 all_in_sync = False
 
         self.all_in_sync = all_in_sync
+        self.current_progress = 0
 
     def _clean_for_filesystem(self, value):
         name = value

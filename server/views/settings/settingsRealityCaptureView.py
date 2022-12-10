@@ -69,6 +69,19 @@ class RealityCaptureView(PyHtmlView):
                         <div class="list-group-item">
                             <div class="row align-items-center">
                                 <div class="col-md-8">
+                                    <strong class="mb-0">Ground Control Points</strong>
+                                    <p class="text-muted mb-0"> Ground pints for RealityCapture alignment</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="custom-control custom-switch">
+                                        <textarea class="form-control" rows=8 id="ground_points_{{pyview.uid}}"  style="white-space: pre-wrap;width:100%" onchange='pyview.subject.set_ground_points($("#ground_points_{{pyview.uid}}").val())'>{{pyview.subject.ground_points}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
                                     <strong class="mb-0">Reconstruction region</strong>
                                     <p class="text-muted mb-0">Size of RealityCapture reconstruction region</p>
                                 </div>

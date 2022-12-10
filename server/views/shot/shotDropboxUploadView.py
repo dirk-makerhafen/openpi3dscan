@@ -4,20 +4,21 @@ from pyhtmlgui import PyHtmlView
 
 class DropboxUploadView(PyHtmlView):
     TEMPLATE_STR = '''
-    <div class="col-md-4">
         {% if pyview.subject.status == "idle" %}
-            {% if pyview.subject.last_success != None %}
-                <p>Last uploaded {{pyview.get_last_success()}} ago</p>
-            {% endif %}
-            {% if pyview.subject.last_failed != None %}
-                <p>Failed to upload {{pyview.get_last_failed()}} ago</p>
-            {% endif %}
-            <button class="btn" onclick="pyview.subject.sync()">Upload to Dropbox</button>
+            <div class="col-md-3">
+                {% if pyview.subject.last_success != None %}
+                    <p class="h5">Last uploaded {{pyview.get_last_success()}} ago</p>
+                {% elif pyview.subject.last_failed != None %}
+                    <p class="h5">Failed to upload {{pyview.get_last_failed()}} ago</p>
+                {% endif %}
+            </div>
+            <div class="col-md-2">
+                <button class="btn" onclick="pyview.subject.sync()">Upload to Dropbox</button>
+            </div>
         {% else %}
-            <p>Uploading, {{pyview.subject.current_progress}}% done</p>
-            <i>&nbsp;{{pyview.subject.current_upload_file}}&nbsp;</i>
+            <div class="col-md-3"> <p class="h5">Uploading, {{pyview.subject.current_progress}}% done      </p> </div>
+            <div class="col-md-2"> <p class="h5"><i>&nbsp;{{pyview.subject.current_upload_file}}&nbsp;</i> </p> </div>
         {% endif %}
-    </div>
     '''
     def get_last_success(self):
         seconds = time.time() - self.subject.last_success
@@ -40,4 +41,7 @@ class DropboxUploadView(PyHtmlView):
         weeks = int(seconds / 60 / 60 / 24 / 7)
         if weeks < 5:
             return "%s days" % days
-        return "%s weeks" % weeks
+        month = int(seconds / 60 / 60 / 24 / 30.416)
+        if month < 5:
+            return "%s weeks" % weeks
+        return "%s month" % month

@@ -13,6 +13,7 @@ class Shots:
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         self.cache = {}
+        self.unprocessed_models = []
         self.load_shots_from_disk()
 
     def get(self, shot_id):
@@ -39,14 +40,18 @@ class Shots:
         else:
             print("shot not found")
 
-    def get_unprocessed_models(self, limit = None):
+    def get_unprocessed_models(self, limit = 1):
         models = []
-        for shot in self.shots:
-            for m in shot.get_models_by_status("waiting"):
-                models.append(m)
-                if limit is not None and len(models) >= limit:
-                    return models
-        return models
+        while True:
+            try:
+                model = self.unprocessed_models[0]
+            except:
+                return models
+            self.unprocessed_models.remove(model)
+            if model.status == "waiting":
+                models.append(model)
+            if len(models) >= limit:
+                return models
 
     def load_shots_from_disk(self):
         for path in glob.glob(os.path.join(self.path, "*")):
@@ -58,10 +63,13 @@ class Shots:
             shot_id = os.path.split(path)[1]
             shot = self.get(shot_id)
             if shot is None:
-                shot = Shot(path, shot_id)
+                shot = Shot(path, shot_id, self)
                 self.shots.append(shot)
             else:
                 shot.load()
+            for model in shot.models:
+                if model.status == "waiting" and model not in self.unprocessed_models:
+                    self.unprocessed_models.append(model)
             if do_sort is True:
                 self.shots.sort(reverse=True)
             return shot

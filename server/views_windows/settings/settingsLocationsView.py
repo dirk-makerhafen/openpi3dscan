@@ -49,6 +49,7 @@ class SettingsLocationView(PyHtmlView):
     </td>
     <td> 
         <textarea class="form-control" rows=8 id="marker_distances_{{pyview.uid}}"  style="white-space: pre-wrap;width:100%" onchange='pyview.subject.set_markers($("#marker_distances_{{pyview.uid}}").val())'>{{pyview.subject.markers}}</textarea>
+        <textarea class="form-control" rows=8 id="ground_points_{{pyview.uid}}"  style="white-space: pre-wrap;width:100%" onchange='pyview.subject.set_ground_points($("#ground_points_{{pyview.uid}}").val())'>{{pyview.subject.ground_points}}</textarea>
     </td>
     <td>
         <div class="row">

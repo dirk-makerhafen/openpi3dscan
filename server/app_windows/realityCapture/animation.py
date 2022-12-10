@@ -64,13 +64,13 @@ class Animation(GenericTask):
             print("no screenshots found")
             return
 
-        size = 1100
+        size = 1200
         if self.rc_job.export_quality == "high":
-            size = 1400
+            size = 1200
         elif self.rc_job.export_quality == "normal":
-            size = 1100
+            size = 1000
         elif self.rc_job.export_quality == "low":
-            size = 900
+            size = 800
 
         if os.path.exists(output_file):
             os.remove(output_file)
@@ -86,7 +86,7 @@ class Animation(GenericTask):
                 pass
 
         ThreadPool(8).map(f, files)
-        total_duration = 400  # in 1/100s of seconds
+        total_duration = 450  # in 1/100s of seconds
         delay = int(round(total_duration / len(files), 0))
         try:
             subprocess.check_output(shlex.split('"%s" --optimize=3 --delay=%s --loop "%s\\screenshot_*.gif" -o "%s\\tmp.gif" ' % (ExternalFilesInstance().gifsicle_exe, delay, path, path)), shell=False, creationflags=CREATE_NO_WINDOW)

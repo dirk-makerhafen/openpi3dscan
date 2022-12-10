@@ -19,6 +19,15 @@ MARKERS_PRELOAD = '''
 1x12:014 - 1x12:016 - 0.866
 1x12:015 - 1x12:016 - 0.500
 '''
+GROUND_PRELOAD = '''
+# marker     X       Y      Z
+1x12:011   0.000  -0.500  0.000
+1x12:012  -0.433  -0.250  0.000
+1x12:013  -0.433   0.250  0.000
+1x12:014   0.000   0.500  0.000
+1x12:015   0.433   0.250  0.000
+1x12:016   0.433  -0.250  0.000
+'''
 
 
 class SettingsRealityCapture(Observable):
@@ -28,6 +37,7 @@ class SettingsRealityCapture(Observable):
         self.save = parent.save
         self.allow_rc_automation = True
         self.markers = MARKERS_PRELOAD
+        self.ground_points = GROUND_PRELOAD
         self.diameter = 1.9
         self.height = 2.5
         self.pin = ""
@@ -43,6 +53,7 @@ class SettingsRealityCapture(Observable):
     def to_dict(self):
         return {
             "markers": self.markers,
+            "ground_points": self.ground_points,
             "diameter": self.diameter,
             "height": self.height,
             "pin": self.pin,
@@ -78,9 +89,18 @@ class SettingsRealityCapture(Observable):
             self.allow_rc_automation = data["allow_rc_automation"]
         except:
             pass
+        try:
+            self.ground_points = data["ground_points"]
+        except:
+            pass
 
     def set_markers(self, markers):
         self.markers = markers
+        self.save()
+        self.notify_observers()
+
+    def set_ground_points(self, ground_points):
+        self.ground_points = ground_points
         self.save()
         self.notify_observers()
 

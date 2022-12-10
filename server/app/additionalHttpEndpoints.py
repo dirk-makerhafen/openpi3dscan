@@ -104,6 +104,7 @@ class HttpEndpoints:
             data["models"].append(model)
         if len(data["models"]) > 0:
             data["markers"] = SettingsInstance().realityCaptureSettings.markers
+            data["ground_points"] = SettingsInstance().realityCaptureSettings.ground_points
             dia = SettingsInstance().realityCaptureSettings.diameter
             data["box_dimensions"] = [dia, dia, SettingsInstance().realityCaptureSettings.height]
             data["pin"] = SettingsInstance().realityCaptureSettings.pin

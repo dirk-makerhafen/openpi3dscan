@@ -26,6 +26,7 @@ from app_windows.realityCapture.exportModel import ExportModel
 from app_windows.realityCapture.markers import Markers
 from app_windows.realityCapture.prepareFolder import PrepareFolder
 from app_windows.realityCapture.rawModel import RawModel
+from app_windows.realityCapture.rcprojExport import RcprojExport
 from app_windows.realityCapture.resultsArchive import ResultsArchive
 from app_windows.realityCapture.upload import Upload
 from app_windows.realityCapture.verifyImages import VerifyImages
@@ -37,7 +38,7 @@ DEBUG = "debug" in sys.argv
 
 class RealityCapture(Observable):
     def __init__(self, parent, source_ip, source_dir, shot_id, model_id, shot_name, filetype, reconstruction_quality,
-                 export_quality, create_mesh_from, create_textures, lit, distances, pin, token, license_data, box_dimensions,
+                 export_quality, create_mesh_from, create_textures, lit, distances, ground_points, pin, token, license_data, box_dimensions,
                  calibration_data, compress_results = True, debug=False):
         super().__init__()
         self.parent = parent
@@ -80,7 +81,7 @@ class RealityCapture(Observable):
         self.download = None if self.source_ip is None else Download(self)
         self.verifyImages = VerifyImages(self)
         self.markers = Markers(self, distances)
-        self.alignment = Alignment(self, distances)
+        self.alignment = Alignment(self, distances, ground_points)
         self.rawmodel = RawModel(self)
         self.exportmodel = ExportModel(self)
 

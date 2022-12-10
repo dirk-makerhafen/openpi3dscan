@@ -42,11 +42,12 @@ class RawModel(GenericTask):
 
         # cmd += '-smooth '
         cmd += '-simplify 4000000 '
-        cmd += '-closeHoles '
 
         cmd += '-selectLargestModelComponent '
         cmd += '-invertTrianglesSelection '
         cmd += '-removeSelectedTriangles '
+        cmd += '-closeHoles '
+
         cmd += '-renameSelectedModel "RAW" '
         for i in range(1, 19):
             cmd += '-selectModel "Model %s" ' % i

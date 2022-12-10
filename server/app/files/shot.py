@@ -46,6 +46,8 @@ class Shot(Observable):
             self.images_path = self.path
         self.preview_images_path = os.path.join(self.path, "preview_images")
         self.dropboxUpload = ShotDropboxUpload(self)
+        self.dropboxSharing = None
+        self.dropboxSharingName = None
         self.load()
 
     @property

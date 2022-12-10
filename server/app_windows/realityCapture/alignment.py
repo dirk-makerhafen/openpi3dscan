@@ -3,9 +3,10 @@ import os
 from app_windows.realityCapture.genericTask import GenericTask
 
 class Alignment(GenericTask):
-    def __init__(self, rc_job, distances):
+    def __init__(self, rc_job, distances, ground_points):
         super().__init__(rc_job)
         self.distances = distances
+        self.ground_points = ground_points
         self.alignments_were_recreated = False
         self.alignments = []
         self.box_center_correction = [0,0,0]

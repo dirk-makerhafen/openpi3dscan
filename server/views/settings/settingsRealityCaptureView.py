@@ -69,8 +69,8 @@ class RealityCaptureView(PyHtmlView):
                         <div class="list-group-item">
                             <div class="row align-items-center">
                                 <div class="col-md-8">
-                                    <strong class="mb-0">Ground Control Points</strong>
-                                    <p class="text-muted mb-0"> Ground pints for RealityCapture alignment</p>
+                                    <strong class="mb-0">Ground Points</strong>
+                                    <p class="text-muted mb-0"> Ground control points for RealityCapture alignment</p>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="custom-control custom-switch">

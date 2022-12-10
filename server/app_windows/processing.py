@@ -213,11 +213,17 @@ class Processing(Observable):
     def _parse_markers_str(self, markers_str):
         distances = {}
         for line in sorted(markers_str.split("\n")):
-            line = line.split("#")[0].strip()
-            if " - " not in line:
+            line = line.split("#")[0].lower().strip()
+            while "  " in line:
+                line = line.replace("  "," ").strip()
+            if " - " in line:
+                split = " - "
+            elif line.count(" ") == 2:
+                split = " "
+            else:
                 continue
             try:
-                m1, m2, distance = line.split(" - ")
+                m1, m2, distance = line.split(split)
                 m1 = m1.strip()
                 m2 = m2.strip()
                 distance = float(distance.strip())
@@ -235,9 +241,9 @@ class Processing(Observable):
     def _parse_groundpoints_str(self, groundpoints_str):
         ground_points = []
         for line in sorted(groundpoints_str.split("\n")):
+            line = line.split("#")[0].lower().strip()
             while "  " in line:
-                line = line.replace("  ").strip()
-            line = line.split("#")[0].strip()
+                line = line.replace("  "," ").strip()
             if line.count(" ") == 3:
                 ground_points.append(line.split(" "))
         return ground_points

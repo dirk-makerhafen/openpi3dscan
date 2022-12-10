@@ -52,7 +52,6 @@ ExportRegistrationSettings_xml = '''
   <entry key="MvsExportMoveY" value="0.0"/>
 </Configuration>
 '''
-
 XMPSettings_xml = '''
 <Configuration id="{EC40D990-B2AF-42A4-9637-1208A0FD1322}">
   <entry key="xmpMerge" value="true"/>
@@ -104,7 +103,6 @@ groundPlaneImport_xml = '''
   <entry key="gcpuPosYl" value="0.05"/>
   <entry key="csvGCSep" value="0"/>
 </Configuration>
-
 '''
 
 
@@ -133,7 +131,7 @@ class PrepareFolder(GenericTask):
         with open(self.get_path("DetectMarkersParams.xml"), "w") as f:
             f.write(DetectMarkersParams_xml)
         with open(self.get_path("box.rcbox"), "w") as f:
-            f.write(box_rcbox  % (round(self.rc_job.box_dimensions[0], 2), round(self.rc_job.box_dimensions[1], 2), round(self.rc_job.box_dimensions[2], 2), round(self.rc_job.box_dimensions[2]/2, 2)))
+            f.write(box_rcbox  % (round(self.rc_job.box_dimensions[0], 4), round(self.rc_job.box_dimensions[1], 4), round(self.rc_job.box_dimensions[2], 4), round(self.rc_job.box_dimensions[2]/2, 4)))
         with open(self.get_path("exportRegistrationSettings.xml"), "w") as f:
             f.write(ExportRegistrationSettings_xml)
         with open(self.get_path("xmp_settings.xml"), "w") as f:

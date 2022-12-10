@@ -38,6 +38,7 @@ class ExportModel(GenericTask):
         if self.rc_job.export_quality == "low":
             cmd += '-simplify 500000 '
         cmd += '-cleanModel '
+        cmd += '-closeHoles '
         if self.rc_job.create_textures is True:
             cmd += '-calculateTexture '
             cmd += '-calculateVertexColors '

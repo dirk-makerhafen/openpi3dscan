@@ -74,7 +74,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
         #ws = "--window-size=%s,%s " % (w,h)
         #except Exception as e:
         ws = "--start-maximized"
-        cmd = "\"%s\" %s --no-default-browser-check --disable-logging --user-data-dir=\"%s\" --app=http://127.0.0.1:8081" % (ExternalFilesInstance().chromium_exe, ws,  os.path.join(os.environ["APPDATA"], "RCAutomation", "data"))
+        cmd = "\"%s\" %s --no-default-browser-check --disable-logging --overscroll-history-navigation=0 --disable-pinch --user-data-dir=\"%s\" --app=http://127.0.0.1:8081" % (ExternalFilesInstance().chromium_exe, ws,  os.path.join(os.environ["APPDATA"], "RCAutomation", "data"))
         try:
             subprocess.check_output(shlex.split(cmd), shell=False)
         except:

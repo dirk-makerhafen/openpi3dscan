@@ -94,8 +94,10 @@ class ModelFile(Observable):
                 with zipfile.ZipFile(self.get_path(), 'r') as zip_ref:
                     return [filename, zip_ref.read(filename)]
         if os.path.isdir(os.path.join(self.path, self.filename)):
+            print("is dir", filename)
             if filename is not None:
                 fullpath = os.path.join(self.path, self.filename, filename)
+                print("fp", fullpath, os.path.exists(fullpath))
                 if os.path.exists(fullpath):
                     return [self.filename, open(fullpath, "rb")]
             else:

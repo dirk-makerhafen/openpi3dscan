@@ -112,6 +112,8 @@ class ShotModelsView(PyHtmlView):
 
     def get_model_url(self):
         f = self.selected_model.filename.replace(".zip", "").replace(" ", "_")
+        if f.endswith("_glb"):
+            f = "%s.glb" % f[:-4]
         return "/shots/%s/download/%s/%s" % (self.current_shot.shot_id, self.selected_model.model_id, f)
 
     def select_model(self, model):

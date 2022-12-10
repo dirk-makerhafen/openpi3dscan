@@ -23,17 +23,22 @@ class GenericTask(Observable):
         self.rc_job = rc_job
         self.status = "idle"
         self.log = Log()
+        self.last_try_failed = False
 
     def reset(self):
         while len(self.log) > 0:
             del self.log[0]
         if self.status != "idle":
+            if self.status == "failed":
+                self.last_try_failed = True
             self.set_status("repeat")
 
     def set_status(self, new_status):
         if self.status == new_status:
             return
         self.status = new_status
+        if self.status == "success":
+            self.last_try_failed = False
         self.notify_observers()
 
     def get_path(self, fname):
@@ -59,7 +64,7 @@ class GenericTask(Observable):
 
     def _get_cmd_start(self):
         cmd = '"%s" ' % ExternalFilesInstance().RealityCapture_exe
-        if SettingsInstance().realityCaptureSettings.hide_realitycapture is True:
+        if SettingsInstance().realityCaptureSettings.hide_realitycapture is True and self.last_try_failed is False:
             cmd += '-headless '
             cmd += '-silent "%s\\tmp\\crash_report.txt" ' % self.rc_job.workingdir
             cmd += '-set "appQuitOnError=true" '

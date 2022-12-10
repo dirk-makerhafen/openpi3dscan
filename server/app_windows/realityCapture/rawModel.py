@@ -48,7 +48,7 @@ class RawModel(GenericTask):
         cmd += '-invertTrianglesSelection '
         cmd += '-removeSelectedTriangles '
         cmd += '-renameSelectedModel "RAW" '
-        for i in range(1, 19):
+        for i in range(1, 20):
             cmd += '-selectModel "Model %s" ' % i
             cmd += '-deleteSelectedModel '
         cmd += '-save "%s\\%s.rcproj" ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)

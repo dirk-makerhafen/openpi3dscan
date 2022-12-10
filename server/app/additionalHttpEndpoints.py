@@ -132,9 +132,11 @@ class HttpEndpoints:
     def _shot_download_model_file(self, shot_id, model_id, filename):
         model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
         if model is None or model.filename == "":
+            print("no model")
             return bottle.HTTPResponse(status=404)
         mf = model.get_model_file(filename)
         if mf is None:
+            print("no model file")
             return bottle.HTTPResponse(status=404)
         filename, data = mf
         headers = {

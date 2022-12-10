@@ -44,6 +44,7 @@ class Alignment(GenericTask):
         cmd += '-selectMaximalComponent '
         cmd += '-detectFeatures '
         cmd += '-align '
+        cmd += self._import_ground_plane()
         cmd += '-update '
         cmd += '-renameSelectedComponent "MAIN" '
         cmd += '-selectComponent "Component 0" '
@@ -98,3 +99,14 @@ class Alignment(GenericTask):
                     continue
                 cmd += '-defineDistance "%s" "%s" "%s" "D%s%s" ' % (marker1, marker2, self.distances[marker1][marker2], marker1, marker2)
         return cmd
+
+    def _import_ground_plane(self):
+        ground_plane_file = self.get_path("%s_ground.csv")
+        lines = ["%s, %s, %s, %s" % (g[0], g[1], g[2], g[3]) for g in self.ground_points if g[0] in self.rc_job.markers.available_markers  ]
+        if len(lines) == 0:
+            return ""
+
+        with open(ground_plane_file, "w") as f:
+            f.write("\n".join(lines))
+
+        return '-importGroundControlPoints "%s" "%s" ' % (ground_plane_file, self.get_path("groundPlaneImport.xml"))

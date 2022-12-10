@@ -62,35 +62,6 @@ XMPSettings_xml = '''
   <entry key="xmpRig" value="true"/>
 </Configuration>
 '''
-groundPlaneExport_xml = '''
-<Configuration id="{2D5793BC-A65D-4318-A1B9-A05044608385}">
-  <entry key="calexTrans" value="1"/>
-  <entry key="calexHasDisabled" value="0x0"/>
-  <entry key="MvsExportScaleZ" value="1.0"/>
-  <entry key="MvsExportIsGeoreferenced" value="0x1"/>
-  <entry key="MvsExportIsModelCoordinates" value="0"/>
-  <entry key="MvsExportScaleY" value="1.0"/>
-  <entry key="MvsExportScaleX" value="1.0"/>
-  <entry key="MvsExportRotationY" value="0.0"/>
-  <entry key="MvsExportcoordinatesystemtype" value="0"/>
-  <entry key="MvsExportNormalFlipZ" value="false"/>
-  <entry key="MvsExportRotationX" value="0.0"/>
-  <entry key="hasCalexFilePath" value="1"/>
-  <entry key="MvsExportNormalFlipY" value="false"/>
-  <entry key="MvsExportNormalSpace" value="Mikktspace"/>
-  <entry key="calexHasUndistort" value="-1"/>
-  <entry key="MvsExportNormalFlipX" value="false"/>
-  <entry key="MvsExportRotationZ" value="0.0"/>
-  <entry key="calexFileFormat" value="Comma-separated, Name, X, Y, Alt"/>
-  <entry key="MvsExportMoveZ" value="0.0"/>
-  <entry key="calexFileFormatId" value="{CE348030-6853-4582-9904-458D3B8C2402}"/>
-  <entry key="hasCalexFileName" value="1"/>
-  <entry key="calexHasImageExport" value="-1"/>
-  <entry key="MvsExportMoveX" value="0.0"/>
-  <entry key="MvsExportNormalRange" value="ZeroToOne"/>
-  <entry key="MvsExportMoveY" value="0.0"/>
-</Configuration>
-'''
 groundPlaneImport_xml = '''
 <Configuration id="{65E79B42-7042-4A81-B68D-0F835D913191}">
   <entry key="gcpuPosXl" value="0.05"/>

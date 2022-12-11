@@ -7,7 +7,7 @@ from app_windows.settings.settingsLocations import SettingsLocations
 from app_windows.settings.settingsRealityCapture import SettingsRealityCapture
 from app_windows.settings.settingsRemoteHosts import SettingsRemoteHosts
 
-VERSION = "2022.12.03-10.02"
+VERSION = "2022.12.06-10.04"
 
 
 class Settings(Observable):

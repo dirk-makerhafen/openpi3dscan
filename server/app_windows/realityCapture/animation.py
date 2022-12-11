@@ -36,17 +36,17 @@ class Animation(GenericTask):
         options.add_argument("--disable-dev-shm-usage")
         browser = webdriver.Chrome(executable_path=ExternalFilesInstance().chromedriver_exe, options=options)
         browser.set_window_position(0, 0)
-        browser.set_window_size(1200, 1200)
+        browser.set_window_size(1000, 1000)
 
         browser.get("http://127.0.0.1:8081/modelview.html?src=http://127.0.0.1:8081/rc_cache/%s" % (glb_path.replace("c:\\rc_cache\\", "").replace("\\","/")))
 
         time.sleep(5)
         angle = 0
-        angle_add = 8
+        angle_add = 5
         if self.rc_job.export_quality == "high":
-            angle_add = 6
+            angle_add = 5
         elif self.rc_job.export_quality == "normal":
-            angle_add = 8
+            angle_add = 7.5
         elif self.rc_job.export_quality == "low":
             angle_add = 10
 
@@ -63,14 +63,15 @@ class Animation(GenericTask):
         if len(files) == 0:
             print("no screenshots found")
             return
+        self.log.append("Animating from %s images" % len(files))
 
-        size = 1200
+        size = 1000
         if self.rc_job.export_quality == "high":
-            size = 1200
-        elif self.rc_job.export_quality == "normal":
             size = 1000
-        elif self.rc_job.export_quality == "low":
+        elif self.rc_job.export_quality == "normal":
             size = 800
+        elif self.rc_job.export_quality == "low":
+            size = 600
 
         if os.path.exists(output_file):
             os.remove(output_file)
@@ -78,9 +79,10 @@ class Animation(GenericTask):
         def f(file):
             tmpf = "%s_tmp.png" % file[0:-4]
             try:
-                subprocess.check_output(shlex.split('"%s" -resize %sx "%s" "%s"' % (ExternalFilesInstance().convert_exe, size, file, tmpf)), shell=False, creationflags=CREATE_NO_WINDOW)
-                os.remove(file)
-                os.rename(tmpf, file)
+                if size != 1000:
+                    subprocess.check_output(shlex.split('"%s" -resize %sx "%s" "%s"' % (ExternalFilesInstance().convert_exe, size, file, tmpf)), shell=False, creationflags=CREATE_NO_WINDOW)
+                    os.remove(file)
+                    os.rename(tmpf, file)
                 subprocess.check_output(shlex.split('"%s" "%s" "%s"' % (ExternalFilesInstance().convert_exe, file, "%s.gif" % file[:-4])), shell=False, creationflags=CREATE_NO_WINDOW)
             except:
                 pass

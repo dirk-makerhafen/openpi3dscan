@@ -21,6 +21,7 @@ class RawModel(GenericTask):
             self.set_status("success")
             return
 
+        self.log.append("Reconstructing in %s quality" % self.rc_job.reconstruction_quality )
         cmd = self._get_cmd_start()
         last_changed = os.path.getmtime(rc_proj_file)
         cmd += '-load "%s\\%s.rcproj" deleteAutosave ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)

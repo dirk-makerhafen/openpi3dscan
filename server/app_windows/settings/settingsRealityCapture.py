@@ -1,5 +1,6 @@
 from pyhtmlgui import Observable
 
+from app.settings.settingsDefaultModelSets import SettingsDefaultModelSets
 
 MARKERS_PRELOAD = '''
 #marker1 - marker2  - distance
@@ -37,6 +38,7 @@ class SettingsRealityCapture(Observable):
         self.hide_realitycapture = False
         self.allow_rc_automation = True # dummy for frontend rendering
         self.compress_models = False
+        self.settingsDefaultModelSets = SettingsDefaultModelSets(self)
 
     def to_dict(self):
         return {
@@ -49,6 +51,7 @@ class SettingsRealityCapture(Observable):
             "default_lit": self.default_create_textures,
             "hide_realitycapture": self.hide_realitycapture,
             "compress_models": self.compress_models,
+            "settingsDefaultModelSets": self.settingsDefaultModelSets.to_dict(),
         }
 
     def from_dict(self, data):
@@ -68,6 +71,10 @@ class SettingsRealityCapture(Observable):
             pass
         try:
             self.compress_models = data["compress_models"]
+        except:
+            pass
+        try:
+            self.settingsDefaultModelSets.from_dict(data["settingsDefaultModelSets"])
         except:
             pass
 

@@ -313,7 +313,8 @@ class Shot(Observable):
                     except:
                         pass
                     try:
-                        self.models = ObservableList([ModelFile(self).from_dict(m) for m in data["models"]])
+                        self.models.clear()
+                        self.models.extend([ModelFile(self).from_dict(m) for m in data["models"]])
                     except:
                         pass
                     try:

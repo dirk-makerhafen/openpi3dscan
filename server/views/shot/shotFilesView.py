@@ -91,7 +91,7 @@ class ShotFilesView(PyHtmlView):
                     {{pyview.filesListView.render()}}
                     <tr style="border-top: 1px solid lightgray;    line-height: 3em;">
                         <td style="padding-left: 5px;padding-right: 5px;">
-                            <select style="" class="form-control" name="filetype" id="filetype">
+                            <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"){ $("#lit_unlit").prop("disabled", False); }else{ $("#lit_unlit").prop("disabled", True);$("#lit_unlit")[0].checked = True; }'>
                                 <option value="obj">OBJ</option>
                                 <option value="stl">STL</option>
                                 <option value="3mf">3MF</option>

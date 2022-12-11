@@ -45,7 +45,7 @@ class ModelFile(Observable):
 
         self.filesize = round(os.path.getsize(os.path.join(self.path, self.filename)) / 1024 / 1024, 3)
         if self.filesize >= 1:
-            self.filesize = int(self.filesize)
+            self.filesize = int(round(self.filesize,0))
         self.set_status("ready")
 
     def write_folder(self, sourcefolder):
@@ -68,7 +68,7 @@ class ModelFile(Observable):
 
         self.filesize = round(get_size(target_dir) / 1024 / 1024, 3)
         if self.filesize >= 1:
-            self.filesize = int(self.filesize)
+            self.filesize = int(round(self.filesize,0))
 
         self.set_status("ready")
 

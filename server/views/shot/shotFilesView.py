@@ -9,7 +9,7 @@ from views.shot.shotDropboxUploadView import DropboxUploadView
 class DropboxSharingView(PyHtmlView):
     TEMPLATE_STR = '''
         <div class="row">
-            <div class="col-md-12" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">Sharing</div>
+            <div class="col-md-12" style="border-top:1px solid gray;font-weight:bold;padding-top:10px;padding-bottom:10px;">Sharing</div>
                 {% if pyview.dropboxSharingView is None % }
                     <div class="col-md-12">
                         <table style="width:100%;text-align:center">
@@ -74,19 +74,19 @@ class ShotFilesView(PyHtmlView):
     {% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}
         <div class="row">
             {% if pyview.settingsInstance.realityCaptureSettings.settingsDefaultModelSets.default_models | length != 0 %}
-                <div class="col-md-8" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">Model Files</div>
-                <div class="col-md-2" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">
+                <div class="col-md-8" style="border-top:1px solid gray;font-weight:bold;padding-top:10px;padding-bottom:15px;">Model Files</div>
+                <div class="col-md-2" style="border-top:1px solid gray;padding-top:10px;padding-bottom:15px;">
                     <select style="" class="form-control" name="set_name" id="set_name">
                         {% for set_name in pyview.settingsInstance.realityCaptureSettings.settingsDefaultModelSets.get_set_names() %}
                             <option value="{{set_name}}">{{set_name}}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-2" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">
-                    <button class="form-control btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_models_from_set($("#set_name").val());'> Create Models </button>
+                <div class="col-md-2" style="border-top:1px solid gray;padding-top:10px;padding-bottom:15px;">
+                    <button class="btn btn-success btnfw" style="margin-right:5px" onclick='pyview.parent.create_models_from_set($("#set_name").val());'> Create Models </button>
                 </div>
             {% else %}
-                <div class="col-md-12" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">Model Files</div>
+                <div class="col-md-12" style="border-top:1px solid gray;font-weight:bold;padding-top:10px;padding-bottom:10px;">Model Files</div>
             {% endif %}
             
             <div class="col-md-12">
@@ -141,7 +141,7 @@ class ShotFilesView(PyHtmlView):
                         <td> <input id="create_textures" {% if pyview.settingsInstance.realityCaptureSettings.default_create_textures == true %}checked{% endif %} type="checkbox"/> </td>
                         <td> <input id="lit_unlit" {% if pyview.settingsInstance.realityCaptureSettings.default_lit == true %}checked{% endif %} type="checkbox"/>  </td>
                         <td> &nbsp;  </td>
-                        <td> <button class="form-control btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked, $("#lit_unlit")[0].checked);'> Create Model </button></td>
+                        <td> <button class="btn btn-success btnfw" style="margin-right:5px" onclick='pyview.parent.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked, $("#lit_unlit")[0].checked);'> Create Model </button></td>
                     </tr>
                 </table>
             </div>
@@ -233,7 +233,7 @@ class ModelFileItemView(PyHtmlView):
                 {{pyview.subject.status}}
             {% endif %}
         </td>
-        <td><button class="btn" onclick='pyview.subject.delete()'> Delete</button></td>
+        <td><button class="btn btnfw" onclick='pyview.subject.delete()'> Delete</button></td>
     '''
 
     def open_in_explorer(self):

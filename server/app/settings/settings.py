@@ -10,7 +10,7 @@ from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsDropbox import SettingsDropbox
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2022.12.06-10.04"
+VERSION = "2022.12.06-10.05"
 
 
 class Settings(Observable):

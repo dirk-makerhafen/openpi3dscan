@@ -180,7 +180,7 @@ class Processing(Observable):
                 compress_results       = True,
             )
             self.rc_tasks.insert(0, rc)
-            while len(self.rc_tasks) > 20:
+            while len(self.rc_tasks) > 4:
                 del self.rc_tasks[-1]
 
             while True:

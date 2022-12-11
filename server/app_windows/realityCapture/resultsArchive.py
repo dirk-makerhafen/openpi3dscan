@@ -16,7 +16,7 @@ class ResultsArchive(GenericTask):
     def run(self):
         force_reload = self.status != "idle"
         self.set_status("active")
-        input_size = self._get_size(self.rc_job.export_foldername)
+        input_size = self._get_size(os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername))
         model_file_zip = os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.export_foldername)
         if os.path.exists(model_file_zip):
             os.remove(model_file_zip)
@@ -38,6 +38,8 @@ class ResultsArchive(GenericTask):
             self.set_status("success")
 
     def _get_size(self, start_path):
+        if not os.path.exists(start_path):
+            return 0
         if os.path.isdir(start_path):
             total_size = 0
             for dirpath, dirnames, filenames in os.walk(start_path):

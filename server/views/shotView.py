@@ -164,6 +164,10 @@ class ShotView(PyHtmlView):
             create_textures = False
         self.current_shot.create_model(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures, lit=lit)
 
+    def create_models_from_set(self, set_name ):
+        self.current_shot.create_models_from_set(set_name)
+
+
     def switch_type(self):
         self.imageCarousel.switch_type()
 

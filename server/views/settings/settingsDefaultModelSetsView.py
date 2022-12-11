@@ -1,4 +1,17 @@
-from pyhtmlgui import PyHtmlView
+from pyhtmlgui import PyHtmlView, ObservableListView
+
+class SettingsDefaultModelView(PyHtmlView):
+    DOM_ELEMENT = "tr"
+    TEMPLATE_STR = '''
+        <td>{{   pyview.subject.setname}} </td>
+        <td>{{   pyview.subject.filetype}} </td>
+        <td>{{   pyview.subject.reconstruction_quality}}</td>
+        <td>{{   pyview.subject.export_quality}}</td>
+        <td>{{   pyview.subject.create_mesh_from}}</td>
+        <td>{{   pyview.subject.create_textures}}</td>
+        <td>{{   pyview.subject.lit}}</td>
+        <td><button class="btn" onclick='   pyview.subject.delete()'> Remove</button></td>
+    '''
 
 class SettingsDefaultModelSetsView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -6,14 +19,15 @@ class SettingsDefaultModelSetsView(PyHtmlView):
         <div class="list-group-item">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <strong class="mb-0">One Click File Sets</strong>
-                    <p class="text-muted mb-0"> Create sets of model so you can created mutiple models with one click </p>
+                    <strong class="mb-0">Model File Sets</strong>
+                    <p class="text-muted mb-0"> Create sets of model so you can created multiple models with one click </p>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-2"></div>
+                <div class="col-md-10">
                 <table style="width:100%;text-align:center">
                     <thead>
                         <tr>
-                        <th style="text-align:center">Name</th>
+                        <th style="text-align:center">Set Name</th>
                         <th style="text-align:center">Type</th>
                         <th style="text-align:center">Reconstruction Quality</th>
                         <th style="text-align:center">Export Quality</th>
@@ -24,22 +38,11 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                         </tr>
                     </thead>
                     
-                    {% for default_model in pyview.subject.default_models %}
-                        <tr>
-                            <td>{{default_model.name}} </td>
-                            <td>{{default_model.filetype}} </td>
-                            <td>{{default_model.reconstruction_quality}}</td>
-                            <td>{{default_model.quality}}</td>
-                            <td>{{default_model.create_mesh_from}}</td>
-                            <td>{{default_model.create_textures}}</td>
-                            <td>{{default_model.lit}}</td>
-                            <td><button class="btn" onclick='default_model.delete()'> Remove</button></td>
-                        </tr>
-                    {% endfor %}
-                                        
+                    {{ pyview.defaultModelView.render() }}
+                       
                     <tr style="border-top: 1px solid lightgray;    line-height: 3em;">
                         <td> 
-                          <input id="set_name" placefolder="Set Name" />  
+                          <input id="set_name"  class="form-control" type="text"  placefolder="Set Name" />  
                         </td>
                         <td style="padding-left: 5px;padding-right: 5px;">
                             <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"){ $("#lit_unlit").prop("disabled", False); }else{ $("#lit_unlit").prop("disabled", True);$("#lit_unlit")[0].checked = True; }'>
@@ -74,10 +77,10 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                                 <option value="all"        >All Images</option>
                             </select>   
                         </td>
-                        <td> <input id="create_textures" type="checkbox"/> </td>
-                        <td> <input id="lit_unlit" type="checkbox"/>  </td>
+                        <td> <input id="create_textures" type="checkbox" checked /> </td>
+                        <td> <input id="lit_unlit" type="checkbox" checked />  </td>
                         
-                        <td> <button class="form-control btn btn-success" style="margin-right:5px" onclick='pyview.parent.addDefaultModel($("#set_name").val(), $("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked, $("#lit_unlit")[0].checked);'> Add Model </button></td>
+                        <td> <button class="form-control btn btn-success" style="margin-right:5px" onclick='pyview.subject.addDefaultModel($("#set_name").val(), $("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked, $("#lit_unlit")[0].checked);'> Add Model </button></td>
                     </tr>
                 </table>
                     
@@ -89,5 +92,5 @@ class SettingsDefaultModelSetsView(PyHtmlView):
     '''
     def __init__(self, subject, parent, **kwargs):
         super().__init__(subject, parent, **kwargs)
-
+        self.defaultModelView = ObservableListView(self.subject.default_models, self, item_class=SettingsDefaultModelView, dom_element="tbody")
 

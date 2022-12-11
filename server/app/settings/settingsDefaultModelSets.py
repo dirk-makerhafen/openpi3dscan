@@ -1,6 +1,6 @@
 import os
 import re
-
+import time
 from pyhtmlgui import Observable, ObservableList
 
 
@@ -39,6 +39,7 @@ class SettingsDefaultModel(Observable):
         self.create_mesh_from = data["create_mesh_from"]
         self.create_textures = data["create_textures"]
         self.lit = data["lit"]
+        return self
 
 
 
@@ -50,7 +51,7 @@ class SettingsDefaultModelSets(Observable):
         self.default_models = ObservableList()
 
     def get_set_names(self):
-        return list(set([l.name for l in self.default_models]))
+        return list(set([l.setname for l in self.default_models]))
 
     def get_models_by_setname(self, setname):
         return [m for m in self.default_models if m.setname == setname]
@@ -67,6 +68,7 @@ class SettingsDefaultModelSets(Observable):
         except:
             pass
         self.default_models.sort(key=lambda x:[x.setname, x.create_mesh_from, x.reconstruction_quality, x.export_quality, x.create_textures, x.lit ])
+        return self
 
     def addDefaultModel(self, setname, filetype, reconstruction_quality, export_quality, create_mesh_from, create_textures, lit):
         if self._defaultModelExists(setname, filetype, reconstruction_quality, export_quality, create_mesh_from, create_textures, lit):
@@ -91,4 +93,3 @@ class SettingsDefaultModelSets(Observable):
         if model in self.default_models:
             self.default_models.remove(model)
             self.save()
-            self.notify_observers()

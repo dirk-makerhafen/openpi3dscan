@@ -73,7 +73,19 @@ class ShotFilesView(PyHtmlView):
     </div>
     {% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}
         <div class="row">
-            <div class="col-md-12" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">Model Files</div>
+            <div class="col-md-8" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">Model Files</div>
+            {% if pyview.settingsInstance.realityCaptureSettings.settingsDefaultModelSets.default_models | length != 0 %}
+                <div class="col-md-2" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">
+                    <select style="" class="form-control" name="set_name" id="set_name">
+                        {% for set_name in pyview.settingsInstance.realityCaptureSettings.settingsDefaultModelSets.get_set_names() %}
+                            <option value="{{set_name}}">{{set_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2" style="border-top:1px solid gray;font-weight:bold;;padding-top:10px;padding-bottom:10px;">
+                    <button class="form-control btn btn-success" style="margin-right:5px" onclick='pyview.parent.create_models_from_set($("#set_name").val());'> Create Models </button>
+                </div>
+            {% endif %}
             <div class="col-md-12">
                 <table style="width:100%;text-align:center">
                     <thead>

@@ -11,7 +11,7 @@ class SettingsLocations(Observable):
 
     def new_location(self):
         l = SettingsLocation(self)
-        self.locations.append()
+        self.locations.append(l)
         self.save()
         self.notify_observers()
         return l

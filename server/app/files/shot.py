@@ -235,6 +235,18 @@ class Shot(Observable):
             self.save()
         self.notify_observers()
 
+    def create_models_from_set(self, set_name):
+        model_templates = SettingsInstance().realityCaptureSettings.settingsDefaultModelSets.get_models_by_setname(set_name)
+        for model_template in model_templates:
+            self.create_model(
+                filetype=model_template.filetype,
+                reconstruction_quality=model_template.reconstruction_quality,
+                quality=model_template.export_quality,
+                create_mesh_from=model_template.create_mesh_from,
+                create_textures=model_template.create_textures,
+                lit=model_template.lit
+            )
+
     def get_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
         try:
             return [m for m in self.models if m.filetype == filetype and m.quality == quality and m.reconstruction_quality == reconstruction_quality and m.create_mesh_from == create_mesh_from and m.create_textures == create_textures and m.lit == lit][0]

@@ -44,7 +44,7 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                           <input id="set_name"  class="form-control" type="text"  placefolder="Set Name" />  
                         </td>
                         <td style="padding-left: 5px;padding-right: 5px;">
-                            <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"){ $("#lit_unlit").prop("disabled", False); }else{ $("#lit_unlit").prop("disabled", True);$("#lit_unlit")[0].checked = True; }'>
+                            <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
                                 <option value="obj">OBJ</option>
                                 <option value="stl">STL</option>
                                 <option value="3mf">3MF</option>

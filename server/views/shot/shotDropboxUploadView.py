@@ -5,7 +5,7 @@ from pyhtmlgui import PyHtmlView
 class DropboxUploadView(PyHtmlView):
     TEMPLATE_STR = '''
         {% if pyview.subject.status == "idle" %}
-            <div class="col-md-3">
+            <div class="col-md-3" style="text-align: right;">
                 {% if pyview.subject.last_success != None %}
                     <p class="h5">Last uploaded {{pyview.get_last_success()}} ago</p>
                 {% elif pyview.subject.last_failed != None %}
@@ -16,7 +16,7 @@ class DropboxUploadView(PyHtmlView):
                 <button class="btn btnfw" onclick="pyview.subject.sync()">Upload to Dropbox</button>
             </div>
         {% else %}
-            <div class="col-md-3"> <p class="h5">Uploading, {{pyview.subject.current_progress}}% done      </p> </div>
+            <div class="col-md-3" style="text-align: right;"> <p class="h5">Uploading, {{pyview.subject.current_progress}}% done      </p> </div>
             <div class="col-md-2"> <p class="h5"><i>&nbsp;{{pyview.subject.current_upload_file}}&nbsp;</i> </p> </div>
         {% endif %}
     '''

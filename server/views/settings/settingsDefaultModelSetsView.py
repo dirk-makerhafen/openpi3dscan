@@ -10,20 +10,19 @@ class SettingsDefaultModelView(PyHtmlView):
         <td>{{   pyview.subject.create_mesh_from}}</td>
         <td>{{   pyview.subject.create_textures}}</td>
         <td>{{   pyview.subject.lit}}</td>
-        <td><button class="btn" onclick='   pyview.subject.delete()'> Remove</button></td>
+        <td><button class="btn btnfw " style="margin:2px" onclick='pyview.subject.delete()'> Remove</button></td>
     '''
 
 class SettingsDefaultModelSetsView(PyHtmlView):
+    DOM_ELEMENT_CLASS = "SettingsDefaultModelSetsView list-group-item"
     TEMPLATE_STR = '''
-
-        <div class="list-group-item">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <strong class="mb-0">Model File Sets</strong>
-                    <p class="text-muted mb-0"> Create sets of model so you can created multiple models with one click </p>
+                    <strong class="mb-0">Model Creation Templates</strong>
+                    <p class="text-muted mb-0"> Create model templates for one click generation of multiple files </p>
                 </div>
-                <div class="col-md-2"></div>
-                <div class="col-md-10">
+                <div class="col-md-1"></div>
+                <div class="col-md-11">
                 <table style="width:100%;text-align:center">
                     <thead>
                         <tr>
@@ -87,7 +86,6 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                     
                 </div>
             </div>
-        </div>
  
     '''
     def __init__(self, subject, parent, **kwargs):

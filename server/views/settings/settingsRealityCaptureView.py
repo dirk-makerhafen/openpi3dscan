@@ -1,5 +1,7 @@
 from pyhtmlgui import PyHtmlView
 
+from views.settings.settingsDefaultModelSetsView import SettingsDefaultModelSetsView
+
 
 class RealityCaptureView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -195,10 +197,15 @@ class RealityCaptureView(PyHtmlView):
                                     </div>
                                 </div>         
                             </div>
-                        </div>    
+                        </div>
+                        {{ pyview.settingsDefaultModelSetsView.render() }}
                     {% endif %}                               
                 </div>
             </div>   
         </div>
     </div>
     '''
+
+    def __init__(self, subject, parent, **kwargs):
+        super().__init__(subject, parent, **kwargs)
+        self.settingsDefaultModelSetsView = SettingsDefaultModelSetsView(self.subject.settingsDefaultModelSets, self)

@@ -1,4 +1,5 @@
 from pyhtmlgui import Observable
+from app.settings.settingsDefaultModelSets import SettingsDefaultModelSets
 
 
 MARKERS_PRELOAD = '''
@@ -49,6 +50,7 @@ class SettingsRealityCapture(Observable):
         self.default_create_textures = True
         self.default_lit = True
         self.calibration_data = "{}" # json dump of rc data
+        self.settingsDefaultModelSets = SettingsDefaultModelSets(self)
 
     def to_dict(self):
         return {
@@ -65,6 +67,7 @@ class SettingsRealityCapture(Observable):
             "calibration_data": self.calibration_data,
             "token": self.token,
             "allow_rc_automation": self.allow_rc_automation,
+            "settingsDefaultModelSets": self.settingsDefaultModelSets.to_dict(),
         }
 
     def from_dict(self, data):
@@ -93,6 +96,11 @@ class SettingsRealityCapture(Observable):
             self.ground_points = data["ground_points"]
         except:
             pass
+        try:
+            self.settingsDefaultModelSets.from_dict(data["settingsDefaultModelSets"])
+        except:
+            pass
+
 
     def set_markers(self, markers):
         self.markers = markers

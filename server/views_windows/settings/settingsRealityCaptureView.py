@@ -2,6 +2,8 @@ import webbrowser
 
 from pyhtmlgui import PyHtmlView
 
+from views.settings.settingsDefaultModelSetsView import SettingsDefaultModelSetsView
+
 
 class SettingsRealityCaptureView(PyHtmlView):
     TEMPLATE_STR = '''
@@ -145,13 +147,16 @@ class SettingsRealityCaptureView(PyHtmlView):
                                 </div>
                             </div>         
                         </div>
-                    </div>                    
+                    </div>   
+                    {{ pyview.settingsDefaultModelSetsView.render() }}                 
                 </div>
             </div>   
         </div>
     </div>
     '''
-
+    def __init__(self, subject, parent, **kwargs):
+        super().__init__(subject, parent, **kwargs)
+        self.settingsDefaultModelSetsView = SettingsDefaultModelSetsView(self.subject.settingsDefaultModelSets, self)
 
     def open_link_pin(self):
         webbrowser.open("https://www.capturingreality.com/my.pin")

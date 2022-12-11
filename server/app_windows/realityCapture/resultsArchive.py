@@ -33,7 +33,7 @@ class ResultsArchive(GenericTask):
             self.set_status("failed")
         else:
             output_size = self._get_size(model_file_zip)
-            self.log.append("%sMb in, %s Mb out" % (input_size, output_size))
+            self.log.append("%s MB compressed to %s MB" % (input_size, output_size))
             self.rc_job.result_file = model_file_zip
             self.set_status("success")
 
@@ -41,8 +41,7 @@ class ResultsArchive(GenericTask):
         if os.path.isdir(start_path):
             total_size = 0
             for dirpath, dirnames, filenames in os.walk(start_path):
-                total_size += sum([os.path.getsize(fp) for fp in [os.path.join(dirpath, f) for f in filenames] if
-                                   not os.path.islink(fp)])
+                total_size += sum([os.path.getsize(fp) for fp in [os.path.join(dirpath, f) for f in filenames] if not os.path.islink(fp)])
             total_size = round(total_size / 1024 / 1024, 3)
         else:
             total_size = round(os.path.getsize(start_path) / 1024 / 1024, 3)

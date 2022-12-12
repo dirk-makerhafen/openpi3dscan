@@ -6,10 +6,9 @@ from app_windows.realityCapture.genericTask import GenericTask
 class ExportModel(GenericTask):
     def __init__(self, rc_job):
         super().__init__(rc_job)
-        if self.rc_job.filetype == "rcproj":
-            self.output_model_path = os.path.join(self.rc_job.workingdir, "%s%s.rcproj" % (self.rc_job.realityCapture_filename, self.rc_job.quality_str))
-        else:
-            self.export_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_filename)
+        self.export_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername,self.rc_job.export_filename)
+
+        if self.rc_job.filetype != "rcproj":
             self.output_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_filename.replace(" ","_" if self.rc_job.filetype not in ["3mf","stl", ] else " "))
 
 
@@ -43,10 +42,11 @@ class ExportModel(GenericTask):
             cmd += '-calculateTexture '
             cmd += '-calculateVertexColors '
         cmd += '-renameSelectedModel "EXPORT" '
-        if self.rc_job.filetype != "rcproj":
-            cmd += '-exportModel "EXPORT" "%s" ' % self.export_model_path
+        if self.rc_job.filetype == "rcproj":
+            cmd += '-save "%s" ' % self.export_model_path
         else:
-            cmd += '-save "%s" ' % self.output_model_path
+            cmd += '-exportModel "EXPORT" "%s" ' % self.export_model_path
+
         cmd += '-quit '
         self._run_command(cmd, "create_export_model")
 

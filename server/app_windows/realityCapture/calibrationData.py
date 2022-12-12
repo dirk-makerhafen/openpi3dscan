@@ -93,6 +93,8 @@ class CalibrationData(GenericTask):
 
     def update_from_xmp(self):
         cnt = 0
+
+        self.delete_xmp_files()
         cmd = self._get_cmd_start()
         cmd += '-load "%s\\%s.rcproj" deleteAutosave ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
         cmd += '-exportXMP "%s" ' %  self.get_path("xmp_settings.xml")

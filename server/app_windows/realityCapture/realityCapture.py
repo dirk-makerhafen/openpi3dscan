@@ -67,9 +67,8 @@ class RealityCapture(Observable):
         self.create_mesh_from_str = create_mesh_from[0].upper()
         self.create_textures_str = "T" if create_textures is True else ""
         self.litUnlitStr = "" if self.filetype not in ["gif", "webp", "glb"] else ("L" if self.lit else "U") if self.create_textures else ""
-        self.alignFromStr = "A" if (self.create_mesh_from == "projection" and self.create_textures is True) else self.create_mesh_from_str
 
-        self.realityCapture_filename = "rc_%s%s" % (self.reconstruction_quality_str, self.alignFromStr)
+        self.realityCapture_filename = "rc_%s%s%s" % (self.reconstruction_quality_str, self.create_mesh_from_str, self.create_textures_str)
         self.export_filename   = "%s_%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr ,self.fileextension)
         self.export_foldername = "%s_%s%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.filetype)
 

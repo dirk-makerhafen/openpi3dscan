@@ -111,7 +111,7 @@ class Processing(Observable):
                 compress_results       = self.settings_instance.realityCaptureSettings.compress_models,
             )
             self.rc_tasks.insert(0, rc)
-            while len(self.rc_tasks) > 20:
+            while len(self.rc_tasks) > 10:
                 del self.rc_tasks[-1]
 
             while True:
@@ -121,7 +121,7 @@ class Processing(Observable):
                 except Exception as e:
                     traceback.print_exc()
                     print("Failed to process", e)
-                if rc.result_file is not None or (rc.result_path is not None and rc.compress_results is False):
+                if rc.result_file is not None or (rc.result_path is not None and rc.compress_results is False) and rc.status == "success":
                     break
                 self.set_status("failed")
                 while self.status == "failed":
@@ -180,7 +180,7 @@ class Processing(Observable):
                 compress_results       = True,
             )
             self.rc_tasks.insert(0, rc)
-            while len(self.rc_tasks) > 4:
+            while len(self.rc_tasks) > 10:
                 del self.rc_tasks[-1]
 
             while True:
@@ -190,7 +190,7 @@ class Processing(Observable):
                 except Exception as e:
                     traceback.print_exc()
                     print("Failed to process", e)
-                if rc.result_file is not None:
+                if rc.result_file is not None and rc.status == "success":
                     break
                 self.set_status("failed")
                 while self.status == "failed":

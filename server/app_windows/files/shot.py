@@ -207,6 +207,8 @@ class Shot(Observable):
 
     def remove_model(self, model):
         self.models.remove(model)
+        if model in self.parent_shots.unprocessed_models:
+            self.parent_shots.unprocessed_models.remove(model)
         self.save()
         self.notify_observers()
 

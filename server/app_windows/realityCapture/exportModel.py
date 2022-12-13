@@ -38,7 +38,7 @@ class ExportModel(GenericTask):
             cmd += '-simplify 500000 '
         cmd += '-cleanModel '
         cmd += '-closeHoles '
-        if self.rc_job.create_textures is True:
+        if self.rc_job.create_textures is True and self.rc_job.filetype not in ["stl"]:
             cmd += '-calculateTexture '
             cmd += '-calculateVertexColors '
         cmd += '-renameSelectedModel "EXPORT" '

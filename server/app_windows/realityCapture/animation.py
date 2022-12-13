@@ -29,6 +29,9 @@ class Animation(GenericTask):
             self.set_status("failed")
 
     def _convert_glb_to_images(self, glb_path, output_path):
+        for f in glob.glob(os.path.join(output_path, "screenshot_*.*")):
+            os.remove(f)
+
         options = webdriver.ChromeOptions()
         options.binary_location = ExternalFilesInstance().chromium_exe
         options.add_argument("--no-sandbox")
@@ -56,7 +59,6 @@ class Animation(GenericTask):
             browser.execute_script("rotate(%s);" % angle)
             time.sleep(0.3)
         browser.close()
-        os.remove(glb_path)
 
     def _screenshots_to_animation(self, path, output_file, filetype):
         files = glob.glob(os.path.join(path, "screenshot_*.png"))

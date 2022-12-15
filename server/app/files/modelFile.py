@@ -30,9 +30,10 @@ class ModelFile(Observable):
         self.parentShot.notify_observers()
 
     def write_file(self, input_file):
-        self.filename = self._create_filename("%s_%s%s%s%s%s.%s")
-        if self.filetype not in ["gif", "webp"]:
-            self.filename = "%s.zip" % (self.filename)
+        if self.filetype in ["gif", "webp"]:
+            self.filename = self._create_filename("%s_%s%s%s%s%s.%s")
+        else:
+            self.filename = self._create_filename("%s_%s%s%s%s%s_%s.zip")
 
         if not os.path.exists(self.path):
             os.mkdir(self.path)

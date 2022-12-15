@@ -23,10 +23,10 @@ class ResultsArchive(GenericTask):
 
         try:
             if len([x for x in glob.glob(os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, "*"))]) == 1:
-                subprocess.check_output(shlex.split("powershell -command \"Compress-Archive '*' '..\\%s'\"" % ( model_file_zip)),shell=False, creationflags=CREATE_NO_WINDOW, cwd=os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername))
+                subprocess.check_output(shlex.split("powershell -command \"Compress-Archive '*' '%s'\"" % ( model_file_zip)),shell=False, creationflags=CREATE_NO_WINDOW, cwd=os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername))
             else:
                 subprocess.check_output(shlex.split("powershell -command \"Compress-Archive '%s\\*' '%s'\"" % (self.rc_job.export_foldername, model_file_zip)),shell=False, creationflags=CREATE_NO_WINDOW, cwd=self.rc_job.workingdir)
-        except:
+        except Exception as e:
             pass
 
         if not os.path.exists(model_file_zip):

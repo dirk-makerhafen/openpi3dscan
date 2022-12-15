@@ -4,14 +4,14 @@ from pyhtmlgui import PyHtmlView, ObservableListView
 class SettingsLocationView(PyHtmlView):
     DOM_ELEMENT = "tr"
     TEMPLATE_STR = '''    
-    <td> <input class="form-control" id="location_{{pyview.uid}}" type="text" value="{{pyview.subject.location}}" onchange='pyview.subject.set_location($("#location_{{pyview.uid}}").val())'> </td>
+    <td> <input class="form-control" style="width:10em" id="location_{{pyview.uid}}" type="text" value="{{pyview.subject.location}}" onchange='pyview.subject.set_location($("#location_{{pyview.uid}}").val())'> </td>
     <td> 
         <div class="row">
             <div class="col-md-6">
                 Segments
             </div>
             <div class="col-md-6">
-                <input class="form-control" style="width:100%;text-align:center" id="segments_{{pyview.uid}}" type="number" min=2 max=128 step=1 value="{{pyview.subject.segments}}" onchange='pyview.subject.set_segments($("#segments_{{pyview.uid}}").val())'>
+                <input class="form-control" style="width:8em;text-align:center" id="segments_{{pyview.uid}}" type="number" min=2 max=128 step=1 value="{{pyview.subject.segments}}" onchange='pyview.subject.set_segments($("#segments_{{pyview.uid}}").val())'>
             </div>
         </div>
         <div class="row">
@@ -19,7 +19,7 @@ class SettingsLocationView(PyHtmlView):
                 Cameras/Seg
             </div>
             <div class="col-md-6">
-                <input class="form-control" style="width:100%;text-align:center" id="cameras_per_segment_{{pyview.uid}}" type="number" min=2 max=128 step=1 value="{{pyview.subject.cameras_per_segment}}" onchange='pyview.subject.set_cameras_per_segment($("#cameras_per_segment_{{pyview.uid}}").val())'>
+                <input class="form-control" style="width:8em;text-align:center" id="cameras_per_segment_{{pyview.uid}}" type="number" min=2 max=128 step=1 value="{{pyview.subject.cameras_per_segment}}" onchange='pyview.subject.set_cameras_per_segment($("#cameras_per_segment_{{pyview.uid}}").val())'>
             </div>
         </div>
         <div class="row">
@@ -27,7 +27,7 @@ class SettingsLocationView(PyHtmlView):
                 Rotation
             </div>
             <div class="col-md-6">
-                <select  class="form-control" style="width:100%;text-align:center" id="camera_rotation_{{pyview.uid}}"  onchange='pyview.subject.set_camera_rotation($("#camera_rotation_{{pyview.uid}}").val())'>
+                <select  class="form-control" style="width:8em;text-align:center" id="camera_rotation_{{pyview.uid}}"  onchange='pyview.subject.set_camera_rotation($("#camera_rotation_{{pyview.uid}}").val())'>
                     <option value=0   {% if pyview.subject.camera_rotation == 0   %}selected{%endif%}>   0 </option>
                     <option value=90  {% if pyview.subject.camera_rotation == 90  %}selected{%endif%}>  90 </option>
                     <option value=180 {% if pyview.subject.camera_rotation == 180 %}selected{%endif%}> 180 </option>
@@ -40,7 +40,7 @@ class SettingsLocationView(PyHtmlView):
                 Cam1 Position
             </div>
             <div class="col-md-6">
-                <select  class="form-control" style="width:100%;text-align:center" id="camera_one_position_{{pyview.uid}}"  onchange='pyview.subject.set_camera_one_position($("#camera_one_position_{{pyview.uid}}").val())'>
+                <select  class="form-control" style="width:8em;text-align:center" id="camera_one_position_{{pyview.uid}}"  onchange='pyview.subject.set_camera_one_position($("#camera_one_position_{{pyview.uid}}").val())'>
                     <option value="top"    {% if pyview.subject.camera_one_position == "top"    %} selected {%endif%}> Top </option>
                     <option value="bottom" {% if pyview.subject.camera_one_position == "bottom" %} selected {%endif%}> Bottom </option>
                 </select>
@@ -59,7 +59,7 @@ class SettingsLocationView(PyHtmlView):
                 Diameter
             </div>
             <div class="col-md-8">
-                <input  class="form-control" style="text-align:center" id="region_diameter_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.diameter}}" onchange='pyview.subject.set_diameter($("#region_diameter_{{pyview.uid}}").val())'>
+                <input  class="form-control" style="text-align:center;width:8em" id="region_diameter_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.diameter}}" onchange='pyview.subject.set_diameter($("#region_diameter_{{pyview.uid}}").val())'>
             </div>
         </div>
         <div class="row">
@@ -67,7 +67,7 @@ class SettingsLocationView(PyHtmlView):
                 Height
             </div>
             <div class="col-md-8">
-                <input  class="form-control" style="text-align:center" id="region_height_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.height}}" onchange='pyview.subject.set_height($("#region_height_{{pyview.uid}}").val())'>
+                <input  class="form-control" style="text-align:center;width:8em" id="region_height_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.height}}" onchange='pyview.subject.set_height($("#region_height_{{pyview.uid}}").val())'>
             </div>
         </div>    
     </td>

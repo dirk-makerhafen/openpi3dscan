@@ -45,6 +45,7 @@ class CalibrationData(GenericTask):
         super().__init__(rc_job)
         self.data = initial_data
         self.xmp_exclude = []
+        self.written_files = {}
 
     def reset(self):
         self.data = {}
@@ -94,13 +95,6 @@ class CalibrationData(GenericTask):
     def update_from_xmp(self):
         cnt = 0
 
-        self.delete_xmp_files()
-        cmd = self._get_cmd_start()
-        cmd += '-load "%s\\%s.rcproj" deleteAutosave ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
-        cmd += '-exportXMP "%s" ' %  self.get_path("xmp_settings.xml")
-        cmd += '-quit '
-        self._run_command(cmd, "export_xmp")
-
         cam_data = self._read_xmp_files()
         self.delete_xmp_files()
         first_time_calibration = len(self.data) == 0
@@ -131,6 +125,7 @@ class CalibrationData(GenericTask):
     def write_xmp_files(self):
         self.xmp_exclude = []
         cnt = 0
+        self.written_files = {}
         for cam_id in self.get_camera_ids():
             segment, row = cam_id.split("-")
             group_id = ( int(segment) * 100 ) + int(row)
@@ -160,31 +155,36 @@ class CalibrationData(GenericTask):
                         cnt += 1
                         with open(xmp_path, "w") as f:
                             f.write(s)
+                        self.written_files["seg%s-cam%s-%s.xmp" % (segment, row, mode[0])] = os.path.getmtime(xmp_path)
             except:
                 pass
         return cnt
 
     def _read_xmp_files(self):
         camera_data = []
-        for path in glob.glob(os.path.join(self.rc_job.workingdir, "images", "*", "*.xmp")):
-            img_path = path.replace(".xmp",".jpg")
+        for xmp_path in glob.glob(os.path.join(self.rc_job.workingdir, "images", "*", "*.xmp")):
+            img_path = xmp_path.replace(".xmp",".jpg")
             if not os.path.exists(img_path):
                 continue
-            data = open(path, "r").read()
+            fname = os.path.split(xmp_path)[1]
+            if fname in self.written_files and self.written_files[fname] == os.path.getmtime(xmp_path): # file did not change
+                continue
+
+            data = open(xmp_path, "r").read()
             try:
                 cam_data = {
-                    "segment"              : path.split('\\')[-1].split("-")[0].replace("seg","").strip(),
-                    "row"                  : path.split('\\')[-1].split("-")[1].replace("cam","").strip(),
-                    "mode"                 : path.split('\\')[-1].split('-')[2].strip(),
+                    "segment"              : fname.split("-")[0].replace("seg","").strip(),
+                    "row"                  : fname.split("-")[1].replace("cam","").strip(),
+                    "mode"                 : fname.split('-')[2].strip(),
                     "FocalLength35mm"      : float(data.split("FocalLength35mm=")[1].split('"')[1]),
                     "PrincipalPointU"      : float(data.split("PrincipalPointU=")[1].split('"')[1]),
                     "PrincipalPointV"      : float(data.split("PrincipalPointV=")[1].split('"')[1]),
                     "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
                     "CalibrationPrior"     : data.split("CalibrationPrior=")[1].split('"')[1],
-                }
+                } 
                 cam_data["cam_id"] = "%s-%s" % (cam_data["segment"], cam_data["row"])
             except Exception as e:
-                print("Failed to load",path ,e)
+                print("Failed to load", xmp_path ,e)
                 continue
             try:
                 cam_data["Rotation"]= [float(x) for x in data.split("Rotation>")[1].split('<')[0].split(" ")]

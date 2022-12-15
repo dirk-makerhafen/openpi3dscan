@@ -20,13 +20,14 @@ class ResultsArchive(GenericTask):
         model_file_zip = os.path.join(self.rc_job.workingdir, "%s.zip" % self.rc_job.export_foldername)
         if os.path.exists(model_file_zip):
             os.remove(model_file_zip)
+
         try:
-            subprocess.check_output(shlex.split(
-                "powershell -command \"Compress-Archive '%s\\*' '%s'\"" % (self.rc_job.export_foldername, model_file_zip)
-            ),shell=False, creationflags=CREATE_NO_WINDOW, cwd=self.rc_job.workingdir)
+            if len([x for x in glob.glob(os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, "*"))]) == 1:
+                subprocess.check_output(shlex.split("powershell -command \"Compress-Archive '*' '..\\%s'\"" % ( model_file_zip)),shell=False, creationflags=CREATE_NO_WINDOW, cwd=os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername))
+            else:
+                subprocess.check_output(shlex.split("powershell -command \"Compress-Archive '%s\\*' '%s'\"" % (self.rc_job.export_foldername, model_file_zip)),shell=False, creationflags=CREATE_NO_WINDOW, cwd=self.rc_job.workingdir)
         except:
             pass
-
 
         if not os.path.exists(model_file_zip):
             self.log.append("Failed to create result zip file")

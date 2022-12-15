@@ -65,6 +65,8 @@ class ExportModel(GenericTask):
         if self.rc_job.compress_results is False and self.rc_job.filetype != "rcproj":
             self.rc_job.result_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername)
 
+        if os.path.exists("%s.rcInfo" % self.output_model_path):
+            os.remove("%s.rcInfo" % self.output_model_path)
         self.log.append("Export model created")
         self.set_status("success")
 

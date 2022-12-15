@@ -140,6 +140,12 @@ class RealityCapture(Observable):
         if self.status == "active":
             self.set_status("success")
 
+
+        if self.compress_results is False and self.result_path is not None and self.status == "success":
+            result_files = [x for x in glob.glob(os.path.join(self.workingdir, self.export_foldername, "*"))]
+            if len(result_files) == 1:
+                self.result_file = result_files[0]
+
         if self.compress_results is True and os.path.exists(os.path.join(self.workingdir, self.export_foldername)):
             try:
                 shutil.rmtree(os.path.join(self.workingdir, self.export_foldername))

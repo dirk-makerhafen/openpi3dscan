@@ -181,7 +181,7 @@ class CalibrationData(GenericTask):
                     "PrincipalPointV"      : float(data.split("PrincipalPointV=")[1].split('"')[1]),
                     "DistortionCoeficients": [float(x) for x in data.split("DistortionCoeficients>")[1].split('<')[0].split(" ")],
                     "CalibrationPrior"     : data.split("CalibrationPrior=")[1].split('"')[1],
-                } 
+                }
                 cam_data["cam_id"] = "%s-%s" % (cam_data["segment"], cam_data["row"])
             except Exception as e:
                 print("Failed to load", xmp_path ,e)

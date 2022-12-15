@@ -1,3 +1,4 @@
+import datetime
 import glob
 import json
 import os
@@ -12,6 +13,7 @@ import zipstream
 from zipfile import ZIP_STORED
 
 from app_windows.files.shots import ShotsInstance
+from app_windows.settings.settings import SettingsInstance
 
 bottle.BaseRequest.MEMFILE_MAX = 800 * 1024 * 1024
 
@@ -75,7 +77,19 @@ class HttpEndpoints:
         bottle.route("/modelview.html")(self._modelview_html)
         bottle.route("/model-viewer.min.js")(self._modelview_js)
         bottle.route("/rc_cache/<path:path>")(self.rc_cache)
+        bottle.route("/settings_backup")(self._settings_backup)
 
+    def _settings_backup(self):
+        fname = "Backup-Settings"
+        if SettingsInstance().settingsScanner.location != "":
+            fname = "%s-%s" % (fname, SettingsInstance().settingsScanner.location)
+        now = datetime.datetime.now()
+        fname = "%s-%s.%s.%s %s%s.json" % (fname, now.year, ("%s" % now.month).zfill(2), ("%s" % now.day).zfill(2), ("%s" % now.hour).zfill(2), ("%s" % now.minute).zfill(2))
+        headers = {
+            'Content-Type': "application/json",
+            'Content-Disposition': 'attachment; filename="%s"' % fname
+        }
+        return bottle.HTTPResponse(json.dumps(SettingsInstance().to_dict()), **headers)
 
     def rc_cache(self, path):
         filename = path.split("/")[-1]

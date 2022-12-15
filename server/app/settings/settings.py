@@ -10,7 +10,7 @@ from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsDropbox import SettingsDropbox
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2022.12.12-10.01"
+VERSION = "2022.12.12-10.02"
 
 
 class Settings(Observable):
@@ -29,8 +29,9 @@ class Settings(Observable):
         self.VERSION = VERSION
         self.load()
 
-    def save(self):
-        data = {
+
+    def to_dict(self):
+        return {
             "sequenceSettingsSpeed" : self.sequenceSettingsSpeed.to_dict(),
             "sequenceSettingsQuality" : self.sequenceSettingsQuality.to_dict(),
             "cameraSettings" : self.cameraSettings.to_dict(),
@@ -41,7 +42,9 @@ class Settings(Observable):
             "settingsScanner" : self.settingsScanner.to_dict(),
             "settingsDropbox" : self.settingsDropbox.to_dict()
         }
-        open("/opt/openpi3dscan/.openpi3dscan.json", "w").write(json.dumps(data))
+
+    def save(self):
+        open("/opt/openpi3dscan/.openpi3dscan.json", "w").write(json.dumps(self.to_dict()))
 
     def load(self):
         try:

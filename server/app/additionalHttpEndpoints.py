@@ -1,3 +1,4 @@
+import datetime
 import glob
 import json
 import os
@@ -88,6 +89,7 @@ class HttpEndpoints:
         bottle.route("/force_update")(self.force_update)
         bottle.route("/realityCaptureProcess")(self.realityCaptureProcess)
         bottle.route("/upload_calibration", method="POST")(self.upload_calibration)
+        bottle.route("/settings_backup")(self._settings_backup)
 
     def realityCaptureProcess(self):
         data = {
@@ -129,6 +131,17 @@ class HttpEndpoints:
         }
         return bottle.HTTPResponse(data, **headers)
 
+    def _settings_backup(self):
+        fname = "Backup-Settings"
+        if SettingsInstance().settingsScanner.location != "":
+            fname = "%s-%s" % (fname, SettingsInstance().settingsScanner.location)
+        now = datetime.datetime.now()
+        fname = "%s-%s.%s.%s %s%s.json" % (fname, now.year, ("%s" % now.month).zfill(2), ("%s" % now.day).zfill(2), ("%s" % now.hour).zfill(2), ("%s" % now.minute).zfill(2))
+        headers = {
+            'Content-Type': "application/json",
+            'Content-Disposition': 'attachment; filename="%s"' % fname
+        }
+        return bottle.HTTPResponse(json.dumps(SettingsInstance().to_dict()), **headers)
 
     def _shot_download_model_file(self, shot_id, model_id, filename):
         model = ShotsInstance().get(shot_id).get_model_by_id(model_id)

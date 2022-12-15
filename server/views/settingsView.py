@@ -11,6 +11,7 @@ from views.settings.settingsScannerView import SettingsScannerView
 from views.settings.settingsSequenceView import SequenceSettingsView
 from views.settings.settingsUsbStorageView import UsbStorageView
 from views.settings.settingsWirelessView import WirelessSettingsView
+from views.settings.settingsBackupView import SettingsBackupView
 
 
 class TaskUpdateServerView(PyHtmlView):
@@ -84,6 +85,7 @@ class SettingsView(PyHtmlView):
         {{pyview.rebootShutdownView.render()}}  
 
         {{pyview.hostnameView.render()}}  
+        {{pyview.settingsBackupView.render()}}  
 
     </div> 
     
@@ -103,3 +105,4 @@ class SettingsView(PyHtmlView):
         self.hostnameView = HostnameSettingsView(self.subject.settings.hostnameSettings, self)
         self.scannerSettingsView = SettingsScannerView(self.subject.settings.settingsScanner, self)
         self.dropboxSettingsView = SettingsDropboxView(self.subject.settings.settingsDropbox, self)
+        self.settingsBackupView = SettingsBackupView(self.subject.settings, self)

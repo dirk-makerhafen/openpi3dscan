@@ -1,28 +1,8 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from app.app import App
-    from views.appView import AppView
 from pyhtmlgui import PyHtmlView
-from views.sidebar.shotsView import ShotsView
+from views.sidebar.sidebarShotsView import SidebarShotsView
 from app.settings.settings import SettingsInstance
+from views.sidebar.sidebarTopView import SidebarTopView
 
-
-
-class SidebarButtonsView(PyHtmlView):
-    DOM_ELEMENT_CLASS = "row menu"
-    TEMPLATE_STR = '''
-    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.settingsView %} selected {% endif %}" onclick='pyview.parent.show_settings();'>
-        Settings
-    </div>
-    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.devicesView %} selected {% endif %}" onclick='pyview.parent.show_devices();'>
-        Devices
-    </div>
-    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.liveView %} selected {% endif %}" onclick='pyview.parent.show_liveview();'>
-       Live
-    </div>
-    <div class="col-md-12 item" style="height:3px"'> </div> 
-    '''
 
 class SidebarView(PyHtmlView):
     DOM_ELEMENT_CLASS = "Sidebar col-md-3"
@@ -36,10 +16,11 @@ class SidebarView(PyHtmlView):
     </div>
     '''
 
-    def __init__(self, subject: App, parent: AppView):
+    def __init__(self, subject, parent):
         super().__init__(subject, parent)
-        self.shotsView = ShotsView(subject=subject.shots.shots, parent=self, settingsInstance=SettingsInstance())
-        self.buttonsView = SidebarButtonsView(subject=subject, parent=self)
+        self._mainView = self.parent.mainView
+        self.shotsView = SidebarShotsView(subject=subject.shots.shots, parent=self, settingsInstance=SettingsInstance())
+        self.buttonsView = SidebarTopView(subject=subject, parent=self)
         self.current_search = ""
 
     def show_devices(self):

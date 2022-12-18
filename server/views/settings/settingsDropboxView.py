@@ -1,6 +1,5 @@
 from pyhtmlgui import PyHtmlView
 
-
 class SettingsDropboxView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="Dropbox">

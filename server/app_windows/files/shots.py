@@ -4,8 +4,10 @@ import os
 from pyhtmlgui import ObservableList
 
 from app_windows.files.shot import Shot
+from app.dropbox.process import DropboxUploads
+from app_windows.settings.settings import SettingsInstance
 
-# All local and remote Shots
+
 class Shots:
     def __init__(self):
         self.shots = ObservableList()
@@ -14,6 +16,7 @@ class Shots:
             os.mkdir(self.path)
         self.cache = {}
         self.unprocessed_models = []
+        self.dropboxUploads = DropboxUploads(SettingsInstance())
         self.load_shots_from_disk()
 
     def get(self, shot_id):

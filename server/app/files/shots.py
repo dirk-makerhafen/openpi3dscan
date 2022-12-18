@@ -5,7 +5,7 @@ from pyhtmlgui import ObservableList
 
 from app.files.shot import Shot
 from app.settings.settings import SettingsInstance
-
+from app.dropbox.process import DropboxUploads
 # All local and remote Shots
 class Shots:
     def __init__(self, devices):
@@ -15,6 +15,7 @@ class Shots:
         self.devices = devices
         self.deleted_shot_ids = []
         self.unprocessed_models = []
+        self.dropboxUploads = DropboxUploads(SettingsInstance())
         self.load()
 
     def create(self, shot_id, name):

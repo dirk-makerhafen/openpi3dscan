@@ -1,6 +1,7 @@
 from pyhtmlgui import PyHtmlView
 
 from app_windows.files.shotsDropboxDownload import ShotsDropboxDownloadInstance
+import webbrowser
 
 import time
 

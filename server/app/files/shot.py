@@ -15,8 +15,10 @@ from gevent.fileobject import FileObjectThread
 from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
 
+from app.dropbox.sharings import DropboxPrivateImagesShare
 from app.files.modelFile import ModelFile
-from app.files.shotDropboxUpload import ShotDropboxUpload
+from app.files.old_shotDropboxUpload import ShotDropboxUpload
+from app.files.shotPublicFolder import ShotDropboxPublicFolder
 from app.settings.settings import SettingsInstance
 
 SyncThreadPool = ThreadPool(8)
@@ -25,6 +27,7 @@ class Shot(Observable):
     def __init__(self, shot_dir, shot_id, parent_shots):
         super().__init__()
         self.parent_shots = parent_shots
+        self.settingsInstance = SettingsInstance()
         self.shot_id = shot_id
         self.name = self.shot_id
         self.status = ""
@@ -45,9 +48,8 @@ class Shot(Observable):
         if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
             self.images_path = self.path
         self.preview_images_path = os.path.join(self.path, "preview_images")
-        self.dropboxUpload = ShotDropboxUpload(self)
-        self.dropboxSharing = None
-        self.dropboxSharingName = None
+        self.dropboxUpload = DropboxPrivateImagesShare(self)
+        self.dropboxPublicFolder = ShotDropboxPublicFolder(self)
         self.load()
 
     @property
@@ -82,6 +84,9 @@ class Shot(Observable):
             self.save()
 
     def set_name(self, name):
+        while "  " in name:
+            name = name.replace("  ", " ")
+        name = name.strip()
         if self.name == name:
             return
         self.name = name
@@ -90,6 +95,9 @@ class Shot(Observable):
         self.notify_observers()
 
     def set_comment(self, comment):
+        while "  " in comment:
+            comment = comment.replace("  ", " ")
+        comment = comment.strip()
         if self.comment == comment:
             return
         self.comment = comment
@@ -289,6 +297,7 @@ class Shot(Observable):
                         "license_data": self.license_data,
                         "models" : [m.to_dict() for m in self.models],
                         "dropbox" : self.dropboxUpload.to_dict(),
+                        "dropboxPublicFolder" : self.dropboxPublicFolder.to_dict(),
                     })
                 with open(os.path.join(self.path, "metadata.json"), "w") as f:
                     f.write(data)
@@ -331,6 +340,10 @@ class Shot(Observable):
                         pass
                     try:
                         self.dropboxUpload.from_dict(data["dropbox"])
+                    except:
+                        pass
+                    try:
+                        self.dropboxPublicFolder.from_dict(data["dropboxPublicFolder"])
                     except:
                         pass
             except Exception as e:

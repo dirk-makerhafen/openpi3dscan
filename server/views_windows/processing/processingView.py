@@ -1,6 +1,6 @@
 from pyhtmlgui import PyHtmlView, ObservableListView
 
-from views_windows.realityCapture.realityCaptureView import RealityCaptureView
+from views_windows.processing.realityCaptureView import RealityCaptureView
 
 
 class ProcessingView(PyHtmlView):

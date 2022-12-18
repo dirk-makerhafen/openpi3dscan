@@ -19,9 +19,11 @@ class ModelFile(Observable):
         self.create_mesh_from = create_mesh_from  # normal, projection, all
         self.lit = lit # unlit = No shadows, lit = with shadows
         self.filename = ""
+        self.is_folder = None
         self.filesize = 0
         self.create_textures = create_textures
         self.path = os.path.join(self.parentShot.path, "models")
+
 
     def set_status(self, new_status):
         self.status = new_status
@@ -47,6 +49,7 @@ class ModelFile(Observable):
         self.filesize = round(os.path.getsize(os.path.join(self.path, self.filename)) / 1024 / 1024, 3)
         if self.filesize >= 1:
             self.filesize = int(round(self.filesize,0))
+        self.is_folder = False
         self.set_status("ready")
 
     def write_folder(self, sourcefolder):
@@ -70,7 +73,7 @@ class ModelFile(Observable):
         self.filesize = round(get_size(target_dir) / 1024 / 1024, 3)
         if self.filesize >= 1:
             self.filesize = int(round(self.filesize,0))
-
+        self.is_folder = True
         self.set_status("ready")
 
     def _create_filename(self, pattern):

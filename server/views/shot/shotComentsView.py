@@ -11,7 +11,7 @@ class ShotCommentsView(PyHtmlView):
     </div>
     <div class="row">
         <div class="col-md-12">
-            <textarea style="width: 100%;min-height: 300px;" id="comment_input" onchange='pyview.parent.current_shot.set_comment($("#comment_input").val())'>{{pyview.parent.current_shot.comment}}</textarea>
+            <textarea style="width: 100%;min-height: 300px;" id="comment_input" onchange='pyview.subject.set_comment($("#comment_input").val())'>{{pyview.subject.comment}}</textarea>
         </div>
     </div>
     <script>

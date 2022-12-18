@@ -182,14 +182,6 @@ class ShotDropboxUpload(Observable):
                 rv[entry.name] = entry
             return rv
 
-    def check_apitoken(self):
-        try:
-            res = self.dropbox.files_list_folder("")
-            return True
-        except Exception as e:
-            print(e)
-        return False
-
     def _upload_file(self, source, destination):
         with open(source, 'rb') as f:
             client_modified = datetime.datetime(*time.gmtime(os.path.getmtime(source))[:6])

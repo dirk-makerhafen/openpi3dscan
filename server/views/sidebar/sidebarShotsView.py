@@ -1,7 +1,7 @@
 from pyhtmlgui import PyHtmlView, ObservableListView
 
 
-class ShotsView(ObservableListView):
+class SidebarShotsView(ObservableListView):
     DOM_ELEMENT_CLASS = "ShotsView row"
     TEMPLATE_STR = '''
     {% for item in pyview.get_items() %}

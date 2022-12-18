@@ -4,7 +4,6 @@ from app_windows.files.shotsDropboxDownload import ShotsDropboxDownloadInstance
 from app_windows.settings.settings import SettingsInstance
 from app_windows.processing import Processing
 
-
 class App(Observable):
     def __init__(self):
         super().__init__()

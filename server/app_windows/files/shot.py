@@ -16,6 +16,7 @@ from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
 
 from app.files.modelFile import ModelFile
+from app.files.shotPublicFolder import ShotDropboxPublicFolder
 from app_windows.settings.settings import SettingsInstance
 
 SyncThreadPool = ThreadPool(8)
@@ -24,6 +25,7 @@ class Shot(Observable):
     def __init__(self, shot_dir, shot_id, parent_shots):
         super().__init__()
         self.parent_shots = parent_shots
+        self.settingsInstance = SettingsInstance()
         self.shot_id = shot_id
         self.name = self.shot_id
         self.status = ""
@@ -45,6 +47,7 @@ class Shot(Observable):
         if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
             self.images_path = self.path
         self.preview_images_path = os.path.join(self.path, "preview_images")
+        self.dropboxPublicFolder = ShotDropboxPublicFolder(self)
         self.load()
 
 
@@ -64,6 +67,9 @@ class Shot(Observable):
         return len([m for m in self.models if m.status == "failed"])
 
     def set_name(self, name):
+        while "  " in name:
+            name = name.replace("  ", " ")
+        name = name.strip()
         if self.name == name:
             return
         self.name = name
@@ -71,6 +77,9 @@ class Shot(Observable):
         self.notify_observers()
 
     def set_comment(self, comment):
+        while "  " in comment:
+            comment = comment.replace("  ", " ")
+        comment = comment.strip()
         if self.comment == comment:
             return
         self.comment = comment
@@ -173,7 +182,6 @@ class Shot(Observable):
             self.parent_shots.unprocessed_models.append(model)
             self.models.append(model)
             self.save()
-        self.notify_observers()
 
     def create_models_from_set(self, set_name):
         model_templates = SettingsInstance().realityCaptureSettings.settingsDefaultModelSets.get_models_by_setname(set_name)
@@ -210,7 +218,6 @@ class Shot(Observable):
         if model in self.parent_shots.unprocessed_models:
             self.parent_shots.unprocessed_models.remove(model)
         self.save()
-        self.notify_observers()
 
     def count_number_of_files(self):
         self.nr_of_files = len(glob.glob(os.path.join(self.images_path, "normal", "*.jpg"))) + len(glob.glob(os.path.join(self.images_path, "projection", "*.jpg")))
@@ -227,7 +234,8 @@ class Shot(Observable):
                     "meta_rotation": self.meta_rotation,
                     "license_data": self.license_data,
                     "meta_camera_one_position": self.meta_camera_one_position,
-                    "models" : [m.to_dict() for m in self.models]
+                    "models" : [m.to_dict() for m in self.models],
+                    "dropboxPublicFolder": self.dropboxPublicFolder.to_dict(),
                 }))
 
     def load(self):
@@ -248,6 +256,11 @@ class Shot(Observable):
                         pass
                     try:
                         self.models = ObservableList([ModelFile(self).from_dict(m) for m in data["models"]])
+                    except:
+                        pass
+                    try:
+                        self.dropboxPublicFolder.from_dict(data["dropboxPublicFolder"])
+                        print("here")
                     except:
                         pass
             except Exception as e:

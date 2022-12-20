@@ -212,6 +212,7 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
         if len(l) > 0:
             l = "%s " % l
         self.target_path = "/private/%s%s %s/" % (l, shot.shot_id, n)
+        print(self.target_path)
 
     def upload(self):
         self.set_status("pending")

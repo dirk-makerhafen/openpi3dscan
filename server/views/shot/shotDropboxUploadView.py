@@ -21,6 +21,7 @@ class DropboxUploadView(PyHtmlView):
             <div class="col-md-2"> <p class="h5"><i>&nbsp;{{pyview.subject.current_upload_file}}&nbsp;</i> </p> </div>
         {% else %}
             <div class="col-md-3" style="text-align: right;"> <p class="h5">Uploading, {{pyview.subject.status}} </div>
+            <div class="col-md-2" style="text-align: right;"> </div>
         {% endif %}
     '''
     def get_last_success(self):

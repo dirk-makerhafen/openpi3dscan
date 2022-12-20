@@ -143,6 +143,7 @@ class DropboxUploaderProcess():
         destination = '/%s' % destination.replace(os.path.sep, '/')
         while '//' in destination:
             destination = destination.replace('//', '/')
+        print("destination")
         try:
             res = self.dropbox.files_upload(data, destination, dropbox.files.WriteMode.overwrite, client_modified=client_modified, mute=True)
         except Exception as e:

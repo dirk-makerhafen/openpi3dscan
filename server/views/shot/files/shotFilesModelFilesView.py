@@ -118,7 +118,7 @@ class ModelFileItemView(PyHtmlView):
         <div class="col-md-3" style="text-align:center;margin-top:1px">
             {% if pyview.subject.status == "ready" %} 
                  {% if pyview.parent.parent.parent.parent.show_path == True %}
-                    <a style="white-space: nowrap;" href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.filename}}({{pyview.subject.filesize}}&nbsp;MB)
+                    <a style="white-space: nowrap;" href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.filename}}</a> ({{pyview.subject.filesize}}&nbsp;MB)
                 {% else %}
                     <a style="white-space: nowrap;" href="/shots/{{pyview.subject.parentShot.shot_id}}/download/{{pyview.subject.model_id}}">{{pyview.subject.filename}}</a> ({{pyview.subject.filesize}}&nbsp;MB)
                 {% endif %}

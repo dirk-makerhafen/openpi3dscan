@@ -211,7 +211,9 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
         n = self._clean_for_filesystem(shot.name.replace(":", "").replace(shot.shot_id, "").replace(shot.shot_id.split(" ")[0], "").replace(shot.shot_id.split(" ")[-1], ""))
         if len(l) > 0:
             l = "%s " % l
-        self.target_path = "/private/%s%s %s/" % (l, shot.shot_id, n)
+        if len(n) > 0:
+            n = " %s" % n
+        self.target_path = "/private/%s%s%s/" % (l, shot.shot_id, n)
         print(self.target_path)
 
     def upload(self):

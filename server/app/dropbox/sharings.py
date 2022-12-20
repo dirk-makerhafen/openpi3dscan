@@ -232,7 +232,7 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
             "meta_camera_one_position": self.shot.meta_camera_one_position,
         }).encode("UTF-8")
         data.append([ "data",metadata, "%s/%s" % (self.target_path, "metadata.json")])
-
+        return data
 
     def to_dict(self):
         d = super().to_dict()

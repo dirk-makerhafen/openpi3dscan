@@ -220,7 +220,7 @@ class DropboxUploads(Observable):
                 pending_upload.set_status("uploading")
                 if hasattr(pending_upload, "model") and pending_upload.model is not None:
                     pending_upload.model.set_publishing_status("state_changing")
-                if hasattr(pending_upload, "shot") and pending_upload.shot is not None:
+                if hasattr(pending_upload, "shot") and pending_upload.shot is not None and pending_upload.name != "ImagesAndMetadata":
                     pending_upload.shot.set_publishing_status("state_changing")
                 if hasattr(pending_upload, "shotPublicFolder"):
                     pending_upload.shotPublicFolder.notify_observers()

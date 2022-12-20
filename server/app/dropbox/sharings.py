@@ -216,7 +216,7 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
             n = " %s" % n
         self.target_path = "/private/%s%s%s/" % (l, shot.shot_id, n)
         print(self.target_path)
-        
+
     def upload(self):
         self.set_status("pending")
         self.shot.parent_shots.dropboxUploads.add_to_uploadqueue(self)

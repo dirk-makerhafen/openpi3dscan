@@ -375,6 +375,8 @@ class Shot(Observable):
                     self.meta_rotation = SettingsInstance().settingsScanner.camera_rotation
                     self.meta_camera_one_position = SettingsInstance().settingsScanner.camera_one_position
                     self.save()
+                else:
+                    print("has location -%s-" % self.meta_location)
             except Exception as e:
                 print("failed to load %s" % os.path.join(self.path, "metadata.json"), e)
 

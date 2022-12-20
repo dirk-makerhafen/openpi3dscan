@@ -13,6 +13,7 @@ class ModelFile(Observable):
         self.parentShot = parentShot
         self.model_id = "%s" % uuid.uuid4()
         self.status = "waiting"  # ready, failed
+        self.publishing_status = "no_publish" # "can_publish"  # can_publish, state_changing, can_unpublish
         self.filetype = filetype  # "obj", obj, 3mf, stl
         self.reconstruction_quality = reconstruction_quality  # preview, normal, high,
         self.quality = quality   # "high", normal, low
@@ -24,8 +25,15 @@ class ModelFile(Observable):
         self.create_textures = create_textures
         self.path = os.path.join(self.parentShot.path, "models")
 
+    def set_publishing_status(self, new_status):
+        if self.publishing_status == new_status:
+            return
+        self.publishing_status = new_status
+        self.notify_observers()
 
     def set_status(self, new_status):
+        if self.status == new_status:
+            return
         self.status = new_status
         self.parentShot.save()
         self.notify_observers()
@@ -51,6 +59,7 @@ class ModelFile(Observable):
             self.filesize = int(round(self.filesize,0))
         self.is_folder = False
         self.set_status("ready")
+        self.set_publishing_status("can_publish")
 
     def write_folder(self, sourcefolder):
         self.filename = self._create_filename("%s_%s%s%s%s%s_%s")
@@ -75,6 +84,7 @@ class ModelFile(Observable):
             self.filesize = int(round(self.filesize,0))
         self.is_folder = True
         self.set_status("ready")
+        self.set_publishing_status("can_publish")
 
     def _create_filename(self, pattern):
         rcStr = self.reconstruction_quality[0].upper()
@@ -176,6 +186,7 @@ class ModelFile(Observable):
             self.lit = data["lit"]
         except:
             pass
-
+        if self.status == "ready":
+            self.publishing_status = "can_publish"
         return self
 

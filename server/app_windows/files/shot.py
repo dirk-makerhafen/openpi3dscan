@@ -29,6 +29,7 @@ class Shot(Observable):
         self.shot_id = shot_id
         self.name = self.shot_id
         self.status = ""
+        self.publishing_status = "can_publish"  # can_publish, state_changing, can_unpublish
         self.comment = ""
         #metadata
         self.meta_location = ""
@@ -65,6 +66,22 @@ class Shot(Observable):
     @property
     def nr_of_models_failed(self):
         return len([m for m in self.models if m.status == "failed"])
+
+    @property
+    def can_delete(self):
+        if self.status == "sync":
+            return False
+        if self.dropboxPublicFolder.can_delete is False:
+            return False
+        return True
+
+    def set_publishing_status(self, new_status):
+        if self.publishing_status == new_status:
+            return
+        self.publishing_status = new_status
+        self.notify_observers()
+
+
 
     def set_name(self, name):
         while "  " in name:
@@ -103,6 +120,8 @@ class Shot(Observable):
 
 
     def delete(self):
+        if self.can_delete is False:
+            return
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
 

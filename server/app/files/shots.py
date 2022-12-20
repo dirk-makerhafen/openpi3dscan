@@ -15,7 +15,7 @@ class Shots:
         self.devices = devices
         self.deleted_shot_ids = []
         self.unprocessed_models = []
-        self.dropboxUploads = DropboxUploads(SettingsInstance())
+        self.dropboxUploads = DropboxUploads(self, SettingsInstance())
         self.load()
 
     def create(self, shot_id, name):

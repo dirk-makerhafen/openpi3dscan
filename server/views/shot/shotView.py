@@ -23,10 +23,10 @@ class ShotView(PyHtmlView):
                 {% endif %}
                 <div id="comments_btn" class="col-md-1 topMenuItem" onclick='pyview.toggle_comments();'>
                     Comments
-                </div>        
-                <div id="files_btn" class="col-md-1 topMenuItem" onclick='pyview.toggle_files();'>
-                    Files
                 </div>
+                <div id="files_btn" class="col-md-1 topMenuItem {% if pyview.current_view == pyview.shotFiles   %}selected{%endif%}" onclick='pyview.show_files();'>
+                    Files
+                </div>        
                 {% if pyview.show_path == True %}
                     <div class="{% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}col-md-3{% else %}col-md-4{% endif %} topMenuItem"> <a href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.path}}</a>  </div>
                 {% else %}
@@ -77,7 +77,6 @@ class ShotView(PyHtmlView):
         </div>
         {% if pyview.subject._deleted != True %}
             {{ pyview.comments.render() }}
-            {{ pyview.shotFiles.render() }}
         {% endif %}
         <script>
             document.onkeydown = function (e) {
@@ -125,12 +124,13 @@ class ShotView(PyHtmlView):
                 self.update()
 
     def toggle_comments(self):
-        self.shotFiles.hide()
         self.comments.toggle()
 
-    def toggle_files(self):
-        self.comments.hide()
-        self.shotFiles.toggle()
+    def show_files(self):
+        if self.current_view != self.shotFiles:
+            self.current_view = self.shotFiles
+            if self.is_visible:
+                self.update()
 
     def delete_shot(self):
         self.shotsInstance.delete(self.subject)

@@ -27,9 +27,13 @@ class DropboxGenericShare(Observable):
     def save(self):
         raise NotImplementedError()
 
+    def delete(self):
+        raise NotImplementedError()
+
     def set_status(self, status):
         if status != self.status:
             self.status = status
+            self.save()
             self.notify_observers()
 
     def to_dict(self):
@@ -42,6 +46,7 @@ class DropboxGenericShare(Observable):
             "progress": self.progress,
             "source_path": self.source_path,
             "target_path": self.target_path,
+            "url": self.url,
         }
 
     def from_dict(self, data):
@@ -53,6 +58,11 @@ class DropboxGenericShare(Observable):
         self.progress = data["progress"]
         self.source_path = data["source_path"]
         self.target_path = data["target_path"]
+        self.url = data["url"]
+        if self.status == "uploading":
+            self.status = "pending"
+        if self.status in ["deleting", "deleted"]:
+            self.delete()
         return self
 
     def _clean_for_filesystem(self, value):
@@ -81,19 +91,27 @@ class DropboxPublicModelShare(DropboxGenericShare):
         super().__init__()
         self.shotPublicFolder = shotPublicFolder
         self.model = model
-        self.name = self.model.filename
-        self.source_path = self.model.get_path()
-        self.target_path = "/public/%s/%s" % (self._clean_for_filesystem(self.shotPublicFolder.name), self.model.filename)
+        if model is not None:
+            self.name = self.model.filename
+            self.source_path = self.model.get_path()
+            self.target_path = "/public/%s/%s" % (self._clean_for_filesystem(self.shotPublicFolder.name), self.model.filename)
+        else:
+            self.name = ""
+            self.source_path = ""
+            self.target_path = ""
         self.url = ""
 
     def delete(self):
+        if self.model is not None:
+            self.model.set_publishing_status("state_changing")
         t = threading.Thread(target=self._delete_thread, daemon=True)
         t.run()
 
     def _delete_thread(self):
         self.shotPublicFolder.parent_shot.parent_shots.dropboxUploads.remove_from_uploadqueue(self)
-        old_status = self.status
         self.set_status("deleting")
+        self.shotPublicFolder.notify_observers()
+        old_status = self.status
         try:
             with dropbox.Dropbox(oauth2_refresh_token=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
                 try:
@@ -101,16 +119,22 @@ class DropboxPublicModelShare(DropboxGenericShare):
                 except:
                     pass
                 self.shotPublicFolder.uploads.remove(self)
-                self.model.is_shared = False
-                self.model.notify_observers()
+                if self.model is not None:
+                    self.model.set_publishing_status("can_publish")
         except:
             self.set_status(old_status)
+            if self.model is not None:
+                self.model.set_publishing_status("can_unpublish")
         self.save()
         self.notify_observers()
+        self.shotPublicFolder.notify_observers()
 
     def to_dict(self):
         d = super().to_dict()
-        d["model_id"] = self.model.model_id
+        if self.model is not None:
+            d["model_id"] = self.model.model_id
+        else:
+            d["model_id"] = None
         d["name"] = self.name
         return d
 
@@ -127,17 +151,19 @@ class DropboxPublicImagesShare(DropboxGenericShare):
         super().__init__()
         self.shotPublicFolder = shotPublicFolder
         self.name = "Images"
-        shot = self.shotPublicFolder.parent_shot
-        self.source_path = shot.images_path
+        self.shot = self.shotPublicFolder.parent_shot
+        self.source_path = self.shot.images_path
         f = self._clean_for_filesystem(self.shotPublicFolder.name)
-        n = self._clean_for_filesystem(shot.name)
+        n = self._clean_for_filesystem(self.shot.name)
         if f != n:
-            self.target_path = "/public/%s/%s Images" % (f ,n)
+            self.target_path = "/public/%s/%s_Images" % (f ,n)
+            self.name = "%s Images" % n
         else:
             self.target_path = "/public/%s/Images" % (f)
         self.url = ""
 
     def delete(self):
+        self.shotPublicFolder.parent_shot.set_publishing_status("state_changing")
         t = threading.Thread(target=self._delete_thread, daemon=True)
         t.run()
 
@@ -145,6 +171,8 @@ class DropboxPublicImagesShare(DropboxGenericShare):
         self.shotPublicFolder.parent_shot.parent_shots.dropboxUploads.remove_from_uploadqueue(self)
         old_status = self.status
         self.set_status("deleting")
+        self.shotPublicFolder.notify_observers()
+
         try:
             with dropbox.Dropbox(oauth2_refresh_token=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
                 try:
@@ -152,13 +180,15 @@ class DropboxPublicImagesShare(DropboxGenericShare):
                 except:
                     pass
                 self.shotPublicFolder.uploads.remove(self)
-                self.shotPublicFolder.share_images = False
+                self.shotPublicFolder.parent_shot.set_publishing_status("can_publish")
                 self.shotPublicFolder.notify_observers()
                 self.shotPublicFolder.parent_shot.notify_observers()
         except:
+            self.shotPublicFolder.parent_shot.set_publishing_status("can_unpublish")
             self.set_status(old_status)
         self.save()
         self.notify_observers()
+        self.shotPublicFolder.notify_observers()
 
     def to_dict(self):
         d = super().to_dict()
@@ -201,6 +231,3 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
     def to_dict(self):
         d = super().to_dict()
         return d
-
-    def set_deleted(self):
-        self.set_status("deleted")

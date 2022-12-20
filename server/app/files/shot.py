@@ -29,6 +29,7 @@ class Shot(Observable):
         self.parent_shots = parent_shots
         self.settingsInstance = SettingsInstance()
         self.shot_id = shot_id
+        self.publishing_status = "can_publish"  # can_publish, state_changing, can_unpublish
         self.name = self.shot_id
         self.status = ""
         self.comment = ""
@@ -70,6 +71,23 @@ class Shot(Observable):
     @property
     def nr_of_models_failed(self):
         return len([m for m in self.models if m.status == "failed"])
+
+    @property
+    def can_delete(self):
+        if self.status == "sync":
+            return False
+        if self.dropboxPublicFolder.can_delete is False:
+            return False
+        return True
+
+
+    def set_publishing_status(self, new_status):
+        if self.publishing_status == new_status:
+            return
+        self.publishing_status = new_status
+        self.notify_observers()
+
+
 
     def create_folders(self):
         if not os.path.exists(self.path):
@@ -116,6 +134,8 @@ class Shot(Observable):
             self.notify_observers()
 
     def delete(self):
+        if self.can_delete is False:
+            return
         if self.devices is not None:
             for device in self.devices:
                 device.camera.shots.delete(self.shot_id)
@@ -129,7 +149,7 @@ class Shot(Observable):
 
     # image_mode = normal | preview, image_type = normal | projection
     def _sync_remote(self):
-        self.status = "Sync"
+        self.status = "sync"
         self.notify_observers()
         self.create_folders()
         tasks = []

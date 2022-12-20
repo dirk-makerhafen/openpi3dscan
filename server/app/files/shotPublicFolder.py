@@ -20,9 +20,17 @@ class ShotDropboxPublicFolder(Observable):
         self.path = ""
         self.compressed = False
         self.expire_in = 0
+        self.expire_time = 0
         self.url = ""
         self.uploads = ObservableList()
-        self.share_images = False
+
+    @property
+    def can_delete(self):
+        if self.status in ["creating", "pending_delete", "deleting", "deleted"]:
+            return False
+        if True in [u.status in ["uploading", "deleting", "deleted"] for u in self.uploads]:
+            return False
+        return True
 
     def save(self):
         self.parent_shot.save()
@@ -37,8 +45,8 @@ class ShotDropboxPublicFolder(Observable):
         if len([m for m in self.uploads if not hasattr(m,"model")]) > 0:
             return
         upload = DropboxPublicImagesShare(self)
-        self.share_images = True
         self.uploads.append(upload)
+        self.parent_shot.set_publishing_status("can_unpublish")
         self.parent_shot.parent_shots.dropboxUploads.add_to_uploadqueue(upload)
         self.save()
         self.notify_observers()
@@ -54,9 +62,10 @@ class ShotDropboxPublicFolder(Observable):
         if model in [m.model for m in self.uploads if hasattr(m,"model")]:
             return
         upload = DropboxPublicModelShare(self, model)
+        for old_upload in [u for u in self.uploads if hasattr(u,"model") and u.model is None and upload.target_path == u.target_path]:
+            old_upload.delete()
         self.parent_shot.parent_shots.dropboxUploads.add_to_uploadqueue(upload)
-        model.is_shared = True
-        model.notify_observers()
+        model.set_publishing_status("can_unpublish")
         self.uploads.append(upload)
         self.save()
         self.notify_observers()
@@ -67,22 +76,31 @@ class ShotDropboxPublicFolder(Observable):
         except:
             pass
 
+    def get_by_model(self, model):
+        try:
+            return [m for m in self.uploads if hasattr(m, "model") and m.model == model][0]
+        except:
+            return None
 
-    def create_link(self, name, expire_in, compressed):
+    def create_link(self, name, expire_in_weeks, compressed):
         if self.url != "" or self.status != "new":
             return
         self.name = self._clean_for_filesystem(name)
         if self.name == "":
             return
+        expire_in_seconds = int(expire_in_weeks) * 7 * 24 * 60 * 60
         self.set_status("creating")
         self.path = "/public/%s" % self.name
         self.compressed = compressed
-        self.expire_in = expire_in
+        self.expire_in = expire_in_seconds
+        self.expire_time = time.time() + expire_in_seconds
         self.save()
         t = threading.Thread(target=self._create_thread, daemon=True)
         t.run()
 
     def delete(self):
+        if self.can_delete is False:
+            return
         t = threading.Thread(target=self._delete_thread, daemon=True)
         t.run()
 
@@ -110,6 +128,7 @@ class ShotDropboxPublicFolder(Observable):
             "compressed": self.compressed,
             "expire_in": self.expire_in,
             "url": self.url,
+            "expire_time": self.expire_time,
             "uploads": [  u.to_dict() for u in self.uploads]
         }
 
@@ -119,39 +138,50 @@ class ShotDropboxPublicFolder(Observable):
         self.compressed = data["compressed"]
         self.expire_in = data["expire_in"]
         self.url = data["url"]
+        self.expire_time = data["expire_time"]
+        # new, creating, online, pending_delete, deleting, deleted
         if self.status == "creating":
             self.status = "new"
             self.url = ""
+        [u.model.set_publishing_status("can_publish") for u in self.uploads if hasattr(u, "model") and u.model is not None]
+        [u.shot.set_publishing_status("can_publish") for u in self.uploads if hasattr(u, "shot") and u.shot is not None]
         self.uploads.clear()
-        return
         for upload in data["uploads"]:
             if "model_id" in upload:
-                models = [m for m in self.parent_shot.models if m.model_id == uploads["model_id"]]
+                models = [m for m in self.parent_shot.models if m.model_id == upload["model_id"]]
                 if len(models) == 1:
                     model = models[0]
-                    model.is_shared = True
-                    model.notify_observers()
+                    model.set_publishing_status("can_unpublish")  # can_publish, state_changing, is_public
                 else:
                     model = None
-                self.uploads.append(DropboxPublicModelUpload(self, model=model).from_dict(upload))
+                self.uploads.append(DropboxPublicModelShare(self, model=model).from_dict(upload))
             else:
-                self.uploads.append(DropboxPublicImagesUpload(self).from_dict(upload))
-                self.share_images = True
-        for upload in self.uploads():
+                self.parent_shot.set_publishing_status("can_unpublish")
+                self.uploads.append(DropboxPublicImagesShare(self).from_dict(upload))
+        if self.status in ["pending_delete", "deleting"]:
+            print("deleteß")
+            self.delete()
+
+        for upload in self.uploads:
             if upload.all_in_sync == False:
                 self.parent_shot.parent_shots.dropboxUploads.add_to_uploadqueue(upload)
+
+
 
     def _create_thread(self):
         self.set_status("creating")
         try:
             with dropbox.Dropbox(oauth2_refresh_token=self.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
+                if dbx.check_user("pong").result != "pong":
+                    raise Exception("Dropbox login failed")
                 try:
                     dbx.files_create_folder_v2(self.path)
                 except:
                     pass
                 self.url = dbx.sharing_create_shared_link_with_settings(self.path).url
                 self.set_status("online")
-        except:
+        except Exception as e:
+            print("failed to create", e)
             self.url = ""
             self.set_status("new")
         self.save()
@@ -159,19 +189,26 @@ class ShotDropboxPublicFolder(Observable):
         self.parent_shot.notify_observers()
 
     def _delete_thread(self):
-        if self.status != "online":
-            return
         self.set_status("deleting")
+
+        [u.model.set_publishing_status("state_changing") for u in self.uploads if hasattr(u, "model")  and u.model is not None]
+        [u.shot.set_publishing_status("state_changing") for u in self.uploads if hasattr(u, "shot")  and u.shot is not None]
         try:
             with dropbox.Dropbox(oauth2_refresh_token=self.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
+                if dbx.check_user("pong").result != "pong":
+                    raise Exception("Dropbox login failed")
                 try:
                     dbx.files_delete_v2(self.path)
                 except:
                     pass
                 self.url = ""
+                self.expire_time = 0
+                [u.model.set_publishing_status("can_publish") for u in self.uploads if hasattr(u,"model") and u.model is not None]
+                [u.shot.set_publishing_status("can_publish") for u in self.uploads if hasattr(u,"shot") and u.shot is not None]
                 self.uploads.clear()
                 self.set_status("new")
-        except:
+        except Exception as e:
+            print("failed to delete", e)
             self.set_status("online")
         self.save()
         self.notify_observers()

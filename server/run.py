@@ -1,5 +1,5 @@
 from gevent import monkey
-monkey.patch_all(thread=False, socket=False)
+monkey.patch_all()
 import os, sys
 import time
 

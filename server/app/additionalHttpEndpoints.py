@@ -11,7 +11,6 @@ import zipfile
 from zipfile import ZIP_STORED
 
 import bottle
-import gevent
 import zipstream
 from bottle import request
 
@@ -60,7 +59,7 @@ class DownloadStreamer:
         timeout_seconds = 90
         sleeptime = 0.3
         while filename not in self.results and cnt < (timeout_seconds/sleeptime):
-            gevent.sleep(sleeptime)
+            time.sleep(sleeptime)
             cnt += 1
         try:
             item = self.results[filename]

@@ -207,6 +207,7 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
         self.name = "ImagesAndMetadata"
         self.source_path = self.shot.images_path
         self.shot = self.shot
+        print(shot.meta_location)
         l = self._clean_for_filesystem(shot.meta_location)
         n = self._clean_for_filesystem(shot.name.replace(":", "").replace(shot.shot_id, "").replace(shot.shot_id.split(" ")[0], "").replace(shot.shot_id.split(" ")[-1], ""))
         if len(l) > 0:
@@ -214,7 +215,6 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
         if len(n) > 0:
             n = " %s" % n
         self.target_path = "/private/%s%s%s/" % (l, shot.shot_id, n)
-        print(self.target_path)
 
     def upload(self):
         self.set_status("pending")

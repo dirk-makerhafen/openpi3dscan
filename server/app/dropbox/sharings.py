@@ -205,17 +205,6 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
         self.shot = shot
         self.status = "idle"
         self.name = "ImagesAndMetadata"
-        self.source_path = self.shot.images_path
-        self.shot = self.shot
-        print("-%s-" % shot.meta_location)
-        l = self._clean_for_filesystem(shot.meta_location)
-        n = self._clean_for_filesystem(shot.name.replace(":", "").replace(shot.shot_id, "").replace(shot.shot_id.split(" ")[0], "").replace(shot.shot_id.split(" ")[-1], ""))
-        if len(l) > 0:
-            l = "%s " % l
-        if len(n) > 0:
-            n = " %s" % n
-        self.target_path = "/private/%s%s%s/" % (l, shot.shot_id, n)
-        print(self.target_path)
 
     def upload(self):
         self.set_status("pending")
@@ -224,7 +213,18 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
     def save(self):
         self.shot.save()
 
+
     def get_upload_data(self):
+        self.source_path = self.shot.images_path
+        self.shot = self.shot
+        l = self._clean_for_filesystem(self.shot.meta_location)
+        n = self._clean_for_filesystem(self.shot.name.replace(":", "").replace(self.shot.shot_id, "").replace(self.shot.shot_id.split(" ")[0], "").replace(self.shot.shot_id.split(" ")[-1], ""))
+        if len(l) > 0:
+            l = "%s " % l
+        if len(n) > 0:
+            n = " %s" % n
+        self.target_path = "/private/%s%s%s/" % (l, self.shot.shot_id, n)
+
         data = super().get_upload_data()
         metadata = json.dumps({
             "name": self.shot.name,

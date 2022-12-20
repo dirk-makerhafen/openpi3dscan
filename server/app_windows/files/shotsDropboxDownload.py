@@ -97,7 +97,7 @@ class ShotsDropboxDownload(Observable):
         all_in_sync = True
         self.current_progress = 0
         self.notify_observers()
-        source_dir = ""
+        source_dir = "/private"
         listing = self._list_folder(source_dir)
         for name in listing:
             if not isinstance(listing[name], dropbox.files.FolderMetadata):

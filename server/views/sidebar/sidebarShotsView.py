@@ -72,4 +72,5 @@ class ShotsItemView(PyHtmlView):
             else:
                 if self.dropboxUploadView is None:
                     self.dropboxUploadView = SidebarDropboxUploadView(self.subject.dropboxUpload, self)
-        super().update()
+        if self.is_visible:
+            super().update()

@@ -17,7 +17,7 @@ class DropboxGenericShare(Observable):
         self.last_success = None
         self.last_failed = None
         self.all_in_sync = False
-        self.status = "pending"  # # pending, uploading, online, deleting, deleted
+        self.status = "pending"  # # idle, pending, uploading, online, deleting, deleted
         self.current_upload_file = ""
         self.progress = 0
         self.source_path = ""
@@ -203,14 +203,19 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
     def __init__(self, shot):
         super().__init__()
         self.shot = shot
+        self.status = "idle"
         self.name = "ImagesAndMetadata"
         self.source_path = self.shot.images_path
-        shot = self.shot
+        self.shot = self.shot
         l = self._clean_for_filesystem(shot.meta_location)
         n = self._clean_for_filesystem(shot.name.replace(":", "").replace(shot.shot_id, "").replace(shot.shot_id.split(" ")[0], "").replace(shot.shot_id.split(" ")[-1], ""))
         if len(l) > 0:
             l = "%s " % l
         self.target_path = "/private/%s%s %s/" % (l, shot.shot_id, n)
+
+    def upload(self):
+        self.set_status("pending")
+        self.shot.parent_shots.dropboxUploads.add_to_uploadqueue(self)
 
     def save(self):
         self.shot.save()

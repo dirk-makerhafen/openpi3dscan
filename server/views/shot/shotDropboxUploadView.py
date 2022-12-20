@@ -14,7 +14,7 @@ class DropboxUploadView(PyHtmlView):
                 {% endif %}
             </div>
             <div class="col-md-2">
-                <button class="btn btnfw" onclick="pyview.subject.sync()">Upload to Dropbox</button>
+                <button class="btn btnfw" onclick="pyview.subject.upload()">Upload to Dropbox</button>
             </div>
         {% else %}
             <div class="col-md-3" style="text-align: right;"> <p class="h5">Uploading, {{pyview.subject.current_progress}}% done      </p> </div>

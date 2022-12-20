@@ -43,7 +43,7 @@ class SidebarShotsView(ObservableListView):
 
 class SidebarDropboxUploadView(PyHtmlView):
     DOM_ELEMENT = "dummy"
-    TEMPLATE_STR = ''',{{pyview.subject.current_progress}}%'''
+    TEMPLATE_STR = ''',{{pyview.subject.progress}}%'''
 
 class ShotsItemView(PyHtmlView):
     DOM_ELEMENT_CLASS = "ShotsItemView col-md-12"

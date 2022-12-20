@@ -23,23 +23,23 @@ class SidebarView(PyHtmlView):
         self.buttonsView = SidebarTopView(subject=subject, parent=self)
         self.current_search = ""
 
-    def show_devices(self):
-        self.shotsView.select_shot(None)
-        if self._mainView.show_devicesView() is True:
-            self.buttonsView.update()
-
     def show_settings(self):
         self.shotsView.select_shot(None)
         if self._mainView.show_settingsView() is True:
             self.buttonsView.update()
 
+    def show_shot(self, shot):
+        if self._mainView.show_shotView(shot) is True:
+            self.buttonsView.update()
+
+    def show_devices(self):
+        self.shotsView.select_shot(None)
+        if self._mainView.show_devicesView() is True:
+            self.buttonsView.update()
+
     def show_liveview(self):
         self.shotsView.select_shot(None)
         if self._mainView.show_liveView() is True:
-            self.buttonsView.update() 
-
-    def show_shot(self, shot):
-        if self._mainView.show_shotView(shot) is True:
             self.buttonsView.update()
 
     def search(self, value):

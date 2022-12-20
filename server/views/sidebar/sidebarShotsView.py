@@ -65,7 +65,7 @@ class ShotsItemView(PyHtmlView):
 
     def update(self):
         if hasattr(self.subject, "dropboxUpload"):
-            if self.subject.dropboxUpload.status == "idle":
+            if self.subject.dropboxUpload.status == "uploading":
                 if self.dropboxUploadView is not None:
                     self.dropboxUploadView.delete(remove_from_dom = False)
                     self.dropboxUploadView = None

@@ -159,7 +159,6 @@ class ShotDropboxPublicFolder(Observable):
                 self.parent_shot.set_publishing_status("can_unpublish")
                 self.uploads.append(DropboxPublicImagesShare(self).from_dict(upload))
         if self.status in ["pending_delete", "deleting"]:
-            print("deleteß")
             self.delete()
 
         for upload in self.uploads:

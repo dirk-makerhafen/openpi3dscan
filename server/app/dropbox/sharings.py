@@ -207,7 +207,7 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
         self.name = "ImagesAndMetadata"
         self.source_path = self.shot.images_path
         self.shot = self.shot
-        print(shot.meta_location)
+        print("-%s-", shot.meta_location)
         l = self._clean_for_filesystem(shot.meta_location)
         n = self._clean_for_filesystem(shot.name.replace(":", "").replace(shot.shot_id, "").replace(shot.shot_id.split(" ")[0], "").replace(shot.shot_id.split(" ")[-1], ""))
         if len(l) > 0:

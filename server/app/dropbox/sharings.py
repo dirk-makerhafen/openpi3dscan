@@ -237,3 +237,9 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
     def to_dict(self):
         d = super().to_dict()
         return d
+
+    def from_dict(self, data):
+        d = super().from_dict(data)
+        if d.status == "pending":
+            self.shot.parent_shots.dropboxUploads.add_to_uploadqueue(self)
+        return d

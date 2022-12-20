@@ -367,7 +367,9 @@ class Shot(Observable):
                     except:
                         pass
                 if self.meta_location == "":
+                    print("no location")
                     self.meta_location = SettingsInstance().settingsScanner.location
+                    print(self.meta_location)
                     self.meta_max_segments = SettingsInstance().settingsScanner.segments
                     self.meta_max_rows = SettingsInstance().settingsScanner.cameras_per_segment
                     self.meta_rotation = SettingsInstance().settingsScanner.camera_rotation

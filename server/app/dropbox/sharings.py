@@ -213,7 +213,6 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
     def save(self):
         self.shot.save()
 
-
     def get_upload_data(self):
         self.source_path = self.shot.images_path
         self.shot = self.shot
@@ -244,8 +243,7 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
 
     def from_dict(self, data):
         d = super().from_dict(data)
-        print("status", d.status)
-        d.status = "idle"
+        self.set_status("idle")
         if d.status == "pending":
             self.shot.parent_shots.dropboxUploads.add_to_uploadqueue(self)
         return d

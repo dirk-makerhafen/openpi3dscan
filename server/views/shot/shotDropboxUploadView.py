@@ -20,7 +20,7 @@ class DropboxUploadView(PyHtmlView):
                     <p class="h5">Last uploaded {{pyview.get_last_success()}} ago</p>
                 {% endif %}
             </div>
-             <div class="col-md-2" style="text-align: right;"> </div>
+             <div class="col-md-2" style="text-align: right;"><button class="btn btnfw" onclick="pyview.subject.upload()">Upload to Dropbox</button>  </div>
         {% else %}
             <div class="col-md-3" style="text-align: right;"> <p class="h5">{{pyview.subject.status}} </div>
             <div class="col-md-2" style="text-align: right;"> </div>

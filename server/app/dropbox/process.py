@@ -278,7 +278,7 @@ class DropboxUploads(Observable):
                 self.pending_uploads.append(pending_upload)
             if hasattr(pending_upload, "model"):
                 pending_upload.model.set_publishing_status("can_unpublish")
-            if hasattr(pending_upload, "shot"):
+            if hasattr(pending_upload, "shot") and pending_upload.name != "ImagesAndMetadata":
                 pending_upload.shot.set_publishing_status("can_unpublish")
             if hasattr(pending_upload, "shotPublicFolder"):
                 pending_upload.shotPublicFolder.notify_observers()

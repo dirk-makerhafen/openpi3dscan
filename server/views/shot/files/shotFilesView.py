@@ -63,7 +63,7 @@ class ShotFilesView(PyHtmlView):
         {{ pyview.modelFilesView.render() }}
     {% endif %}
     {{ pyview.dropboxPublicFolderView.render() }}
-</div>
+</div> 
     '''
 
     def __init__(self, subject, parent, settingsInstance, **kwargs):

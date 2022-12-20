@@ -25,21 +25,21 @@ class SidebarView(PyHtmlView):
 
     def show_devices(self):
         self.shotsView.select_shot(None)
-        if self.parent.currentView.show_devicesView() is True:
+        if self._mainView.show_devicesView() is True:
             self.buttonsView.update()
 
     def show_settings(self):
         self.shotsView.select_shot(None)
-        if self.parent.currentView.show_settingsView() is True:
+        if self._mainView.show_settingsView() is True:
             self.buttonsView.update()
 
     def show_liveview(self):
         self.shotsView.select_shot(None)
-        if self.parent.currentView.show_liveView() is True:
+        if self._mainView.show_liveView() is True:
             self.buttonsView.update()
 
     def show_shot(self, shot):
-        if self.parent.currentView.show_shotView(shot) is True:
+        if self._mainView.show_shotView(shot) is True:
             self.buttonsView.update()
 
     def search(self, value):

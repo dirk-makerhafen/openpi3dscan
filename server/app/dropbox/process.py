@@ -186,7 +186,7 @@ class DropboxUploads(Observable):
         self.to_subprocess_queue = queue.Queue()
         ##self._workers = multiprocessing.Pool(processes=1).apply_async(_uploader_subprocess, args=(self.to_subprocess_queue,))
         #multiprocessing.Process(target=_uploader_subprocess, args=(self.to_subprocess_queue,), daemon=True).start()
-        self._uploader_thread = threading.Thread(target=_uploader_subprocess, daemon=True).start()
+        self._uploader_thread = threading.Thread(target=_uploader_subprocess, args=[self.to_subprocess_queue],  daemon=True).start()
         self._upload_thread = threading.Thread(target=self._loop, daemon=True).start()
         self._cleanup_thread = threading.Thread(target=self._cleanup_loop, daemon=True).start()
 

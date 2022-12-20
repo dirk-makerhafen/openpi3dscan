@@ -36,7 +36,7 @@ class SidebarView(PyHtmlView):
     def show_liveview(self):
         self.shotsView.select_shot(None)
         if self._mainView.show_liveView() is True:
-            self.buttonsView.update()
+            self.buttonsView.update() 
 
     def show_shot(self, shot):
         if self._mainView.show_shotView(shot) is True:

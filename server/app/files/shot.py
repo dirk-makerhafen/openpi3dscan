@@ -366,6 +366,13 @@ class Shot(Observable):
                         self.dropboxPublicFolder.from_dict(data["dropboxPublicFolder"])
                     except:
                         pass
+                if self.meta_location == "":
+                    self.meta_location = SettingsInstance().settingsScanner.location
+                    self.meta_max_segments = SettingsInstance().settingsScanner.segments
+                    self.meta_max_rows = SettingsInstance().settingsScanner.cameras_per_segment
+                    self.meta_rotation = SettingsInstance().settingsScanner.camera_rotation
+                    self.meta_camera_one_position = SettingsInstance().settingsScanner.camera_one_position
+                    self.save()
             except Exception as e:
                 print("failed to load %s" % os.path.join(self.path, "metadata.json"), e)
 

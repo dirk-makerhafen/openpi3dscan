@@ -75,9 +75,10 @@ class DropboxGenericShare(Observable):
             while rp[0] in name:
                 name = name.replace(rp[0], rp[1]).strip()
         name = name.strip()
-        while name[-1] in ["_", "."]:
+
+        while len(name) > 0 and name[-1] in ["_", "."]:
             name = name[:-1].strip()
-        while name[0] in ["_", "."]:
+        while len(name) > 0 and name[0] in ["_", "."]:
             name = name[1:].strip()
         return name
 

@@ -8,7 +8,7 @@ from pyhtmlgui import Observable
 
 from app.devices.devices import DevicesInstance
 from app.settings.settings import SettingsInstance
-from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
+from views.images.imagesLiveView import PreviewQueueInstance
 
 
 class Task_CameraBalance(Observable):

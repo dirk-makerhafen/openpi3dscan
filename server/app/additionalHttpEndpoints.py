@@ -72,17 +72,17 @@ class HttpEndpoints:
         self.flaskApp.route("/shots/list")(self._shot_list)
         self.flaskApp.route("/shots/<shot_id>/processing/<model_id>")(self._shot_processing)
         self.flaskApp.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
-        self.flaskApp.route("/shots/<shot_id>/upload/<model_id>", method="POST")(self._shot_upload_model)
-        self.flaskApp.route("/shots/<shot_id>/upload_license", method="POST")(self._shot_upload_license)
+        self.flaskApp.route("/shots/<shot_id>/upload/<model_id>", methods="POST")(self._shot_upload_model)
+        self.flaskApp.route("/shots/<shot_id>/upload_license", methods="POST")(self._shot_upload_license)
         self.flaskApp.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
         self.flaskApp.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
         self.flaskApp.route("/shots/<shot_id>/<image_mode>/<image_type>/<fname>.jpg")(self._shot_get_image)  # return remote shot as jpeg
         self.flaskApp.route("/shots/<shot_id>.zip")(self._shot_get_images_zip)
         self.flaskApp.route("/live/<device_id>.jpg")(self._live)
-        self.flaskApp.route("/heartbeat", method="POST")(self._heartbeat)
+        self.flaskApp.route("/heartbeat", methods="POST")(self._heartbeat)
         self.flaskApp.route("/force_update")(self.force_update)
         self.flaskApp.route("/realityCaptureProcess")(self.realityCaptureProcess)
-        self.flaskApp.route("/upload_calibration", method="POST")(self.upload_calibration)
+        self.flaskApp.route("/upload_calibration", methods="POST")(self.upload_calibration)
         self.flaskApp.route("/settings_backup")(self._settings_backup)
 
     def realityCaptureProcess(self):

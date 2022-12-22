@@ -94,7 +94,6 @@ class ShotModelsView(PyHtmlView):
         super().__init__(subject, parent)
         self.settingsInstance = settingsInstance
         self.filesListView = ObservableListView(self.subject.models, self, item_class=ModelPreviewFileItemView, dom_element="tbody", filter_function=lambda x: x.subject.filetype != "glb")
-
         models = [m for m in self.subject.models if m.filetype == "glb" and m.status == "ready"]
         if len(models) > 0:
             self.selected_model = models[0]
@@ -111,7 +110,7 @@ class ShotModelsView(PyHtmlView):
 
     @property
     def has_preview_models(self):
-        return len([m for m in self.current_models if m.filetype == "glb" and m.status == "ready"]) > 0
+        return len([m for m in self.subject.models if m.filetype == "glb" and m.status == "ready"]) > 0
 
     def get_model_url(self):
         f = self.selected_model.filename.replace(".zip", "").replace(" ", "_")

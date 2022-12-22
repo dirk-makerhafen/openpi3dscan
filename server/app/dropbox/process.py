@@ -229,8 +229,8 @@ class DropboxUploads(Observable):
             all_in_sync = True
             for pending_upload_data in pending_upload_datas:
                 dtype, source, destination = pending_upload_data
-                #result_queue =  multiprocessing.Manager().Queue()
-                result_queue =  queue.Queue()
+                result_queue =  multiprocessing.Manager().Queue()
+                #result_queue =  queue.Queue()
                 self.to_subprocess_queue.put([
                     self.settings_instance.settingsDropbox.refresh_token,
                     self.settings_instance.settingsDropbox.app_key,

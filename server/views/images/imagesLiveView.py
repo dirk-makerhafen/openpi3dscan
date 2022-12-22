@@ -8,7 +8,7 @@ from app.devices.devices import DevicesInstance
 from views.images.imagesView import ImagesView
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-loading_img_path = os.path.join(SCRIPT_DIR, "../shot", "..", "static", "images", "nophoto.jpg")
+loading_img_path = os.path.join(SCRIPT_DIR, "..", "..", "static", "images", "nophoto.jpg")
 
 
 class PreviewQueue:

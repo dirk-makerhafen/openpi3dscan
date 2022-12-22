@@ -7,11 +7,7 @@ import re
 import shutil
 import threading
 from multiprocessing.pool import ThreadPool
-from multiprocessing import Process
-
-import gevent
 from PIL import Image
-from gevent.fileobject import FileObjectThread
 from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
 
@@ -243,7 +239,7 @@ class Shot(Observable):
         else:
             img_path = os.path.join(self.preview_images_path, image_type, "%s-%s.jpg" % (device_name.lower(), image_type[0]))
 
-        with FileObjectThread(img_path, "wb") as f:
+        with open(img_path, "wb") as f:
             f.write(image_data)
             if image_mode == "normal":
                 self.nr_of_files += 1

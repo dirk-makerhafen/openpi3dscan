@@ -1,11 +1,8 @@
 import io
-import math
 import os
 import queue
 import threading
 import time
-
-import gevent
 import pexpect
 import requests
 from pyhtmlgui import Observable

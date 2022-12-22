@@ -8,7 +8,6 @@ import subprocess
 import threading
 import time
 import bottle
-import gevent
 import zipstream
 from zipfile import ZIP_STORED
 
@@ -55,7 +54,7 @@ class DownloadStreamer:
         timeout_seconds = 90
         sleeptime = 0.3
         while filename not in self.results and cnt < (timeout_seconds/sleeptime):
-            gevent.sleep(sleeptime)
+            time.sleep(sleeptime)
             cnt += 1
         try:
             image = self.results[filename]

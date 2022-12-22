@@ -1,17 +1,10 @@
 import glob
 import json
-import multiprocessing
 import os
-import random
 import re
 import shutil
-import threading
 from multiprocessing.pool import ThreadPool
-from multiprocessing import Process
-
-import gevent
 from PIL import Image
-from gevent.fileobject import FileObjectThread
 from pyhtmlgui import Observable
 from pyhtmlgui import ObservableList
 

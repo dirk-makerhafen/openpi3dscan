@@ -1,20 +1,18 @@
 import datetime
-import json
 import os,sys, dropbox
 import queue
 import threading
 import time
 import unicodedata
 import six
-import re
 from dropbox import exceptions, files
 from pyhtmlgui import Observable, ObservableList
-from dropbox import DropboxOAuth2FlowNoRedirect
-#import multiprocessing
-#try:
-#    multiprocessing.set_start_method("spawn")
-#except:
-#    pass
+import multiprocessing
+try:
+    multiprocessing.set_start_method("spawn")
+except:
+    pass
+
 class DropboxUploaderProcess():
     def __init__(self, refresh_token, app_key, dtype, source, destination, result_queue ):
         self.refresh_token = refresh_token
@@ -182,11 +180,11 @@ class DropboxUploads(Observable):
         self.shots = shots
         self.settings_instance = settings_instance
         self.pending_uploads = ObservableList()
-        #self.to_subprocess_queue = multiprocessing.Manager().Queue()
-        self.to_subprocess_queue = queue.Queue()
+        self.to_subprocess_queue = multiprocessing.Manager().Queue()
+        #self.to_subprocess_queue = queue.Queue()
         ##self._workers = multiprocessing.Pool(processes=1).apply_async(_uploader_subprocess, args=(self.to_subprocess_queue,))
-        #multiprocessing.Process(target=_uploader_subprocess, args=(self.to_subprocess_queue,), daemon=True).start()
-        self._uploader_thread = threading.Thread(target=_uploader_subprocess, args=[self.to_subprocess_queue],  daemon=True).start()
+        multiprocessing.Process(target=_uploader_subprocess, args=(self.to_subprocess_queue,), daemon=True).start()
+        #self._uploader_thread = threading.Thread(target=_uploader_subprocess, args=[self.to_subprocess_queue],  daemon=True).start()
         self._upload_thread = threading.Thread(target=self._loop, daemon=True).start()
         self._cleanup_thread = threading.Thread(target=self._cleanup_loop, daemon=True).start()
 

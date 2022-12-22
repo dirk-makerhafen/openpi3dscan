@@ -1,6 +1,5 @@
 import os
 import uuid
-from gevent.fileobject import FileObjectThread
 from pyhtmlgui import Observable
 import zipfile
 from zipfile import ZIP_STORED
@@ -47,8 +46,8 @@ class ModelFile(Observable):
 
         if not os.path.exists(self.path):
             os.mkdir(self.path)
-        with FileObjectThread(os.path.join(self.path, self.filename), "wb") as f:
-            with FileObjectThread(input_file, "rb") as fi:
+        with open(os.path.join(self.path, self.filename), "wb") as f:
+            with open(input_file, "rb") as fi:
                 buf = fi.read(32000)
                 while buf:
                     f.write(buf)

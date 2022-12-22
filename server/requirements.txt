@@ -1,7 +1,6 @@
-bottle
+flask
 requests
-pyhtmlgui>=2.7
-bottle-websocket
+pyhtmlgui>=2.16
 whichcraft
 zipstream-ng
 pexpect

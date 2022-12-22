@@ -8,7 +8,6 @@ import threading
 import time
 from zipfile import ZIP_STORED
 import zipstream
-from bottle import request
 
 from app.devices.devices import DevicesInstance
 from app.settings.settings import SettingsInstance
@@ -161,13 +160,13 @@ class HttpEndpoints:
         ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("processing")
 
     def _shot_upload_model(self, shot_id, model_id):
-        file = request.files.get('upload_file').file
+        file = flask.request.files['file']
         ShotsInstance().get(shot_id).get_model_by_id(model_id).write_file(file)
 
     def _shot_upload_license(self, shot_id):
         shot = ShotsInstance().get(shot_id)
-        if shot is not None and len(shot.license_data) < len(request.json["data"]):
-            shot.license_data = request.json["data"]
+        if shot is not None and len(shot.license_data) < len(flask.request.json["data"]):
+            shot.license_data = flask.request.json["data"]
             shot.save()
 
     # image_mode = normal | preview , image_type = normal | projection
@@ -222,13 +221,12 @@ class HttpEndpoints:
         return flask.Response(zs, headers=headers)
 
     def _heartbeat(self):
-        ip = request.environ.get('REMOTE_ADDR')
-        data = request.json
-        DevicesInstance().heartbeat_received(ip, data)
+        ip = flask.request.remote_addr
+        DevicesInstance().heartbeat_received(ip, flask.request.json)
         return "OK"
 
     def upload_calibration(self):
-        data = request.json["data"]
+        data = flask.request.json["data"]
         try:
             if len(json.loads(data)) < 50:# broken data?
                 print("rejecting data")

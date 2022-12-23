@@ -104,6 +104,31 @@ class ShotFilesModelFilesView(PyHtmlView):
         self.filesListView = ObservableListView(self.subject, self, item_class=ModelFileItemView)
 
 
+class ModelPublishingView(PyHtmlView):
+    DOM_ELEMENT = "dummy"
+    TEMPLATE_STR = '''
+        {% if pyview.subject.value == "state_changing" %}
+            <div class="col-md-2" style="text-align:center;margin-top:1px">processing</div>
+        {% else %}
+            <div class="col-md-1" style="text-align:center">
+                {% if pyview.subject.value == "can_unpublish" %}
+                     <button class="btn btnfw" onclick='pyview.unpublish_model()' > Unpublish</button>
+                {% elif pyview.subject.value == "can_publish" %}
+                    <button class="btn btnfw" onclick='pyview.publish_model()' > Publish</button> 
+                {% elif pyview.subject.value == "no_publish" %}
+
+                {% endif %}
+            </div>
+            <div class="col-md-1" style="text-align:center">
+                <button class="btn btnfw " onclick='pyview.parent.subject.delete()'> Delete</button>
+            </div>
+        {% endif %} 
+    '''
+    def publish_model(self):
+        self.parent.subject.parentShot.dropboxPublicFolder.add_model(self.parent.subject)
+    def unpublish_model(self):
+        self.parent.subject.parentShot.dropboxPublicFolder.remove_model(self.parent.subject)
+
 class ModelFileItemView(PyHtmlView):
     DOM_ELEMENT = "div"
     DOM_ELEMENT_CLASS = 'row'
@@ -127,40 +152,18 @@ class ModelFileItemView(PyHtmlView):
             {% endif %}    
         </div>
         {% if  pyview.parent.parent.settingsInstance.settingsDropbox.refresh_token != "" and pyview.subject.parentShot.dropboxPublicFolder.status != "new" %}
-            {% if pyview.subject.publishing_status == "state_changing" %}
-                <div class="col-md-2" style="text-align:center;margin-top:1px">processing</div>
-            {% else %}
-                <div class="col-md-1" style="text-align:center">
-                    {% if pyview.subject.publishing_status == "can_unpublish" %}
-                         <button class="btn btnfw" onclick='pyview.unpublish_model()' > Unpublish</button>
-                    {% elif pyview.subject.publishing_status == "can_publish" %}
-                        <button class="btn btnfw" onclick='pyview.publish_model()' > Publish</button> 
-                    {% elif pyview.subject.publishing_status == "no_publish" %}
- 
-                    {% endif %}
-                </div>
-                <div class="col-md-1" style="text-align:center">
-                    <button class="btn btnfw " onclick='pyview.subject.delete()'> Delete</button>
-                </div>
-            {% endif %}
-            
-
-
+            {{ pyview.modelPulishingView.render() }}
         {% else %}
             <div class="col-md-1"></div>
             <div class="col-md-1 " style="text-align:center">
                 <button class="btn btnfw" onclick='pyview.subject.delete()'> Delete</button>
             </div>
         {% endif %}
-
-
     '''
 
-    def publish_model(self):
-        self.subject.parentShot.dropboxPublicFolder.add_model(self.subject)
-    def unpublish_model(self):
-        self.subject.parentShot.dropboxPublicFolder.remove_model(self.subject)
-
+    def __init__(self, subject, parent, **kwargs):
+        super().__init__(subject, parent, **kwargs)
+        self.modelPublishingView = ModelPublishingView(self.subject.publishing_status, self)
 
     def open_in_explorer(self):
         p = self.subject.get_path()

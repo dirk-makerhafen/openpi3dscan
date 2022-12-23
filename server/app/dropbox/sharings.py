@@ -104,7 +104,7 @@ class DropboxPublicModelShare(DropboxGenericShare):
 
     def delete(self):
         if self.model is not None:
-            self.model.set_publishing_status("state_changing")
+            self.model.publishing_status.set("state_changing")
         t = threading.Thread(target=self._delete_thread, daemon=True)
         t.run()
 
@@ -121,11 +121,11 @@ class DropboxPublicModelShare(DropboxGenericShare):
                     pass
                 self.shotPublicFolder.uploads.remove(self)
                 if self.model is not None:
-                    self.model.set_publishing_status("can_publish")
+                    self.model.publishing_status.set("can_publish")
         except:
             self.set_status(old_status)
             if self.model is not None:
-                self.model.set_publishing_status("can_unpublish")
+                self.model.publishing_status.set("can_unpublish")
         self.save()
         self.notify_observers()
         self.shotPublicFolder.notify_observers()
@@ -164,7 +164,7 @@ class DropboxPublicImagesShare(DropboxGenericShare):
         self.url = ""
 
     def delete(self):
-        self.shotPublicFolder.parent_shot.set_publishing_status("state_changing")
+        self.shotPublicFolder.parent_shot.publishing_status.set("state_changing")
         t = threading.Thread(target=self._delete_thread, daemon=True)
         t.run()
 
@@ -181,11 +181,11 @@ class DropboxPublicImagesShare(DropboxGenericShare):
                 except:
                     pass
                 self.shotPublicFolder.uploads.remove(self)
-                self.shotPublicFolder.parent_shot.set_publishing_status("can_publish")
+                self.shotPublicFolder.parent_shot.publishing_status.set("can_publish")
                 self.shotPublicFolder.notify_observers()
                 self.shotPublicFolder.parent_shot.notify_observers()
         except:
-            self.shotPublicFolder.parent_shot.set_publishing_status("can_unpublish")
+            self.shotPublicFolder.parent_shot.publishing_status.set("can_unpublish")
             self.set_status(old_status)
         self.save()
         self.notify_observers()

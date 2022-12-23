@@ -113,7 +113,7 @@ class HttpEndpoints:
         return response
 
     def _shot_download_model(self, shot_id, model_id):
-        model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
+        model = ShotsInstance().get(shot_id).models.get_by_id(model_id)
         if model is None or model.filename == "":
             return flask.abort(404)
         mf = model.get_model_file()
@@ -127,7 +127,7 @@ class HttpEndpoints:
         return flask.Response(data, headers=headers)
 
     def _shot_download_model_file(self, shot_id, model_id, filename):
-        model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
+        model = ShotsInstance().get(shot_id).models.get_by_id(model_id)
         if model is None or model.filename == "":
             return flask.abort(404)
         mf = model.get_model_file(filename)

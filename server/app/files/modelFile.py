@@ -6,13 +6,16 @@ from zipfile import ZIP_STORED
 import shutil
 import zipstream
 
+from app.files.shot import ObservableValue
+
+
 class ModelFile(Observable):
     def __init__(self, parentShot, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
         super().__init__()
         self.parentShot = parentShot
         self.model_id = "%s" % uuid.uuid4()
         self.status = "waiting"  # ready, failed
-        self.publishing_status = "no_publish" # "can_publish"  # can_publish, state_changing, can_unpublish
+        self.publishing_status = ObservableValue("no_publish") # "can_publish"  # can_publish, state_changing, can_unpublish
         self.filetype = filetype  # "obj", obj, 3mf, stl
         self.reconstruction_quality = reconstruction_quality  # preview, normal, high,
         self.quality = quality   # "high", normal, low
@@ -23,12 +26,6 @@ class ModelFile(Observable):
         self.filesize = 0
         self.create_textures = create_textures
         self.path = os.path.join(self.parentShot.path, "models")
-
-    def set_publishing_status(self, new_status):
-        if self.publishing_status == new_status:
-            return
-        self.publishing_status = new_status
-        self.notify_observers()
 
     def set_status(self, new_status):
         if self.status == new_status:
@@ -58,7 +55,7 @@ class ModelFile(Observable):
             self.filesize = int(round(self.filesize,0))
         self.is_folder = False
         self.set_status("ready")
-        self.set_publishing_status("can_publish")
+        self.publishing_status.set("can_publish")
 
     def write_folder(self, sourcefolder):
         self.filename = self._create_filename("%s_%s%s%s%s%s_%s")
@@ -83,7 +80,7 @@ class ModelFile(Observable):
             self.filesize = int(round(self.filesize,0))
         self.is_folder = True
         self.set_status("ready")
-        self.set_publishing_status("can_publish")
+        self.publishing_status.set("can_publish")
 
     def _create_filename(self, pattern):
         rcStr = self.reconstruction_quality[0].upper()
@@ -161,31 +158,13 @@ class ModelFile(Observable):
             self.quality = "high"
         if self.quality == "default":
             self.quality = "normal"
-        try:
-            self.model_id = data["model_id"]
-        except:
-            pass
-        try:
-            self.filesize = data["filesize"]
-        except:
-            pass
-        try:
-            self.create_textures = data["create_textures"]
-        except:
-            pass
-        try:
-            self.create_mesh_from = data["create_mesh_from"]
-        except:
-            pass
-        try:
-            self.reconstruction_quality = data["reconstruction_quality"]
-        except:
-            pass
-        try:
-            self.lit = data["lit"]
-        except:
-            pass
+        self.model_id = data["model_id"]
+        self.filesize = data["filesize"]
+        self.create_textures = data["create_textures"]
+        self.create_mesh_from = data["create_mesh_from"]
+        self.reconstruction_quality = data["reconstruction_quality"]
+        self.lit = data["lit"]
         if self.status == "ready":
-            self.publishing_status = "can_publish"
+            self.publishing_status._value = "can_publish"
         return self
 

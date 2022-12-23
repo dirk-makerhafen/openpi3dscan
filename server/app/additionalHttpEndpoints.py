@@ -111,7 +111,7 @@ class HttpEndpoints:
         return json.dumps([shot.shot_id for shot in ShotsInstance().shots])
 
     def _shot_download_model(self, shot_id, model_id):
-        model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
+        model = ShotsInstance().get(shot_id).models.get_by_id(model_id)
         if model is None or model.filename == "":
             return flask.abort(404)
         mf = model.get_model_file()
@@ -137,7 +137,7 @@ class HttpEndpoints:
         return flask.Response(json.dumps(SettingsInstance().to_dict()), headers=headers)
 
     def _shot_download_model_file(self, shot_id, model_id, filename):
-        model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
+        model = ShotsInstance().get(shot_id).models.get_by_id(model_id)
         if model is None or model.filename == "":
             print("no model")
             return flask.abort(404)
@@ -154,14 +154,14 @@ class HttpEndpoints:
         return flask.Response(data, headers=headers)
 
     def _shot_processing_failed(self, shot_id, model_id):
-        ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("failed")
+        ShotsInstance().get(shot_id).models.get_by_id(model_id).set_status("failed")
 
     def _shot_processing(self, shot_id, model_id):
-        ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("processing")
+        ShotsInstance().get(shot_id).models.get_by_id(model_id).set_status("processing")
 
     def _shot_upload_model(self, shot_id, model_id):
         file = flask.request.files['file']
-        ShotsInstance().get(shot_id).get_model_by_id(model_id).write_file(file)
+        ShotsInstance().get(shot_id).models.get_by_id(model_id).write_file(file)
 
     def _shot_upload_license(self, shot_id):
         shot = ShotsInstance().get(shot_id)

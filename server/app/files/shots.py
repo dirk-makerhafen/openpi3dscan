@@ -6,7 +6,8 @@ from pyhtmlgui import ObservableList
 from app.files.shot import Shot
 from app.settings.settings import SettingsInstance
 from app.dropbox.process import DropboxUploads
-# All local and remote Shots
+
+
 class Shots:
     def __init__(self, devices):
         self.shots = ObservableList()
@@ -15,11 +16,12 @@ class Shots:
         self.devices = devices
         self.deleted_shot_ids = []
         self.unprocessed_models = []
+        self.settingsInstance = SettingsInstance()
         self.dropboxUploads = DropboxUploads(self, SettingsInstance())
         self.load()
 
     def create(self, shot_id, name):
-        s = Shot(self.path, shot_id, self)
+        s = Shot(os.path.join(self.path, shot_id), shot_id, self)
         s.meta_location = SettingsInstance().settingsScanner.location
         s.meta_max_segments = SettingsInstance().settingsScanner.segments
         s.meta_max_rows = SettingsInstance().settingsScanner.cameras_per_segment
@@ -49,7 +51,7 @@ class Shots:
             return
         s = self.get(shot_id)
         if s is None:
-            s = Shot(self.path, shot_id, self)
+            s = Shot(os.path.join(self.path, shot_id), shot_id, self)
             index = 0
             for i in range(len(self.shots)):
                 index = i
@@ -120,7 +122,7 @@ class Shots:
                 shot_id = os.path.split(path)[1]
                 shot = self.get(shot_id)
                 if shot is None:
-                    shot = Shot(self.path, shot_id, self)
+                    shot = Shot(path, shot_id, self)
                     self.shots.append(shot)
                 else:
                     shot.load()

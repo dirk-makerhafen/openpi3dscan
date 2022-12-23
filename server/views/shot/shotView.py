@@ -95,7 +95,10 @@ class ShotView(PyHtmlView):
     </div>   
     '''
 
+
+
     def __init__(self, subject, parent, settingsInstance, shotsInstance):
+        self._on_subject_updated = None
         super().__init__(subject, parent)
         self.imageCarousel = ImagesStaticView(self.subject, self)
         self.shotModels = ShotModelsView(self.subject, self, settingsInstance)
@@ -106,6 +109,9 @@ class ShotView(PyHtmlView):
         self.show_path = False
         self.settingsInstance = settingsInstance
         self.shotsInstance = shotsInstance
+
+
+
 
     def open_in_explorer(self):
         if self.subject is not None:

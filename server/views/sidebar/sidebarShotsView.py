@@ -45,6 +45,20 @@ class SidebarDropboxUploadView(PyHtmlView):
     DOM_ELEMENT = "dummy"
     TEMPLATE_STR = ''',{{pyview.subject.progress}}%'''
 
+class NrOfDevicesView(PyHtmlView):
+    DOM_ELEMENT = "dummy"
+    TEMPLATE_STR = '''{{pyview.subject | length }},'''
+
+class NrOfFilesView(PyHtmlView):
+    DOM_ELEMENT = "dummy"
+    TEMPLATE_STR = '''{{pyview.subject.value }}'''
+
+class ModelsStatsView(PyHtmlView):
+    DOM_ELEMENT = "dummy"
+    TEMPLATE_STR = '''
+    ,{{pyview.subject.models|length}}{% if pyview.subject.waiting_or_processing|length > 0 or pyview.subject.failed|length > 0 %}({% if pyview.subject.waiting_or_processing|length > 0%}{{pyview.subject.waiting_or_processing|length}}{% endif %}{% if pyview.subject.waiting_or_processing|length > 0 and pyview.subject.failed|length > 0 %},{% endif %}{% if pyview.subject.failed|length > 0%}{{pyview.subject.failed|length}}!{% endif %}){% endif %}
+    '''
+
 class ShotsItemView(PyHtmlView):
     DOM_ELEMENT_CLASS = "ShotsItemView col-md-12"
     TEMPLATE_STR = '''
@@ -54,14 +68,19 @@ class ShotsItemView(PyHtmlView):
                {% if pyview.subject.devices == None %}{{pyview.subject.meta_location}},{% endif %} {{pyview.subject.name}} {{pyview.subject.status}}
             </div>
             <div class="info"> 
-                {% if pyview.subject.devices != None %}{{pyview.subject.nr_of_devices}},{% endif %}{{pyview.subject.nr_of_files}}{% if pyview.parent.settingsInstance.realityCaptureSettings.allow_rc_automation == True %},{{pyview.subject.nr_of_models}}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 or pyview.subject.nr_of_models_failed > 0 %}({% if pyview.subject.nr_of_models_waiting_or_processing > 0%}{{pyview.subject.nr_of_models_waiting_or_processing}}{% endif %}{% if pyview.subject.nr_of_models_waiting_or_processing > 0 and pyview.subject.nr_of_models_failed > 0 %},{% endif %}{% if pyview.subject.nr_of_models_failed > 0%}{{pyview.subject.nr_of_models_failed}}!{% endif %}){% endif %}{% endif %}{% if pyview.dropboxUploadView != None %}{{pyview.dropboxUploadView.render()}}{% endif %} 
+                {% if pyview.nrOfDevicesView != None %}{{pyview.nrOfDevicesView.render()}}{% endif %}{{pyview.nrOfFilesView.render()}}{% if pyview.parent.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}{{pyview.modelsStatsView.render()}}{% endif %}{% if pyview.dropboxUploadView != None %}{{pyview.dropboxUploadView.render()}}{% endif %} 
             </div>  
         </div>  
     </div>
     '''
     def __init__(self, subject, parent):
         super().__init__(subject, parent)
+        self.nrOfDevicesView = None
         self.dropboxUploadView = None
+        self.nrOfFilesView = NrOfFilesView(self.subject.nr_of_files, self)
+        self.modelsStatsView = ModelsStatsView(self.subject.model, self)
+        if self.subject.devices is not None:
+            self.nrOfDevicesView = NrOfDevicesView(self.subject.devices, self)
 
     def update(self):
         if hasattr(self.subject, "dropboxUpload"):

@@ -7,10 +7,25 @@ from views.shot.files.shotFilesModelFilesView import ShotFilesModelFilesView
 from views.shot.files.shotFilesPublicSharingView import DropboxPublicFolderView
 from views.shot.shotDropboxUploadView import DropboxUploadView
 
-class ShotFilesImagesView(PyHtmlView):
+
+class ShotPublishingView(PyHtmlView):
+    DOM_ELEMENT_CLASS = "col-md-1"
+    DOM_ELEMENT_EXTRAS = "style='line-height:3em'"
     TEMPLATE_STR = '''
-    
+        <div class="col-md-1" style="line-height:3em"> 
+            {% if pyview.subject.value == "can_unpublish" %}
+                <button class="btn btnfw" onclick='pyview.unpublish_images()' > Unpublish </button>
+            {% elif pyview.subject.value == "can_publish"  %}
+                <button class="btn btnfw" onclick='pyview.publish_images()' > Publish </button>
+            {% elif pyview.subject.value == "state_changing" %}
+                <p style="text-align:center">processing</p>
+            {% endif %}
+        </div>
     '''
+    def publish_images(self):
+        self.parent.subject.dropboxPublicFolder.add_images()
+    def unpublish_images(self):
+        self.parent.subject.dropboxPublicFolder.remove_images()
 
 
 class ShotFilesView(PyHtmlView):
@@ -40,15 +55,7 @@ class ShotFilesView(PyHtmlView):
                                  <div class="col-md-5"> </div>
                             {% endif %}
                             {% if  pyview.settingsInstance.settingsDropbox.refresh_token != "" and pyview.subject.dropboxPublicFolder.status != "new" %}
-                                <div class="col-md-1" style="line-height:3em"> 
-                                    {% if pyview.subject.publishing_status == "can_unpublish" %}
-                                        <button class="btn btnfw" onclick='pyview.unpublish_images()' > Unpublish </button>
-                                    {% elif pyview.subject.publishing_status == "can_publish"  %}
-                                        <button class="btn btnfw" onclick='pyview.publish_images()' > Publish </button>
-                                    {% elif pyview.subject.publishing_status == "state_changing" %}
-                                        <p style="text-align:center">processing</p>
-                                    {% endif %}
-                                </div>
+                                {{pyvview.shotPublishingView.render()}}
                             {% endif %}
                         </div>
                     </div>
@@ -57,8 +64,6 @@ class ShotFilesView(PyHtmlView):
             </div>   
         </div>
     </div>
-
-
     {% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}
         {{ pyview.modelFilesView.render() }}
     {% endif %}
@@ -70,6 +75,7 @@ class ShotFilesView(PyHtmlView):
         super().__init__(subject, parent, **kwargs)
         self.settingsInstance = settingsInstance
         self.modelFilesView = ShotFilesModelFilesView(self.subject.models, self, settingsInstance)
+        self.shotPublishingView = ShotPublishingView(self.subject.publishing_status, self)
 
         if hasattr(self.subject, "dropboxUpload"):
             self.dropboxUploadView = DropboxUploadView(self.subject.dropboxUpload, self)
@@ -79,8 +85,3 @@ class ShotFilesView(PyHtmlView):
 
     def open_images_in_explorer(self):
         os.startfile( self.subject.images_path)
-
-    def publish_images(self):
-        self.subject.dropboxPublicFolder.add_images()
-    def unpublish_images(self):
-        self.subject.dropboxPublicFolder.remove_images()

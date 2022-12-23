@@ -217,9 +217,9 @@ class DropboxUploads(Observable):
                 pending_upload.last_checked = time.time()
                 pending_upload.set_status("uploading")
                 if hasattr(pending_upload, "model") and pending_upload.model is not None:
-                    pending_upload.model.set_publishing_status("state_changing")
+                    pending_upload.model.publishing_status.set("state_changing")
                 if hasattr(pending_upload, "shot") and pending_upload.shot is not None and pending_upload.name != "ImagesAndMetadata":
-                    pending_upload.shot.set_publishing_status("state_changing")
+                    pending_upload.shot.publishing_status.set("state_changing")
                 if hasattr(pending_upload, "shotPublicFolder"):
                     pending_upload.shotPublicFolder.notify_observers()
 
@@ -275,8 +275,8 @@ class DropboxUploads(Observable):
                 self.pending_uploads.remove(pending_upload)
                 self.pending_uploads.append(pending_upload)
             if hasattr(pending_upload, "model"):
-                pending_upload.model.set_publishing_status("can_unpublish")
+                pending_upload.model.publishing_status.set("can_unpublish")
             if hasattr(pending_upload, "shot") and pending_upload.name != "ImagesAndMetadata":
-                pending_upload.shot.set_publishing_status("can_unpublish")
+                pending_upload.shot.publishing_status.set("can_unpublish")
             if hasattr(pending_upload, "shotPublicFolder"):
                 pending_upload.shotPublicFolder.notify_observers()

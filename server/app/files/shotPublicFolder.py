@@ -46,7 +46,7 @@ class ShotDropboxPublicFolder(Observable):
             return
         upload = DropboxPublicImagesShare(self)
         self.uploads.append(upload)
-        self.parent_shot.set_publishing_status("can_unpublish")
+        self.parent_shot.publishing_status.set("can_unpublish")
         self.parent_shot.parent_shots.dropboxUploads.add_to_uploadqueue(upload)
         self.save()
         self.notify_observers()
@@ -65,7 +65,7 @@ class ShotDropboxPublicFolder(Observable):
         for old_upload in [u for u in self.uploads if hasattr(u,"model") and u.model is None and upload.target_path == u.target_path]:
             old_upload.delete()
         self.parent_shot.parent_shots.dropboxUploads.add_to_uploadqueue(upload)
-        model.set_publishing_status("can_unpublish")
+        model.publishing_status.set("can_unpublish")
         self.uploads.append(upload)
         self.save()
         self.notify_observers()
@@ -143,20 +143,20 @@ class ShotDropboxPublicFolder(Observable):
         if self.status == "creating":
             self.status = "new"
             self.url = ""
-        [u.model.set_publishing_status("can_publish") for u in self.uploads if hasattr(u, "model") and u.model is not None]
-        [u.shot.set_publishing_status("can_publish") for u in self.uploads if hasattr(u, "shot") and u.shot is not None]
+        [u.model.publishing_status.set("can_publish") for u in self.uploads if hasattr(u, "model") and u.model is not None]
+        [u.shot.publishing_status.set("can_publish") for u in self.uploads if hasattr(u, "shot") and u.shot is not None]
         self.uploads.clear()
         for upload in data["uploads"]:
             if "model_id" in upload:
                 models = [m for m in self.parent_shot.models if m.model_id == upload["model_id"]]
                 if len(models) == 1:
                     model = models[0]
-                    model.set_publishing_status("can_unpublish")  # can_publish, state_changing, is_public
+                    model.publishing_status.set("can_unpublish")  # can_publish, state_changing, is_public
                 else:
                     model = None
                 self.uploads.append(DropboxPublicModelShare(self, model=model).from_dict(upload))
             else:
-                self.parent_shot.set_publishing_status("can_unpublish")
+                self.parent_shot.publishing_status.set("can_unpublish")
                 self.uploads.append(DropboxPublicImagesShare(self).from_dict(upload))
         if self.status in ["pending_delete", "deleting"]:
             self.delete()
@@ -190,8 +190,8 @@ class ShotDropboxPublicFolder(Observable):
     def _delete_thread(self):
         self.set_status("deleting")
 
-        [u.model.set_publishing_status("state_changing") for u in self.uploads if hasattr(u, "model")  and u.model is not None]
-        [u.shot.set_publishing_status("state_changing") for u in self.uploads if hasattr(u, "shot")  and u.shot is not None]
+        [u.model.publishing_status.set("state_changing") for u in self.uploads if hasattr(u, "model")  and u.model is not None]
+        [u.shot.publishing_status.set("state_changing") for u in self.uploads if hasattr(u, "shot")  and u.shot is not None]
         try:
             with dropbox.Dropbox(oauth2_refresh_token=self.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
                 if dbx.check_user("pong").result != "pong":
@@ -202,8 +202,8 @@ class ShotDropboxPublicFolder(Observable):
                     pass
                 self.url = ""
                 self.expire_time = 0
-                [u.model.set_publishing_status("can_publish") for u in self.uploads if hasattr(u,"model") and u.model is not None]
-                [u.shot.set_publishing_status("can_publish") for u in self.uploads if hasattr(u,"shot") and u.shot is not None]
+                [u.model.publishing_status.set("can_publish") for u in self.uploads if hasattr(u,"model") and u.model is not None]
+                [u.shot.publishing_status.set("can_publish") for u in self.uploads if hasattr(u,"shot") and u.shot is not None]
                 self.uploads.clear()
                 self.set_status("new")
         except Exception as e:

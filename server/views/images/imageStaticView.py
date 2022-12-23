@@ -5,6 +5,7 @@ class ImagesStaticView(ImagesView):
     DOM_ELEMENT_CLASS = "ImageCarousel"
 
     def __init__(self, subject, parent):
+        self._on_subject_updated = None
         super().__init__(subject, parent)
 
     def _get_settings_camera_one_position(self):

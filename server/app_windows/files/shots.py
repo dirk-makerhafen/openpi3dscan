@@ -16,6 +16,7 @@ class Shots:
             os.mkdir(self.path)
         self.cache = {}
         self.unprocessed_models = []
+        self.settingsInstance = SettingsInstance()
         self.dropboxUploads = DropboxUploads(self, SettingsInstance())
         self.load_shots_from_disk()
 

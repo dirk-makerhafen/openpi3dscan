@@ -155,19 +155,23 @@ class HttpEndpoints:
 
     def _shot_processing_failed(self, shot_id, model_id):
         ShotsInstance().get(shot_id).models.get_by_id(model_id).set_status("failed")
+        return flask.Response("")
 
     def _shot_processing(self, shot_id, model_id):
         ShotsInstance().get(shot_id).models.get_by_id(model_id).set_status("processing")
+        return flask.Response("")
 
     def _shot_upload_model(self, shot_id, model_id):
         file = flask.request.files['file']
         ShotsInstance().get(shot_id).models.get_by_id(model_id).write_file(file)
+        return flask.Response("")
 
     def _shot_upload_license(self, shot_id):
         shot = ShotsInstance().get(shot_id)
         if shot is not None and len(shot.license_data) < len(flask.request.json["data"]):
             shot.license_data = flask.request.json["data"]
             shot.save()
+        return flask.Response("")
 
     # image_mode = normal | preview , image_type = normal | projection
     def _shot_get_image(self, shot_id, image_mode, image_type, fname):
@@ -223,7 +227,7 @@ class HttpEndpoints:
     def _heartbeat(self):
         ip = flask.request.remote_addr
         DevicesInstance().heartbeat_received(ip, flask.request.json)
-        return "OK"
+        return flask.Response("OK")
 
     def upload_calibration(self):
         data = flask.request.json["data"]
@@ -236,7 +240,7 @@ class HttpEndpoints:
             return "Failed"
 
         SettingsInstance().realityCaptureSettings.set_calibration_data(data)
-        return "OK"
+        return flask.Response("OK")
 
     def _live(self, device_id):
         headers = {

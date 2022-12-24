@@ -44,11 +44,10 @@ class ModelFile(Observable):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         with open(os.path.join(self.path, self.filename), "wb") as f:
-            with open(input_file, "rb") as fi:
-                buf = fi.read(32000)
-                while buf:
-                    f.write(buf)
-                    buf = fi.read(32000)
+            buf = input_file.read(32000)
+            while buf:
+                f.write(buf)
+                buf = input_file.read(32000)
 
         self.filesize = round(os.path.getsize(os.path.join(self.path, self.filename)) / 1024 / 1024, 3)
         if self.filesize >= 1:

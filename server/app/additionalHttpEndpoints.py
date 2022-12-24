@@ -15,6 +15,7 @@ from app.files.shots import ShotsInstance
 from views.images.imagesLiveView import PreviewQueueInstance
 import flask
 
+
 class DownloadStreamer:
     def __init__(self, data):
         self.data_queue = queue.Queue()
@@ -68,6 +69,7 @@ class HttpEndpoints:
         self.gui = gui
         # image_mode = normal | preview, image_type = normal | projection
         self.flaskApp = flask.current_app
+        self.flaskApp.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 1024
         self.flaskApp.route("/shots/list")(self._shot_list)
         self.flaskApp.route("/shots/<shot_id>/processing/<model_id>")(self._shot_processing)
         self.flaskApp.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
@@ -162,7 +164,7 @@ class HttpEndpoints:
         return flask.Response("")
 
     def _shot_upload_model(self, shot_id, model_id):
-        file = flask.request.files['file']
+        file = flask.request.files['upload_file']
         ShotsInstance().get(shot_id).models.get_by_id(model_id).write_file(file)
         return flask.Response("")
 

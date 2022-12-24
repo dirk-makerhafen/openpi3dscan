@@ -21,7 +21,6 @@ SyncThreadPool = ThreadPool(8)
 class Models(ObservableList):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print("models inited")
 
     @property
     def waiting(self):

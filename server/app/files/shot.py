@@ -13,26 +13,16 @@ from pyhtmlgui import ObservableList
 from app.dropbox.sharings import DropboxPrivateImagesShare
 from app.files.modelFile import ModelFile
 from app.files.shotPublicFolder import ShotDropboxPublicFolder
+from app.lib.observableValue import ObservableValue
 
 SyncThreadPool = ThreadPool(8)
 
 
-class ObservableValue(Observable):
-    def __init__(self, value):
-        super().__init__()
-        self._value = value
-    @property
-    def value(self):
-        return self._value
-    @value.setter
-    def value(self, value):
-        self.set(value)
-    def set(self, value):
-        if value != self._value:
-            self._value = value
-            self.notify_observers()
-
 class Models(ObservableList):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        print("models inited")
+
     @property
     def waiting(self):
         return [m for m in self if m.status == "waiting"]
@@ -70,7 +60,7 @@ class LocationData(Observable):
 class Shot(Observable):
     def __init__(self, shot_dir, shot_id, parent_shots):
         super().__init__()
-        self.settingsInstance = parent_shots.settingsInstance()
+        self.settingsInstance = parent_shots.settingsInstance
         self.path = shot_dir
         self.shot_id = shot_id
         self.parent_shots = parent_shots
@@ -78,7 +68,7 @@ class Shot(Observable):
         self.name = self.shot_id
         self.status = ""
         self.publishing_status = ObservableValue("can_publish") # can_publish, state_changing, can_unpublish
-        self.comment = ""
+        self.comment = ObservableValue("")
         self.meta_location = ""
         self.meta_max_segments = 16
         self.meta_max_rows = 7
@@ -94,9 +84,10 @@ class Shot(Observable):
         if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
             self.images_path = self.path
         self.preview_images_path = os.path.join(self.path, "preview_images")
-        self.dropboxUpload = DropboxPrivateImagesShare(self)
+        self.dropboxUpload = None
         self.dropboxPublicFolder = ShotDropboxPublicFolder(self)
         self.load()
+
 
     @property
     def can_delete(self):
@@ -133,12 +124,11 @@ class Shot(Observable):
         while "  " in comment:
             comment = comment.replace("  ", " ")
         comment = comment.strip()
-        if self.comment == comment:
+        if self.comment.value == comment:
             return
-        self.comment = comment
+        self.comment.set(comment)
         self.save()
         self.backup_meta()
-        self.notify_observers()
 
     def add_device(self, device):
         if device not in self.devices:
@@ -267,6 +257,7 @@ class Shot(Observable):
 
     def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
         self.create_folders()
+
         model = self.models.get(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures, lit=lit)
         if model is not None:
             if model.status == "failed":
@@ -277,7 +268,6 @@ class Shot(Observable):
             self.parent_shots.unprocessed_models.append(model)
             self.models.append(model)
             self.save()
-        self.notify_observers()
 
     def create_models_from_set(self, set_name):
         model_templates = self.settingsInstance.realityCaptureSettings.settingsDefaultModelSets.get_models_by_setname(set_name)
@@ -296,7 +286,6 @@ class Shot(Observable):
         if model in self.parent_shots.unprocessed_models:
             self.parent_shots.unprocessed_models.remove(model)
         self.save()
-        self.notify_observers()
 
     def count_number_of_files(self):
         self.nr_of_files.value = len(glob.glob(os.path.join(self.images_path, "normal", "*.jpg"))) + len( glob.glob(os.path.join(self.images_path, "projection", "*.jpg")))
@@ -306,7 +295,7 @@ class Shot(Observable):
             try:
                 data = json.dumps({
                     "name": self.name,
-                    "comment": self.comment,
+                    "comment": self.comment.value,
                     "meta_location": self.meta_location,
                     "meta_max_rows": self.meta_max_rows,
                     "meta_max_segments": self.meta_max_segments,
@@ -326,7 +315,7 @@ class Shot(Observable):
         with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "w") as f:
             f.write(json.dumps({
                 "name": self.name,
-                "comment": self.comment,
+                "comment": self.comment.value,
                 "meta_location": self.meta_location,
                 "meta_max_rows": self.meta_max_rows,
                 "meta_max_segments": self.meta_max_segments,
@@ -337,11 +326,12 @@ class Shot(Observable):
 
     def load(self):
         if os.path.exists(os.path.join(self.path, "metadata.json")):
+            self.dropboxUpload = DropboxPrivateImagesShare(self)
             try:
                 with open(os.path.join(self.path, "metadata.json"), "r") as f:
                     data = json.loads(f.read())
                     self.name = data["name"]
-                    self.comment = data["comment"]
+                    self.comment._value = data["comment"]
                     try:
                         self.meta_location = data["meta_location"]
                         self.meta_max_rows = data["meta_max_rows"]
@@ -379,7 +369,7 @@ class Shot(Observable):
                 with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "r") as f:
                     data = json.loads(f.read())
                     self.name = data["name"]
-                    self.comment = data["comment"]
+                    self.comment._value = data["comment"]
                     try:
                         self.meta_location = data["meta_location"]
                         self.meta_max_rows = data["meta_max_rows"]

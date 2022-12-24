@@ -6,7 +6,7 @@ from zipfile import ZIP_STORED
 import shutil
 import zipstream
 
-from app.files.shot import ObservableValue
+from app.lib.observableValue import ObservableValue
 
 
 class ModelFile(Observable):
@@ -33,7 +33,7 @@ class ModelFile(Observable):
         self.status = new_status
         self.parentShot.save()
         self.notify_observers()
-        self.parentShot.notify_observers()
+        self.parentShot.models.notify_observers()
 
     def write_file(self, input_file):
         if self.filetype in ["gif", "webp"]:

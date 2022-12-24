@@ -152,7 +152,7 @@ class ModelFileItemView(PyHtmlView):
             {% endif %}    
         </div>
         {% if  pyview.parent.parent.settingsInstance.settingsDropbox.refresh_token != "" and pyview.subject.parentShot.dropboxPublicFolder.status != "new" %}
-            {{ pyview.modelPulishingView.render() }}
+            {{ pyview.modelPublishingView.render() }}
         {% else %}
             <div class="col-md-1"></div>
             <div class="col-md-1 " style="text-align:center">

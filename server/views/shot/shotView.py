@@ -102,16 +102,13 @@ class ShotView(PyHtmlView):
         super().__init__(subject, parent)
         self.imageCarousel = ImagesStaticView(self.subject, self)
         self.shotModels = ShotModelsView(self.subject, self, settingsInstance)
-        self.comments = ShotCommentsView(self.subject, self)
+        self.comments = ShotCommentsView(self.subject.comment, self)
         self.shotFiles = ShotFilesView(self.subject, self,settingsInstance)
         self.current_view = self.imageCarousel
         self.can_sync = True
         self.show_path = False
         self.settingsInstance = settingsInstance
         self.shotsInstance = shotsInstance
-
-
-
 
     def open_in_explorer(self):
         if self.subject is not None:

@@ -206,7 +206,7 @@ class HttpEndpoints:
 
         zs.add(json.dumps({
             "name": shot.name,
-            "comment": shot.comment,
+            "comment": shot.comment.value,
             "meta_location": shot.meta_location,
             "meta_max_rows": shot.meta_max_rows,
             "meta_max_segments": shot.meta_max_segments,

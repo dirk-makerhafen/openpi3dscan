@@ -227,7 +227,7 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
         data = super().get_upload_data()
         metadata = json.dumps({
             "name": self.shot.name,
-            "comment": self.shot.comment,
+            "comment": self.shot.comment.value,
             "meta_location": self.shot.meta_location,
             "meta_max_rows": self.shot.meta_max_rows,
             "meta_max_segments": self.shot.meta_max_segments,

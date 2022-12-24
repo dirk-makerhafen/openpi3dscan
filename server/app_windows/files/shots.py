@@ -3,7 +3,7 @@ import json
 import os
 from pyhtmlgui import ObservableList
 
-from app_windows.files.shot import Shot
+from app_windows.files.shot import ShotWindows
 from app.dropbox.process import DropboxUploads
 from app_windows.settings.settings import SettingsInstance
 
@@ -67,7 +67,7 @@ class Shots:
             shot_id = os.path.split(path)[1]
             shot = self.get(shot_id)
             if shot is None:
-                shot = Shot(path, shot_id, self)
+                shot = ShotWindows(path, shot_id, self)
                 self.shots.append(shot)
             else:
                 shot.load()

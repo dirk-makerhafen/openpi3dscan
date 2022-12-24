@@ -82,7 +82,7 @@ class ShotWindows(Shot):
             with open(os.path.join(self.path, "metadata.json"), "w") as f:
                 f.write(json.dumps({
                     "name": self.name,
-                    "comment": self.comment,
+                    "comment": self.comment.value,
                     "meta_location": self.meta_location,
                     "meta_max_rows": self.meta_max_rows,
                     "meta_max_segments": self.meta_max_segments,
@@ -99,7 +99,7 @@ class ShotWindows(Shot):
                 with open(os.path.join(self.path, "metadata.json"), "r") as f:
                     data = json.loads(f.read())
                     self.name = data["name"]
-                    self.comment = data["comment"]
+                    self.comment._value = data["comment"]
                     try:
                         self.meta_location = data["meta_location"]
                         self.meta_max_rows = data["meta_max_rows"]
@@ -110,7 +110,8 @@ class ShotWindows(Shot):
                     except:
                         pass
                     try:
-                        self.models = ObservableList([ModelFile(self).from_dict(m) for m in data["models"]])
+                        self.models.clear()
+                        self.models.extend([ModelFile(self).from_dict(m) for m in data["models"]])
                     except:
                         pass
                     try:
@@ -122,9 +123,8 @@ class ShotWindows(Shot):
                 print("failed to load %s" % os.path.join(self.path, "metadata.json"), e)
 
         self.path_exists = os.path.exists(self.path)
-        if self.path_exists is True and self.nr_of_files == 0:
+        if self.path_exists is True and self.nr_of_files.value == 0:
             self.count_number_of_files()
-
         self.notify_observers()
 
     def backup_meta(self):

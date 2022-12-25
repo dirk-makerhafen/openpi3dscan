@@ -46,12 +46,12 @@ class ShotFilesView(PyHtmlView):
                                         <p class="h5"><a href="#" onclick="pyview.open_images_in_explorer()">{{pyview.subject.images_path}}</a></p>
                                     {% endif %}
                                 </div>
-                                {% if pyview.settingsInstance.settingsDropbox.refresh_token != "" and pyview.dropboxUploadView != None %}
+                                {% if pyview.settingsInstance.settingsDropbox.is_authorized() == True and  pyview.settingsInstance.settingsDropbox.enabled == True and pyview.dropboxUploadView != None %}
                                     {{ pyview.dropboxUploadView.render() }}
                                 {% else %}
                                      <div class="col-md-5"> </div>
                                 {% endif %}
-                                {% if  pyview.settingsInstance.settingsDropbox.refresh_token != "" and pyview.subject.dropboxPublicFolder.status != "new" %}
+                                {% if pyview.settingsInstance.settingsDropbox.is_authorized() == True and  pyview.settingsInstance.settingsDropbox.enable_public == True and pyview.subject.dropboxPublicFolder.status != "new" %}
                                     {{pyview.shotPublishingView.render()}}
                                 {% endif %}
                             </div>
@@ -64,7 +64,11 @@ class ShotFilesView(PyHtmlView):
         {% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}
             {{ pyview.modelFilesView.render() }}
         {% endif %}
-        {{ pyview.dropboxPublicFolderView.render() }}
+        
+        {% if pyview.settingsInstance.settingsDropbox.is_authorized() == True and  pyview.settingsInstance.settingsDropbox.enable_public == True %}
+            {{ pyview.dropboxPublicFolderView.render() }}
+        {% endif %}
+        
     </div> 
     '''
 

@@ -1,103 +1,61 @@
 from pyhtmlgui import PyHtmlView
-from app.tasks.task_UpdateServer import TaskUpdateServerInstance
 from views.settings.settingsCameraView import CameraSettingsView
 from views.settings.settingsCardReaderView import CardReaderView
 from views.settings.settingsDropboxView import SettingsDropboxView
 from views.settings.settingsFirmwareView import FirmwareSettingsView
 from views.settings.settingsHostnameView import HostnameSettingsView
+from views.settings.settingsImageCalibrationView import CameraImageCalibationView
 from views.settings.settingsRealityCaptureView import RealityCaptureView
 from views.settings.settingsRebootView import RebootShutdownView
 from views.settings.settingsScannerView import SettingsScannerView
 from views.settings.settingsSequenceView import SequenceSettingsView
+from views.settings.settingsUpdateView import SettingsUpdateView
 from views.settings.settingsUsbStorageView import UsbStorageView
 from views.settings.settingsWirelessView import WirelessSettingsView
 from views.settings.settingsBackupView import SettingsBackupView
 
 
-class TaskUpdateServerView(PyHtmlView):
-    TEMPLATE_STR = '''
-    {% if pyview.subject.status == "idle" %} 
-        <button class="btn btnfw" onclick='pyview.subject.run();'> Update Server </button>
-    {% else %}
-        <p style="color:green" class="h5">{{pyview.subject.status}}</p>
-    {% endif %}
-    '''
-
-
 class SettingsView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="main">
-    
-        {{pyview.cameraSettingsView.render()}}
-    
-        {{pyview.sequenceSettingsSpeedView.render()}}  
-    
+        {{ pyview.lockSettingsView.render() }}
+        {% if pyview.subject.settings.locked == False %}
+            {{pyview.cameraSettingsView.render()}}
+        {% endif %}
+        {{pyview.cameraImageCalibationView.render()}}  
+        
+        {% if pyview.subject.settings.locked == False %}
+            {{pyview.sequenceSettingsSpeedView.render()}}  
+        {% endif %}
+        
         {{pyview.cardReaderView.render()}}  
 
         {{pyview.wirelessSettingsView.render()}}  
 
-        {{pyview.firmwareSettingsView.render()}}  
-                  
-        {{pyview.realityCaptureView.render()}}  
-        
         {{pyview.usbStorageView.render()}}  
         
-        {{pyview.scannerSettingsView.render()}} 
-         
-        {{pyview.dropboxSettingsView.render()}}  
-        
-        <div class="System">
-            <div class="row justify-content-center" style="width:100%">
-                <div class="col-md-12">
-                    <div class="list-group mb-5 shadow">
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Version</div>
-                            </div>
-                        </div>
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-10">
-                                    <strong class="mb-0">Version</strong>
-                                    <p class="text-muted mb-0">Current server version</p>
-                                </div>
-                                <div class="col-md-2" style="text-align:center">
-                                    <p class="h5">{{pyview.subject.settings.VERSION}}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="list-group-item">
-                            <div class="row align-items-center">
-                                <div class="col-md-10">
-                                    <strong class="mb-0">Online Updates</strong>
-                                    <p class="text-muted mb-0">Check for updates and install if available. Server will reboot after updates are installed.</p>
-                                </div>
-                                <div class="col-md-2" style="text-align:center">
-                                    {{pyview.updateServerView.render()}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>   
-            </div>
-        </div>    
-
+        {% if pyview.subject.settings.locked == False %}
+            {{pyview.firmwareSettingsView.render()}}  
+            {{pyview.realityCaptureView.render()}}  
+            {{pyview.scannerSettingsView.render()}} 
+            {{pyview.dropboxSettingsView.render()}}  
+            {{pyview.settingsUpdateView.render()}}          
+            {{pyview.hostnameView.render()}}  
+            {{pyview.settingsBackupView.render()}}  
+        {% endif %}
         {{pyview.rebootShutdownView.render()}}  
-
-        {{pyview.hostnameView.render()}}  
-        {{pyview.settingsBackupView.render()}}  
-
     </div> 
     
     '''
 
     def __init__(self, subject, parent):
         super().__init__(subject, parent)
+        self.add_observable(self.subject.settings)
         self.sequenceSettingsSpeedView = SequenceSettingsView(self.subject.settings.sequenceSettingsSpeed, self)
         self.cameraSettingsView = CameraSettingsView(self.subject.settings.cameraSettings, self)
+        self.cameraImageCalibationView = CameraImageCalibationView(self.subject.settings.cameraSettings, self)
         self.firmwareSettingsView = FirmwareSettingsView(self.subject.settings.firmwareSettings, self)
         self.wirelessSettingsView = WirelessSettingsView(self.subject.settings.wirelessSettings, self)
-        self.updateServerView = TaskUpdateServerView(TaskUpdateServerInstance(), self)
         self.realityCaptureView = RealityCaptureView(self.subject.settings.realityCaptureSettings, self)
         self.usbStorageView = UsbStorageView(self.subject.usbDisks, self)
         self.rebootShutdownView = RebootShutdownView(self.subject, self)
@@ -106,3 +64,5 @@ class SettingsView(PyHtmlView):
         self.scannerSettingsView = SettingsScannerView(self.subject.settings.settingsScanner, self)
         self.dropboxSettingsView = SettingsDropboxView(self.subject.settings.settingsDropbox, self)
         self.settingsBackupView = SettingsBackupView(self.subject.settings, self)
+        self.settingsUpdateView = SettingsUpdateView(self.subject.settings, self)
+        self.lockSettingsView = LockSettingsView(self.subject.settings, self)

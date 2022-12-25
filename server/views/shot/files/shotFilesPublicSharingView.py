@@ -165,7 +165,7 @@ class DropboxPublicFolderView(PyHtmlView):
         seconds = self.subject.expire_time - time.time()
         minutes = int(math.ceil(seconds / 60 ))
         if minutes < 10:
-            return "A few minutes"
+            return "a few minutes"
         hours = int(math.ceil(seconds / 60 / 60 ))
         if hours < 2:
             return "%s minutes" % minutes

@@ -37,7 +37,7 @@ class DropboxUploadView(PyHtmlView):
 
     def _convert_time(self, seconds):
         if seconds < 5:
-            return "A few seconds"
+            return "a few seconds"
         minutes = int(math.ceil(seconds / 60 ))
         if minutes < 2:
             return "%s seconds" % int(seconds)

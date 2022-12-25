@@ -43,7 +43,7 @@ class SidebarShotsView(ObservableListView):
 
 class SidebarDropboxUploadView(PyHtmlView):
     DOM_ELEMENT = "dummy"
-    TEMPLATE_STR = ''',{{pyview.subject.progress}}%'''
+    TEMPLATE_STR = '''{% if pyview.subject.status == "uploading" %},{{pyview.subject.progress}}%{% endif %}'''
 
 class NrOfDevicesView(PyHtmlView):
     DOM_ELEMENT = "dummy"
@@ -79,15 +79,5 @@ class ShotsItemView(PyHtmlView):
         self.modelsStatsView = ModelsStatsView(self.subject.models, self)
         if self.subject.devices is not None:
             self.nrOfDevicesView = NrOfDevicesView(self.subject.devices, self)
-
-    def update(self):
         if self.subject.dropboxUpload != None:
-            if self.subject.dropboxUpload.status != "uploading":
-                if self.dropboxUploadView is not None:
-                    self.dropboxUploadView.delete(remove_from_dom = False)
-                    self.dropboxUploadView = None
-            else:
-                if self.dropboxUploadView is None:
-                    self.dropboxUploadView = SidebarDropboxUploadView(self.subject.dropboxUpload, self)
-        if self.is_visible:
-            super().update()
+            self.dropboxUploadView = SidebarDropboxUploadView(self.subject.dropboxUpload, self)

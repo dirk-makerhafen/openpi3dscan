@@ -1,4 +1,6 @@
 import os
+import traceback
+
 import dropbox
 import threading
 import time
@@ -73,6 +75,7 @@ class ShotsDropboxDownload(Observable):
                 self._sync()
             except Exception as e:
                 print("failed sync", e)
+                traceback.print_exc()
                 self.last_success = None
                 self.last_failed = int(time.time())
                 time.sleep(5)

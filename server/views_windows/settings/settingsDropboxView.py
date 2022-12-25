@@ -67,14 +67,14 @@ class SettingsDropboxView(PyHtmlView):
                 <div class="list-group mb-5 shadow">
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Remote Synchronisation</div>
+                            <div class="col-md-12 h3" style="border-bottom: 1px solid lightgray;">Dropbox</div>
                         </div>
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-11">
-                                <strong class="mb-0">Enable synchronisation of remote locations via Dropbox.</strong>
-                                <p class="text-muted mb-0"> </p>
+                                <strong class="mb-0">Location synchronisation</strong>
+                                <p class="text-muted mb-0">Enable synchronisation of remote locations via Dropbox. </p>
                             </div>
                             <div class="col-md-1" style="text-align:center">
                                 <div class="custom-control custom-switch">
@@ -83,7 +83,20 @@ class SettingsDropboxView(PyHtmlView):
                             </div>         
                         </div>
                     </div>  
-                    {% if pyview.subject.enabled == True %}
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-11">
+                                <strong class="mb-0">Public Sharing</strong>
+                                <p class="text-muted mb-0"> Allow public data sharing via dropbox links</p>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch" style="text-align:center">
+                                    <input id="dropbox_enable_public"  type="checkbox" {% if pyview.subject.enable_public == True %}checked{% endif %} onchange='pyview.subject.set_enable_public($("#dropbox_enable_public").prop("checked") === true)'>                                 
+                                </div>
+                            </div>         
+                        </div>
+                    </div>   
+                    {% if pyview.subject.enabled == True or pyview.subject.enable_public == True  %}
                         <div class="list-group-item">
                             <div class="row align-items-center">
                                 <div class="col-md-8">

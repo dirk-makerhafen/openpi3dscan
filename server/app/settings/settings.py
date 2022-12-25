@@ -27,6 +27,8 @@ class Settings(Observable):
         self.settingsScanner = SettingsScanner(self)
         self.settingsDropbox = SettingsDropbox(self)
         self.VERSION = VERSION
+        self.locked = False
+        self.password = ""
         self.load()
 
 
@@ -40,7 +42,9 @@ class Settings(Observable):
             "hostnameSettings" : self.hostnameSettings.to_dict(),
             "realityCaptureSettings" : self.realityCaptureSettings.to_dict(),
             "settingsScanner" : self.settingsScanner.to_dict(),
-            "settingsDropbox" : self.settingsDropbox.to_dict()
+            "settingsDropbox" : self.settingsDropbox.to_dict(),
+            "locked"          : self.locked,
+            "password"        : self.password,
         }
 
     def save(self):
@@ -89,9 +93,25 @@ class Settings(Observable):
             self.settingsDropbox.from_dict(data["settingsDropbox"])
         except:
             pass
+        try:
+            self.locked = data["locked"]
+            self.password = data["password"]
+        except:
+            pass
+
         self.save()
         self.notify_observers()
 
+    def lock(self, password):
+        self.locked = True
+        self.password = password
+        self.save()
+        self.notify_observers()
+
+    def unlock(self, password):
+        if self.password == password:
+            self.locked = False
+            self.notify_observers()
 
 _settingsInstance = None
 

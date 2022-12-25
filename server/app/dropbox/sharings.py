@@ -117,7 +117,9 @@ class DropboxPublicModelShare(DropboxGenericShare):
             with dropbox.Dropbox(oauth2_refresh_token=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
                 parent = "/" .join(self.target_path.split("/")[:-1])
                 pname = unicodedata.normalize('NFC', "/" .join(self.target_path.split("/")[-1]))
-                if pname in dbx.files_list_folder(parent):
+                folders = {}
+                [folders.__setitem__(entry.name, entry) for entry in dbx.files_list_folder(parent).entries]
+                if pname in folders:
                     dbx.files_delete_v2(self.target_path)
                 else:
                     print("Folder does not exist")
@@ -182,7 +184,9 @@ class DropboxPublicImagesShare(DropboxGenericShare):
             with dropbox.Dropbox(oauth2_refresh_token=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
                 parent = "/".join(self.target_path.split("/")[:-1])
                 pname = unicodedata.normalize('NFC', "/".join(self.target_path.split("/")[-1]))
-                if pname in dbx.files_list_folder(parent):
+                folders = {}
+                [folders.__setitem__(entry.name, entry) for entry in dbx.files_list_folder(parent).entries]
+                if pname in folders:
                     dbx.files_delete_v2(self.target_path)
                 else:
                     print("Folder does not exist")

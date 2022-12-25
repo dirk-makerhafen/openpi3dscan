@@ -201,7 +201,9 @@ class ShotDropboxPublicFolder(Observable):
             with dropbox.Dropbox(oauth2_refresh_token=self.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
                 parent = "/".join(self.path.split("/")[:-1])
                 pname = unicodedata.normalize('NFC', "/".join(self.path.split("/")[-1]))
-                if pname in dbx.files_list_folder(parent):
+                folders = {}
+                [folders.__setitem__(entry.name, entry) for entry in dbx.files_list_folder(parent).entries]
+                if pname in folders:
                     dbx.files_delete_v2(self.path)
                 else:
                     print("Folder does not exist")

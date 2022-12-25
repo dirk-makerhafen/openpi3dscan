@@ -140,7 +140,7 @@ class ModelFileItemView(PyHtmlView):
         <div class="col-md-1" style="text-align:center;width:11.1%;margin-top:1px"> {{pyview.subject.create_mesh_from}} </div>
         <div class="col-md-1" style="text-align:center;margin-top:1px"> {{pyview.subject.create_textures}} </div>
         <div class="col-md-1" style="text-align:center;margin-top:1px"> {{pyview.subject.lit}} </div>
-        <div class="col-md-3" style="text-align:center;margin-top:1px">
+        <div class="col-md-3" style="text-align:center;margin-top:1px;white-space: nowrap;">
             {% if pyview.subject.status == "ready" %} 
                  {% if pyview.parent.parent.parent.parent.show_path == True %}
                     <a style="white-space: nowrap;" href="#" onclick="pyview.open_in_explorer()">{{pyview.subject.filename}}</a> ({{pyview.subject.filesize}}&nbsp;MB)

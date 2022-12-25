@@ -151,7 +151,7 @@ class ModelFileItemView(PyHtmlView):
                 {{pyview.subject.status}}
             {% endif %}    
         </div>
-        {% if pyview.settingsInstance.settingsDropbox.is_authorized() == True and  pyview.settingsInstance.settingsDropbox.enable_public == True and pyview.subject.parentShot.dropboxPublicFolder.status != "new" %}
+        {% if  pyview.parent.parent.settingsInstance.settingsDropbox.is_authorized() == True and pyview.parent.parent.settingsInstance.settingsDropbox.enable_public == True and pyview.subject.parentShot.dropboxPublicFolder.status != "new" %}
             {{ pyview.modelPublishingView.render() }}
         {% else %}
             <div class="col-md-1"></div>

@@ -136,8 +136,7 @@ class ShotsDropboxDownload(Observable):
                         all_success = False
                     else:
                         if shot is not None:
-                            shot.nr_of_files += 1
-                            shot.notify_observers()
+                            shot.nr_of_files.value += 1
                 self.current_progress =  100
                 self.notify_observers()
                 if all_success is True:

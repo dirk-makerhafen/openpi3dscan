@@ -187,10 +187,12 @@ class DropboxUploads(Observable):
         #self._uploader_thread = threading.Thread(target=_uploader_subprocess, args=[self.to_subprocess_queue],  daemon=True).start()
         self._upload_thread = threading.Thread(target=self._loop, daemon=True).start()
         self._cleanup_thread = threading.Thread(target=self._cleanup_loop, daemon=True).start()
+        self.must_run_q = queue.Queue()
 
     def add_to_uploadqueue(self, dropboxUploader):
         if dropboxUploader not in self.pending_uploads:
             self.pending_uploads.append(dropboxUploader)
+            self.must_run_q.put(True)
 
     def remove_from_uploadqueue(self, dropboxUploader):
         if dropboxUploader in self.pending_uploads:
@@ -208,23 +210,22 @@ class DropboxUploads(Observable):
 
     def _loop(self):
         time.sleep(30)
-        while True:
-            if len(self.pending_uploads) == 0 or self.settings_instance.settingsDropbox.is_authorized() is False:
-                time.sleep(6)
+        while self.must_run_q.get():
+            while self.settings_instance.settingsDropbox.is_authorized() is False:
+                time.sleep(30)
+            if len(self.pending_uploads) == 0:
                 continue
-            try:
-                pending_upload = self.pending_uploads[0]
-                pending_upload.last_checked = time.time()
-                pending_upload.set_status("uploading")
-                if hasattr(pending_upload, "model") and pending_upload.model is not None:
-                    pending_upload.model.publishing_status.set("state_changing")
-                if hasattr(pending_upload, "shot") and pending_upload.shot is not None and pending_upload.name != "ImagesAndMetadata":
-                    pending_upload.shot.publishing_status.set("state_changing")
-                if hasattr(pending_upload, "shotPublicFolder"):
-                    pending_upload.shotPublicFolder.notify_observers()
 
-            except:
-                continue
+            pending_upload = self.pending_uploads[0]
+            pending_upload.last_checked = time.time()
+            pending_upload.set_status("uploading")
+            if hasattr(pending_upload, "model") and pending_upload.model is not None:
+                pending_upload.model.publishing_status.set("state_changing")
+            if hasattr(pending_upload, "shot") and pending_upload.shot is not None and pending_upload.name != "ImagesAndMetadata":
+                pending_upload.shot.publishing_status.set("state_changing")
+            if hasattr(pending_upload, "shotPublicFolder"):
+                pending_upload.shotPublicFolder.notify_observers()
+
             pending_upload_datas = pending_upload.get_upload_data()
             all_in_sync = True
             for pending_upload_data in pending_upload_datas:
@@ -274,6 +275,7 @@ class DropboxUploads(Observable):
                 pending_upload.set_status("pending")
                 self.pending_uploads.remove(pending_upload)
                 self.pending_uploads.append(pending_upload)
+                self.must_run_q.put(True)
             if hasattr(pending_upload, "model"):
                 pending_upload.model.publishing_status.set("can_unpublish")
             if hasattr(pending_upload, "shot") and pending_upload.name != "ImagesAndMetadata":

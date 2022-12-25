@@ -12,6 +12,7 @@ class SettingsDropbox(Observable):
         self.parent = parent
         self.save = parent.save
         self.enabled = False
+        self.enable_public = False
         self.token = ""
         self.refresh_token = ""
         self.authorize_url = None
@@ -21,6 +22,7 @@ class SettingsDropbox(Observable):
     def to_dict(self):
         return {
             "enabled": self.enabled,
+            "enable_public": self.enable_public,
             "token": self.token,
             "refresh_token": self.refresh_token,
         }
@@ -29,11 +31,18 @@ class SettingsDropbox(Observable):
         self.token = data["token"]
         self.enabled = data["enabled"]
         self.refresh_token = data["refresh_token"]
+        self.enable_public = data["enable_public"]
 
     def set_token(self, new_token):
         if self.token != new_token:
             self.token = new_token
             self.finish_authflow()
+            self.save()
+            self.notify_observers()
+
+    def set_enable_public(self, new_enable_public):
+        if self.enable_public != new_enable_public:
+            self.enable_public = new_enable_public
             self.save()
             self.notify_observers()
 
@@ -50,9 +59,9 @@ class SettingsDropbox(Observable):
             self.notify_observers()
 
     def start_authflow(self):
-        self.refresh_token = ""
         self.auth_flow = DropboxOAuth2FlowNoRedirect(self.app_key, use_pkce=True, token_access_type='offline')
         self.authorize_url = self.auth_flow.start()
+        self.set_refresh_token("")
         self.notify_observers()
 
     def finish_authflow(self):

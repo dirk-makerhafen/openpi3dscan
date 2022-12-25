@@ -4,8 +4,8 @@ import queue
 import os
 
 from app.settings.settings import SettingsInstance
-from views.imageCarousel.imageCarousel import ImageCarousel
 from app.devices.devices import DevicesInstance
+from views.images.imagesView import ImagesView
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 loading_img_path = os.path.join(SCRIPT_DIR, "..", "..", "static", "images", "nophoto.jpg")
@@ -107,7 +107,7 @@ class PreviewQueue:
         return self.loading_img
 
 
-class ImageCarouselLive(ImageCarousel):
+class ImagesLiveView(ImagesView):
     DOM_ELEMENT_CLASS = "ImageCarousel"
 
     def __init__(self, subject, parent):

@@ -1,18 +1,11 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
 from pyhtmlgui import PyHtmlView
 
 from app.settings.settings import SettingsInstance
 from app.tasks.task_CameraBalance import TaskCameraBalanceInstance
-
-if TYPE_CHECKING:
-    from app.app import App
-    from views.appView import AppView
-from views.imageCarousel.imageCarouselLive import ImageCarouselLive
 from app.devices.devices import DevicesInstance
 from app.tasks.tasks import TasksInstance
 from app.tasks.task_CreateShot import TaskCreateShotInstance
-
+from views.images.imagesLiveView import ImagesLiveView
 
 
 class TaskShutterAdjustTopView(PyHtmlView):
@@ -161,9 +154,9 @@ class LiveView(PyHtmlView):
     </div>   
     '''
 
-    def __init__(self, subject: App, parent):
+    def __init__(self, subject, parent):
         super().__init__(subject, parent)
-        self.imageCarousel = ImageCarouselLive(self.subject, self)
+        self.imageCarousel = ImagesLiveView(self.subject, self)
         self._name_input = ""
         self.shot_quality = "speed"
         self.create_shot_view = TaskCreateShotView(TaskCreateShotInstance(), self)

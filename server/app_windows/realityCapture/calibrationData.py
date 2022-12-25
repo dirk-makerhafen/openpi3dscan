@@ -129,7 +129,7 @@ class CalibrationData(GenericTask):
         for cam_id in self.get_camera_ids():
             segment, row = cam_id.split("-")
             group_id = ( int(segment) * 100 ) + int(row)
-            if self.count(segment, row, "FocalLength35mm") == 0:
+            if self.count(segment, row, "FocalLength35mm") < 2:
                continue
 
             CalibrationPrior = "initial"

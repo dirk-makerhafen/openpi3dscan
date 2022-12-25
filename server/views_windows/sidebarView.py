@@ -1,28 +1,31 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+from views.sidebar.sidebarShotsView import SidebarShotsView
+
 if TYPE_CHECKING:
     from app.app import App
     from views.appView import AppView
 from pyhtmlgui import PyHtmlView
-from views.sidebar.shotsView import ShotsView
 from app_windows.settings.settings import SettingsInstance
 
 
 
-class SidebarButtonsView(PyHtmlView):
+class SidebarTopView(PyHtmlView):
     DOM_ELEMENT_CLASS = "row menu"
     TEMPLATE_STR = '''
-    <div class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.settingsView %} selected {% endif %}" onclick='pyview.parent.show_settings();'>
-        Settings
-    </div>
-    <div {% if pyview.parent.parent.currentView.processingView.subject.status == "failed" %}style="color:#ff0000bb !important"{% endif %} class="col-md-12 item {% if pyview.parent.parent.currentView.current_view == pyview.parent.parent.currentView.processingView %} selected {% endif %}" onclick='pyview.parent.show_processing();'>
-        Processing {% if pyview.parent.parent.currentView.processingView.subject.status == "failed" %}failed{% endif %}
-    </div>
-    <div class="col-md-12 item" style="height:3px"'> </div> 
+        <div class="col-md-12 item {% if pyview._mainView.current_view == pyview._mainView.settingsView %} selected {% endif %}" onclick='pyview.parent.show_settings();'>
+            Settings
+        </div>
+        <div {% if pyview._mainView.processingView.subject.status == "failed" %}style="color:#ff0000bb !important"{% endif %} class="col-md-12 item {% if pyview._mainView.current_view == pyview._mainView.processingView %} selected {% endif %}" onclick='pyview.parent.show_processing();'>
+            Processing {% if pyview._mainView.processingView.subject.status == "failed" %}failed{% endif %}
+        </div>
+        <div class="col-md-12 item" style="height:3px"'> </div> 
     '''
     def __init__(self, subject: App, parent):
         super().__init__(subject, parent)
-        self.add_observable(self.parent.parent.currentView.processingView.subject)
+        self._mainView = self.parent._mainView
+        self.add_observable(self._mainView.processingView.subject)
 
 class SidebarView(PyHtmlView):
     DOM_ELEMENT_CLASS = "Sidebar col-md-3"
@@ -38,22 +41,23 @@ class SidebarView(PyHtmlView):
 
     def __init__(self, subject: App, parent: AppView):
         super().__init__(subject, parent)
-        self.shotsView = ShotsView(subject=subject.shots.shots, parent=self, settingsInstance=SettingsInstance())
-        self.buttonsView = SidebarButtonsView(subject=subject, parent=self)
+        self._mainView = self.parent.mainView
+        self.shotsView = SidebarShotsView(subject=subject.shots.shots, parent=self, settingsInstance=SettingsInstance())
+        self.buttonsView = SidebarTopView(subject=subject, parent=self)
         self.current_search = ""
 
     def show_settings(self):
         self.shotsView.select_shot(None)
-        if self.parent.currentView.show_settingsView() is True:
+        if self._mainView.show_settingsView() is True:
             self.buttonsView.update()
 
     def show_processing(self):
         self.shotsView.select_shot(None)
-        if self.parent.currentView.show_processingView() is True:
+        if self._mainView.show_processingView() is True:
             self.buttonsView.update()
 
     def show_shot(self, shot):
-        if self.parent.currentView.show_shotView(shot) is True:
+        if self._mainView.show_shotView(shot) is True:
             self.buttonsView.update()
 
     def search(self, value):

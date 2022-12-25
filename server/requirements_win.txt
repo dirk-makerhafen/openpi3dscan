@@ -1,7 +1,5 @@
-bottle
 requests
-pyhtmlgui>=2.7
-bottle-websocket
+pyhtmlgui>=2.18
 whichcraft
 zipstream-ng
 pillow

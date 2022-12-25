@@ -1,5 +1,4 @@
 import datetime
-import glob
 import json
 import os
 import queue
@@ -7,20 +6,14 @@ import random
 import subprocess
 import threading
 import time
-import zipfile
 from zipfile import ZIP_STORED
-
-import bottle
-import gevent
 import zipstream
-from bottle import request
 
 from app.devices.devices import DevicesInstance
 from app.settings.settings import SettingsInstance
 from app.files.shots import ShotsInstance
-from views.imageCarousel.imageCarouselLive import PreviewQueueInstance
-
-bottle.BaseRequest.MEMFILE_MAX = 800 * 1024 * 1024
+from views.images.imagesLiveView import PreviewQueueInstance
+import flask
 
 
 class DownloadStreamer:
@@ -60,7 +53,7 @@ class DownloadStreamer:
         timeout_seconds = 90
         sleeptime = 0.3
         while filename not in self.results and cnt < (timeout_seconds/sleeptime):
-            gevent.sleep(sleeptime)
+            time.sleep(sleeptime)
             cnt += 1
         try:
             item = self.results[filename]
@@ -75,21 +68,23 @@ class HttpEndpoints:
         self.app = app
         self.gui = gui
         # image_mode = normal | preview, image_type = normal | projection
-        bottle.route("/shots/list")(self._shot_list)
-        bottle.route("/shots/<shot_id>/processing/<model_id>")(self._shot_processing)
-        bottle.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
-        bottle.route("/shots/<shot_id>/upload/<model_id>", method="POST")(self._shot_upload_model)
-        bottle.route("/shots/<shot_id>/upload_license", method="POST")(self._shot_upload_license)
-        bottle.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
-        bottle.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
-        bottle.route("/shots/<shot_id>/<image_mode>/<image_type>/<fname>.jpg")(self._shot_get_image)  # return remote shot as jpeg
-        bottle.route("/shots/<shot_id>.zip")(self._shot_get_images_zip)
-        bottle.route("/live/<device_id>.jpg")(self._live)
-        bottle.route("/heartbeat", method="POST")(self._heartbeat)
-        bottle.route("/force_update")(self.force_update)
-        bottle.route("/realityCaptureProcess")(self.realityCaptureProcess)
-        bottle.route("/upload_calibration", method="POST")(self.upload_calibration)
-        bottle.route("/settings_backup")(self._settings_backup)
+        self.flaskApp = flask.current_app
+        self.flaskApp.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 1024
+        self.flaskApp.route("/shots/list")(self._shot_list)
+        self.flaskApp.route("/shots/<shot_id>/processing/<model_id>")(self._shot_processing)
+        self.flaskApp.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
+        self.flaskApp.route("/shots/<shot_id>/upload/<model_id>", methods=["POST"])(self._shot_upload_model)
+        self.flaskApp.route("/shots/<shot_id>/upload_license", methods=["POST"])(self._shot_upload_license)
+        self.flaskApp.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
+        self.flaskApp.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
+        self.flaskApp.route("/shots/<shot_id>/<image_mode>/<image_type>/<fname>.jpg")(self._shot_get_image)  # return remote shot as jpeg
+        self.flaskApp.route("/shots/<shot_id>.zip")(self._shot_get_images_zip)
+        self.flaskApp.route("/live/<device_id>.jpg")(self._live)
+        self.flaskApp.route("/heartbeat", methods=["POST"])(self._heartbeat)
+        self.flaskApp.route("/force_update")(self.force_update)
+        self.flaskApp.route("/realityCaptureProcess")(self.realityCaptureProcess)
+        self.flaskApp.route("/upload_calibration", methods=["POST"])(self.upload_calibration)
+        self.flaskApp.route("/settings_backup")(self._settings_backup)
 
     def realityCaptureProcess(self):
         data = {
@@ -118,18 +113,18 @@ class HttpEndpoints:
         return json.dumps([shot.shot_id for shot in ShotsInstance().shots])
 
     def _shot_download_model(self, shot_id, model_id):
-        model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
+        model = ShotsInstance().get(shot_id).models.get_by_id(model_id)
         if model is None or model.filename == "":
-            return bottle.HTTPResponse(status=404)
+            return flask.abort(404)
         mf = model.get_model_file()
         if mf is None:
-            return bottle.HTTPResponse(status=404)
+            return flask.abort(404)
         filename, data = mf
         headers = {
             'Content-Type': "application/%s" % filename.split(".")[-1],
             'Content-Disposition': 'attachment; filename="%s"' % filename
         }
-        return bottle.HTTPResponse(data, **headers)
+        return flask.Response(data, headers=headers)
 
     def _settings_backup(self):
         fname = "Backup-Settings"
@@ -141,40 +136,44 @@ class HttpEndpoints:
             'Content-Type': "application/json",
             'Content-Disposition': 'attachment; filename="%s"' % fname
         }
-        return bottle.HTTPResponse(json.dumps(SettingsInstance().to_dict()), **headers)
+        return flask.Response(json.dumps(SettingsInstance().to_dict()), headers=headers)
 
     def _shot_download_model_file(self, shot_id, model_id, filename):
-        model = ShotsInstance().get(shot_id).get_model_by_id(model_id)
+        model = ShotsInstance().get(shot_id).models.get_by_id(model_id)
         if model is None or model.filename == "":
             print("no model")
-            return bottle.HTTPResponse(status=404)
+            return flask.abort(404)
         mf = model.get_model_file(filename)
         if mf is None:
             print("no model file")
-            return bottle.HTTPResponse(status=404)
+            return flask.abort(404)
         filename, data = mf
         headers = {
             'Content-Type': "application/%s" % filename.split(".")[-1],
             'Content-Disposition': 'attachment; filename="%s"' % filename,
             'Cache-Control': "public, max-age=3600"
         }
-        return bottle.HTTPResponse(data, **headers)
+        return flask.Response(data, headers=headers)
 
     def _shot_processing_failed(self, shot_id, model_id):
-        ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("failed")
+        ShotsInstance().get(shot_id).models.get_by_id(model_id).set_status("failed")
+        return flask.Response("")
 
     def _shot_processing(self, shot_id, model_id):
-        ShotsInstance().get(shot_id).get_model_by_id(model_id).set_status("processing")
+        ShotsInstance().get(shot_id).models.get_by_id(model_id).set_status("processing")
+        return flask.Response("")
 
     def _shot_upload_model(self, shot_id, model_id):
-        file = request.files.get('upload_file').file
-        ShotsInstance().get(shot_id).get_model_by_id(model_id).write_file(file)
+        file = flask.request.files['upload_file']
+        ShotsInstance().get(shot_id).models.get_by_id(model_id).write_file(file)
+        return flask.Response("")
 
     def _shot_upload_license(self, shot_id):
         shot = ShotsInstance().get(shot_id)
-        if shot is not None and len(shot.license_data) < len(request.json["data"]):
-            shot.license_data = request.json["data"]
+        if shot is not None and len(shot.license_data) < len(flask.request.json["data"]):
+            shot.license_data = flask.request.json["data"]
             shot.save()
+        return flask.Response("")
 
     # image_mode = normal | preview , image_type = normal | projection
     def _shot_get_image(self, shot_id, image_mode, image_type, fname):
@@ -183,20 +182,20 @@ class HttpEndpoints:
         row = fname.split("-")[1].replace("cam","").strip()
 
         if shot is None:
-            return bottle.HTTPResponse(status=404)
+            return flask.abort(404)
         image = shot.get_image(image_type, image_mode, segment, row)
         if image is None:
-            return bottle.HTTPResponse(status=503)
+            return flask.abort(503)
         headers = {
             'Content-Type': "image/jpeg",
             'Cache-Control': "public, max-age=36000"
         }
-        return bottle.HTTPResponse(image, **headers)
+        return flask.Response(image, headers=headers)
 
     def _shot_get_images_zip(self, shot_id):
         shot = self.app.shots.get(shot_id)
         if shot is None:
-            return bottle.HTTPResponse(status=404)
+            return flask.abort(404)
 
 
         filelist = []
@@ -213,7 +212,7 @@ class HttpEndpoints:
 
         zs.add(json.dumps({
             "name": shot.name,
-            "comment": shot.comment,
+            "comment": shot.comment.value,
             "meta_location": shot.meta_location,
             "meta_max_rows": shot.meta_max_rows,
             "meta_max_segments": shot.meta_max_segments,
@@ -225,16 +224,15 @@ class HttpEndpoints:
             'Content-Type': "application/zip",
             'Content-Disposition': 'attachment; filename="%s.zip"' % shot.get_clean_shotname()
         }
-        return bottle.HTTPResponse(zs, **headers)
+        return flask.Response(zs, headers=headers)
 
     def _heartbeat(self):
-        ip = request.environ.get('REMOTE_ADDR')
-        data = request.json
-        DevicesInstance().heartbeat_received(ip, data)
-        return "OK"
+        ip = flask.request.remote_addr
+        DevicesInstance().heartbeat_received(ip, flask.request.json)
+        return flask.Response("OK")
 
     def upload_calibration(self):
-        data = request.json["data"]
+        data = flask.request.json["data"]
         try:
             if len(json.loads(data)) < 50:# broken data?
                 print("rejecting data")
@@ -244,14 +242,14 @@ class HttpEndpoints:
             return "Failed"
 
         SettingsInstance().realityCaptureSettings.set_calibration_data(data)
-        return "OK"
+        return flask.Response("OK")
 
     def _live(self, device_id):
         headers = {
             'Content-Type': "image/jpeg",
             'Cache-Control': "public, max-age=0"
         }
-        response = bottle.HTTPResponse(PreviewQueueInstance().get_image(device_id), **headers)
+        response = flask.Response(PreviewQueueInstance().get_image(device_id), headers=headers)
         return response
 
     def force_update(self):
@@ -275,4 +273,4 @@ class HttpEndpoints:
             'Content-Type': "text/plain ; charset=UTF-8",
             'Cache-Control': "public, max-age=0"
         }
-        return bottle.HTTPResponse(output, **headers)
+        return flask.Response(output, headers=headers)

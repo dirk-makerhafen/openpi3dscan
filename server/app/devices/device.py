@@ -1,11 +1,8 @@
 import io
-import math
 import os
 import queue
 import threading
 import time
-
-import gevent
 import pexpect
 import requests
 from pyhtmlgui import Observable
@@ -211,7 +208,7 @@ class Device(Observable):
 
     def wait_locked(self):
         while self.busy_until > time.time():
-            gevent.sleep(0.3)
+            time.sleep(0.3)
 
     def lock(self, seconds):
         self.busy_until = time.time() + seconds

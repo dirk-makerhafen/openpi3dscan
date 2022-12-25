@@ -2,66 +2,7 @@ import math
 from pyhtmlgui import PyHtmlView
 
 
-class ImageRowView(PyHtmlView):
-    TEMPLATE_STR = '''
-    <img 
-        id="S{{pyview.parent.seg_nr}}_R{{pyview.row_nr}}" 
-        style="min-height:{{pyview.parent.parent.img_height}}vw" 
-        onerror="this.onerror=null;this.src='/static/images/nophoto.jpg';" 
-        src="{{pyview.get_image_source()}}"
-    >
-    '''
-
-    def __init__(self, subject, parent, row_nr):
-        super().__init__(subject, parent)
-        self.row_nr = row_nr
-
-    def update(self) -> None:
-        if self.is_visible and self.parent is not None:
-            js = 'document.getElementById("S%s_R%s").src = "%s"' % (self.parent.seg_nr, self.row_nr, self.get_image_source())
-            try:
-                self.eval_javascript(js, skip_results=True)
-            except:
-                pass
-
-    def get_image_source(self):
-        return self.parent.parent.get_image_source(self)
-
-    def __eq__(self, other):
-        try:
-            return self.row_nr == other.row_nr and self.parent.seg_nr == other.parent.seg_nr
-        except:
-            return False
-
-    def __hash__(self):
-        return id(self)
-
-
-class SegmentView(PyHtmlView):
-    TEMPLATE_STR = '''
-    {% for image in pyview.images %}
-        {{image.render()}}
-    {% endfor %}
-    '''
-
-    @property
-    def DOM_ELEMENT_CLASS(self):
-        return "segment segment_%s" % self.seg_nr
-
-    @property
-    def DOM_ELEMENT_EXTRAS(self):
-        return 'style="width:%s%%;"' % self.parent.segment_width
-
-    def __init__(self, subject, parent, seg_nr):
-        super().__init__(subject, parent)
-        self.seg_nr = seg_nr
-        if self.parent._get_settings_camera_one_position() == "top":
-            self.images = [ImageRowView(subject, self, i+1) for i in range(0, self.parent._get_settings_cameras_per_segment() )]
-        else:
-            self.images = [ImageRowView(subject, self, i) for i in range(self.parent._get_settings_cameras_per_segment(), 0, -1 )]
-
-
-class ImageCarousel(PyHtmlView):
+class ImagesView(PyHtmlView):
     TEMPLATE_STR = ''' 
     <div class="controls">
         <div class="col-md-3" ><button class="btn rotate_cw"  onclick='pyview.rotate_cw();' > < </button></div>
@@ -202,3 +143,63 @@ class ImageCarousel(PyHtmlView):
     def update(self):
         if self.is_visible:
             super().update()
+
+
+class ImageRowView(PyHtmlView):
+    TEMPLATE_STR = '''
+    <img 
+        id="S{{pyview.parent.seg_nr}}_R{{pyview.row_nr}}" 
+        style="min-height:{{pyview.parent.parent.img_height}}vw" 
+        onerror="this.onerror=null;this.src='/static/images/nophoto.jpg';" 
+        src="{{pyview.get_image_source()}}"
+    >
+    '''
+
+    def __init__(self, subject, parent, row_nr):
+        super().__init__(subject, parent)
+        self.row_nr = row_nr
+
+    def update(self) -> None:
+        if self.is_visible and self.parent is not None:
+            js = 'document.getElementById("S%s_R%s").src = "%s"' % (self.parent.seg_nr, self.row_nr, self.get_image_source())
+            try:
+                self.eval_javascript(js, skip_results=True)
+            except:
+                pass
+
+    def get_image_source(self):
+        return self.parent.parent.get_image_source(self)
+
+    def __eq__(self, other):
+        try:
+            return self.row_nr == other.row_nr and self.parent.seg_nr == other.parent.seg_nr
+        except:
+            return False
+
+    def __hash__(self):
+        return id(self)
+
+
+class SegmentView(PyHtmlView):
+    TEMPLATE_STR = '''
+    {% for image in pyview.images %}
+        {{image.render()}}
+    {% endfor %}
+    '''
+
+    @property
+    def DOM_ELEMENT_CLASS(self):
+        return "segment segment_%s" % self.seg_nr
+
+    @property
+    def DOM_ELEMENT_EXTRAS(self):
+        return 'style="width:%s%%;"' % self.parent.segment_width
+
+    def __init__(self, subject, parent, seg_nr):
+        super().__init__(subject, parent)
+        self.seg_nr = seg_nr
+        if self.parent._get_settings_camera_one_position() == "top":
+            self.images = [ImageRowView(subject, self, i+1) for i in range(0, self.parent._get_settings_cameras_per_segment() )]
+        else:
+            self.images = [ImageRowView(subject, self, i) for i in range(self.parent._get_settings_cameras_per_segment(), 0, -1 )]
+

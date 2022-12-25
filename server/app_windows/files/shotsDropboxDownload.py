@@ -1,4 +1,6 @@
 import os
+import traceback
+
 import dropbox
 import threading
 import time
@@ -73,6 +75,7 @@ class ShotsDropboxDownload(Observable):
                 self._sync()
             except Exception as e:
                 print("failed sync", e)
+                traceback.print_exc()
                 self.last_success = None
                 self.last_failed = int(time.time())
                 time.sleep(5)
@@ -97,7 +100,7 @@ class ShotsDropboxDownload(Observable):
         all_in_sync = True
         self.current_progress = 0
         self.notify_observers()
-        source_dir = ""
+        source_dir = "/private"
         listing = self._list_folder(source_dir)
         for name in listing:
             if not isinstance(listing[name], dropbox.files.FolderMetadata):
@@ -133,8 +136,7 @@ class ShotsDropboxDownload(Observable):
                         all_success = False
                     else:
                         if shot is not None:
-                            shot.nr_of_files += 1
-                            shot.notify_observers()
+                            shot.nr_of_files.value += 1
                 self.current_progress =  100
                 self.notify_observers()
                 if all_success is True:

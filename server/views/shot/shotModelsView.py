@@ -93,10 +93,12 @@ class ShotModelsView(PyHtmlView):
     def __init__(self, subject, parent, settingsInstance):
         super().__init__(subject, parent)
         self.settingsInstance = settingsInstance
-        self.current_shot = None
-        self.current_models = ObservableList()
-        self.selected_model = None
-        self.filesListView = ObservableListView(self.current_models, self, item_class=ModelPreviewFileItemView, dom_element="tbody", filter_function=lambda x: x.subject.filetype != "glb")
+        self.filesListView = ObservableListView(self.subject.models, self, item_class=ModelPreviewFileItemView, dom_element="tbody", filter_function=lambda x: x.subject.filetype != "glb")
+        models = [m for m in self.subject.models if m.filetype == "glb" and m.status == "ready"]
+        if len(models) > 0:
+            self.selected_model = models[0]
+        else:
+            self.selected_model = None
 
     def create_model(self, create_mesh_from, create_textures):
         self.parent.create_model(
@@ -108,13 +110,13 @@ class ShotModelsView(PyHtmlView):
 
     @property
     def has_preview_models(self):
-        return len([m for m in self.current_models if m.filetype == "glb" and m.status == "ready"]) > 0
+        return len([m for m in self.subject.models if m.filetype == "glb" and m.status == "ready"]) > 0
 
     def get_model_url(self):
         f = self.selected_model.filename.replace(".zip", "").replace(" ", "_")
         if f.endswith("_glb"):
             f = "%s.glb" % f[:-4]
-        return "/shots/%s/download/%s/%s" % (self.current_shot.shot_id, self.selected_model.model_id, f)
+        return "/shots/%s/download/%s/%s" % (self.subject.shot_id, self.selected_model.model_id, f)
 
     def select_model(self, model):
         if self.selected_model != model:
@@ -122,24 +124,3 @@ class ShotModelsView(PyHtmlView):
             if self.is_visible:
                 self.update()
 
-    def render(self):
-        self._update_current_shot()
-        return super(ShotModelsView, self).render()
-
-    def update(self) -> None:
-        self._update_current_shot()
-        return super(ShotModelsView, self).update()
-
-    def _update_current_shot(self):
-        if self.current_shot != self.parent.current_shot:
-            self.current_shot = self.parent.current_shot
-            self.selected_model = None
-            if self.current_shot is not None:
-                self.current_models = self.parent.current_shot.models
-            else:
-                self.current_models = ObservableList()
-            self.filesListView = ObservableListView(self.current_models, self, item_class=ModelPreviewFileItemView, dom_element="tbody", filter_function=lambda x: x.subject.filetype != "glb")
-
-            models = [m for m in self.current_models if m.filetype == "glb" and m.status == "ready"]
-            if len(models) > 0:
-                self.selected_model = models[0]

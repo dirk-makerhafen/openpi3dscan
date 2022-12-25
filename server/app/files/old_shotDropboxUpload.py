@@ -132,7 +132,7 @@ class ShotDropboxUpload(Observable):
             res = self._upload_data(
                 json.dumps({
                     "name": self.shot.name,
-                    "comment": self.shot.comment,
+                    "comment": self.shot.comment.value,
                     "meta_location": self.shot.meta_location,
                     "meta_max_rows": self.shot.meta_max_rows,
                     "meta_max_segments": self.shot.meta_max_segments,
@@ -181,14 +181,6 @@ class ShotDropboxUpload(Observable):
             for entry in res.entries:
                 rv[entry.name] = entry
             return rv
-
-    def check_apitoken(self):
-        try:
-            res = self.dropbox.files_list_folder("")
-            return True
-        except Exception as e:
-            print(e)
-        return False
 
     def _upload_file(self, source, destination):
         with open(source, 'rb') as f:

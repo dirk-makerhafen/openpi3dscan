@@ -116,7 +116,6 @@ class ShotWindows(Shot):
                         pass
                     try:
                         self.dropboxPublicFolder.from_dict(data["dropboxPublicFolder"])
-                        print("here")
                     except:
                         pass
             except Exception as e:

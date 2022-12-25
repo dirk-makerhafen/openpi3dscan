@@ -180,10 +180,12 @@ class DropboxPublicImagesShare(DropboxGenericShare):
 
         try:
             with dropbox.Dropbox(oauth2_refresh_token=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.shotPublicFolder.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
-                try:
+                parent = "/".join(self.target_path.split("/")[:-1])
+                pname = unicodedata.normalize('NFC', "/".join(self.target_path.split("/")[-1]))
+                if pname in dbx.files_list_folder(parent):
                     dbx.files_delete_v2(self.target_path)
-                except:
-                    pass
+                else:
+                    print("Folder does not exist")
                 self.shotPublicFolder.uploads.remove(self)
                 self.shotPublicFolder.parent_shot.publishing_status.set("can_publish")
                 self.shotPublicFolder.notify_observers()

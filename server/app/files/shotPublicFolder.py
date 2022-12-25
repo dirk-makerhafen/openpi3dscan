@@ -41,6 +41,11 @@ class ShotDropboxPublicFolder(Observable):
             self.save()
             self.notify_observers()
 
+    def clear_uploads(self):
+        for u in self.uploads:
+            self.parent_shot.parent_shots.dropboxUploads.remove_from_uploadqueue(u)
+        self.uploads.clear()
+
     def add_images(self):
         if len([m for m in self.uploads if not hasattr(m,"model")]) > 0:
             return
@@ -145,7 +150,7 @@ class ShotDropboxPublicFolder(Observable):
             self.url = ""
         [u.model.publishing_status.set("can_publish") for u in self.uploads if hasattr(u, "model") and u.model is not None]
         [u.shot.publishing_status.set("can_publish") for u in self.uploads if hasattr(u, "shot") and u.shot is not None]
-        self.uploads.clear()
+        self.clear_uploads()
         for upload in data["uploads"]:
             if "model_id" in upload:
                 models = [m for m in self.parent_shot.models if m.model_id == upload["model_id"]]
@@ -189,23 +194,31 @@ class ShotDropboxPublicFolder(Observable):
 
     def _delete_thread(self):
         self.set_status("deleting")
+        [u.model.publishing_status.set("state_changing") for u in self.uploads if hasattr(u, "model") and u.model is not None]
+        [u.shot.publishing_status.set("state_changing") for u in self.uploads if hasattr(u, "shot") and u.shot is not None]
 
-        [u.model.publishing_status.set("state_changing") for u in self.uploads if hasattr(u, "model")  and u.model is not None]
-        [u.shot.publishing_status.set("state_changing") for u in self.uploads if hasattr(u, "shot")  and u.shot is not None]
         try:
             with dropbox.Dropbox(oauth2_refresh_token=self.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
-                if dbx.check_user("pong").result != "pong":
-                    raise Exception("Dropbox login failed")
-                try:
+                parent = "/".join(self.path.split("/")[:-1])
+                pname = unicodedata.normalize('NFC', "/".join(self.path.split("/")[-1]))
+                if pname in dbx.files_list_folder(parent):
                     dbx.files_delete_v2(self.path)
-                except:
-                    pass
+                else:
+                    print("Folder does not exist")
                 self.url = ""
                 self.expire_time = 0
                 [u.model.publishing_status.set("can_publish") for u in self.uploads if hasattr(u,"model") and u.model is not None]
                 [u.shot.publishing_status.set("can_publish") for u in self.uploads if hasattr(u,"shot") and u.shot is not None]
-                self.uploads.clear()
+                self.clear_uploads()
                 self.set_status("new")
+                for shot in self.parent_shot.parent_shots.shots:
+                    if shot.dropboxPublicFolder is not None and shot.dropboxPublicFolder.path == self.path:
+                        [u.model.publishing_status.set("can_publish") for u in shot.dropboxPublicFolder.uploads if hasattr(u, "model") and u.model is not None]
+                        [u.shot.publishing_status.set("can_publish") for u in shot.dropboxPublicFolder.uploads if hasattr(u, "shot") and u.shot is not None]
+                        shot.dropboxPublicFolder.url = ""
+                        shot.dropboxPublicFolder.expire_time = 0
+                        shot.dropboxPublicFolder.clear_uploads()
+                        shot.dropboxPublicFolder.set_status("new")
         except Exception as e:
             print("failed to delete", e)
             self.set_status("online")

@@ -30,8 +30,8 @@ class SettingsDropbox(Observable):
     def from_dict(self, data):
         self.token = data["token"]
         self.enabled = data["enabled"]
-        self.enable_public = data["enable_public"]
         self.refresh_token = data["refresh_token"]
+        self.enable_public = data["enable_public"]
 
     def set_token(self, new_token):
         if self.token != new_token:
@@ -62,6 +62,7 @@ class SettingsDropbox(Observable):
         self.auth_flow = DropboxOAuth2FlowNoRedirect(self.app_key, use_pkce=True, token_access_type='offline')
         self.authorize_url = self.auth_flow.start()
         self.set_refresh_token("")
+        self.notify_observers()
 
     def finish_authflow(self):
         self.refresh_token = ""

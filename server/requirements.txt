@@ -1,6 +1,6 @@
 flask
 requests
-pyhtmlgui>=2.16
+pyhtmlgui>=2.17
 whichcraft
 zipstream-ng
 pexpect

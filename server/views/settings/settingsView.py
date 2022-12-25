@@ -5,6 +5,7 @@ from views.settings.settingsDropboxView import SettingsDropboxView
 from views.settings.settingsFirmwareView import FirmwareSettingsView
 from views.settings.settingsHostnameView import HostnameSettingsView
 from views.settings.settingsImageCalibrationView import CameraImageCalibationView
+from views.settings.settingsLockView import LockSettingsView
 from views.settings.settingsRealityCaptureView import RealityCaptureView
 from views.settings.settingsRebootView import RebootShutdownView
 from views.settings.settingsScannerView import SettingsScannerView

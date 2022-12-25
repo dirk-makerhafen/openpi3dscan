@@ -111,6 +111,7 @@ class Settings(Observable):
     def unlock(self, password):
         if self.password == password:
             self.locked = False
+            self.save()
             self.notify_observers()
 
 _settingsInstance = None

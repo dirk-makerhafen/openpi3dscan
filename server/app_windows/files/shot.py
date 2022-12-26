@@ -1,6 +1,7 @@
 import glob
 import json
 import os
+import re
 from multiprocessing.pool import ThreadPool
 from PIL import Image
 from pyhtmlgui import ObservableList

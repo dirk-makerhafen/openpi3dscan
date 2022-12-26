@@ -29,7 +29,7 @@ class ShotWindows(Shot):
         folder_name = "%s%s" % (l, n)
         if folder_name == "":
             return
-        folder_name = os.path.join(self.path, "..", folder_name)
+        folder_name = os.path.abspath(os.path.join(self.path, "..", folder_name))
         new_folder_name = folder_name
         i=1
         while os.path.exists(new_folder_name):

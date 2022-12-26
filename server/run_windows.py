@@ -12,12 +12,12 @@ import win32gui
 from screeninfo import get_monitors
 
 from pyhtmlgui import PyHtmlGui
+import multiprocessing
 from views_windows.appView import AppView
 from app_windows.app import AppInstance
 from app_windows.additionalHttpEndpoints import HttpEndpoints
 from app_windows.files.externalFiles import ExternalFilesInstance
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-
 
 def kill_chrome():
     cmd = "wmic Path win32_process Where \"CommandLine Like '%RCAutomation\\\\bin\\\\chromium\\\\chrome.exe%'\" Call Terminate"
@@ -107,6 +107,8 @@ class MainFrame(wx.Frame):
 
 
 if __name__ == "__main__":
+    if hasattr(sys, 'frozen'):
+        multiprocessing.freeze_support()
     kill_chrome()
 
     gui = PyHtmlGui(

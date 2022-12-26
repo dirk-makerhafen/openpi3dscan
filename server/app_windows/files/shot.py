@@ -14,6 +14,53 @@ class ShotWindows(Shot):
         super().__init__(shot_dir, shot_id, parent_shots)
         self.devices = None
 
+
+    def set_name(self, name):
+        if name == self.name:
+            return
+        super().set_name(name)
+        l = self._clean_for_filesystem(self.meta_location)
+        n = self._clean_for_filesystem(name)
+        if len(l) > 0:
+            l = "%s " % l
+        if len(n) > 0:
+            n = " %s" % n
+        folder_name = "%s%s" % (l, n)
+        if folder_name == "":
+            return
+        folder_name = os.path.join(self.path, "..", folder_name)
+        new_folder_name = folder_name
+        i=1
+        while os.path.exists(new_folder_name):
+            new_folder_name = "%s-%s" % (new_folder_name, i)
+            i+=1
+        os.rename(self.path, new_folder_name)
+        self.path = new_folder_name
+        self.path_exists = os.path.exists(self.path)
+        self.images_path = os.path.join(self.path, "images")
+        if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
+            self.images_path = self.path
+        self.preview_images_path = os.path.join(self.path, "preview_images")
+        self.save()
+        self.notify_observers()
+
+    def _clean_for_filesystem(self, value):
+        name = value
+        for rp in [["ä", "ae"], ["ö", "oe"], ["ü", "ue"], ["Ä", "Ae"], ["Ö", "Oe"], ["Ü", "Ue"]]:
+            name = name.replace(rp[0], rp[1])
+        name = re.sub('\s+', ' ', name)
+        name = re.sub('[^A-Za-z0-9_. ]+', '', name)
+        for rp in [["..", "."], ["__", "_"], ["  ", " "]]:
+            while rp[0] in name:
+                name = name.replace(rp[0], rp[1]).strip()
+        name = name.strip()
+
+        while len(name) > 0 and name[-1] in ["_", "."]:
+            name = name[:-1].strip()
+        while len(name) > 0 and name[0] in ["_", "."]:
+            name = name[1:].strip()
+        return name
+
     def set_location(self, location):
         if self.meta_location == location:
             return

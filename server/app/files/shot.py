@@ -78,7 +78,7 @@ class Shot(Observable):
         self.worker = None
         self.devices = ObservableList()
         self.models = Models()
-        self.path_exists = False
+        self.path_exists = os.path.exists(self.path)
         self.images_path = os.path.join(self.path, "images")
         if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
             self.images_path = self.path

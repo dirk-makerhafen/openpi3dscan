@@ -200,7 +200,7 @@ class ShotDropboxPublicFolder(Observable):
         try:
             with dropbox.Dropbox(oauth2_refresh_token=self.parent_shot.settingsInstance.settingsDropbox.refresh_token, app_key=self.parent_shot.settingsInstance.settingsDropbox.app_key) as dbx:
                 parent = "/".join(self.path.split("/")[:-1])
-                pname = unicodedata.normalize('NFC', "/".join(self.path.split("/")[-1]))
+                pname = unicodedata.normalize('NFC', self.path.split("/")[-1])
                 folders = {}
                 [folders.__setitem__(entry.name, entry) for entry in dbx.files_list_folder(parent).entries]
                 if pname in folders:

@@ -68,14 +68,17 @@ class ShotWindows(Shot):
                 fname = os.path.split(image)[1]
                 preview_img = os.path.join(self.preview_images_path, image_type, fname)
                 if not os.path.exists(preview_img):
-                    img = Image.open(image)
-                    width, height = img.size
-                    if width > height:
-                        resolution = [800, 600]
-                    else:
-                        resolution = [600, 800]
-                    img = img.resize(resolution)
-                    img.save(preview_img, format="jpeg", quality=85)
+                    try:
+                        img = Image.open(image)
+                        width, height = img.size
+                        if width > height:
+                            resolution = [800, 600]
+                        else:
+                            resolution = [600, 800]
+                        img = img.resize(resolution)
+                        img.save(preview_img, format="jpeg", quality=85)
+                    except:
+                        pass
 
     def save(self):
         if os.path.exists(self.path):

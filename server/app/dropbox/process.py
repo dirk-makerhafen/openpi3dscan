@@ -268,14 +268,16 @@ class DropboxUploads(Observable):
                 pending_upload.last_success = time.time()
                 pending_upload.progress = 100
                 pending_upload.set_status("online")
-                self.pending_uploads.remove(pending_upload)
+                if pending_upload in self.pending_uploads:
+                    self.pending_uploads.remove(pending_upload)
             else:
                 pending_upload.last_failed = time.time()
                 pending_upload.last_success = None
                 pending_upload.set_status("pending")
-                self.pending_uploads.remove(pending_upload)
-                self.pending_uploads.append(pending_upload)
-                self.must_run_q.put(True)
+                if pending_upload in self.pending_uploads:
+                    self.pending_uploads.remove(pending_upload)
+                    self.pending_uploads.append(pending_upload)
+                    self.must_run_q.put(True)
             if hasattr(pending_upload, "model"):
                 pending_upload.model.publishing_status.set("can_unpublish")
             if hasattr(pending_upload, "shot") and pending_upload.name != "ImagesAndMetadata":

@@ -6,13 +6,16 @@ BUILDFOLDER = os.path.join(SCRIPT_DIR, "build", "bin")
 TARGETFOLDER = os.path.join(SCRIPT_DIR, "dist", "RCAutomation", "bin")
 
 def download(url, filename):
+    print("download", url)
     with open(os.path.join(BUILDFOLDER, filename),"wb") as f:
         f.write(requests.get(url).content)
 
 def unzip(filename):
+    print("unzip", filename)
     os.system("cd \"%s\" & powershell -command \"Expand-Archive '%s'\"" % (BUILDFOLDER, filename))
 
 def un7zip(filename):
+    print("unzip", filename)
     os.system("cd \"%s\" & \"c:\\Program Files\\7-Zip\\7z.exe\" x \"%s\"" % (BUILDFOLDER, os.path.join(BUILDFOLDER, filename)))
 
 
@@ -23,7 +26,7 @@ if not os.path.exists(BUILDFOLDER):
     os.mkdir(BUILDFOLDER)
 
 if not os.path.exists(os.path.join(BUILDFOLDER,"convert.exe")):
-    download("https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-portable-Q16-x64.zip", "imagemagick.zip")
+    download("https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-55-portable-Q16-x64.zip", "imagemagick.zip")
     unzip("imagemagick.zip")
     shutil.move(os.path.join(BUILDFOLDER,"imagemagick","convert.exe"), BUILDFOLDER)
 

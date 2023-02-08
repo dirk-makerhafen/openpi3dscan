@@ -9,7 +9,7 @@ a = Analysis(
     datas=[
         ('static/', "static"),
         ('templates/', "templates"),
-        (os.path.join(os.path.split(pyhtmlgui.__file__)[0], "assets"), "pyhtmlgui/assets")
+        (os.path.join(os.path.split(pyhtmlgui.__file__)[0], "templates"), "pyhtmlgui/templates")
     ],
     hiddenimports=[],
     hookspath=[],

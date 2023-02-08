@@ -83,7 +83,7 @@ class Shot(Observable):
         if os.path.exists(os.path.join(self.path, "normal")) and os.path.exists(os.path.join(self.path, "projection")):
             self.images_path = self.path
         self.preview_images_path = os.path.join(self.path, "preview_images")
-        self.dropboxUpload = None
+        self.dropboxUpload = DropboxPrivateImagesShare(self)
         self.dropboxPublicFolder = ShotDropboxPublicFolder(self)
         self.load()
 
@@ -325,7 +325,6 @@ class Shot(Observable):
 
     def load(self):
         if os.path.exists(os.path.join(self.path, "metadata.json")):
-            self.dropboxUpload = DropboxPrivateImagesShare(self)
             try:
                 with open(os.path.join(self.path, "metadata.json"), "r") as f:
                     data = json.loads(f.read())

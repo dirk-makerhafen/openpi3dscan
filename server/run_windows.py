@@ -3,13 +3,11 @@ import threading
 import webbrowser
 import os, sys
 import shlex
-
 import win32con
 import wx
 import wx.adv
 import time
 import win32gui
-from screeninfo import get_monitors
 
 from pyhtmlgui import PyHtmlGui
 import multiprocessing
@@ -26,7 +24,6 @@ def kill_chrome():
         subprocess.check_output(cmd, shell=False,creationflags=CREATE_NO_WINDOW)
     except:
         pass
-
 
 class TaskBarIcon(wx.adv.TaskBarIcon):
     def __init__(self, icon, tooltip, frame):
@@ -55,7 +52,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
                 win32gui.SetForegroundWindow(hwnd)
                 win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
                 win32gui.SetWindowPos(hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
-                win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0,win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
+                win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST  , 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
                 win32gui.SetWindowPos(hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_SHOWWINDOW + win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
             else:
                 if time.time() - self._last_usage > 4: # lock button for some time so chromium can launch after multiple clicks
@@ -65,16 +62,11 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
                     self._browser_thread = threading.Thread(target=self._browser, daemon=True)
                     self._browser_thread.start()
         else:
-            webbrowser.open("http://127.0.0.1:8081",2)
+            webbrowser.open("http://127.0.0.1:18081",2)
 
     def _browser(self):
-        #m = [m for m in get_monitors() if m.is_primary is True][0]
-        #w = int(m.width * 0.5)
-        ##h = int(m.height * 0.5)
-        #ws = "--window-size=%s,%s " % (w,h)
-        #except Exception as e:
         ws = "--start-maximized"
-        cmd = "\"%s\" %s --no-default-browser-check --disable-logging --overscroll-history-navigation=0 --disable-pinch --user-data-dir=\"%s\" --app=http://127.0.0.1:8081" % (ExternalFilesInstance().chromium_exe, ws,  os.path.join(os.environ["APPDATA"], "RCAutomation", "data"))
+        cmd = "\"%s\" %s --no-default-browser-check --disable-logging --overscroll-history-navigation=0 --disable-pinch --user-data-dir=\"%s\" --app=http://127.0.0.1:18081" % (ExternalFilesInstance().chromium_exe, ws,  os.path.join(os.environ["APPDATA"], "RCAutomation", "data"))
         try:
             subprocess.check_output(shlex.split(cmd), shell=False)
         except:
@@ -117,7 +109,7 @@ if __name__ == "__main__":
         template_dir    = os.path.join(SCRIPT_DIR, "templates"),
         static_dir      = os.path.join(SCRIPT_DIR, "static"),
         base_template   = "base_windows.html",
-        listen_port     = 8081,
+        listen_port     = 18081,
         listen_host     = "127.0.0.1",
         auto_reload     = False,
         shared_secret   = None,

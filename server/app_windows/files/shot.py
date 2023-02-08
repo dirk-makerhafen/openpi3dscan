@@ -14,7 +14,7 @@ class ShotWindows(Shot):
     def __init__(self, shot_dir, shot_id, parent_shots):
         super().__init__(shot_dir, shot_id, parent_shots)
         self.devices = None
-
+        self.dropboxUpload = None
 
     def set_name(self, name):
         if name == self.name:

@@ -127,6 +127,8 @@ class ShotsDropboxDownload(Observable):
                 shot = None
                 if all_success is True:
                     shot = ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))
+                    shot.status = "sync"
+                    shot.notify_observers()
 
                 for index, file_to_download in enumerate(files_to_download):
                     self.current_progress = int(100 / len(files_to_download) * (index + 1))
@@ -142,6 +144,7 @@ class ShotsDropboxDownload(Observable):
                 if all_success is True:
                     if shot is None:
                         shot = ShotsInstance().load_shot_from_disk(os.path.join(ShotsInstance().path, name))
+                    shot.status = "sync"
                     shot.count_number_of_files()
                     shot.notify_observers()
                     shot.create_preview_images()
@@ -158,6 +161,8 @@ class ShotsDropboxDownload(Observable):
                     self.dropbox.files_delete_v2("%s/%s" % (source_dir, name))
                 else:
                     all_in_sync = False
+                shot.status = ""
+                shot.notify_observers()
 
         self.current_download_shotid = ""
         self.notify_observers()

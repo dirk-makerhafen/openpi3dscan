@@ -255,8 +255,9 @@ class Shot(Observable):
                 self.nr_of_files.value += 1
 
     def create_model(self, filetype="obj", reconstruction_quality="high", quality="high", create_mesh_from="projection", create_textures=False, lit=True):
+        if self.status != "":
+            return
         self.create_folders()
-
         model = self.models.get(filetype=filetype, reconstruction_quality=reconstruction_quality, quality=quality, create_mesh_from=create_mesh_from, create_textures=create_textures, lit=lit)
         if model is not None:
             if model.status == "failed":

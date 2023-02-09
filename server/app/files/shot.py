@@ -317,10 +317,12 @@ class Shot(Observable):
 
 
     def load(self):
+        print("loading %s" % self.path)
+
         if os.path.exists(os.path.join(self.path, "metadata.json")):
             path = os.path.join(self.path, "metadata.json")
         elif os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id):
-            path = os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id)
+            path = '/opt/openpi3dscan/meta/%s.json' % self.shot_id
         else:
             path = None
 
@@ -366,13 +368,26 @@ class Shot(Observable):
         if self.path_exists is True and self.nr_of_files.value == 0:
             self.count_number_of_files()
 
-        if os.path.exists(os.path.join(self.path, "models")) and len(self.models) == 0:
+        if os.path.exists(os.path.join(self.path, "models")):
             modelfiles = [f for f in glob.glob(os.path.join(self.path, "models", "*.*"))]
+            stored_model_filenames = [m.filename for m in self.models]
             if len(modelfiles) > 0:
                 for modelfile in modelfiles:
+                    fname = os.path.split(modelfile)[1]
+                    if fname in stored_model_filenames:
+                        continue
                     try:
-                        filetype = modelfile.split(".")[-2].split("_")[-1] if modelfile.endswith(".zip") else modelfile.split(".")[-1]
-                        s        = modelfile.split(".")[-2].split("_")[-2] if modelfile.endswith(".zip") else modelfile.split(".")[-2].split("_")[-1]
+                        if fname.endswith(".zip"):
+                            if "." in fname.replace(".zip","").split("_")[-1]:
+                                filetype = fname.split(".")[-2]
+                                s = fname.split(".")[-3].split("_")[-1]
+                            else:
+                                filetype = fname.replace(".zip","").split("_")[-1]
+                                s = fname.replace(".zip","").split("_")[-2]
+                        else:
+                            filetype = fname.split(".")[-1]
+                            s = fname.split(".")[-2].split("_")[-1]
+
                         reconstruction_quality = {"H": "high", "N": "normal", "P": "preview"}[s[0]]
                         export_quality = {"H": "high", "N": "normal", "L": "low"}[s[1]]
                         create_mesh_from = {"N": "normal", "P": "projection", "A": "all"}[s[2]]
@@ -382,6 +397,7 @@ class Shot(Observable):
                             create_textures = True
                         if s[-1] == "U":
                             lit = False
+
                         m = ModelFile(self,
                             filetype = filetype,
                             reconstruction_quality = reconstruction_quality,
@@ -390,11 +406,12 @@ class Shot(Observable):
                             create_textures  = create_textures,
                             lit = lit
                         )
-                        m.filename = os.path.split(modelfile)[1]
+                        m.filename = fname
                         m.filesize = round(os.path.getsize(modelfile) / 1024 / 1024, 3)
                         if m.filesize >= 1:
                             m.filesize = int(round(m.filesize, 0))
                         m.is_folder = False
+                        self.models.append(m)
                         m.publishing_status.set("can_publish")
                         m.set_status("ready")
                     except Exception as e:

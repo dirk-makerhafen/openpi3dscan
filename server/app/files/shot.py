@@ -116,7 +116,6 @@ class Shot(Observable):
             return
         self.name = name
         self.save()
-        self.backup_meta()
         self.notify_observers()
 
     def set_comment(self, comment):
@@ -127,7 +126,6 @@ class Shot(Observable):
             return
         self.comment.set(comment)
         self.save()
-        self.backup_meta()
 
     def add_device(self, device):
         if device not in self.devices:
@@ -291,29 +289,8 @@ class Shot(Observable):
         self.nr_of_files.value = len(glob.glob(os.path.join(self.images_path, "normal", "*.jpg"))) + len( glob.glob(os.path.join(self.images_path, "projection", "*.jpg")))
 
     def save(self):
-        if os.path.exists(self.path):
-            try:
-                data = json.dumps({
-                    "name": self.name,
-                    "comment": self.comment.value,
-                    "meta_location": self.meta_location,
-                    "meta_max_rows": self.meta_max_rows,
-                    "meta_max_segments": self.meta_max_segments,
-                    "meta_rotation": self.meta_rotation,
-                    "meta_camera_one_position": self.meta_camera_one_position,
-                    "license_data": self.license_data,
-                    "models": [m.to_dict() for m in self.models],
-                    "dropboxPublicFolder": self.dropboxPublicFolder.to_dict(),
-                    "dropbox": self.dropboxUpload.to_dict(),
-                })
-                with open(os.path.join(self.path, "metadata.json"), "w") as f:
-                    f.write(data)
-            except:
-                print("failed to save metadata")
-
-    def backup_meta(self):
-        with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "w") as f:
-            f.write(json.dumps({
+        try:
+            data = json.dumps({
                 "name": self.name,
                 "comment": self.comment.value,
                 "meta_location": self.meta_location,
@@ -322,12 +299,34 @@ class Shot(Observable):
                 "meta_rotation": self.meta_rotation,
                 "meta_camera_one_position": self.meta_camera_one_position,
                 "license_data": self.license_data,
-            }))
+                "models": [m.to_dict() for m in self.models],
+                "dropboxPublicFolder": self.dropboxPublicFolder.to_dict(),
+                "dropbox": self.dropboxUpload.to_dict(),
+            })
+        except:
+            print("failed to save")
+            return
+
+        if os.path.exists(self.path):
+            with open(os.path.join(self.path, "metadata.json"), "w") as f:
+                f.write(data)
+
+        if os.path.exists("/opt/openpi3dscan/meta/"):
+            with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "w") as f:
+                f.write(data)
+
 
     def load(self):
         if os.path.exists(os.path.join(self.path, "metadata.json")):
+            path = os.path.join(self.path, "metadata.json")
+        elif os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id):
+            path = os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id)
+        else:
+            path = None
+
+        if path is not None:
             try:
-                with open(os.path.join(self.path, "metadata.json"), "r") as f:
+                with open(path, "r") as f:
                     data = json.loads(f.read())
                     self.name = data["name"]
                     self.comment._value = data["comment"]
@@ -363,26 +362,46 @@ class Shot(Observable):
             except Exception as e:
                 print("failed to load %s" % os.path.join(self.path, "metadata.json"), e)
 
-        elif os.path.exists('/opt/openpi3dscan/meta/%s.json' % self.shot_id):
-            try:
-                with open('/opt/openpi3dscan/meta/%s.json' % self.shot_id, "r") as f:
-                    data = json.loads(f.read())
-                    self.name = data["name"]
-                    self.comment._value = data["comment"]
-                    try:
-                        self.meta_location = data["meta_location"]
-                        self.meta_max_rows = data["meta_max_rows"]
-                        self.meta_max_segments = data["meta_max_segments"]
-                        self.meta_rotation = data["meta_rotation"]
-                        self.meta_camera_one_position = data["meta_camera_one_position"]
-                        self.license_data = data["license_data"]
-                    except:
-                        pass
-            except Exception as e:
-                print("failed to load1", e)
         self.path_exists = os.path.exists(self.path)
         if self.path_exists is True and self.nr_of_files.value == 0:
             self.count_number_of_files()
+
+        if os.path.exists(os.path.join(self.path, "models")) and len(self.models) == 0:
+            modelfiles = [f for f in glob.glob(os.path.join(self.path, "models", "*.*"))]
+            if len(modelfiles) > 0:
+                for modelfile in modelfiles:
+                    try:
+                        filetype = modelfile.split(".")[-2].split("_")[-1] if modelfile.endswith(".zip") else modelfile.split(".")[-1]
+                        s        = modelfile.split(".")[-2].split("_")[-2] if modelfile.endswith(".zip") else modelfile.split(".")[-2].split("_")[-1]
+                        reconstruction_quality = {"H": "high", "N": "normal", "P": "preview"}[s[0]]
+                        export_quality = {"H": "high", "N": "normal", "L": "low"}[s[1]]
+                        create_mesh_from = {"N": "normal", "P": "projection", "A": "all"}[s[2]]
+                        create_textures = False
+                        lit = True
+                        if len(s) > 3 and s[3] == "T":
+                            create_textures = True
+                        if s[-1] == "U":
+                            lit = False
+                        m = ModelFile(self,
+                            filetype = filetype,
+                            reconstruction_quality = reconstruction_quality,
+                            quality = export_quality,
+                            create_mesh_from = create_mesh_from,
+                            create_textures  = create_textures,
+                            lit = lit
+                        )
+                        m.filename = os.path.split(modelfile)[1]
+                        m.filesize = round(os.path.getsize(modelfile) / 1024 / 1024, 3)
+                        if m.filesize >= 1:
+                            m.filesize = int(round(m.filesize, 0))
+                        m.is_folder = False
+                        m.publishing_status.set("can_publish")
+                        m.set_status("ready")
+                    except Exception as e:
+                        print("Failed to load %s" % e)
+
+        if self.path_exists is True and not os.path.exists(os.path.join(self.path, "metadata.json")):
+            self.save()
 
         self.notify_observers()
 

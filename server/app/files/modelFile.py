@@ -36,7 +36,7 @@ class ModelFile(Observable):
         self.parentShot.models.notify_observers()
 
     def write_file(self, input_file):
-        if self.filetype in ["gif", "webp"]:
+        if self.filetype in ["gif", "webp", "mp4"]:
             self.filename = self._create_filename("%s_%s%s%s%s%s.%s")
         else:
             self.filename = self._create_filename("%s_%s%s%s%s%s_%s.zip")

@@ -30,7 +30,7 @@ if __name__ == "__main__":
     qt_app = PyHtmlQtApp()
     window = PyHtmlQtWindow(qt_app, gui.get_url(), [1200, 900], "RCAutomation", icon_path=os.path.join(SCRIPT_DIR, 'static', 'app.ico'))
     tray = PyHtmlQtSimpleTray(qt_app, icon_path=os.path.join(SCRIPT_DIR, 'static', 'app.ico'))
-    tray.on_left_clicked.notify_observers(window.show)
+    tray.on_left_clicked.attach_observer(window.show)
     tray.addAction("Show", window.show)
     tray.addAction("Hide", window.close)
     tray.addAction("Exit", qt_app.stop)

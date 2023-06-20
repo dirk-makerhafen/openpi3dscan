@@ -43,7 +43,7 @@ class ShotFilesModelFilesView(PyHtmlView):
                         {{pyview.filesListView.render()}}     
                         <div class="row" style="margin-top:10px">    
                             <div class="col-md-1" style="text-align:center">
-                                <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
+                                <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"||v=="mp4"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
                                     <option value="obj">OBJ</option>
                                     <option value="stl">STL</option>
                                     <option value="3mf">3MF</option>
@@ -52,6 +52,7 @@ class ShotFilesModelFilesView(PyHtmlView):
                                     <option value="rcproj">RCPROJ</option>
                                     <option value="gif">GIF</option>
                                     <option value="webp">WebP</option>
+                                    <option value="mp4">Video (mp4)</option>
                                 </select>
                             </div>
                             <div class="col-md-1" style="text-align:center;width:11.1%">

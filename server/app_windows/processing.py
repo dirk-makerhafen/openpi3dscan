@@ -132,7 +132,7 @@ class Processing(Observable):
             if (rc.result_file is not None or rc.result_path is not None) and rc.status != "failed":
                 location.set_calibration_data(json.dumps(rc.calibrationData.data))
                 if rc.result_file is not None:
-                    model.write_file(rc.result_file)
+                    model.write_file(open(rc.result_file,"rb"))
                 else:
                     model.write_folder(rc.result_path)
                 if os.path.exists(os.path.join(rc.workingdir, "tmp", "license.rclicense")):

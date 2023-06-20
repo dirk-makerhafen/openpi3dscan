@@ -26,9 +26,16 @@ if not os.path.exists(BUILDFOLDER):
     os.mkdir(BUILDFOLDER)
 
 if not os.path.exists(os.path.join(BUILDFOLDER,"convert.exe")):
-    download("https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-55-portable-Q16-x64.zip", "imagemagick.zip")
+    download("https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-61-portable-Q16-x64.zip", "imagemagick.zip")
     unzip("imagemagick.zip")
     shutil.move(os.path.join(BUILDFOLDER,"imagemagick","convert.exe"), BUILDFOLDER)
+
+
+if not os.path.exists(os.path.join(BUILDFOLDER,"ffmpeg.exe")):
+    download("https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip", "ffmpeg.zip")
+    unzip("ffmpeg.zip")
+    shutil.move(os.path.join(BUILDFOLDER,"ffmpeg","ffmpeg.exe"), BUILDFOLDER)
+
 
 if not os.path.exists(os.path.join(BUILDFOLDER,"gifsicle.exe")):
     download("https://eternallybored.org/misc/gifsicle/releases/gifsicle-1.92-win64.zip", "gifsicle.zip")

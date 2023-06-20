@@ -1,9 +1,11 @@
 requests
-pyhtmlgui>=2.18
+pyhtmlgui>=3.10
 whichcraft
 zipstream-ng
 pillow
-wxpython
-cefpython3
 screeninfo
 dropbox
+PyQt5
+PyQtWebEngine
+flask
+flask-sock

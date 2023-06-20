@@ -85,6 +85,12 @@ class PrepareFolder(GenericTask):
 
     def run(self):
         self.set_status("active")
+
+
+        if not os.path.exists(self.rc_job.rc_cache_dir):
+            os.mkdir(self.rc_job.rc_cache_dir)
+            self.log.append("Cache directory created %s" % self.rc_job.rc_cache_dir)
+
         if not os.path.exists(self.rc_job.workingdir):
             os.mkdir(self.rc_job.workingdir)
             self.log.append("Cache directory created %s" % self.rc_job.workingdir)

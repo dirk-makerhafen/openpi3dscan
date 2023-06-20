@@ -44,7 +44,7 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                           <input id="set_name"  class="form-control" type="text"  placeholder="Set Name" />  
                         </td>
                         <td style="padding-left: 5px;padding-right: 5px;">
-                            <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
+                            <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"||v=="mp4"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
                                 <option value="obj">OBJ</option>
                                 <option value="stl">STL</option>
                                 <option value="3mf">3MF</option>
@@ -53,6 +53,7 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                                 <option value="rcproj">RCPROJ</option>
                                 <option value="gif">GIF</option>
                                 <option value="webp">WebP</option>
+                                <option value="mp4">Video(mp4)</option>
                             </select>
                         </td>
                         <td style="padding-left: 5px;padding-right: 5px;">

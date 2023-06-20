@@ -48,7 +48,7 @@ class RealityCapture(Observable):
         self.model_id = model_id
         self.shot_name = self._clean_shot_name(shot_name if shot_name != "" else self.shot_id)
         self.filetype = filetype
-        self.fileextension = "glb" if self.filetype in ["gif","webp"] else self.filetype
+        self.fileextension = "glb" if self.filetype in ["gif","webp", "mp4"] else self.filetype
         self.reconstruction_quality = reconstruction_quality
         self.export_quality = export_quality
         self.create_mesh_from = create_mesh_from
@@ -60,13 +60,14 @@ class RealityCapture(Observable):
         self.box_dimensions = box_dimensions
         self.compress_results = compress_results
         self.debug = debug
-        self.workingdir = os.path.join(SettingsInstance().settingsCache.directory, self.shot_name)
+        self.rc_cache_dir = SettingsInstance().settingsCache.directory
+        self.workingdir = os.path.join(self.rc_cache_dir, self.shot_name)
 
         self.reconstruction_quality_str = self.reconstruction_quality[0].upper()
         self.quality_str = self.export_quality[0].upper()
         self.create_mesh_from_str = create_mesh_from[0].upper()
         self.create_textures_str = "T" if create_textures is True else ""
-        self.litUnlitStr = "" if self.filetype not in ["gif", "webp", "glb"] else ("L" if self.lit else "U") if self.create_textures else ""
+        self.litUnlitStr = "" if self.filetype not in ["gif", "webp", "glb","mp4"] else ("L" if self.lit else "U") if self.create_textures else ""
 
         self.realityCapture_filename = "rc_%s%s%s" % (self.reconstruction_quality_str, self.create_mesh_from_str, self.create_textures_str)
         self.export_filename   = "%s_%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr ,self.fileextension)
@@ -92,7 +93,7 @@ class RealityCapture(Observable):
 
         if self.filetype == "rcproj":
             self.rcprojExport = RcprojExport(self)
-        if self.filetype in ["gif","webp"]:
+        if self.filetype in ["gif","webp", "mp4"]:
             self.animation = Animation(self)
         elif self.compress_results is True:
             self.resultsArchive = ResultsArchive(self)

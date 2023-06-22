@@ -44,7 +44,23 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                           <input id="set_name"  class="form-control" type="text"  placeholder="Set Name" />  
                         </td>
                         <td style="padding-left: 5px;padding-right: 5px;">
-                            <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"||v=="mp4"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
+                            <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();
+                             if(v=="holobox"){ 
+                                        $("#dh").text("High, 60 Fps");
+                                        $("#dm").text("Normal, 48 Fps");
+                                        $("#dl").text("Low, 24 Fps");
+                                   }else{
+                                     if(v=="webp"||v=="gif"){ 
+                                        $("#dh").text("High, 720x1280");
+                                        $("#dm").text("Normal, 576x1024");
+                                        $("#dl").text("Low, 450x800");
+                                     }else{
+                                        $("#dh").text("High, 4M");
+                                        $("#dm").text("Normal, 1M");
+                                        $("#dl").text("Low, 500K");
+                                     }
+                                   };
+                            if(v=="glb"||v=="gif"||v=="webp"||v=="holobox"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
                                 <option value="obj">OBJ</option>
                                 <option value="stl">STL</option>
                                 <option value="3mf">3MF</option>
@@ -53,7 +69,7 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                                 <option value="rcproj">RCPROJ</option>
                                 <option value="gif">GIF</option>
                                 <option value="webp">WebP</option>
-                                <option value="mp4">Video(mp4)</option>
+                                <option value="holobox">Holobox</option>
                             </select>
                         </td>
                         <td style="padding-left: 5px;padding-right: 5px;">
@@ -65,9 +81,9 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                         </td>
                         <td style="padding-left: 5px;padding-right: 5px;">
                             <select style="" class="form-control" name="quality" id="quality">
-                                <option value="high" >High (4M)</option>
-                                <option value="normal">Normal (1M)</option>
-                                <option value="low"   >Low (500K)</option>
+                                <option id="dh" value="high" >High (4M)</option>
+                                <option id="dm" value="normal">Normal (1M)</option>
+                                <option id="dl" value="low"   >Low (500K)</option>
                             </select>                            
                         </td>
                         <td style="padding-left: 5px;padding-right: 5px;">

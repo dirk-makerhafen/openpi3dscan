@@ -43,7 +43,23 @@ class ShotFilesModelFilesView(PyHtmlView):
                         {{pyview.filesListView.render()}}     
                         <div class="row" style="margin-top:10px">    
                             <div class="col-md-1" style="text-align:center">
-                                <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();if(v=="glb"||v=="gif"||v=="webp"||v=="mp4"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
+                                <select style="" class="form-control" name="filetype" id="filetype" onchange='var v=$("#filetype").val();
+                                   if(v=="holobox"){ 
+                                        $("#dh").text("High, 60 Fps");
+                                        $("#dm").text("Normal, 48 Fps");
+                                        $("#dl").text("Low, 24 Fps");
+                                   }else{
+                                     if(v=="webp"||v=="gif"){ 
+                                        $("#dh").text("High, 720x1280");
+                                        $("#dm").text("Normal, 576x1024");
+                                        $("#dl").text("Low, 450x800");
+                                     }else{
+                                        $("#dh").text("High, 4M");
+                                        $("#dm").text("Normal, 1M");
+                                        $("#dl").text("Low, 500K");
+                                     }
+                                   };
+                                   if(v=="glb"||v=="gif"||v=="webp"||v=="holobox"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
                                     <option value="obj">OBJ</option>
                                     <option value="stl">STL</option>
                                     <option value="3mf">3MF</option>
@@ -52,7 +68,7 @@ class ShotFilesModelFilesView(PyHtmlView):
                                     <option value="rcproj">RCPROJ</option>
                                     <option value="gif">GIF</option>
                                     <option value="webp">WebP</option>
-                                    <option value="mp4">Video (mp4)</option>
+                                    <option value="holobox">Holobox Video</option>
                                 </select>
                             </div>
                             <div class="col-md-1" style="text-align:center;width:11.1%">
@@ -64,9 +80,9 @@ class ShotFilesModelFilesView(PyHtmlView):
                             </div>
                             <div class="col-md-1" style="text-align:center;width:11.1%">
                                 <select style="" class="form-control" name="quality" id="quality">
-                                    <option value="high"  {% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "high"   %}selected{% endif %}>High (4M)</option>
-                                    <option value="normal"{% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "normal" %}selected{% endif %}>Normal (1M)</option>
-                                    <option value="low"   {% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "low"    %}selected{% endif %}>Low (500K)</option>
+                                    <option id="dh" value="high"  {% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "high"   %}selected{% endif %}>High, 4M</option>
+                                    <option id="dm" value="normal"{% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "normal" %}selected{% endif %}>Normal, 1M</option>
+                                    <option id="dl" value="low"   {% if pyview.settingsInstance.realityCaptureSettings.default_export_quality == "low"    %}selected{% endif %}>Low, 500K</option>
                                 </select>  
                             </div>
                             <div class="col-md-1" style="text-align:center;width:11.1%">

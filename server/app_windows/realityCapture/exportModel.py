@@ -30,17 +30,17 @@ class ExportModel(GenericTask):
         cmd += '-load "%s\\%s.rcproj" deleteAutosave ' % (self.rc_job.workingdir, self.rc_job.realityCapture_filename)
         cmd += '-selectComponent "MAIN" '
         cmd += '-selectModel "RAW" '
-        if self.rc_job.export_quality == "high":
+        if self.rc_job.export_quality == "high" or self.rc_job.filetype == "holobox":
             cmd += '-simplify 4000000 '
-        if self.rc_job.export_quality == "normal":
+        elif self.rc_job.export_quality == "normal" or self.rc_job.filetype in ["gif", "webp"]:
             cmd += '-simplify 1000000 '
-        if self.rc_job.export_quality == "low":
+        elif self.rc_job.export_quality == "low":
             cmd += '-simplify 500000 '
         cmd += '-cleanModel '
         cmd += '-closeHoles '
         if self.rc_job.create_textures is True and self.rc_job.filetype not in ["stl"]:
             cmd += '-calculateTexture '
-            cmd += '-calculateVertexColors '
+            #cmd += '-calculateVertexColors '
         cmd += '-renameSelectedModel "EXPORT" '
         if self.rc_job.filetype == "rcproj":
             cmd += '-save "%s" ' % self.export_model_path

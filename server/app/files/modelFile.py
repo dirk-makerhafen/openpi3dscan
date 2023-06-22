@@ -36,7 +36,7 @@ class ModelFile(Observable):
         self.parentShot.models.notify_observers()
 
     def write_file(self, input_file):
-        if self.filetype in ["gif", "webp", "mp4"]:
+        if self.filetype in ["gif", "webp", "holobox"]:
             self.filename = self._create_filename("%s_%s%s%s%s%s.%s")
         else:
             self.filename = self._create_filename("%s_%s%s%s%s%s_%s.zip")
@@ -86,15 +86,16 @@ class ModelFile(Observable):
         qStr = self.quality[0].upper()
         meshFromStr = self.create_mesh_from[0].upper()
         textureStr = "T" if self.create_textures else ""
-        if self.filetype in ["gif", "webp", "glb"]:
+        if self.filetype in ["gif", "webp", "glb","holobox"]:
             litUnlitStr = ("L" if self.lit else "U") if self.create_textures else ""
         else:
             litUnlitStr = ""
-        filename = pattern % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, litUnlitStr, self.filetype)
+        ext = self.filetype if self.filetype != "holobox" else "mp4"
+        filename = pattern % (self.parentShot.get_clean_shotname(), rcStr, qStr, meshFromStr, textureStr, litUnlitStr, ext)
         return filename
 
     def get_model_file(self, filename = None):
-        if self.filetype in ["gif", "webp"]:
+        if self.filetype in ["gif", "webp", "holobox"]:
             return [self.filename, open(self.get_path(), "rb")]
         if self.filename.endswith(".zip"):
             if filename is None:
@@ -103,10 +104,8 @@ class ModelFile(Observable):
                 with zipfile.ZipFile(self.get_path(), 'r') as zip_ref:
                     return [filename, zip_ref.read(filename)]
         if os.path.isdir(os.path.join(self.path, self.filename)):
-            print("is dir", filename)
             if filename is not None:
                 fullpath = os.path.join(self.path, self.filename, filename)
-                print("fp", fullpath, os.path.exists(fullpath))
                 if os.path.exists(fullpath):
                     return [self.filename, open(fullpath, "rb")]
             else:

@@ -8,6 +8,7 @@ from app_windows.files.externalFiles import ExternalFilesInstance
 from app_windows.realityCapture.genericTask import GenericTask
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 
 CREATE_NO_WINDOW = 0x08000000
 
@@ -60,7 +61,9 @@ class Animation(GenericTask):
         options.add_argument("--headless")
         options.add_argument("--disable-web-security")
         options.add_argument("--disable-dev-shm-usage")
-        browser = webdriver.Chrome(executable_path=ExternalFilesInstance().chromedriver_exe, options=options)
+        service = Service(ExternalFilesInstance().chromedriver_exe)
+        service.creationflags = CREATE_NO_WINDOW
+        browser = webdriver.Chrome(executable_path=ExternalFilesInstance().chromedriver_exe, options=options, service=service)
         browser.set_window_position(0, 0)
         if self.rc_job.filetype == "holobox":
             browser.set_window_size(2160, 3840)

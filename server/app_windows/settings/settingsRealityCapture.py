@@ -30,6 +30,7 @@ class SettingsRealityCapture(Observable):
         self.save = parent.save
         self.pin = ""
         self.token = ""
+        self.error_repeat = 1
         self.default_reconstruction_quality = "normal" # preview, normal, high
         self.default_export_quality = "normal"  # "high", normal, low
         self.default_create_mesh_from = "projection" # normal, projection, all
@@ -52,6 +53,7 @@ class SettingsRealityCapture(Observable):
             "hide_realitycapture": self.hide_realitycapture,
             "compress_models": self.compress_models,
             "settingsDefaultModelSets": self.settingsDefaultModelSets.to_dict(),
+            "error_repeat": self.error_repeat,
         }
 
     def from_dict(self, data):
@@ -75,6 +77,10 @@ class SettingsRealityCapture(Observable):
             pass
         try:
             self.settingsDefaultModelSets.from_dict(data["settingsDefaultModelSets"])
+        except:
+            pass
+        try:
+            self.error_repeat = data["error_repeat"]
         except:
             pass
 
@@ -124,6 +130,11 @@ class SettingsRealityCapture(Observable):
 
     def set_token(self, new_token):
         self.token = new_token.strip()
+        self.save()
+        self.notify_observers()
+
+    def set_error_repeat(self, new_error_repeat):
+        self.error_repeat = int(new_error_repeat)
         self.save()
         self.notify_observers()
 

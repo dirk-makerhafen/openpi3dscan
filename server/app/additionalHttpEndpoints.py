@@ -10,6 +10,7 @@ from zipfile import ZIP_STORED
 import zipstream
 
 from app.devices.devices import DevicesInstance
+from app.files.modelFile import ModelFile
 from app.settings.settings import SettingsInstance
 from app.files.shots import ShotsInstance
 from views.images.imagesLiveView import PreviewQueueInstance
@@ -74,6 +75,7 @@ class HttpEndpoints:
         self.flaskApp.route("/shots/<shot_id>/processing/<model_id>")(self._shot_processing)
         self.flaskApp.route("/shots/<shot_id>/processing_failed/<model_id>")(self._shot_processing_failed)
         self.flaskApp.route("/shots/<shot_id>/upload/<model_id>", methods=["POST"])(self._shot_upload_model)
+        self.flaskApp.route("/shots/<shot_id>/upload_custom", methods=["POST"])(self._shot_upload_custom_file)
         self.flaskApp.route("/shots/<shot_id>/upload_license", methods=["POST"])(self._shot_upload_license)
         self.flaskApp.route("/shots/<shot_id>/download/<model_id>")(self._shot_download_model)
         self.flaskApp.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
@@ -85,6 +87,25 @@ class HttpEndpoints:
         self.flaskApp.route("/realityCaptureProcess")(self.realityCaptureProcess)
         self.flaskApp.route("/upload_calibration", methods=["POST"])(self.upload_calibration)
         self.flaskApp.route("/settings_backup")(self._settings_backup)
+
+
+    def _shot_upload_custom_file(self, shot_id):
+        files = flask.request.files.getlist('files[]')
+        shot = ShotsInstance().get(shot_id)
+        if shot is None:
+            return
+        mf = ModelFile(parentShot=shot)
+        for file in files:
+            print("here", file, file.filename)
+            if file.filename == "":
+                continue
+            if len([m for m in shot.models if m.is_custom_upload is True and m.filename == file.filename]) > 0:
+                continue
+            mf.from_custom_upload(file.filename, file)
+            shot.models.append(mf)
+            shot.save()
+        return flask.Response("")
+
 
     def realityCaptureProcess(self):
         data = {
@@ -166,6 +187,12 @@ class HttpEndpoints:
     def _shot_upload_model(self, shot_id, model_id):
         file = flask.request.files['upload_file']
         ShotsInstance().get(shot_id).models.get_by_id(model_id).write_file(file)
+        return flask.Response("")
+
+    def _shot_upload_custom_file(self, shot_id, filename):
+        file = flask.request.files['upload_file']
+        mf = ModelFile(ShotsInstance().get(shot_id))
+        mf.from_custom_upload(filename, file)
         return flask.Response("")
 
     def _shot_upload_license(self, shot_id):

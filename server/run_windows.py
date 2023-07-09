@@ -21,7 +21,7 @@ if __name__ == "__main__":
         base_template   = "base_windows.html",
         listen_port     = 18081,
         listen_host     = "127.0.0.1",
-        auto_reload     = False,
+        auto_reload     = True,
         shared_secret   = None,
     )
     httpEndpoints = HttpEndpoints(AppInstance(), gui)

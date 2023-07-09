@@ -3,7 +3,7 @@ import time
 
 from pyhtmlgui import PyHtmlView, ObservableListView, ObservableList
 
-from views.shot.files.shotFilesModelFilesView import ShotFilesModelFilesView
+from views.shot.files.shotFilesModelFilesView import ShotFilesModelFilesView, ShotFilesCustomModelFilesView
 from views.shot.files.shotFilesPublicSharingView import DropboxPublicFolderView
 from views.shot.shotDropboxUploadView import DropboxUploadView
 
@@ -63,6 +63,8 @@ class ShotFilesView(PyHtmlView):
         </div>
         {% if pyview.settingsInstance.realityCaptureSettings.allow_rc_automation == True %}
             {{ pyview.modelFilesView.render() }}
+            {{ pyview.modelCustomFilesView.render() }}
+            
         {% endif %}
         
         {% if pyview.settingsInstance.settingsDropbox.is_authorized() == True and  pyview.settingsInstance.settingsDropbox.enable_public == True %}
@@ -76,6 +78,7 @@ class ShotFilesView(PyHtmlView):
         super().__init__(subject, parent, **kwargs)
         self.settingsInstance = settingsInstance
         self.modelFilesView = ShotFilesModelFilesView(self.subject.models, self, settingsInstance)
+        self.modelCustomFilesView = ShotFilesCustomModelFilesView(self.subject.models, self, settingsInstance)
         self.shotPublishingView = ShotPublishingView(self.subject.publishing_status, self)
 
         if self.subject.dropboxUpload is not None:

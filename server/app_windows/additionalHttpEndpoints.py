@@ -8,6 +8,7 @@ import time
 import zipstream
 from zipfile import ZIP_STORED
 
+from app.files.modelFile import ModelFile
 from app_windows.files.shots import ShotsInstance
 from app_windows.settings.settings import SettingsInstance
 
@@ -70,10 +71,28 @@ class HttpEndpoints:
         self.flaskApp.route("/shots/<shot_id>/download/<model_id>/<filename>")(self._shot_download_model_file)
         self.flaskApp.route("/shots/<shot_id>/<image_mode>/<image_type>/<fname>.jpg")(self._shot_get_image)  # return remote shot as jpeg
         self.flaskApp.route("/shots/<shot_id>.zip")(self._shot_get_images_zip)
+        self.flaskApp.route("/shots/<shot_id>/upload_custom", methods=["POST"])(self._shot_upload_custom_file)
         self.flaskApp.route("/modelview.html")(self._modelview_html)
         self.flaskApp.route("/model-viewer.min.js")(self._modelview_js)
         self.flaskApp.route("/rc_cache/<path:path>")(self.rc_cache)
         self.flaskApp.route("/settings_backup")(self._settings_backup)
+
+    def _shot_upload_custom_file(self, shot_id):
+        files = flask.request.files.getlist('files[]')
+        shot = ShotsInstance().get(shot_id)
+        if shot is None:
+            return
+        mf = ModelFile(parentShot=shot)
+        for file in files:
+            print("here", file, file.filename)
+            if file.filename == "":
+                continue
+            if len([m for m in shot.models if m.is_custom_upload is True and m.filename == file.filename]) > 0:
+                continue
+            mf.from_custom_upload(file.filename, file)
+            shot.models.append(mf)
+            shot.save()
+        return flask.Response("")
 
     def _settings_backup(self):
         fname = "Backup-Settings"

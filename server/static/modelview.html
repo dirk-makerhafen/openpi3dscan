@@ -9,8 +9,6 @@
     <div class="container"  style="height:100%;overflow:hidden;text-align:center">
       <model-viewer 
         orientation="0deg -90deg 90deg"
-        camera-orbit="0deg 95deg 100%"
-        camera-target="auto 100% auto"
         ar ar-modes="webxr scene-viewer "
         seamlovess-poster
         shadow-intensity="1"
@@ -26,6 +24,13 @@
         function rotate(to_angle){
             modelViewer.orientation = "" + to_angle + "deg -90deg 90deg"
         }
+        function orbit(orbit){
+            modelViewer.cameraOrbit = orbit;
+        }
+        function target(target){
+            modelViewer.cameraTarget = target;
+        }
+
     </script>
 </body>
 </html>

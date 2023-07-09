@@ -14,6 +14,7 @@ class ModelFile(Observable):
         super().__init__()
         self.parentShot = parentShot
         self.model_id = "%s" % uuid.uuid4()
+        self.is_custom_upload = False
         self.status = "waiting"  # ready, failed
         self.publishing_status = ObservableValue("no_publish") # "can_publish"  # can_publish, state_changing, can_unpublish
         self.filetype = filetype  # "obj", obj, 3mf, stl
@@ -27,6 +28,65 @@ class ModelFile(Observable):
         self.create_textures = create_textures
         self.path = os.path.join(self.parentShot.path, "models")
 
+    def from_custom_upload(self, filename, input_file):
+        self.is_custom_upload = True
+        self.filetype = filename.split(".")[-1]
+        self.filename = filename
+        self.path = os.path.join(self.parentShot.path, "uploads")
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
+
+        if filename.endswith(".zip"):
+            self.filetype = "zip"
+            if "_" in filename:
+                maybe_ext = filename.split("_")[-1].split(".")[0]
+                if maybe_ext in ["mp4", "obj", "glb", "gif", "stl", "fbx"]:
+                    self.filetype = maybe_ext
+        self.reconstruction_quality = "-"
+        self.quality = "-"
+        self.create_mesh_from = "-"
+        for key in ["HH", "HN", "HL", "NH", "NN", "NL", "PH", "PN", "PL"]:
+            if "_%s" % key in filename:
+                markers = filename.split("_%s" % key)[1].split("_")[0].split(".")[0]
+                markers = "%s%s" % (key, markers)
+                if markers[0] == "H":
+                    self.reconstruction_quality = "high"
+                elif markers[0] == "N":
+                    self.reconstruction_quality = "normal"
+                elif markers[0] == "P":
+                    self.reconstruction_quality = "preview"
+                else:
+                    self.reconstruction_quality = "-"
+
+                if markers[1] == "H":
+                    self.quality = "high"
+                elif markers[1] == "N":
+                    self.quality = "normal"
+                elif markers[1] == "L":
+                    self.quality = "low"
+                else:
+                    self.quality = "-"
+
+                if markers[2] == "P":
+                    self.create_mesh_from = "projection"
+                elif markers[2] == "N":
+                    self.create_mesh_from = "normal"
+                elif markers[2] == "A":
+                    self.create_mesh_from = "all"
+                else:
+                    self.create_mesh_from = "-"
+
+                if "T" in markers:
+                    self.create_textures = True
+                else:
+                    self.create_textures = False
+                if "L" in markers:
+                    self.lit = True
+                elif "U" in markers:
+                    self.lit = False
+                break
+        self.write_file(input_file, filename)
+
     def set_status(self, new_status):
         if self.status == new_status:
             return
@@ -35,11 +95,12 @@ class ModelFile(Observable):
         self.notify_observers()
         self.parentShot.models.notify_observers()
 
-    def write_file(self, input_file):
-        if self.filetype in ["gif", "webp", "holobox"]:
-            self.filename = self._create_filename("%s_%s%s%s%s%s.%s")
-        else:
-            self.filename = self._create_filename("%s_%s%s%s%s%s_%s.zip")
+    def write_file(self, input_file, filename = None):
+        if filename == None:
+            if self.filetype in ["gif", "webp", "holobox"]:
+                self.filename = self._create_filename("%s_%s%s%s%s%s.%s")
+            else:
+                self.filename = self._create_filename("%s_%s%s%s%s%s_%s.zip")
 
         if not os.path.exists(self.path):
             os.mkdir(self.path)
@@ -145,6 +206,7 @@ class ModelFile(Observable):
             "create_textures": self.create_textures,
             "reconstruction_quality": self.reconstruction_quality,
             "lit": self.lit,
+            "is_custom_upload": self.is_custom_upload,
         }
 
     def from_dict(self, data):
@@ -162,7 +224,15 @@ class ModelFile(Observable):
         self.create_mesh_from = data["create_mesh_from"]
         self.reconstruction_quality = data["reconstruction_quality"]
         self.lit = data["lit"]
+        try:
+            self.is_custom_upload = data["is_custom_upload"]
+        except:
+            self.is_custom_upload = False
+        if self.is_custom_upload:
+            self.path = os.path.join(self.parentShot.path, "uploads")
+
         if self.status == "ready":
             self.publishing_status._value = "can_publish"
+
         return self
 

@@ -100,13 +100,14 @@ class RealityCapture(Observable):
 
         self.upload   = None if self.source_ip is None else Upload(self)
         self.status = "idle"
+        self.error_cnt = 0
 
     def set_status(self, status):
         if self.status != status:
             self.status = status
             self.notify_observers()
 
-    def process(self):
+    def process(self, is_last_try = True):
         self.set_status("active")
 
         tasks = [
@@ -125,7 +126,7 @@ class RealityCapture(Observable):
             self.upload,
         ]
         tasks = [task for task in tasks if task is not None]
-        [task.reset() for task in tasks]
+        [task.reset(is_last_try) for task in tasks]
         for task in tasks:
             self.check_pause()
             try:

@@ -79,13 +79,16 @@ class Animation(GenericTask):
 
         angle = 0
         cnt = 0
+        if self.rc_job.filetype == "holobox":
+            browser.execute_script("target('auto 100% auto');")
+            browser.execute_script("orbit('0deg 95deg 100%');")
+            time.sleep(2)
         while angle < 360:
             browser.execute_script("rotate(%s);" % angle)
             time.sleep(1.3)
             browser.save_screenshot(os.path.join(output_path, "screenshot_%s.png" % ("%s" % cnt).zfill(3)))
             angle += angle_step
             cnt += 1
-
         browser.close()
 
     def cmd(self, cmd):

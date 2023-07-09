@@ -117,13 +117,18 @@ class Processing(Observable):
             while True:
                 self.set_status("processing")
                 try:
-                    rc.process()
+                    is_last_try = rc.error_cnt == self.settings_instance.realityCaptureSettings.error_repeat
+                    rc.process(is_last_try)
                 except Exception as e:
                     traceback.print_exc()
                     print("Failed to process", e)
                 if rc.result_file is not None or (rc.result_path is not None and rc.compress_results is False) and rc.status == "success":
                     break
                 self.set_status("failed")
+                rc.error_cnt += 1
+                if rc.error_cnt <= self.settings_instance.realityCaptureSettings.error_repeat:
+                    self.status = "repeat"
+
                 while self.status == "failed":
                     time.sleep(2)
                 if self.status != "repeat":
@@ -186,13 +191,17 @@ class Processing(Observable):
             while True:
                 self.set_status("processing")
                 try:
-                    rc.process()
+                    is_last_try = rc.error_cnt == self.settings_instance.realityCaptureSettings.error_repeat
+                    rc.process(is_last_try)
                 except Exception as e:
                     traceback.print_exc()
                     print("Failed to process", e)
                 if rc.result_file is not None and rc.status == "success":
                     break
                 self.set_status("failed")
+                rc.error_cnt += 1
+                if rc.error_cnt <= self.settings_instance.realityCaptureSettings.error_repeat:
+                    self.status = "repeat"
                 while self.status == "failed":
                     time.sleep(2)
                 if self.status != "repeat":

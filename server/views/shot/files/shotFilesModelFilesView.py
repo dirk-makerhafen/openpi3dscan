@@ -98,7 +98,10 @@ class ShotFilesModelFilesView(PyHtmlView):
                             <div class="col-md-1" style="text-align:center">
                                 <input id="lit_unlit" {% if pyview.settingsInstance.realityCaptureSettings.default_lit == true %}checked{% endif %} type="checkbox"/>
                             </div>
-                            <div class="col-md-3" style="text-align:center"></div>
+                            <div class="col-md-3" style="text-align:center">
+                         
+                            </div>
+                            
                             <div class="col-md-2" style="text-align:center">
                                 <button class="btn btn-success btnfw" style="margin-right:5px" onclick='pyview.parent.subject.create_model($("#filetype").val(), $("#reconstruction_quality").val(), $("#quality").val(), $("#create_mesh_from").val(), $("#create_textures")[0].checked, $("#lit_unlit")[0].checked);'> Create Model </button>
                             </div>
@@ -109,16 +112,214 @@ class ShotFilesModelFilesView(PyHtmlView):
             </div>   
         </div>
     </div>
-    
-        
-
-    
     '''
 
     def __init__(self, subject, parent, settingsInstance, **kwargs):
         super().__init__(subject, parent, **kwargs)
         self.settingsInstance = settingsInstance
-        self.filesListView = ObservableListView(self.subject, self, item_class=ModelFileItemView)
+        self.filesListView = ObservableListView(self.subject, self, item_class=ModelFileItemView, filter_function=lambda x:x.subject.is_custom_upload==True)
+
+
+class ShotFilesCustomModelFilesView(PyHtmlView):
+    TEMPLATE_STR = '''
+<style>
+
+.box__dragndrop,
+.box__uploading,
+.box__success,
+.box__error {
+  display: none;
+}
+.box {
+    width: 100%;
+    height: 60px;
+}
+.box.has-advanced-upload {
+  background-color: white;
+}
+.box.has-advanced-upload .box__dragndrop {
+  display: inline;
+}
+.box.is-dragover {
+  background-color: #f0fff0;
+}
+.box.is-uploading .box__input {
+  visibility: block;
+}
+.box.is-uploading .box__uploading {
+  display: block;
+}
+
+
+</style>
+    <div class="CustomModelFiles">
+    
+
+    
+        <div class="row justify-content-center" style="width:100%">
+            <div class="col-md-12">
+                <div class="list-group mb-5 shadow">
+                    <div class="list-group-item">
+                        <div class="row align-items-center" style="border-bottom: 1px solid lightgray;">
+                            <form id="form" class="box" method="post" action="/shots/{{pyview.parent.subject.shot_id}}/upload_custom" enctype="multipart/form-data">
+                              <div class="col-md-7  h3">
+                                Custom Files
+                              </div>
+                              <div class="box__input col-md-3" style="">
+                                <input style="display:none" class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
+                                <label style="line-height: 50px;height: 50px;" for="file">
+                                    <strong style="color:#337ab7">Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.
+                                </label>
+                                <div class="box__uploading">Uploading…</div>
+                                <div class="box__success">Done!</div>
+                                <div class="box__error">Error! <span></span>.</div>
+                              </div>
+                              <div class="col-md-2">
+                                <button id="btn_upload" disabled class="btn btn-success btnfw" style="margin-top:10px"> Upload File</button>
+                              </div>
+                            </form>
+                            
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-1 h5" style="text-align:center;font-weight:bold">Type</div>
+                            <div class="col-md-1 h5" style="text-align:center;font-weight:bold;width:11.1%">Reconstruction Quality</div>
+                            <div class="col-md-1 h5" style="text-align:center;font-weight:bold;width:11.1%">Export Quality</div>
+                            <div class="col-md-1 h5" style="text-align:center;font-weight:bold;width:11.1%">Mesh from</div>
+                            <div class="col-md-1 h5" style="text-align:center;font-weight:bold">Textures</div>
+                            <div class="col-md-1 h5" style="text-align:center;font-weight:bold">Lit</div>
+                            <div class="col-md-3 h5" style="text-align:center;font-weight:bold">File</div>
+                            <div class="col-md-2 h5" style="text-align:center;font-weight:bold">Action</div>
+                        </div>
+                        {{pyview.filesListView.render()}}     
+                        <div class="row" style="margin-top:10px">    
+                            <script>
+                                var existing_files = [{% for item in pyview.subject %}{%if item.is_custom_upload%}"{{item.filename}}",{%endif%}{% endfor %}""];
+
+                                var isAdvancedUpload = function() {
+                                  var div = document.createElement('div');
+                                  return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+                                }();
+                            
+                                var $form = $('.box');
+                                if (isAdvancedUpload) {
+                                  $form.addClass('has-advanced-upload');
+                                }
+
+
+                                if (isAdvancedUpload) {
+                                  var $input    = $form.find('input[type="file"]');
+                                  var $label    = $form.find('label')
+                                    
+                                  var droppedFiles = false;
+                                
+                                  $form.on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  })
+                                  .on('dragover dragenter', function() {
+                                    $form.addClass('is-dragover');
+                                  })
+                                  .on('dragleave dragend drop', function() {
+                                    $form.removeClass('is-dragover');
+                                  })
+                                  .on('drop', function(e) {
+                                    droppedFiles = e.originalEvent.dataTransfer.files;
+                                    $label.text(droppedFiles.length > 1 ? ($input.attr('data-multiple-caption') || '').replace( '{count}', droppedFiles.length ) : droppedFiles[ 0 ].name);
+                                    console.log(droppedFiles);
+                                    $("#btn_upload").prop('disabled', false);
+                                  });
+                                  
+                                  $input.on('change', function(e) {
+                                     droppedFiles = e.target.files;
+                                     $label.text(droppedFiles.length > 1 ? ($input.attr('data-multiple-caption') || '').replace( '{count}', droppedFiles.length ) : droppedFiles[ 0 ].name);
+                                     
+                                     $("#btn_upload").prop('disabled', false);
+                                     for (let i = 0; i < droppedFiles.length; i++) {
+                                        if(existing_files.includes(droppedFiles[i].name)){
+                                            console.log("exists: " + droppedFiles[i] );
+                                        }
+                                     }
+                                  });
+                                
+                                }
+
+
+                                $form.on('submit', function(e) {
+                                    e.preventDefault();
+                                  if ($form.hasClass('is-uploading')) return false;
+                                
+                                  $form.addClass('is-uploading').removeClass('is-error');
+                                
+                                  if (isAdvancedUpload) {
+                                      
+                                    
+                                      var ajaxData = new FormData($form.get(0));
+                                    console.log();
+                                   
+                                    ajaxData.delete( $input.attr('name') );
+                                      if (droppedFiles) {
+                                      console.log("yep");
+                                        $.each( droppedFiles, function(i, file) {
+                                            console.log("here23" + i + file.name);
+                                            if(!existing_files.includes(file.name)){
+                                               console.log("append" + file);
+                                                ajaxData.append( $input.attr('name'), file );
+                                            }
+                                        });
+                                      }
+                                 
+                                 
+                                 
+                                 
+                                      $.ajax({
+                                        url: $form.attr('action'),
+                                        type: $form.attr('method'),
+                                        data: ajaxData,
+                                        dataType: 'json',
+                                        cache: false,
+                                        contentType: false,
+                                        processData: false,
+                                        complete: function() {
+                                          $form.removeClass('is-uploading');
+                                           console.log("complete");
+                                           document.getElementById("form").reset();
+                                           $label.html('<strong style="color:#337ab7">Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.');
+                                      
+                                        },
+                                        success: function(data) {
+                                           console.log("success");
+                                          $form.addClass( data.success == true ? 'is-success' : 'is-error' );
+                                          if (!data.success) $errorMsg.text(data.error);
+                                        },
+                                        error: function() {
+                                          console.log("error");
+                                          // Log the error, show an alert, whatever works for you
+                                        }
+                                      });
+                                  } else {
+                                    // ajax for legacy browsers
+                                  }
+                                });
+                            </script>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>   
+        </div>
+    </div>
+
+
+
+
+    '''
+
+    def __init__(self, subject, parent, settingsInstance, **kwargs):
+        super().__init__(subject, parent, **kwargs)
+        self.settingsInstance = settingsInstance
+        self.filesListView = ObservableListView(self.subject, self, item_class=ModelFileItemView, filter_function=lambda x:x.subject.is_custom_upload==False)
 
 
 class ModelPublishingView(PyHtmlView):

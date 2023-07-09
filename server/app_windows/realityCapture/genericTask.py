@@ -24,12 +24,14 @@ class GenericTask(Observable):
         self.status = "idle"
         self.log = Log()
         self.last_try_failed = False
+        self.is_last_try = False
 
-    def reset(self):
+    def reset(self, is_last_try):
+        self.is_last_try = is_last_try
         while len(self.log) > 0:
             del self.log[0]
         if self.status != "idle":
-            if self.status == "failed":
+            if self.status == "failed" and is_last_try is True:
                 self.last_try_failed = True
             self.set_status("repeat")
 

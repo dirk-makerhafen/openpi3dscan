@@ -45,6 +45,32 @@ class SettingsRealityCaptureView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">
+                                <strong class="mb-0">Repeat on error</strong>
+                                <p class="text-muted mb-0">Automatically retry RealityCapture jobs several times on error. Note that "Hide RealityCapture" must be active to resume jobs without showing an error. </p>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="custom-control custom-switch">
+                                    <input class="form-control" id="error_repeat" type="number" value="{{pyview.subject.error_repeat}}" onchange='pyview.subject.set_error_repeat($("#error_repeat").val())'>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-11">
+                                <strong class="mb-0">Hide RealityCapture</strong>
+                                <p class="text-muted mb-0">Don't show RealityCapture window during processing</p>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input class="form-check-input" id="hide_realitycapture"  type="checkbox" {% if pyview.subject.hide_realitycapture == True %}checked{% endif %} onclick='pyview.subject.set_hide_realitycapture($("#hide_realitycapture").prop("checked") === true)'>                                 
+                                </div>
+                            </div>         
+                        </div>
+                    </div>    
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-10">
                                 <strong class="mb-0">Reconstruction quality</strong>
                                 <p class="text-muted mb-0">Default reconstruction quality for RealityCapture </p>
                             </div>
@@ -122,19 +148,6 @@ class SettingsRealityCaptureView(PyHtmlView):
                             </div>         
                         </div>
                     </div> 
-                    <div class="list-group-item">
-                        <div class="row align-items-center">
-                            <div class="col-md-11">
-                                <strong class="mb-0">Hide RealityCapture</strong>
-                                <p class="text-muted mb-0">Don't show RealityCapture window during processing</p>
-                            </div>
-                            <div class="col-md-1">
-                                <div class="custom-control custom-switch">
-                                    <input class="form-check-input" id="hide_realitycapture"  type="checkbox" {% if pyview.subject.hide_realitycapture == True %}checked{% endif %} onclick='pyview.subject.set_hide_realitycapture($("#hide_realitycapture").prop("checked") === true)'>                                 
-                                </div>
-                            </div>         
-                        </div>
-                    </div>    
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-11">

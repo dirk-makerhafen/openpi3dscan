@@ -177,6 +177,7 @@ class ModelFile(Observable):
                     for fn in filenames:
                         zs.add(os.path.join(root, fn), os.path.join(dirname, fn))
                 return ["%s.zip" % self.filename, zs]
+        return [self.filename, open(self.get_path(), "rb")]
 
     def get_path(self):
         return os.path.join(self.path, self.filename)

@@ -189,12 +189,6 @@ class HttpEndpoints:
         ShotsInstance().get(shot_id).models.get_by_id(model_id).write_file(file)
         return flask.Response("")
 
-    def _shot_upload_custom_file(self, shot_id, filename):
-        file = flask.request.files['upload_file']
-        mf = ModelFile(ShotsInstance().get(shot_id))
-        mf.from_custom_upload(filename, file)
-        return flask.Response("")
-
     def _shot_upload_license(self, shot_id):
         shot = ShotsInstance().get(shot_id)
         if shot is not None and len(shot.license_data) < len(flask.request.json["data"]):

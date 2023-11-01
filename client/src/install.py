@@ -72,6 +72,11 @@ class Installer():
             # Fix ROUTING
             self.shell('sudo route add default gw 192.168.99.254')
 
+            # fix legacy state of distri
+            #legacy.raspbian.or
+            if "legacy.raspbian.org" not in open("/etc/apt/sources.list","r").read():
+                self.shell('echo "deb http://legacy.raspbian.org/raspbian/ stretch main contrib non-free rpi" >> /etc/apt/sources.list')
+
             # REQUIREMENTS
             self.shell('sudo DEBIAN_FRONTEND=noninteractive sudo dpkg --configure -a')
             self.shell('sudo DEBIAN_FRONTEND=noninteractive apt-get update', tries=2)

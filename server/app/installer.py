@@ -107,7 +107,7 @@ class Installer():
         self.shell("echo 'sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE' >> 1")
         self.shell("echo 'sudo iptables -A FORWARD -i wlan0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT' >> 1")
         self.shell("echo 'sudo iptables -A FORWARD -i eth0 -o wlan0 -j ACCEPT' >> 1")
-        self.shell("echo 'sudo python3 /opt/openpi3dscan/%s/run.py &' >> 1" % apps_dir_name)
+        self.shell("echo 'sudo python3 /opt/openpi3dscan/%s/run.py 1>/dev/null &' >> 1" % apps_dir_name)
         self.shell("echo 'exit 0' >> 1")
         self.shell("sudo chown root:root 1 ; sudo chmod +x 1 ; sudo mv 1 /etc/rc.local ")
     

@@ -1,5 +1,6 @@
 import os, sys
 import time
+import logging
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -30,6 +31,10 @@ if __name__ == "__main__":
         shared_secret   = None,
     )
     httpEndpoints = HttpEndpoints(AppInstance(), gui)
+
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+
     gui.start(show_frontend=False, block=True)
 
 

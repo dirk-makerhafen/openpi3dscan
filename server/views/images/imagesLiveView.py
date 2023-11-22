@@ -116,6 +116,9 @@ class ImagesLiveView(ImagesView):
     def _get_settings_camera_one_position(self):
         return SettingsInstance().settingsScanner.camera_one_position
 
+    def _get_first_camera_number(self):
+        return SettingsInstance().settingsScanner.first_camera_number
+
     def _get_settings_camera_rotation(self):
         return SettingsInstance().settingsScanner.camera_rotation
 

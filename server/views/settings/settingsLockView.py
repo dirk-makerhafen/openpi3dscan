@@ -35,7 +35,7 @@ class LockSettingsView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-10">
                                 <strong class="mb-0">Lock</strong>
-                                <p class="text-muted mb-0">System settings can be password protected, enter password prevent unauthorized changes </p>
+                                <p class="text-muted mb-0">System settings can be password protected, enter password to prevent unauthorized changes </p>
                             </div>
                             <div class="col-md-1">
                                 <div class="custom-control custom-switch">

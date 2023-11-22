@@ -55,7 +55,7 @@ class SettingsScannerView(PyHtmlView):
                         <div class="row align-items-center">
                             <div class="col-md-11">
                                 <strong class="mb-0">Rotation</strong>
-                                <p class="text-muted mb-0">Camera rotation. You must update all cameras for this change to take place!</p>
+                                <p class="text-muted mb-0">Default camera rotation. You must update cameras for this change to take place!</p>
                             </div>
                             <div class="col-md-1">
                                 <div class="custom-control custom-switch">
@@ -72,8 +72,8 @@ class SettingsScannerView(PyHtmlView):
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-11">
-                                <strong class="mb-0">Camera numbering</strong>
-                                <p class="text-muted mb-0">Position of camera 1</p>
+                                <strong class="mb-0">Camera position numbering</strong>
+                                <p class="text-muted mb-0">Position of first camera</p>
                             </div>
                             <div class="col-md-1">
                                 <div class="custom-control custom-switch">
@@ -85,6 +85,19 @@ class SettingsScannerView(PyHtmlView):
                             </div>
                         </div>
                     </div>
+                    <div class="list-group-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-11">
+                                <strong class="mb-0">Camera numbering</strong>
+                                <p class="text-muted mb-0">First camera number (0 or 1)</p>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="custom-control custom-switch">
+                                    <input class="form-control" style="width:100%;text-align:center" id="first_camera_number" type="number" min=0 max=1 value="{{pyview.subject.first_camera_number}}" onchange='pyview.subject.set_first_camera_number($("#first_camera_number").val())'>
+                                </div>
+                            </div>
+                        </div>
+                    </div>            
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-10">

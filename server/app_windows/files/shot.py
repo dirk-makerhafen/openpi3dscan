@@ -73,6 +73,7 @@ class ShotWindows(Shot):
         self.meta_max_rows = l.cameras_per_segment
         self.meta_rotation = l.camera_rotation
         self.meta_camera_one_position = l.camera_one_position
+        self.meta_first_camera_number = l.first_camera_number
         self.save()
         self.notify_observers()
 

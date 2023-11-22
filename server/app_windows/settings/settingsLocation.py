@@ -43,6 +43,7 @@ class SettingsLocation(Observable):
         self.cameras_per_segment = 7
         self.camera_rotation = 0  # 0, 90, 180, 270
         self.camera_one_position = "top"  # top, bottom
+        self.first_camera_number = 1
         self.calibration_data = "{}" # json dump of rc data
         self.markers = MARKERS_PRELOAD
         self.ground_points = GROUND_PRELOAD
@@ -61,6 +62,7 @@ class SettingsLocation(Observable):
             "camera_one_position": self.camera_one_position,
             "location": self.location,
             "calibration_data": self.calibration_data,
+            "first_camera_number": self.first_camera_number,
 
         }
 
@@ -76,8 +78,10 @@ class SettingsLocation(Observable):
         self.calibration_data = data["calibration_data"]
         try:
             self.ground_points = data["ground_points"]
+            self.first_camera_number = data["first_camera_number"]
         except:
             pass
+
         return self
 
     def set_markers(self, markers):
@@ -180,4 +184,9 @@ class SettingsLocation(Observable):
     def calibration_count(self):
         return self.calibration_data.count("FocalLength35mm")
 
+    def set_first_camera_number(self, value):
+        if value != self.first_camera_number:
+            self.first_camera_number = value
+            self.save()
+            self.notify_observers()
 

@@ -72,6 +72,11 @@ class Installer():
             # Fix ROUTING
             self.shell('sudo route add default gw 192.168.99.254')
 
+            # fix legacy state of distri
+            #legacy.raspbian.or
+            if "legacy.raspbian.org" not in open("/etc/apt/sources.list","r").read():
+                self.shell('echo "deb http://legacy.raspbian.org/raspbian/ stretch main contrib non-free rpi" >> /etc/apt/sources.list')
+
             # REQUIREMENTS
             self.shell('sudo DEBIAN_FRONTEND=noninteractive sudo dpkg --configure -a')
             self.shell('sudo DEBIAN_FRONTEND=noninteractive apt-get update', tries=2)
@@ -184,7 +189,7 @@ class Installer():
                     for image_type in ["normal", "projection"]:
                         try:
                             img = requests.get(
-                                "http://192.168.99.254/shots/%s/normal/%s/%s.jpg" % (shot_id, image_type, self.device_id),
+                                "http://192.168.99.254/shots/%s/normal/%s/%s-%s.jpg" % (shot_id, image_type, self.name.lower(),image_type[0]),
                                 timeout=25).content
                             if len(img) < 30000:
                                 continue

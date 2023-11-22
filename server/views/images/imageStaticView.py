@@ -11,6 +11,9 @@ class ImagesStaticView(ImagesView):
     def _get_settings_camera_one_position(self):
         return self.subject.meta_camera_one_position
 
+    def _get_first_camera_number(self):
+        return self.subject.meta_first_camera_number
+
     def _get_settings_camera_rotation(self):
         return self.subject.meta_rotation
 

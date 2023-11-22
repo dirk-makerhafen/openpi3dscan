@@ -37,7 +37,7 @@ class SettingsLocationView(PyHtmlView):
         </div>
         <div class="row">
             <div class="col-md-6">
-                Cam1 Position
+                First Cam
             </div>
             <div class="col-md-6">
                 <select  class="form-control" style="width:8em;text-align:center" id="camera_one_position_{{pyview.uid}}"  onchange='pyview.subject.set_camera_one_position($("#camera_one_position_{{pyview.uid}}").val())'>
@@ -46,6 +46,16 @@ class SettingsLocationView(PyHtmlView):
                 </select>
             </div>
         </div> 
+        <div class="row">
+            <div class="col-md-6">
+                First Cam Number
+            </div>
+            <div class="col-md-6">
+                <input class="form-control" style="width:100%;text-align:center" id="first_camera_number" type="number" min=0 max=1 value="{{pyview.subject.first_camera_number}}" onchange='pyview.subject.set_first_camera_number($("#first_camera_number").val())'>
+            </div>
+        </div> 
+        
+        
     </td>
     <td> 
         <textarea class="form-control" rows=8 id="marker_distances_{{pyview.uid}}"  style="white-space: pre-wrap;width:100%" onchange='pyview.subject.set_markers($("#marker_distances_{{pyview.uid}}").val())'>{{pyview.subject.markers}}</textarea>

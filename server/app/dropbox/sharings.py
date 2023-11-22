@@ -243,6 +243,7 @@ class DropboxPrivateImagesShare(DropboxGenericShare):
             "meta_max_segments": self.shot.meta_max_segments,
             "meta_rotation": self.shot.meta_rotation,
             "meta_camera_one_position": self.shot.meta_camera_one_position,
+            "meta_first_camera_number": self.shot.meta_first_camera_number,
         }).encode("UTF-8")
         data.append([ "data",metadata, "%s/%s" % (self.target_path, "metadata.json")])
         return data

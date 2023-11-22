@@ -7,7 +7,7 @@ class Settings():
         self.ID = "%s" % random.randint(1000, 99999)
         self.TYPE = "camera"
         self.NAME = "noname"
-        self.VERSION = "2022.11.09-01:02"
+        self.VERSION = "2023.11.23-00:23"
         self.ROTATION = 0
         self.load()
 

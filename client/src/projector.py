@@ -3,7 +3,7 @@ from queue import Queue
 import time
 import os
 from bottle import route
-from src.projector_image import ProjectorImage
+from src.projector_image import ProjectorImage_new
 from src.heartbeat import HeartbeatInstance
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -25,7 +25,7 @@ class Framebuffer(object):
         self.projection_file_name = "projection_%sx%sx%s.fb" % (self.size[0], self.size[1], self.bits_per_pixel)
         self.projection_file_path = os.path.join(SCRIPT_DIR, self.projection_file_name)
         if not os.path.exists(self.projection_file_path):
-            pi = ProjectorImage(self.size[0], self.size[1], 11)
+            pi = ProjectorImage_new(self.size[0], self.size[1], 11)
             self.fb_image = pi.get_fb()
             with open(self.projection_file_path, "wb") as f:
                 f.write(self.fb_image)

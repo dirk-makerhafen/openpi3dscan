@@ -73,6 +73,7 @@ class Shot(Observable):
         self.meta_max_rows = 7
         self.meta_rotation = 0
         self.meta_camera_one_position = "top"
+        self.meta_first_camera_number = 1
         self.license_data = ""
         self.nr_of_files = ObservableValue(0)
         self.worker = None
@@ -305,6 +306,7 @@ class Shot(Observable):
                 "meta_max_segments": self.meta_max_segments,
                 "meta_rotation": self.meta_rotation,
                 "meta_camera_one_position": self.meta_camera_one_position,
+                "meta_first_camera_number": self.meta_first_camera_number,
                 "license_data": self.license_data,
                 "models": [m.to_dict() for m in self.models],
                 "dropboxPublicFolder": self.dropboxPublicFolder.to_dict(),
@@ -346,6 +348,7 @@ class Shot(Observable):
                         self.meta_rotation = data["meta_rotation"]
                         self.meta_camera_one_position = data["meta_camera_one_position"]
                         self.license_data = data["license_data"]
+                        self.meta_first_camera_number = data["meta_first_camera_number"]
                     except:
                         pass
                     try:
@@ -367,6 +370,7 @@ class Shot(Observable):
                     self.meta_max_rows = self.settingsInstance.settingsScanner.cameras_per_segment
                     self.meta_rotation = self.settingsInstance.settingsScanner.camera_rotation
                     self.meta_camera_one_position = self.settingsInstance.settingsScanner.camera_one_position
+                    self.meta_first_camera_number = self.settingsInstance.settingsScanner.first_camera_number
                     self.save()
             except Exception as e:
                 print("failed to load %s" % os.path.join(self.path, "metadata.json"), e)

@@ -1,6 +1,7 @@
 import json, os
 from pyhtmlgui import Observable
 
+from app.settings.settingsPrinters import SettingsPrinters
 from app_windows.settings.settingsCache import SettingsCache
 from app_windows.settings.settingsDropbox import SettingsDropboxWindows
 from app_windows.settings.settingsLocations import SettingsLocations
@@ -21,6 +22,7 @@ class Settings(Observable):
         self.settingsRemoteHosts = SettingsRemoteHosts(self)
         self.settingsCache = SettingsCache(self)
         self.settingsDropbox = SettingsDropboxWindows(self)
+        self.settingsPrinters = SettingsPrinters(self)
         self.VERSION = VERSION
         self.load()
 
@@ -31,6 +33,7 @@ class Settings(Observable):
             "settingsRemoteHosts" : self.settingsRemoteHosts.to_dict(),
             "settingsCache" : self.settingsCache.to_dict(),
             "settingsDropbox" : self.settingsDropbox.to_dict(),
+            "settingsPrinters" : self.settingsPrinters.to_dict(),
         }
         open(self.save_file, "w").write(json.dumps(data))
 
@@ -59,6 +62,10 @@ class Settings(Observable):
             pass
         try:
             self.settingsDropbox.from_dict(data["settingsDropbox"])
+        except:
+            pass
+        try:
+            self.settingsPrinters.from_dict(data["settingsPrinters"])
         except:
             pass
         self.save()

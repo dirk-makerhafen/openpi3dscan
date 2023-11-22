@@ -4,6 +4,7 @@ from pyhtmlgui import Observable
 from app.settings.settingsCameras import SettingsCameras
 from app.settings.settingsFirmware import SettingsFirmwareImage
 from app.settings.settingsHostname import SettingsHostname
+from app.settings.settingsPrinters import SettingsPrinters
 from app.settings.settingsScanner import SettingsScanner
 from app.settings.settingsSequence import SettingsSequence
 from app.settings.settingsWireless import SettingsWireless
@@ -26,6 +27,7 @@ class Settings(Observable):
         self.realityCaptureSettings = SettingsRealityCapture(self)
         self.settingsScanner = SettingsScanner(self)
         self.settingsDropbox = SettingsDropbox(self)
+        self.settingsPrinters = SettingsPrinters(self)
         self.VERSION = VERSION
         self.locked = False
         self.password = ""
@@ -43,6 +45,7 @@ class Settings(Observable):
             "realityCaptureSettings" : self.realityCaptureSettings.to_dict(),
             "settingsScanner" : self.settingsScanner.to_dict(),
             "settingsDropbox" : self.settingsDropbox.to_dict(),
+            "settingsPrinters" : self.settingsPrinters.to_dict(),
             "locked"          : self.locked,
             "password"        : self.password,
         }
@@ -91,6 +94,10 @@ class Settings(Observable):
             pass
         try:
             self.settingsDropbox.from_dict(data["settingsDropbox"])
+        except:
+            pass
+        try:
+            self.settingsPrinters.from_dict(data["settingsPrinters"])
         except:
             pass
         try:

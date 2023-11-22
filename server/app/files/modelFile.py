@@ -1,12 +1,37 @@
 import os
 import uuid
-from pyhtmlgui import Observable
+from pyhtmlgui import Observable, ObservableList
 import zipfile
 from zipfile import ZIP_STORED
 import shutil
 import zipstream
 
 from app.lib.observableValue import ObservableValue
+
+
+class PrintQueueItem(Observable):
+    def __init__(self, model, color, printer):
+        super().__init__()
+        self.model = model
+        self.color = color
+        self.printer = printer
+        self.status = "waiting"  # printing, failed, printed
+        self.created = ""
+        self.printed = ""
+        self.failed  = ""
+
+    def to_dict(self):
+        return {
+            "color": self.color,
+            "printer": self.printer,
+            "status": self.status,
+        }
+
+    def from_dict(self, data):
+        self.color = data["color"]
+        self.printer = data["printer"]
+        self.status = data["status"]
+        return self
 
 
 class ModelFile(Observable):
@@ -27,6 +52,12 @@ class ModelFile(Observable):
         self.filesize = 0
         self.create_textures = create_textures
         self.path = os.path.join(self.parentShot.path, "models")
+        self.printqueue = ObservableList()
+        self.printqueue.attach_observer(self.parentShot.notify_observers)
+
+    def print(self, color = "", printer = ""):
+        self.printqueue.append(PrintQueueItem(self, color=color, printer=printer))
+        self.parentShot.save()
 
     def from_custom_upload(self, filename, input_file):
         self.is_custom_upload = True
@@ -208,6 +239,7 @@ class ModelFile(Observable):
             "reconstruction_quality": self.reconstruction_quality,
             "lit": self.lit,
             "is_custom_upload": self.is_custom_upload,
+            "printqueue": [p.to_dict() for p in self.printqueue]
         }
 
     def from_dict(self, data):
@@ -231,6 +263,13 @@ class ModelFile(Observable):
             self.is_custom_upload = False
         if self.is_custom_upload:
             self.path = os.path.join(self.parentShot.path, "uploads")
+
+        try:
+            #self.printqueue.clear()
+            self.printqueue.extend([PrintQueueItem(self,"","").from_dict(item) for item in data["printqueue"]])
+        except Exception as e:
+            print("faild", e)
+            #self.printqueue.clear()
 
         if self.status == "ready":
             self.publishing_status._value = "can_publish"

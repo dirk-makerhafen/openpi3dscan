@@ -6,6 +6,7 @@ from views.settings.settingsFirmwareView import FirmwareSettingsView
 from views.settings.settingsHostnameView import HostnameSettingsView
 from views.settings.settingsImageCalibrationView import CameraImageCalibationView
 from views.settings.settingsLockView import LockSettingsView
+from views.settings.settingsPrintersView import PrinterSettingsView
 from views.settings.settingsRealityCaptureView import RealityCaptureView
 from views.settings.settingsRebootView import RebootShutdownView
 from views.settings.settingsScannerView import SettingsScannerView
@@ -45,6 +46,7 @@ class SettingsView(PyHtmlView):
             {{pyview.settingsBackupView.render()}}  
         {% endif %}
         {{pyview.rebootShutdownView.render()}}  
+        {{pyview.printerSettingsView.render()}}  
     </div> 
     
     '''
@@ -67,3 +69,4 @@ class SettingsView(PyHtmlView):
         self.settingsBackupView = SettingsBackupView(self.subject.settings, self)
         self.settingsUpdateView = SettingsUpdateView(self.subject.settings, self)
         self.lockSettingsView = LockSettingsView(self.subject.settings, self)
+        self.printerSettingsView = PrinterSettingsView(self.subject.settings.settingsPrinters, self)

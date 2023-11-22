@@ -199,14 +199,13 @@ class DropboxUploads(Observable):
             self.pending_uploads.remove(dropboxUploader)
 
     def _cleanup_loop(self):
-        time.sleep(10)
         while True:
+            time.sleep(3600)
             for shot in self.shots.shots:
                 pf = shot.dropboxPublicFolder
                 if pf.expire_time != 0 and pf.expire_time < time.time():
                     if pf.can_delete is True:
                         pf.delete()
-            time.sleep(3600)
 
     def _loop(self):
         time.sleep(30)

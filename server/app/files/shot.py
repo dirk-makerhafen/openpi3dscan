@@ -87,6 +87,13 @@ class Shot(Observable):
         self.dropboxPublicFolder = ShotDropboxPublicFolder(self)
         self.load()
 
+    @property
+    def printqueue(self):
+        pq = []
+        for m in self.models:
+            pq.extend([p for p in m.printqueue])
+        pq.sort(key=lambda x:x.created)
+        return pq
 
     @property
     def can_delete(self):

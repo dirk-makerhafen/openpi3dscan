@@ -38,7 +38,7 @@ class ShotFilesModelFilesView(PyHtmlView):
                             <div class="col-md-1 h5" style="text-align:center;font-weight:bold">Textures</div>
                             <div class="col-md-1 h5" style="text-align:center;font-weight:bold">Lit</div>
                             <div class="col-md-3 h5" style="text-align:center;font-weight:bold">File</div>
-                            <div class="col-md-2 h5" style="text-align:center;font-weight:bold">Action</div>
+                            <div class="col-md-2 h5" style="text-align:center;font-weight:bold">Actions</div>
                         </div>
                         {{pyview.filesListView.render()}}     
                         <div class="row" style="margin-top:10px">    
@@ -167,8 +167,8 @@ class ShotFilesCustomModelFilesView(PyHtmlView):
                               </div>
                               <div class="box__input col-md-3" style="">
                                 <input style="display:none" class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
-                                <label style="line-height: 50px;height: 50px;" for="file">
-                                    <strong style="color:#337ab7">Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.
+                                <label style="margin-top:15px" for="file">
+                                    <strong style="color:#337ab7">Choose a file</strong><span class="box__dragndrop"> or drag here</span>.
                                 </label>
                                 <div class="box__uploading">Uploading…</div>
                                 <div class="box__success">Done!</div>
@@ -190,7 +190,7 @@ class ShotFilesCustomModelFilesView(PyHtmlView):
                             <div class="col-md-1 h5" style="text-align:center;font-weight:bold">Textures</div>
                             <div class="col-md-1 h5" style="text-align:center;font-weight:bold">Lit</div>
                             <div class="col-md-3 h5" style="text-align:center;font-weight:bold">File</div>
-                            <div class="col-md-2 h5" style="text-align:center;font-weight:bold">Action</div>
+                            <div class="col-md-2 h5" style="text-align:center;font-weight:bold">Actions</div>
                         </div>
                         {{pyview.filesListView.render()}}     
                         <div class="row" style="margin-top:10px">    
@@ -326,20 +326,35 @@ class ModelPublishingView(PyHtmlView):
     DOM_ELEMENT = "dummy"
     TEMPLATE_STR = '''
         {% if pyview.subject.value == "state_changing" %}
-            <div class="col-md-2" style="text-align:center;margin-top:1px">processing</div>
+            processing
         {% else %}
-            <div class="col-md-1" style="text-align:center">
-                {% if pyview.subject.value == "can_unpublish" %}
-                     <button class="btn btnfw" onclick='pyview.unpublish_model()' > Unpublish</button>
-                {% elif pyview.subject.value == "can_publish" %}
-                    <button class="btn btnfw" onclick='pyview.publish_model()' > Publish</button> 
-                {% elif pyview.subject.value == "no_publish" %}
-
+            {% if pyview.subject.value == "can_unpublish" %}
+                 {% if pyview.parent.parent.parent.settingsInstance.settingsPrinters.enabled == True %}
+                    <button class="btn" style="width:33%" onclick='pyview.unpublish_model()' > Unpublish</button>
+                    <button class="btn"  style="width:33%" onclick='pyview.subject.print()'> Print</button>
+                    <button class="btn" style="width:33%" onclick='pyview.parent.subject.delete()'> Delete</button>
+                 {% else %}
+                    <button class="btn" style="width:50%" onclick='pyview.unpublish_model()' > Unpublish</button>
+                    <button class="btn" style="width:50%" onclick='pyview.parent.subject.delete()'> Delete</button>
+                 {% endif %}
+            {% elif pyview.subject.value == "can_publish" %}
+                {% if pyview.parent.parent.parent.settingsInstance.settingsPrinters.enabled == True %}
+                    <button class="btn" style="width:33%" onclick='pyview.publish_model()' > Publish</button>
+                    <button class="btn"  style="width:33%" onclick='pyview.subject.print()'> Print</button>
+                    <button class="btn" style="width:33%" onclick='pyview.parent.subject.delete()'> Delete</button>
+                {% else %}
+                    <button class="btn" style="width:50%" onclick='pyview.publish_model()' > Publish</button>
+                    <button class="btn" style="width:50%" onclick='pyview.parent.subject.delete()'> Delete</button>
                 {% endif %}
-            </div>
-            <div class="col-md-1" style="text-align:center">
-                <button class="btn btnfw " onclick='pyview.parent.subject.delete()'> Delete</button>
-            </div>
+            {% elif pyview.subject.value == "no_publish" %}
+                {% if pyview.parent.parent.parent.settingsInstance.settingsPrinters.enabled == True %}
+                    <button class="btn"  style="width:50%" onclick='pyview.subject.print()'> Print</button>
+                {% endif %}
+                <button class="btn" style="width:50%" onclick='pyview.parent.subject.delete()'> Delete</button>
+            {% endif %}
+            
+
+            
         {% endif %} 
     '''
     def publish_model(self):
@@ -369,14 +384,18 @@ class ModelFileItemView(PyHtmlView):
                 {{pyview.subject.status}}
             {% endif %}    
         </div>
-        {% if  pyview.parent.parent.settingsInstance.settingsDropbox.is_authorized() == True and pyview.parent.parent.settingsInstance.settingsDropbox.enable_public == True and pyview.subject.parentShot.dropboxPublicFolder.status != "new" %}
-            {{ pyview.modelPublishingView.render() }}
-        {% else %}
-            <div class="col-md-1"></div>
-            <div class="col-md-1 " style="text-align:center">
-                <button class="btn btnfw" onclick='pyview.subject.delete()'> Delete</button>
-            </div>
-        {% endif %}
+        <div class="col-md-2" style="text-align:center;margin-top:1px;white-space: nowrap;">
+            {% if  pyview.parent.parent.settingsInstance.settingsDropbox.is_authorized() == True and pyview.parent.parent.settingsInstance.settingsDropbox.enable_public == True and pyview.subject.parentShot.dropboxPublicFolder.status != "new" %}
+                {{ pyview.modelPublishingView.render() }}
+            {% else %}
+                {% if pyview.parent.parent.settingsInstance.settingsPrinters.enabled == True %}
+                    <button class="btn"  style="width:50%" onclick='pyview.subject.print()'> Print</button>
+                {% endif %}
+                <button class="btn"  style="width:50%" onclick='pyview.subject.delete()'> Delete</button>
+
+            {% endif %}
+        </div>
+        
     '''
 
     def __init__(self, subject, parent, **kwargs):

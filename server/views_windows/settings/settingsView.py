@@ -1,5 +1,6 @@
 from pyhtmlgui import PyHtmlView
 
+from views.settings.settingsPrintersView import PrinterSettingsView
 from views_windows.settings.settingsCacheView import SettingsCacheView
 from views_windows.settings.settingsDropboxView import SettingsDropboxView
 from views_windows.settings.settingsRealityCaptureView import SettingsRealityCaptureView
@@ -16,6 +17,7 @@ class SettingsView(PyHtmlView):
         {{pyview.remoteHostsView.render()}}  
         {{pyview.settingsCacheView.render()}}  
         {{pyview.locationsSettingsView.render()}}  
+        {{pyview.printerSettingsView.render()}}  
         <br>
         <br>
         
@@ -30,3 +32,4 @@ class SettingsView(PyHtmlView):
         self.remoteHostsView = SettingsRemoteHostsView(self.subject.settings.settingsRemoteHosts, self)
         self.settingsCacheView = SettingsCacheView(self.subject.settings.settingsCache, self)
         self.settingsDropboxView = SettingsDropboxView(self.subject.settings.settingsDropbox, self)
+        self.printerSettingsView = PrinterSettingsView(self.subject.settings.settingsPrinters, self)

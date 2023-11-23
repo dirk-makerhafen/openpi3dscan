@@ -199,12 +199,12 @@ class SegmentView(PyHtmlView):
         super().__init__(subject, parent)
         self.seg_nr = seg_nr
         if self.parent._get_settings_camera_one_position() == "top":
-            if self.parent._get_first_camera_number == 1:
+            if self.parent._get_first_camera_number() == 1:
                 self.images = [ImageRowView(subject, self, i+1) for i in range(0, self.parent._get_settings_cameras_per_segment() )]
-            if self.parent._get_first_camera_number == 0:
+            if self.parent._get_first_camera_number() == 0:
                 self.images = [ImageRowView(subject, self, i ) for i in range(0, self.parent._get_settings_cameras_per_segment())]
         else:
-            if self.parent._get_first_camera_number == 1:
+            if self.parent._get_first_camera_number() == 1:
                 self.images = [ImageRowView(subject, self, i) for i in range(self.parent._get_settings_cameras_per_segment(), 0, -1 )]
-            if self.parent._get_first_camera_number == 0:
+            if self.parent._get_first_camera_number() == 0:
                 self.images = [ImageRowView(subject, self, i) for i in range(self.parent._get_settings_cameras_per_segment(), -1, -1)]

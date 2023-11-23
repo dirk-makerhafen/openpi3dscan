@@ -51,7 +51,7 @@ class SettingsLocationView(PyHtmlView):
                 First Cam Number
             </div>
             <div class="col-md-6">
-                <input class="form-control" style="width:100%;text-align:center" id="first_camera_number" type="number" min=0 max=1 value="{{pyview.subject.first_camera_number}}" onchange='pyview.subject.set_first_camera_number($("#first_camera_number").val())'>
+                <input class="form-control" style="width:8em;text-align:center" id="first_camera_number" type="number" min=0 max=1 value="{{pyview.subject.first_camera_number}}" onchange='pyview.subject.set_first_camera_number($("#first_camera_number").val())'>
             </div>
         </div> 
         
@@ -64,22 +64,10 @@ class SettingsLocationView(PyHtmlView):
         <textarea class="form-control" rows=8 id="ground_points_{{pyview.uid}}"  style="white-space: pre-wrap;width:100%" onchange='pyview.subject.set_ground_points($("#ground_points_{{pyview.uid}}").val())'>{{pyview.subject.ground_points}}</textarea>
     </td>
     <td>
-        <div class="row">
-            <div class="col-md-4">
-                Diameter
-            </div>
-            <div class="col-md-8">
-                <input  class="form-control" style="text-align:center;width:8em" id="region_diameter_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.diameter}}" onchange='pyview.subject.set_diameter($("#region_diameter_{{pyview.uid}}").val())'>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                Height
-            </div>
-            <div class="col-md-8">
-                <input  class="form-control" style="text-align:center;width:8em" id="region_height_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.height}}" onchange='pyview.subject.set_height($("#region_height_{{pyview.uid}}").val())'>
-            </div>
-        </div>    
+        Diameter<br>
+        <input  class="form-control" style="text-align:center;width:8em" id="region_diameter_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.diameter}}" onchange='pyview.subject.set_diameter($("#region_diameter_{{pyview.uid}}").val())'><br>
+        Height<br>
+        <input  class="form-control" style="text-align:center;width:8em" id="region_height_{{pyview.uid}}" type="number" step="0.01" value="{{pyview.subject.height}}" onchange='pyview.subject.set_height($("#region_height_{{pyview.uid}}").val())'>
     </td>
     <td>
         <button class="btn btnfw" onclick="pyview.subject.reset_calibration()">Reset</button>

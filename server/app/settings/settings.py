@@ -11,7 +11,7 @@ from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsDropbox import SettingsDropbox
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2023.11.23-00:23"
+VERSION = "2023.11.29-00:23"
 
 class Settings(Observable):
     def __init__(self, devicesInstance):

@@ -85,6 +85,10 @@ class SettingsScanner(Observable):
             self.notify_observers()
 
     def set_first_camera_number(self, value):
+        try:
+            value = int(value)
+        except:
+            return
         if value != self.first_camera_number:
             self.first_camera_number = value
             self.save()

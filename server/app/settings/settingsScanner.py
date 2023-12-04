@@ -36,6 +36,10 @@ class SettingsScanner(Observable):
         self.camera_one_position = data["camera_one_position"]
         self.flipped_cameras = data["flipped_cameras"]
         self.location = data["location"]
+        try:
+            self.first_camera_number = data["first_camera_number"]
+        except:
+            pass
 
     def set_segments(self, value):
         try:

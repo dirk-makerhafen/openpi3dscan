@@ -49,7 +49,7 @@ class UsbDisks(Observable):
                 if disk is None:
                     disk = UsbDisk(self, name, fssize, label, uuid)
                     self.disks.append(disk)
-                    disk.mount()
+                    disk.load()
 
             except Exception as e:
                 print(e)

@@ -10,9 +10,9 @@ class UsbDiskView(PyHtmlView):
         <td>{{pyview.subject.disk_free}}</td>
         <td>{{pyview.subject.is_primary}}</td>
         <td>
-        {% if disk.status == "Active" %}
+        {% if pyview.subject.status == "Active" %}
         <button style="width:50%" class="btn btnfw" onclick="pyview.subject.umount()">Eject</button>
-        {% elif  disk.status == "" %} 
+        {% elif  pyview.subject.status == "" %} 
         <button style="width:50%"  class="btn btnfw" onclick="pyview.subject.mount()">Activate</button>
         {% endif %}  
         <button class="btn btnfw" onclick="pyview.subject.set_as_primary()">Set as Primary</button>

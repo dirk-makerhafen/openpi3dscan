@@ -40,9 +40,6 @@ class UsbDisks(Observable):
 
         for line in stdout.split("\n"):
             try:
-                line = line.replace("\t", " ").replace("└─", "")
-                while "  " in line:
-                    line = line.replace("  ", " ")
                 if len(line) < 5:
                     continue
                 name, fssize, label, uuid, mountpoint = line.split(" ")

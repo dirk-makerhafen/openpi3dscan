@@ -6,9 +6,9 @@ class UsbDiskView(PyHtmlView):
         <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
         <td>{{pyview.subject.label}}</td>
         <td>{{pyview.subject.status}}</td>
-        <td>{{pyview.subject.disk_total}}</td>
-        <td>{{pyview.subject.disk_free}}</td>
-        <td>{{pyview.subject.nr_of_shots}}</td>
+        <td>{{pyview.subject.disk_free}}/{{pyview.subject.disk_total}}</td>
+        <td>{{pyview.subject.shots_loaded}} / {{pyview.subject.shots_available}}</td>
+        <td>{{pyview.subject.oldest_shot}} / {{pyview.subject.newest_shot}}</td>
         <td>{{pyview.subject.is_primary}}</td>
         <td>
         {% if pyview.subject.status == "Active" %}
@@ -36,19 +36,19 @@ class UsbStorageView(PyHtmlView):
                     </div>
                     <div class="list-group-item">
                         <div class="row align-items-center">
-                            <div class="col-md-5">
+                            <div class="col-md-3">
                                 <strong class="mb-0">USB-Disks</strong>
                                 <p class="text-muted mb-0">List of connected USB Disks</p>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-7">
                                 <table style="width:100%;text-align:center">
                                     <thead>
                                         <tr>
                                             <th style="text-align:center">Name</th>
                                             <th style="text-align:center">Status</th>
-                                            <th style="text-align:center">Disk Size</th>
-                                            <th style="text-align:center">Disk Free</th>
-                                            <th style="text-align:center">Shots</th>
+                                            <th style="text-align:center">Disk Free/Size</th>
+                                            <th style="text-align:center">Shots Loaded/Avail</th>
+                                            <th style="text-align:center">Shots From/To</th>
                                             <th style="text-align:center">Primary</th>
                                             <th style="text-align:center">Action</th>
                                         </tr>

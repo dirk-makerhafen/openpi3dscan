@@ -1,6 +1,7 @@
 import os.path
 import subprocess
 import time
+import glob
 from pyhtmlgui import Observable
 from app.files.shots import ShotsInstance
 from app.settings.settings import SettingsInstance
@@ -17,7 +18,10 @@ class UsbDisk(Observable):
         self.disk_total = fssize
         self.disk_free = ""
         self.status = ""
-        self.nr_of_shots = 0
+        self.shots_available = 0
+        self.shots_loaded = 0
+        self.oldest_shot = ""
+        self.newest_shot = ""
 
     @property
     def is_primary(self):
@@ -30,8 +34,21 @@ class UsbDisk(Observable):
         self.status = status
         self.usb_disks.notify_observers()
 
-    def mount(self):
+    def load(self):
         self.set_status("Loading")
+        self.mount()
+        self.load_stats()
+        self.shots_loaded = ShotsInstance().load_shots_from_dir("/shots/%s" % self.uuid)
+        self.set_status("Active")
+
+    def unload(self):
+        self.set_status("Unloading")
+        ShotsInstance().unload_dir("/shots/%s" % self.uuid)
+        self.umount()
+        self.shots_loaded = 0
+        self.set_status("")
+
+    def mount(self):
         if not os.path.exists("/shots/%s" % self.uuid):
             os.system("mkdir -p /shots/%s" % self.uuid)
         try:
@@ -39,21 +56,41 @@ class UsbDisk(Observable):
         except:
             stdout = ""
         time.sleep(5)
-        self.get_diskspace()
-        self.nr_of_shots = ShotsInstance().load_shots_from_dir("/shots/%s" % self.uuid)
-        self.set_status("Active")
 
     def umount(self):
-        self.set_status("Unloading")
-        ShotsInstance().unload_dir("/shots/%s" % self.uuid)
         try:
             stdout = subprocess.check_output("sudo umount '%s' '/shots/%s'" % (self.name, self.uuid), shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
-        self.set_status("")
+        try:
+            stdout = subprocess.check_output('mount | grep %s' % self.uuid, shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+        except:
+            stdout = ""
+        if self.uuid not in stdout:
+            os.rmdir('/shots/%s' % self.uuid)
 
+    def load_stats(self):
+        self._get_diskspace()
+        self.shots_available = 0
+        self.oldest_shot = ""
+        self.newest_shot = ""
 
-    def get_diskspace(self):
+        if self.status == "":
+            self.mount()
+
+        for path in glob.glob(os.path.join("/shots/%s" % self.uuid, "*")):
+            if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images", "normal")) or (os.path.exists(os.path.join(path, "normal")) and os.path.exists(os.path.join(path, "projection"))):
+                shot_id = os.path.split(path)[1].split(" ")[0]
+                if shot_id > self.newest_shot or self.newest_shot == "":
+                    self.newest_shot = shot_id
+                if shot_id < self.oldest_shot or self.oldest_shot == "":
+                    self.oldest_shot = shot_id
+                self.shots_available += 1
+
+        if self.status == "":
+            self.umount()
+
+    def _get_diskspace(self):
         try:
             stdout = subprocess.check_output('lsblk -fpro UUID,FSAVAIL,FSSIZE | grep %s' % self.uuid, shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
@@ -67,4 +104,3 @@ class UsbDisk(Observable):
             print(e)
             pass
         self.notify_observers()
-

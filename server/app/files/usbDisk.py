@@ -101,6 +101,5 @@ class UsbDisk(Observable):
         try:
             uuid, self.disk_free, self.disk_total = line.split(" ")
         except Exception as e:
-            print(e)
-            pass
+            print("failed to get disk space from line'%s'" % line)
         self.notify_observers()

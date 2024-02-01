@@ -34,7 +34,7 @@ class UsbDisks(Observable):
     def _load(self):
         self.set_status("reload")
         try:
-            stdout = subprocess.check_output('lsblk -fpro NAME,FSSIZE,LABEL,UUID,MOUNTPOINT | grep -i /dev/sd | grep -v EFI | grep -v boot | grep -i fat', shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output('lsblk -fpro NAME,FSSIZE,LABEL,UUID,MOUNTPOINT | grep -i /dev/sd ', shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
 
@@ -46,6 +46,8 @@ class UsbDisks(Observable):
                 if len(line) < 5:
                     continue
                 name, fssize, label, uuid, mountpoint = line.split(" ")
+                if uuid.strip() == "":
+                    continue
                 disk = self.get_disk_by_uid(uuid)
                 if disk is None:
                     disk = UsbDisk(self, name, fssize, label, uuid)

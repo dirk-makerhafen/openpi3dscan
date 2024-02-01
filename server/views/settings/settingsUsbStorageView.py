@@ -6,7 +6,7 @@ class UsbDiskView(PyHtmlView):
         <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
         <td>{{pyview.subject.label}}</td>
         <td>{{pyview.subject.status}}</td>
-        <td>{{pyview.subject.disk_free}}/{{pyview.subject.disk_total}}</td>
+        <td>{{pyview.subject.disk_free}} / {{pyview.subject.disk_total}}</td>
         <td>{{pyview.subject.shots_loaded}} / {{pyview.subject.shots_available}}</td>
         <td>{{pyview.subject.oldest_shot}} / {{pyview.subject.newest_shot}}</td>
         <td>{{pyview.subject.is_primary}}</td>

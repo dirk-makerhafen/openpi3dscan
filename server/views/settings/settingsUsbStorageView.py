@@ -45,7 +45,7 @@ class UsbStorageView(PyHtmlView):
                                     <button class="btn btnfw">{{pyview.subject.status }}</button>
                                 {% endif %}
                             </div>
-                            <div class="col-md-7">
+                            <div class="col-md-9">
                                 <table style="width:100%;text-align:center">
                                     <thead>
                                         <tr>

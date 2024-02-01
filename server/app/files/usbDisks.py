@@ -1,43 +1,29 @@
 import subprocess
 import threading
 import time
-from pyhtmlgui import Observable
-from app.files.shots import ShotsInstance
+from pyhtmlgui import Observable, ObservableList
 from app.files.usbDisk import UsbDisk
-
+from app.settings.settings import SettingsInstance
 
 class UsbDisks(Observable):
     def __init__(self):
         super().__init__()
-        self.disks = []
+        self.disks = ObservableList()
         self.load_worker = None
         self.status = "idle"
+        time.sleep(10)
         for i in range(5):
             self._load()
-            try:
-                stdout = subprocess.check_output('mount', shell=True, timeout=20, stderr=subprocess.STDOUT, ).decode("UTF-8")
-            except:
-                stdout = ""
-            if "/shots" in stdout:
+            if len(self.disks) > 1:
                 break
             time.sleep(10)
-        ShotsInstance().load_shots_from_disk()
+
+    def set_primary(self, uuid):
+        SettingsInstance().set_primary_disk(uuid)
+        self.notify_observers()
 
     def set_status(self, status):
         self.status = status
-        self.notify_observers()
-
-    def automount(self):
-        try:
-            stdout = subprocess.check_output('mount', shell=True, timeout=20, stderr=subprocess.STDOUT, ).decode("UTF-8")
-        except:
-            stdout = ""
-        if "/shots" not in stdout:
-            if len(self.disks) > 0:
-                self.disks[0].mount()
-        else:
-            if len(self.disks) > 0:
-                self.disks[0].get_diskspace()
         self.notify_observers()
 
     def load(self):
@@ -48,7 +34,7 @@ class UsbDisks(Observable):
     def _load(self):
         self.set_status("reload")
         try:
-            stdout = subprocess.check_output('lsblk -fp | grep -i /dev/sd | grep -v EFI | grep -v boot | grep -i fat', shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output('lsblk -fpro NAME,FSSIZE,LABEL,UUID,MOUNTPOINT | grep -i /dev/sd | grep -v EFI | grep -v boot | grep -i fat', shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
 
@@ -59,10 +45,12 @@ class UsbDisks(Observable):
                     line = line.replace("  ", " ")
                 if len(line) < 5:
                     continue
-                name, fstype, fsver, label, uuid, rest = line.split(" ", 5)
+                name, fssize, label, uuid, mountpoint = line.split(" ")
                 disk = self.get_disk_by_uid(uuid)
                 if disk is None:
-                    self.disks.append(UsbDisk(name, fstype, fsver, label, uuid))
+                    disk = UsbDisk(self, name, fssize, label, uuid)
+                    self.disks.append(disk)
+                    disk.mount()
 
             except Exception as e:
                 print(e)
@@ -72,10 +60,8 @@ class UsbDisks(Observable):
                 toremove.append(disk)
         for r in toremove:
             self.disks.remove(r)
-        self.automount()
-        self.set_status("idle")
         self.load_worker = None
-        self.notify_observers()
+        self.set_status("idle")
 
     def get_disk_by_uid(self, uid):
         try:

@@ -171,11 +171,9 @@ class Shot(Observable):
             for image_mode in ["normal", "preview"]:
                 for image_type in ["normal", "projection"]:
                     if image_mode == "normal":
-                        img_path = os.path.join(self.images_path, image_type,
-                                                "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+                        img_path = os.path.join(self.images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
                     else:
-                        img_path = os.path.join(self.preview_images_path, image_type,
-                                                "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
+                        img_path = os.path.join(self.preview_images_path, image_type, "seg%s-cam%s-%s.jpg" % (segment, row, image_type[0]))
 
                     if img_path not in existing_images:
                         tasks.append([device, [self.shot_id, image_type, image_mode, False]])
@@ -230,6 +228,7 @@ class Shot(Observable):
 
         results = []
         for file in files:
+            foo = os.path.split(file)[1].split("-")[0]
             segment = os.path.split(file)[1].split("-")[0].replace("seg", "")
             row = os.path.split(file)[1].split("-")[1].replace("cam", "")
             results.append([image_type, image_mode, segment, row, ])

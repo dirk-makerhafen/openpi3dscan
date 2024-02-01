@@ -11,7 +11,6 @@ from app.dropbox.process import DropboxUploads
 class Shots:
     def __init__(self, devices):
         self.shots = ObservableList()
-        self.path = "/shots/"
         self.cache = {}
         self.devices = devices
         self.deleted_shot_ids = []
@@ -19,6 +18,10 @@ class Shots:
         self.settingsInstance = SettingsInstance()
         self.dropboxUploads = DropboxUploads(self, SettingsInstance())
         self.load()
+
+    @property
+    def path(self):
+        return os.path.join("/shots/", self.settingsInstance.primary_disk)
 
     def create(self, shot_id, name):
         s = Shot(os.path.join(self.path, shot_id), shot_id, self)
@@ -116,22 +119,27 @@ class Shots:
         except:
             pass
 
-    def load_shots_from_disk(self):
-        for path in glob.glob(os.path.join(self.path, "*")):
+    def load_shots_from_dir(self, directory):
+        for path in glob.glob(os.path.join(directory, "*")):
             if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images","normal")) or (os.path.exists(os.path.join(path, "normal")) and os.path.exists(os.path.join(path, "projection"))  ):
                 shot_id = os.path.split(path)[1]
                 shot = self.get(shot_id)
                 if shot is None:
                     shot = Shot(path, shot_id, self)
                     self.shots.append(shot)
-                else:
-                    shot.load()
-                for model in shot.models:
-                    if model.status == "waiting" and model not in self.unprocessed_models:
-                        self.unprocessed_models.append(model)
-
+                    for model in shot.models:
+                        if model.status == "waiting" and model not in self.unprocessed_models:
+                            self.unprocessed_models.append(model)
         self.shots.sort(reverse=True)
 
+    def unload_dir(self, directory):
+        for shot in [s for s in self.shots]:
+            if shot.path.startswith(directory):
+                self.shots.remove(shot)
+                try:
+                    del self.cache[shot.shot_id]
+                except:
+                    pass
 
 _shotsInstance = None
 

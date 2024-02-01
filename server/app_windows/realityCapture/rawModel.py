@@ -41,7 +41,7 @@ class RawModel(GenericTask):
             cmd += '-rotateReconstructionRegion 0 0 30 '  #
         cmd += '-cleanModel '
 
-        # cmd += '-smooth '
+        cmd += '-smooth '
         cmd += '-simplify 4000000 '
 
         cmd += '-selectLargestModelComponent '

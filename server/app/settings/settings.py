@@ -11,7 +11,7 @@ from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsDropbox import SettingsDropbox
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2023.12.04-14:02"
+VERSION = "2023.02.01-14:16"
 
 class Settings(Observable):
     def __init__(self, devicesInstance):
@@ -30,6 +30,7 @@ class Settings(Observable):
         self.VERSION = VERSION
         self.locked = False
         self.password = ""
+        self.primary_disk = ""
         self.load()
 
 
@@ -37,16 +38,17 @@ class Settings(Observable):
         return {
             "sequenceSettingsSpeed" : self.sequenceSettingsSpeed.to_dict(),
             "sequenceSettingsQuality" : self.sequenceSettingsQuality.to_dict(),
-            "cameraSettings" : self.cameraSettings.to_dict(),
+            "cameraSettings"   : self.cameraSettings.to_dict(),
             "firmwareSettings" : self.firmwareSettings.to_dict(),
             "wirelessSettings" : self.wirelessSettings.to_dict(),
             "hostnameSettings" : self.hostnameSettings.to_dict(),
             "realityCaptureSettings" : self.realityCaptureSettings.to_dict(),
-            "settingsScanner" : self.settingsScanner.to_dict(),
-            "settingsDropbox" : self.settingsDropbox.to_dict(),
+            "settingsScanner"  : self.settingsScanner.to_dict(),
+            "settingsDropbox"  : self.settingsDropbox.to_dict(),
             "settingsPrinters" : self.settingsPrinters.to_dict(),
-            "locked"          : self.locked,
-            "password"        : self.password,
+            "locked"           : self.locked,
+            "password"         : self.password,
+            "primary_disk"     : self.primary_disk,
         }
 
     def save(self):
@@ -102,9 +104,15 @@ class Settings(Observable):
         try:
             self.locked = data["locked"]
             self.password = data["password"]
+            self.primary_disk = data["primary_disk"]
         except:
             pass
 
+        self.save()
+        self.notify_observers()
+
+    def set_primary_disk(self, disk_uuid):
+        self.primary_disk = disk_uuid
         self.save()
         self.notify_observers()
 

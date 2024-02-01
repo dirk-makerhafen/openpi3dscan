@@ -46,9 +46,9 @@ class UsbStorageView(PyHtmlView):
                                         <tr>
                                             <th style="text-align:center">Name</th>
                                             <th style="text-align:center">Status</th>
-                                            <th style="text-align:center">Disk Free/Size</th>
-                                            <th style="text-align:center">Shots Loaded/Avail</th>
-                                            <th style="text-align:center">Shots From/To</th>
+                                            <th style="text-align:center">Disk Free / Size</th>
+                                            <th style="text-align:center">Shots Loaded / Avail</th>
+                                            <th style="text-align:center">Shots From / To</th>
                                             <th style="text-align:center">Primary</th>
                                             <th style="text-align:center">Action</th>
                                         </tr>

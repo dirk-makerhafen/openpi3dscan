@@ -17,6 +17,7 @@ class UsbDisk(Observable):
         self.disk_total = fssize
         self.disk_free = ""
         self.status = ""
+        self.nr_of_shots = 0
 
     @property
     def is_primary(self):
@@ -39,7 +40,7 @@ class UsbDisk(Observable):
             stdout = ""
         time.sleep(5)
         self.get_diskspace()
-        ShotsInstance().load_shots_from_dir("/shots/%s" % self.uuid)
+        self.nr_of_shots = ShotsInstance().load_shots_from_dir("/shots/%s" % self.uuid)
         self.set_status("Active")
 
     def umount(self):
@@ -66,3 +67,4 @@ class UsbDisk(Observable):
             print(e)
             pass
         self.notify_observers()
+

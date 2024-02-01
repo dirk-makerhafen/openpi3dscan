@@ -59,6 +59,8 @@ class UsbDisks(Observable):
                 toremove.append(disk)
         for r in toremove:
             self.disks.remove(r)
+        for disk in self.disks:
+            disk.get_diskspace()
         self.load_worker = None
         self.set_status("idle")
 

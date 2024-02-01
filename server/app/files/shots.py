@@ -120,6 +120,7 @@ class Shots:
             pass
 
     def load_shots_from_dir(self, directory):
+        loaded_cnt = 0
         for path in glob.glob(os.path.join(directory, "*")):
             if os.path.exists(os.path.join(path, "metadata.json")) or os.path.exists(os.path.join(path, "images","normal")) or (os.path.exists(os.path.join(path, "normal")) and os.path.exists(os.path.join(path, "projection"))  ):
                 shot_id = os.path.split(path)[1]
@@ -127,10 +128,12 @@ class Shots:
                 if shot is None:
                     shot = Shot(path, shot_id, self)
                     self.shots.append(shot)
+                    loaded_cnt += 1
                     for model in shot.models:
                         if model.status == "waiting" and model not in self.unprocessed_models:
                             self.unprocessed_models.append(model)
         self.shots.sort(reverse=True)
+        return loaded_cnt
 
     def unload_dir(self, directory):
         for shot in [s for s in self.shots]:

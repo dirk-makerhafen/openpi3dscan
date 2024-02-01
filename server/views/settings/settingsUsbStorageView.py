@@ -8,6 +8,7 @@ class UsbDiskView(PyHtmlView):
         <td>{{pyview.subject.status}}</td>
         <td>{{pyview.subject.disk_total}}</td>
         <td>{{pyview.subject.disk_free}}</td>
+        <td>{{pyview.subject.nr_of_shots}}</td>
         <td>{{pyview.subject.is_primary}}</td>
         <td>
         {% if pyview.subject.status == "Active" %}
@@ -15,7 +16,7 @@ class UsbDiskView(PyHtmlView):
         {% elif  pyview.subject.status == "" %} 
         <button style="width:50%"  class="btn btnfw" onclick="pyview.subject.mount()">Activate</button>
         {% endif %}  
-        <button class="btn btnfw" onclick="pyview.subject.set_as_primary()">Set as Primary</button>
+        <button style="width:50%" class="btn btnfw" onclick="pyview.subject.set_as_primary()">Set as Primary</button>
         </td>
         </tr>
     '''
@@ -45,6 +46,7 @@ class UsbStorageView(PyHtmlView):
                                             <th style="text-align:center">Status</th>
                                             <th style="text-align:center">Disk Size</th>
                                             <th style="text-align:center">Disk Free</th>
+                                            <th style="text-align:center">Shots</th>
                                             <th style="text-align:center">Primary</th>
                                             <th style="text-align:center">Action</th>
                                         </tr>

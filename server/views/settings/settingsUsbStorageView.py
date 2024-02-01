@@ -11,14 +11,14 @@ class UsbDiskView(PyHtmlView):
         <td>{{pyview.subject.oldest_shot}} / {{pyview.subject.newest_shot}}</td>
         <td>{{pyview.subject.is_primary}}</td>
         <td>
-        {% if pyview.subject.status == "Active" %}
-        <button style="width:50%" class="btn btnfw" onclick="pyview.subject.unload()">Eject</button>
-        {% elif  pyview.subject.status == "" %} 
-        <button style="width:50%"  class="btn btnfw" onclick="pyview.subject.load()">Activate</button>
-        {% endif %}  
-        {% if pyview.subject.is_primary == false %}
-            <button style="width:50%" class="btn btnfw" onclick="pyview.subject.set_as_primary()">Set as Primary</button>
-         {% endif %}  
+            {% if pyview.subject.status == "Active" %}
+            <button style="width:50%" class="btn btnfw" onclick="pyview.subject.unload()">Eject</button>
+            {% elif  pyview.subject.status == "" %} 
+            <button style="width:50%"  class="btn btnfw" onclick="pyview.subject.load()">Activate</button>
+            {% endif %}  
+            {% if pyview.subject.is_primary == false %}
+                <button style="width:50%" class="btn btnfw" onclick="pyview.subject.set_as_primary()">Set as Primary</button>
+            {% endif %}  
         </td>
         </tr>
     '''
@@ -39,6 +39,11 @@ class UsbStorageView(PyHtmlView):
                             <div class="col-md-3">
                                 <strong class="mb-0">USB-Disks</strong>
                                 <p class="text-muted mb-0">List of connected USB Disks</p>
+                                {% if pyview.subject.status == "idle" %}
+                                    <button class="btn btnfw" onclick="pyview.subject.load()">Reload</button>
+                                {% else %}
+                                    <button class="btn btnfw">{{pyview.subject.status }}</button>
+                                {% endif %}
                             </div>
                             <div class="col-md-7">
                                 <table style="width:100%;text-align:center">
@@ -55,13 +60,6 @@ class UsbStorageView(PyHtmlView):
                                     </thead>                                
                                     {{ pyview.disks.render() }}
                                 </table>   
-                            </div>
-                            <div class="col-md-2" style="text-align:center">
-                                {% if pyview.subject.status == "idle" %}
-                                    <button class="btn btnfw" onclick="pyview.subject.load()">Reload</button>
-                                {% else %}
-                                    <p> {{pyview.subject.status }} </p>
-                                {% endif %}
                             </div>
                         </div>
                     </div>

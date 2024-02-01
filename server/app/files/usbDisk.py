@@ -27,7 +27,7 @@ class UsbDisk(Observable):
 
     def set_status(self, status):
         self.status = status
-        self.notify_observers()
+        self.usb_disks.notify_observers()
 
     def mount(self):
         self.set_status("Loading")

@@ -1,6 +1,25 @@
-from pyhtmlgui import PyHtmlView
+from pyhtmlgui import PyHtmlView,ObservableListView
 
 
+class UsbDiskView(PyHtmlView):
+    TEMPLATE_STR = '''
+        <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
+        <td>{{pyview.subject.label}}</td>
+        <td>{{pyview.subject.status}}</td>
+        <td>{{pyview.subject.disk_total}}</td>
+        <td>{{pyview.subject.disk_free}}</td>
+        <td>{{pyview.subject.is_primary}}</td>
+        <td>
+        {% if disk.status == "Active" %}
+        <button style="width:50%" class="btn btnfw" onclick="pyview.subject.umount()">Eject</button>
+        {% elif  disk.status == "" %} 
+        <button style="width:50%"  class="btn btnfw" onclick="pyview.subject.mount()">Activate</button>
+        {% endif %}  
+        <button class="btn btnfw" onclick="pyview.subject.set_as_primary()">Set as Primary</button>
+        </td>
+        </tr>
+    '''
+    
 class UsbStorageView(PyHtmlView):
     TEMPLATE_STR = '''
     <div class="Storage">
@@ -30,23 +49,7 @@ class UsbStorageView(PyHtmlView):
                                             <th style="text-align:center">Action</th>
                                         </tr>
                                     </thead>                                
-                                    {% for disk in pyview.subject.disks %}
-                                        <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
-                                            <td>{{disk.label}}</td>
-                                            <td>{{disk.status}}</td>
-                                            <td>{{disk.disk_total}}</td>
-                                            <td>{{disk.disk_free}}</td>
-                                            <td>{{disk.is_primary}}</td>
-                                            <td>
-                                                {% if disk.status == "Active" %}
-                                                    <button class="btn btnfw" onclick="disk.umount()">Eject</button>
-                                                {% elif  disk.status == "" %} 
-                                                    <button class="btn btnfw" onclick="disk.mount()">Activate</button>
-                                                {% endif %}  
-                                                <button class="btn btnfw" onclick="disk.set_as_primary()">Set as Primary</button>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
+                                    {{ pyview.disks.render() }}
                                 </table>   
                             </div>
                             <div class="col-md-2" style="text-align:center">
@@ -63,3 +66,7 @@ class UsbStorageView(PyHtmlView):
         </div>
     </div>   
     '''
+
+    def __init__(self, subject, parent):
+        super().__init__(subject, parent)
+        self.disks = ObservableListView(subject=subject.disks, parent=self, item_class=UsbDiskView, dom_element="tbody")

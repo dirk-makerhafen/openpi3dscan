@@ -39,7 +39,7 @@ class Task_NetworkScan(Observable):
             ip = "%s.%s" % (ip_base, i)
             ips.append(ip)
 
-        with ThreadPool(15) as pool:
+        with ThreadPool(10) as pool:
             ping_results = pool.map(lambda ip: self._ping(ip), ips)
             ips_active = [ips[i] for i, item in enumerate(ping_results) if item is not False]
             self.set_status("api_scan")
@@ -60,9 +60,9 @@ class Task_NetworkScan(Observable):
                         except:
                             device.version = "unknown"
                         DevicesInstance().devices.append(device)
-                        if device.device_type == "camera":
-                            device.camera.shots.refresh_list()
-                            # device.camera.performance.receive()
+                    if device.device_type == "camera":
+                        device.camera.shots.refresh_list()
+                        # device.camera.performance.receive()
 
                     device.online_api = True
                     if device.ip != ip:  # ip changed or new id:

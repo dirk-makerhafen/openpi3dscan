@@ -24,13 +24,13 @@ class Shots:
     def path(self):
         return os.path.join("/shots/", self.settingsInstance.primary_disk)
 
-    def create(self, shot_id, name):
+    def path_avail(self):
         try:
             stdout = subprocess.check_output('mount | grep %s' % self.path, shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
         if self.path not in stdout:
-            return None
+            return False
         try:
             stdout = subprocess.check_output('lsblk -bfpro MOUNTPOINT,FSAVAIL | grep %s' % self.path, shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
@@ -41,10 +41,14 @@ class Shots:
         try:
             mp, fsavail = line.split(" ")
             if int(fsavail) < 10*1024*1024*1024:
-                return None
+                return False
         except:
             pass
+        return True
 
+    def create(self, shot_id, name):
+        if self.path_avail() is False:
+            return None
         s = Shot(os.path.join(self.path, shot_id), shot_id, self)
         s.meta_location = SettingsInstance().settingsScanner.location
         s.meta_max_segments = SettingsInstance().settingsScanner.segments
@@ -74,15 +78,15 @@ class Shots:
             device.camera.shots.delete(shot_id)
             return
         s = self.get(shot_id)
-        if s is None:
-            s = Shot(os.path.join(self.path, shot_id), shot_id, self)
-            index = 0
-            for i in range(len(self.shots)):
-                index = i
-                if self.shots[index] < s:
-                    break
-            self.shots.insert(index, s)
-            self.cache[shot_id] = s
+        #if s is None:
+        #    s = Shot(os.path.join(self.path, shot_id), shot_id, self)
+        #    index = 0
+         #   for i in range(len(self.shots)):
+        #        index = i
+        #        if self.shots[index] < s:
+        #            break
+        #    self.shots.insert(index, s)
+        #    self.cache[shot_id] = s
         s.add_device(device)
         return s
 

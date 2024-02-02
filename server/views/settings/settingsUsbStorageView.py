@@ -42,7 +42,7 @@ class UsbStorageView(PyHtmlView):
                                 {% if pyview.subject.status == "idle" %}
                                     <button class="btn btnfw" onclick="pyview.subject.load()">Reload</button>
                                 {% else %}
-                                    <button class="btn btnfw">{{pyview.subject.status }}</button>
+                                    <p>{{pyview.subject.status }}</p>
                                 {% endif %}
                             </div>
                             <div class="col-md-9">

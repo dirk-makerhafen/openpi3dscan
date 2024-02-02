@@ -17,6 +17,8 @@ class UsbDisks(Observable):
             if len(self.disks) > 1:
                 break
             time.sleep(10)
+        for disk in self.disks:
+            disk.load()
 
     def set_primary(self, uuid):
         SettingsInstance().set_primary_disk(uuid)
@@ -49,7 +51,6 @@ class UsbDisks(Observable):
                 if disk is None:
                     disk = UsbDisk(self, name, fssize, label, uuid)
                     self.disks.append(disk)
-                    disk.load()
 
             except Exception as e:
                 print(e)

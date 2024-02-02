@@ -7,7 +7,7 @@ class UsbDiskView(PyHtmlView):
         <td>{{pyview.subject.label}}</td>
         <td>{{pyview.subject.status}}</td>
         <td>{{pyview.subject.disk_free}} / {{pyview.subject.disk_total}}</td>
-        <td>{{pyview.subject.shots_loaded}} / {{pyview.subject.shots_available}}</td>
+        <td> {{pyview.subject.shots_available}}</td>
         <td>{{pyview.subject.oldest_shot}} / {{pyview.subject.newest_shot}}</td>
         <td>{{pyview.subject.is_primary}}</td>
         <td>
@@ -52,8 +52,8 @@ class UsbStorageView(PyHtmlView):
                                             <th style="text-align:center">Name</th>
                                             <th style="text-align:center">Status</th>
                                             <th style="text-align:center">Disk Free / Size</th>
-                                            <th style="text-align:center">Shots Loaded / Avail</th>
-                                            <th style="text-align:center">Shots From / To</th>
+                                            <th style="text-align:center">Nr of Shots</th>
+                                            <th style="text-align:center">From / To</th>
                                             <th style="text-align:center">Primary</th>
                                             <th style="text-align:center">Action</th>
                                         </tr>

@@ -19,7 +19,6 @@ class UsbDisk(Observable):
         self.disk_free = ""
         self.status = ""
         self.shots_available = 0
-        self.shots_loaded = 0
         self.oldest_shot = ""
         self.newest_shot = ""
 
@@ -38,14 +37,13 @@ class UsbDisk(Observable):
         self.set_status("Loading")
         self.mount()
         self.load_stats()
-        self.shots_loaded = ShotsInstance().load_shots_from_dir("/shots/%s" % self.uuid)
+        ShotsInstance().load_shots_from_dir("/shots/%s" % self.uuid)
         self.set_status("Active")
 
     def unload(self):
         self.set_status("Unloading")
         ShotsInstance().unload_dir("/shots/%s" % self.uuid)
         self.umount()
-        self.shots_loaded = 0
         self.set_status("")
 
     def mount(self):

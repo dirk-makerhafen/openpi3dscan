@@ -1,6 +1,7 @@
 import glob
 import json
 import os
+import subprocess
 from pyhtmlgui import ObservableList
 
 from app.files.shot import Shot
@@ -24,6 +25,26 @@ class Shots:
         return os.path.join("/shots/", self.settingsInstance.primary_disk)
 
     def create(self, shot_id, name):
+        try:
+            stdout = subprocess.check_output('mount | grep %s' % self.path, shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+        except:
+            stdout = ""
+        if self.path not in stdout:
+            return None
+        try:
+            stdout = subprocess.check_output('lsblk -bfpro MOUNTPOINT,FSAVAIL | grep %s' % self.path, shell=True, timeout=10, stderr=subprocess.STDOUT, ).decode("UTF-8")
+        except:
+            stdout = ""
+        line = stdout.split("\n")[0]
+        while "  " in line:
+            line = line.replace("  ", " ")
+        try:
+            mp, fsavail = line.split(" ")
+            if int(fsavail) < 10*1024*1024*1024:
+                return None
+        except:
+            pass
+
         s = Shot(os.path.join(self.path, shot_id), shot_id, self)
         s.meta_location = SettingsInstance().settingsScanner.location
         s.meta_max_segments = SettingsInstance().settingsScanner.segments

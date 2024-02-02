@@ -95,6 +95,7 @@ class TaskCreateShotView(PyHtmlView):
                     padding-top: 20%;
                     z-index: 999;
             "> 
+                {% if pyview.subject.status == "failed"  %} Failed, check disk space {% endif %}
                 {% if pyview.subject.status == "preparing"  %} Warmup {% endif %}
                 {% if pyview.subject.status == "waiting"    %} Shot in {{pyview.subject.shot_count_down}}  {% endif %}
                 {% if pyview.subject.status == "shot"       %} SHOT {% endif %}

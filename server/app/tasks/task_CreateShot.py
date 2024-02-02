@@ -58,6 +58,12 @@ class Task_CreateShot(Observable):
             device.lock(6)  # lock early to prevent previews and other querys to camera
 
         shot = ShotsInstance().create(shot_id, shot_name)
+        if shot is None:
+            self.set_status("failed")
+            time.sleep(4)
+            self.set_status("idle")
+            self.worker = None
+            return
 
         if self.shot_quality == "quality":
             image_aquisition_time = 1.0 / 3.5

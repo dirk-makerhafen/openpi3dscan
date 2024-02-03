@@ -36,7 +36,7 @@ class UsbDisks(Observable):
     def _load(self):
         self.set_status("reloading")
         try:
-            stdout = subprocess.check_output('lsblk -fpro NAME,FSSIZE,LABEL,UUID,MOUNTPOINT | grep -i /dev/sd ', shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
+            stdout = subprocess.check_output('lsblk -fpro NAME,FSSIZE,LABEL,UUID,MOUNTPOINT | grep -i /dev/sd | grep -v rootfs | grep -v boot', shell=True, timeout=30, stderr=subprocess.STDOUT, ).decode("UTF-8")
         except:
             stdout = ""
 

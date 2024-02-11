@@ -22,16 +22,16 @@ class Framebuffer(object):
         self.fb_bytesize = self.size[0] * self.size[1] * (self.bits_per_pixel//8)
         self.empty_image = b'\0' * self.fb_bytesize
         self.fb = open(self.path, "wb")
-        self.projection_file_name = "projection_%sx%sx%s.fb" % (self.size[0], self.size[1], self.bits_per_pixel)
-        self.projection_file_path = os.path.join(SCRIPT_DIR, self.projection_file_name)
-        if not os.path.exists(self.projection_file_path):
-            pi = ProjectorImage_new(self.size[0], self.size[1], 11)
-            self.fb_image = pi.get_fb()
-            with open(self.projection_file_path, "wb") as f:
-                f.write(self.fb_image)
-        else:
-            with open(self.projection_file_path, "rb") as f:
-                self.fb_image  = f.read()
+        #self.projection_file_name = "projection_%sx%sx%s.fb" % (self.size[0], self.size[1], self.bits_per_pixel)
+        #self.projection_file_path = os.path.join(SCRIPT_DIR, self.projection_file_name)
+        #if not os.path.exists(self.projection_file_path):
+        pi = ProjectorImage_new(self.size[0], self.size[1], 11)
+        self.fb_image = pi.get_fb()
+        #    with open(self.projection_file_path, "wb") as f:
+        #        f.write(self.fb_image)
+        #else:
+        #    with open(self.projection_file_path, "rb") as f:
+        #        self.fb_image  = f.read()
 
     def show(self):
         self.fb.write(self.fb_image)

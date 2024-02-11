@@ -62,6 +62,7 @@ class ShotFilesModelFilesView(PyHtmlView):
                                    if(v=="glb"||v=="gif"||v=="webp"||v=="holobox"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
                                     <option value="obj">OBJ</option>
                                     <option value="stl">STL</option>
+                                    <option value="stl_printready">STL PrintReady</option>
                                     <option value="3mf">3MF</option>
                                     <option value="glb">GLB</option>
                                     <option value="fbx">FBX</option>

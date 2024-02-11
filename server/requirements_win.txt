@@ -9,3 +9,6 @@ PyQt5
 PyQtWebEngine
 flask
 flask-sock
+trimesh
+numpy
+shutil

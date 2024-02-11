@@ -208,7 +208,7 @@ class RealityCapture():
             self.shot_name = self.source_folder.split('\\')[-1]
         self.shot_name = self._clean_shot_name(self.shot_name)
         self.filetype = filetype
-        self.fileextension = "glb" if self.filetype in ["gif","webp", "holobox"] else self.filetype
+        self.fileextension = "glb" if self.filetype in ["gif","webp", "holobox"] else "stl" if self.filetype == "stl_printready" else self.filetype
         self.reconstruction_quality = reconstruction_quality
         self.quality = quality
         self.create_mesh_from = create_mesh_from
@@ -220,7 +220,8 @@ class RealityCapture():
         self.create_textures_str = "T" if create_textures is True else ""
         self.litUnlitStr = "" if self.filetype not in ["gif", "webp", "glb"] else ("L" if self.lit else "U") if self.create_textures else ""
         self.realityCapture_filename = "realityCapture_%s%s%s" % (self.reconstruction_quality_str, self.create_mesh_from_str, self.create_textures_str)
-        self.export_filename   = "%s_%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr ,self.fileextension)
+        self.printready = "R" if self.filetype == "stl_printready" else ""
+        self.export_filename   = "%s_%s%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.printready, self.fileextension)
         self.export_foldername = "%s_%s%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.filetype)
         self.available_markers = []
         self.alignments = []

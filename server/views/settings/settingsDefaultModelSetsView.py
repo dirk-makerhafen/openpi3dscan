@@ -63,6 +63,7 @@ class SettingsDefaultModelSetsView(PyHtmlView):
                             if(v=="glb"||v=="gif"||v=="webp"||v=="holobox"){ $("#lit_unlit").prop("disabled", false); }else{ $("#lit_unlit").prop("disabled", true);$("#lit_unlit")[0].checked = true; }'>
                                 <option value="obj">OBJ</option>
                                 <option value="stl">STL</option>
+                                <option value="stl_printready">STL PrintReady</option>
                                 <option value="3mf">3MF</option>
                                 <option value="glb">GLB</option>
                                 <option value="fbx">FBX</option>
@@ -108,4 +109,3 @@ class SettingsDefaultModelSetsView(PyHtmlView):
     def __init__(self, subject, parent, **kwargs):
         super().__init__(subject, parent, **kwargs)
         self.defaultModelView = ObservableListView(self.subject.default_models, self, item_class=SettingsDefaultModelView, dom_element="tbody")
-

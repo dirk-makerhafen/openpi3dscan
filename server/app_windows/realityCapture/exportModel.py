@@ -126,7 +126,6 @@ class ExportModel(GenericTask):
 
     def create_plate(self, input_file):
         output_file = input_file.replace(".stl", "_TAG.stl")
-        print("input_file", input_file)
         fname = input_file.split("/")[-1].split("\\")[-1]
         day = fname.split(" ",2)[0].split(".")[2]
         month = fname.split(" ",2)[0].split(".")[1]
@@ -139,18 +138,14 @@ class ExportModel(GenericTask):
         with open(nameplate_scad_script, "w") as f:
             f.write(scad_script)
 
-        command = [
+        subprocess.run([
             openscad_path,
             '-o', output_file,
             os.path.join(self.rc_job.workingdir, "nameplate.scad"),
             f'-D', f'text="{name}"',
             f'-D', f'date="{date}"',
             f'-D', f'length={length}'
-        ]
-
-        # Run the command, suppressing stderr by redirecting it to subprocess.DEVNULL
-        result = subprocess.run(command)
-        print("result", result)
+        ])
         os.remove(nameplate_scad_script)
         return output_file
 

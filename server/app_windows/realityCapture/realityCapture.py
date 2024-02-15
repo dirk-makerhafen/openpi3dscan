@@ -48,7 +48,7 @@ class RealityCapture(Observable):
         self.model_id = model_id
         self.shot_name = self._clean_shot_name(shot_name if shot_name != "" else self.shot_id)
         self.filetype = filetype
-        self.fileextension = "glb" if self.filetype in ["gif","webp", "holobox"] else self.filetype
+        self.fileextension = "glb" if self.filetype in ["gif","webp", "holobox"] else "stl" if self.filetype == "stl_printready" else self.filetype
         self.reconstruction_quality = reconstruction_quality
         self.export_quality = export_quality
         self.create_mesh_from = create_mesh_from
@@ -68,9 +68,9 @@ class RealityCapture(Observable):
         self.create_mesh_from_str = create_mesh_from[0].upper()
         self.create_textures_str = "T" if create_textures is True else ""
         self.litUnlitStr = "" if self.filetype not in ["gif", "webp", "glb","holobox"] else ("L" if self.lit else "U") if self.create_textures else ""
-
+        self.printready = "R" if self.filetype == "stl_printready" else ""
         self.realityCapture_filename = "rc_%s%s%s" % (self.reconstruction_quality_str, self.create_mesh_from_str, self.create_textures_str)
-        self.export_filename   = "%s_%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr ,self.fileextension)
+        self.export_filename   = "%s_%s%s%s%s%s%s.%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.printready ,self.fileextension)
         self.export_foldername = "%s_%s%s%s%s%s_%s" % ( self.shot_name, self.reconstruction_quality_str, self.quality_str, self.create_mesh_from_str, self.create_textures_str, self.litUnlitStr, self.filetype)
 
         self.result_file = None

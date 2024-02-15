@@ -126,7 +126,8 @@ class ExportModel(GenericTask):
 
     def create_plate(self, input_file):
         output_file = input_file.replace(".stl", "_TAG.stl")
-        fname = input_file.split("/")[-1]
+        print("input_file", input_file)
+        fname = input_file.split("/")[-1].split("\\")[-1]
         day = fname.split(" ",2)[0].split(".")[2]
         month = fname.split(" ",2)[0].split(".")[1]
         date = fname.split(" ",2)[1]
@@ -134,17 +135,23 @@ class ExportModel(GenericTask):
         date = "%s.%s %s" % ( day, month, date)
         length = max([len(name), len(date)])
 
+        nameplate_scad_script = os.path.join(self.rc_job.workingdir, "nameplate.scad")
+        with open(nameplate_scad_script, "w") as f:
+            f.write(scad_script)
+
         command = [
             openscad_path,
             '-o', output_file,
-            'nameplate.scad',
+            os.path.join(self.rc_job.workingdir, "nameplate.scad"),
             f'-D', f'text="{name}"',
             f'-D', f'date="{date}"',
             f'-D', f'length={length}'
         ]
 
         # Run the command, suppressing stderr by redirecting it to subprocess.DEVNULL
-        result = subprocess.run(command, stderr=subprocess.DEVNULL)
+        result = subprocess.run(command)
+        print("result", result)
+        os.remove(nameplate_scad_script)
         return output_file
 
     def extract_vertexes(self, mesh, lower_limit = 0.05, upper_limit = 0.3):
@@ -196,9 +203,7 @@ class ExportModel(GenericTask):
 
     def add_plate(self, input_file):
         self.log.append("Preparing printer ready stl")
-        nameplate_scad_script = os.path.join(self.rc_job.workingdir, "nameplate.scad")
-        with open(nameplate_scad_script, "w") as f:
-            f.write(scad_script)
+
         model_mesh = trimesh.load(input_file)  # load model
 
         model_mesh.apply_scale(100)   # scale to mm 1:10 model
@@ -229,7 +234,6 @@ class ExportModel(GenericTask):
         combined_mesh = trimesh.util.concatenate([model_mesh, plate_mesh])
         combined_mesh.export(input_file)
 
-        os.remove(nameplate_scad_script)
         os.remove(plate_file)
 
 

@@ -68,12 +68,15 @@ class Shot(Observable):
         self.status = ""
         self.publishing_status = ObservableValue("can_publish") # can_publish, state_changing, can_unpublish
         self.comment = ObservableValue("")
-        self.meta_location = self.settingsInstance.settingsScanner.location
-        self.meta_max_segments = self.settingsInstance.settingsScanner.segments
-        self.meta_max_rows = self.settingsInstance.settingsScanner.cameras_per_segment
-        self.meta_rotation = self.settingsInstance.settingsScanner.camera_rotation
-        self.meta_camera_one_position = self.settingsInstance.settingsScanner.camera_one_position
-        self.meta_first_camera_number = self.settingsInstance.settingsScanner.first_camera_number
+        try:
+            self.meta_location = self.settingsInstance.settingsScanner.location
+            self.meta_max_segments = self.settingsInstance.settingsScanner.segments
+            self.meta_max_rows = self.settingsInstance.settingsScanner.cameras_per_segment
+            self.meta_rotation = self.settingsInstance.settingsScanner.camera_rotation
+            self.meta_camera_one_position = self.settingsInstance.settingsScanner.camera_one_position
+            self.meta_first_camera_number = self.settingsInstance.settingsScanner.first_camera_number
+        except:
+            pass
         self.license_data = ""
         self.nr_of_files = ObservableValue(0)
         self.worker = None

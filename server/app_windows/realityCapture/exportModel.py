@@ -5,6 +5,7 @@ import sys, os
 import numpy as np
 import trimesh
 import platform
+import subprocess
 import shutil
 
 scad_script = '''
@@ -132,7 +133,18 @@ class ExportModel(GenericTask):
         name = self.capfirst("_".join(fname.split(" ",2)[2].split("_")[:-1])).replace(" ","")
         date = "%s.%s %s" % ( day, month, date)
         length = max([len(name), len(date)])
-        os.system('%s -o "%s" nameplate.scad -D \'text="%s"\'  -D \'date="%s"\' -D \'length=%s\' 2>/dev/null' % (openscad_path,  output_file, name, date, length))
+
+        command = [
+            openscad_path,
+            '-o', output_file,
+            'nameplate.scad',
+            f'-D', f'text="{name}"',
+            f'-D', f'date="{date}"',
+            f'-D', f'length={length}'
+        ]
+
+        # Run the command, suppressing stderr by redirecting it to subprocess.DEVNULL
+        result = subprocess.run(command, stderr=subprocess.DEVNULL)
         return output_file
 
     def extract_vertexes(self, mesh, lower_limit = 0.05, upper_limit = 0.3):

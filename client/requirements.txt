@@ -1,7 +1,7 @@
 bottle
 requests
 picamera
-pillow
+pillow==4.0.0
 Adafruit-PCA9685
 numpy==1.13.3
 paste

@@ -103,8 +103,12 @@ class ExportModel(GenericTask):
             glbf.materials[0].emissiveTexture = TextureInfo(index=0)
             glbf.save(self.output_model_path)
 
-        if self.rc_job.filetype == "stl_printready":
-            self.add_plate(self.output_model_path)
+
+        if self.rc_job.filetype == "stl_printready" or self.rc_job.filetype == "stl":
+            try:
+                self.add_plate(self.output_model_path, tilt=self.rc_job.filetype == "stl_printready")
+            except:
+                self.log.append("Failed to add Nameplate, check OpenScad installation")
 
         if not os.path.exists(self.output_model_path):
             self.log.append("Print preparation failed, %s not found." % self.output_model_path)
@@ -196,7 +200,7 @@ class ExportModel(GenericTask):
                 smallest_angle = i*angle_step
         original_mesh.apply_transform(trimesh.transformations.rotation_matrix( np.deg2rad(smallest_angle-back_angle), [0, 0, 1], center))
 
-    def add_plate(self, input_file):
+    def add_plate(self, input_file, tilt):
         self.log.append("Preparing printer ready stl")
 
         model_mesh = trimesh.load(input_file)  # load model
@@ -212,12 +216,10 @@ class ExportModel(GenericTask):
         self.center_model(model_mesh)
 
         z_dim = model_mesh.bounds[1][2] - model_mesh.bounds[0][2]  # Max X - Min X
-        if z_dim > 60:
+        if z_dim > 60 and tilt is True:
             backward_angle = 25  # tilt model backwards for better printing
             model_mesh.apply_transform(trimesh.transformations.rotation_matrix(np.deg2rad(-backward_angle), [1, 0, 0], model_mesh.centroid))
             model_mesh.apply_translation([0, 0, -model_mesh.bounds[0][2]])  # # Translate the mesh so that its lowest point is at Z=0
-        else:
-            print(" Model too small, %s mm high, not tilting" % int(z_dim))
 
         plate_file = self.create_plate(input_file)  # create plate
         plate_mesh = trimesh.load(plate_file)  # load plate model

@@ -78,15 +78,16 @@ class Shots:
             device.camera.shots.delete(shot_id)
             return
         s = self.get(shot_id)
-        #if s is None:
-        #    s = Shot(os.path.join(self.path, shot_id), shot_id, self)
-        #    index = 0
-         #   for i in range(len(self.shots)):
-        #        index = i
-        #        if self.shots[index] < s:
-        #            break
-        #    self.shots.insert(index, s)
-        #    self.cache[shot_id] = s
+
+        if s is None:
+            s = Shot(os.path.join(self.path, shot_id), shot_id, self)
+            index = 0
+            for i in range(len(self.shots)):
+                index = i
+                if self.shots[index] < s:
+                    break
+            self.shots.insert(index, s)
+            self.cache[shot_id] = s
         s.add_device(device)
         return s
 

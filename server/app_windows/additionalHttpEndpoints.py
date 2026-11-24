@@ -82,13 +82,12 @@ class HttpEndpoints:
         shot = ShotsInstance().get(shot_id)
         if shot is None:
             return
-        mf = ModelFile(parentShot=shot)
         for file in files:
-            print("here", file, file.filename)
             if file.filename == "":
                 continue
             if len([m for m in shot.models if m.is_custom_upload is True and m.filename == file.filename]) > 0:
                 continue
+            mf = ModelFile(parentShot=shot)
             mf.from_custom_upload(file.filename, file)
             shot.models.append(mf)
             shot.save()

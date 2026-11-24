@@ -4,8 +4,9 @@ from app.settings.settings import CLEANUP_DELETE_PERCENT_MAX, SettingsInstance
 
 
 class UsbDiskView(PyHtmlView):
+    DOM_ELEMENT = "tr"
+    DOM_ELEMENT_EXTRAS = 'style="border-top: 1px solid lightgray; line-height: 3em;"'
     TEMPLATE_STR = '''
-        <tr style="border-top: 1px solid lightgray;   line-height: 3em;">
         <td>{{pyview.subject.label}}</td>
         <td>{{pyview.subject.status}}</td>
         <td>{{pyview.subject.disk_free}} / {{pyview.subject.disk_total}}</td>
@@ -22,7 +23,6 @@ class UsbDiskView(PyHtmlView):
                 <button style="width:50%" class="btn btnfw" onclick="pyview.subject.set_as_primary()">Set as Primary</button>
             {% endif %}
         </td>
-        </tr>
     '''
 
 class UsbStorageView(PyHtmlView):

@@ -6,7 +6,7 @@ import subprocess
 from pyhtmlgui import ObservableList
 
 from app.files.shot import Shot
-from app.settings.settings import SettingsInstance
+from app.settings.settings import CLEANUP_DELETE_PERCENT_MAX, SettingsInstance
 from app.dropbox.process import DropboxUploads
 
 # Minimum free space needed to create a shot (shown as "Failed, check disk space").
@@ -65,7 +65,7 @@ class Shots:
         if percent is None:
             percent = SettingsInstance().cleanup_delete_percent
         try:
-            percent = max(1, min(int(percent), 100))
+            percent = max(0, min(int(percent), CLEANUP_DELETE_PERCENT_MAX))
         except:
             percent = CLEANUP_DELETE_PERCENT_DEFAULT
         if total <= 1:
@@ -82,10 +82,11 @@ class Shots:
     def cleanup_preview(self, directory=None, percent=None):
         directory = directory or self.path
         shots = self._cleanup_shots(directory)
-        deletable = [s for s in shots if s.can_delete]
+        to_delete = shots[:self._cleanup_delete_count(len(shots), percent)]
+        deletable = [s for s in to_delete if s.can_delete]
         return {
-            "count": min(self._cleanup_delete_count(len(shots), percent), len(deletable)),
-            "skipped": len(shots) - len(deletable),
+            "count": len(deletable),
+            "skipped": len(to_delete) - len(deletable),
             "total": len(shots),
             "free_bytes": self._free_bytes(directory),
         }
@@ -93,24 +94,23 @@ class Shots:
     def cleanup_old_scans(self, directory=None, percent=None):
         """Delete the configured percentage of the oldest scans on a disk.
 
-        Shots that are busy (syncing or publishing a public dropbox folder)
-        are skipped, and the last remaining scan is never deleted.
+        Only scans within that oldest slice are considered; busy ones are
+        skipped, and the last remaining scan is never deleted.
         """
         directory = directory or self.path
         shots = self._cleanup_shots(directory)
-        deletable = [s for s in shots if s.can_delete]
-        to_delete = deletable[:self._cleanup_delete_count(len(shots), percent)]
+        to_delete = shots[:self._cleanup_delete_count(len(shots), percent)]
         free_before = self._free_bytes(directory)
         deleted = 0
         for shot in to_delete:
             try:
-                self.delete(shot)
-                deleted += 1
+                if self.delete(shot):
+                    deleted += 1
             except Exception as e:
                 print("failed to delete shot '%s': %s" % (shot.shot_id, e))
         return {
             "deleted": deleted,
-            "skipped": len(shots) - len(deletable),
+            "skipped": len(to_delete) - deleted,
             "total": len(shots),
             "free_before": free_before,
             "free_after": self._free_bytes(directory),
@@ -162,16 +162,18 @@ class Shots:
         return s
 
     def delete(self, shot):
-        if shot is not None:
-            shot.delete()
-            self.shots.remove(shot)
-            try:
-                del self.cache[shot.shot_id]
-            except:
-                pass
-            self._add_deleted_shot_id(shot.shot_id)
-        else:
+        if shot is None:
             print("shot not found")
+            return False
+        if shot.delete() is False:
+            return False
+        self.shots.remove(shot)
+        try:
+            del self.cache[shot.shot_id]
+        except:
+            pass
+        self._add_deleted_shot_id(shot.shot_id)
+        return True
 
     def sync_shotlist(self, shot_ids, device):
         for shot_id in shot_ids:

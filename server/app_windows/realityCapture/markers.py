@@ -19,6 +19,7 @@ class Markers(GenericTask):
             return
 
         self.set_status("active")
+        needed_markers = max(1, math.ceil(len(self.distances) / 20.0))
 
         if force_reload is True and os.path.exists(markers_csv):
             self.log.append("Removing cached markers")
@@ -27,10 +28,10 @@ class Markers(GenericTask):
         if os.path.exists(markers_csv):
             self._load_markers_csv(markers_csv)
             self.log.append("%s of %s Markers loaded from cache" % (len(self.available_markers), len(self.distances)))
-            if len(self.available_markers) >= math.floor(len(self.distances) / 20.0):
+            if len(self.available_markers) >= needed_markers:
                 self.set_status("success")
                 return
-            self.log.append("less than 10% of markers loaded, must run detection")
+            self.log.append("not enough markers loaded, must run detection")
 
         cmd = self._get_cmd_start()
         cmd += self._get_cmd_new_scene()
@@ -45,8 +46,8 @@ class Markers(GenericTask):
             self._load_markers_csv(markers_csv)
             self.log.append("%s of %s Markers detected" % (len(self.available_markers),  len(self.distances)))
 
-            if len(self.available_markers) < math.floor(len(self.distances)/20.0):
-                self.log.append("less than 5% of markers detected, failed")
+            if len(self.available_markers) < needed_markers:
+                self.log.append("not enough markers detected, failed")
                 self.set_status("failed")
             else:
                 self.set_status("success")

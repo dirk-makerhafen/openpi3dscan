@@ -11,7 +11,8 @@ from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsDropbox import SettingsDropbox
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2026.11.24-22:05"
+VERSION = "2026.11.24-22:32"
+CLEANUP_DELETE_PERCENT_MAX = 50
 
 class Settings(Observable):
     def __init__(self, devicesInstance):
@@ -110,7 +111,7 @@ class Settings(Observable):
         except:
             pass
         try:
-            self.cleanup_delete_percent = int(data["cleanup_delete_percent"])
+            self.cleanup_delete_percent = max(0, min(int(data["cleanup_delete_percent"]), CLEANUP_DELETE_PERCENT_MAX))
         except:
             pass
 
@@ -123,8 +124,10 @@ class Settings(Observable):
         self.notify_observers()
 
     def set_cleanup_delete_percent(self, value):
+        if self.locked:
+            return
         try:
-            self.cleanup_delete_percent = max(1, min(int(value), 100))
+            self.cleanup_delete_percent = max(0, min(int(value), CLEANUP_DELETE_PERCENT_MAX))
         except:
             return
         self.save()

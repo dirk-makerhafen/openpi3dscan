@@ -15,7 +15,8 @@ class Download(GenericTask):
 
     def run(self):
         self.set_status("active")
-        if os.path.exists(os.path.join(self.rc_job.workingdir, "images")):
+        images_dir = os.path.join(self.rc_job.workingdir, "images")
+        if len(glob.glob(os.path.join(images_dir, "*", "*.jpg"))) > 0:
             self.log.append("Not downloading, exists in cache")
             self.set_status("success")
             return
@@ -51,19 +52,30 @@ class Download(GenericTask):
 
         try:
             subprocess.check_output(shlex.split("powershell -command \"Expand-Archive '%s.zip'\"" % (name)),shell=False, creationflags=CREATE_NO_WINDOW, cwd=source_dir)
-        except:
-            pass
-        os.remove(path)
-        if not os.path.exists(os.path.join(source_dir, "images")):
-            os.mkdir(os.path.join(source_dir, "images"))
+        except Exception as e:
+            self.log.append("Unpacking failed: %s" % e)
+            return 0
+        if not os.path.exists(os.path.join(unzip_dir, "normal")) and not os.path.exists(os.path.join(unzip_dir, "projection")):
+            self.log.append("Unpacked archive contains no images")
+            return 0
+
+        images_dir = os.path.join(source_dir, "images")
+        if os.path.exists(images_dir):
+            try:
+                shutil.rmtree(images_dir)
+            except:
+                pass
+        os.makedirs(images_dir, exist_ok=True)
         if os.path.exists(os.path.join(unzip_dir, "normal")):
-            shutil.move(os.path.join(unzip_dir, "normal"), os.path.join(source_dir, "images"))
+            shutil.move(os.path.join(unzip_dir, "normal"), images_dir)
         if os.path.exists(os.path.join(unzip_dir, "projection")):
-            shutil.move(os.path.join(unzip_dir, "projection"), os.path.join(source_dir, "images"))
+            shutil.move(os.path.join(unzip_dir, "projection"), images_dir)
         if os.path.exists(unzip_dir):
             try:
                 shutil.rmtree(unzip_dir)
             except:
                 pass
-        nr_of_images = len(glob.glob(os.path.join(self.rc_job.workingdir, "images", "*", "*.jpg")))
+        nr_of_images = len(glob.glob(os.path.join(images_dir, "*", "*.jpg")))
+        if nr_of_images > 0:
+            os.remove(path)
         return nr_of_images

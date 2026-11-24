@@ -19,7 +19,7 @@ class ShotWindowsView(ShotView):
         self.imageCarousel.reset()
 
     def delete_shot(self):
-        self.shotsInstance.delete(self.subject)
-        self.subject._deleted = True
+        if self.shotsInstance.delete(self.subject):
+            self.subject._deleted = True
         if self.is_visible:
             self.update()

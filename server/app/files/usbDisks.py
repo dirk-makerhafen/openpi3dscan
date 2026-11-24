@@ -35,6 +35,8 @@ class UsbDisks(Observable):
         return self.get_disk_by_uid(SettingsInstance().primary_disk)
 
     def _active_primary_path(self):
+        if SettingsInstance().locked:
+            return None
         disk = self.primary_disk
         if disk is None or disk.status != "Active":
             return None

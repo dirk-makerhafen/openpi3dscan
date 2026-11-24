@@ -105,6 +105,8 @@ class Shot(Observable):
             return False
         if self.dropboxPublicFolder.can_delete is False:
             return False
+        if self.dropboxUpload.status in ["pending", "uploading", "deleting"]:
+            return False
         return True
 
     def create_folders(self):
@@ -148,12 +150,13 @@ class Shot(Observable):
 
     def delete(self):
         if self.can_delete is False:
-            return
+            return False
         if self.devices is not None:
             for device in self.devices:
                 device.camera.shots.delete(self.shot_id)
         if os.path.exists(self.path):
             shutil.rmtree(self.path)
+        return True
 
     def sync_remote(self):
         if self.worker is None:

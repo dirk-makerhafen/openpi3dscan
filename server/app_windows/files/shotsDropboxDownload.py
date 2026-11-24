@@ -161,8 +161,9 @@ class ShotsDropboxDownload(Observable):
                     self.dropbox.files_delete_v2("%s/%s" % (source_dir, name))
                 else:
                     all_in_sync = False
-                shot.status = ""
-                shot.notify_observers()
+                if shot is not None:
+                    shot.status = ""
+                    shot.notify_observers()
 
         self.current_download_shotid = ""
         self.notify_observers()

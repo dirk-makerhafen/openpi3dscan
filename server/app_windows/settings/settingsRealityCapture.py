@@ -49,7 +49,7 @@ class SettingsRealityCapture(Observable):
             "default_export_quality": self.default_export_quality,
             "default_create_mesh_from": self.default_create_mesh_from,
             "default_create_textures": self.default_create_textures,
-            "default_lit": self.default_create_textures,
+            "default_lit": self.default_lit,
             "hide_realitycapture": self.hide_realitycapture,
             "compress_models": self.compress_models,
             "settingsDefaultModelSets": self.settingsDefaultModelSets.to_dict(),

@@ -1,6 +1,6 @@
 from pyhtmlgui import PyHtmlView,ObservableListView
 
-from app.settings.settings import SettingsInstance
+from app.settings.settings import CLEANUP_DELETE_PERCENT_MAX, SettingsInstance
 
 
 class UsbDiskView(PyHtmlView):
@@ -65,6 +65,7 @@ class UsbStorageView(PyHtmlView):
                             </div>
                         </div>
                     </div>
+                    {% if pyview.settingsInstance.locked == False %}
                     <div class="list-group-item">
                         <div class="row align-items-center">
                             <div class="col-md-8">
@@ -74,7 +75,7 @@ class UsbStorageView(PyHtmlView):
                             </div>
                             <div class="col-md-2">
                                 <label class="mb-0" for="cleanup_percent">Delete oldest (%)</label>
-                                <input class="form-control" id="cleanup_percent" type="number" min="1" max="100" value="{{pyview.settingsInstance.cleanup_delete_percent}}"/>
+                                <input class="form-control" id="cleanup_percent" type="number" min="0" max="{{pyview.max_delete_percent}}" value="{{pyview.settingsInstance.cleanup_delete_percent}}"/>
                                 <button class="btn btnfw" style="margin-top:5px" onclick='pyview.save_delete_percent($("#cleanup_percent").val())'>Save</button>
                             </div>
                             <div class="col-md-2" style="text-align:center">
@@ -102,6 +103,7 @@ class UsbStorageView(PyHtmlView):
                             </div>
                         {% endif %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -112,6 +114,7 @@ class UsbStorageView(PyHtmlView):
         super().__init__(subject, parent)
         self.disks = ObservableListView(subject=subject.disks, parent=self, item_class=UsbDiskView, dom_element="tbody")
         self.settingsInstance = SettingsInstance()
+        self.max_delete_percent = CLEANUP_DELETE_PERCENT_MAX
         self.cleanup_status = ""
         self.cleanup_info = ""
         self.confirm_visible = False
@@ -123,6 +126,8 @@ class UsbStorageView(PyHtmlView):
             self.update()
 
     def show_cleanup_confirm(self):
+        if self.settingsInstance.locked:
+            return
         disk = self.subject.primary_disk
         if disk is None or disk.status != "Active":
             self.cleanup_status = "No active primary disk."
@@ -149,6 +154,8 @@ class UsbStorageView(PyHtmlView):
             self.update()
 
     def cleanup_old_scans(self):
+        if self.settingsInstance.locked:
+            return
         stats = self.subject.cleanup_old_scans()
         gb = 1024 ** 3
         self.cleanup_status = "Deleted %d scan(s), freed %.1f GB." % (

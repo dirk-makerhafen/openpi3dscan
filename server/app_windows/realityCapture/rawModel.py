@@ -21,6 +21,11 @@ class RawModel(GenericTask):
             self.set_status("success")
             return
 
+        if not os.path.exists(rc_proj_file):
+            self.log.append("Project file not found: %s" % rc_proj_file)
+            self.set_status("failed")
+            return
+
         self.log.append("Reconstructing in %s quality" % self.rc_job.reconstruction_quality )
         cmd = self._get_cmd_start()
         last_changed = os.path.getmtime(rc_proj_file)
@@ -58,7 +63,7 @@ class RawModel(GenericTask):
         cmd += '-quit '
         self._run_command(cmd, "create_raw_model")
 
-        if last_changed != os.path.getmtime(rc_proj_file):
+        if os.path.exists(rc_proj_file) and last_changed != os.path.getmtime(rc_proj_file):
             with open(os.path.join(self.rc_job.workingdir, "%s.raw_exists" % self.rc_job.realityCapture_filename), "w") as f:
                 f.write("raw created")
             self.set_status("success")

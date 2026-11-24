@@ -44,6 +44,7 @@ class Light():
         self.last_usage = time.time()
         self.light_segment_adjustments = [1.0] * 16
         self.current_value = 0
+        self.current_pwm_values = [[-1,-1] for i in range(16)]
         self.set(self.current_value )
 
         self.screensaver_timeout = 600
@@ -56,7 +57,6 @@ class Light():
         self._screensaver_steps_per_col = self._screensaver_max_steps / 16
         #self.interpolate_screensaver_data()
         self.start()
-        self.current_pwm_values = [[-1,-1] for i in range(16)]
 
     def interpolate_screensaver_data(self):
         ## init screensaver data
@@ -177,7 +177,7 @@ class LightAPI():
     def __init__(self):
         self.light = Light()
         route("/light/set/<value>")(self.set)
-        route("/light/adjust/<values>")(self.set)
+        route("/light/adjust/<values>")(self.adjust)
         route("/light/sequence/<sequence>")(self.sequence)
 
     # 1..100 # absolut light value in percent

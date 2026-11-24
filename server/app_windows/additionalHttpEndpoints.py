@@ -96,8 +96,14 @@ class HttpEndpoints:
 
     def _settings_backup(self):
         fname = "Backup-Settings"
-        if SettingsInstance().settingsScanner.location != "":
-            fname = "%s-%s" % (fname, SettingsInstance().settingsScanner.location)
+        settings = SettingsInstance()
+        location = getattr(getattr(settings, "settingsScanner", None), "location", "")
+        if not location:
+            locations = getattr(getattr(settings, "settingsLocations", None), "locations", [])
+            if len(locations) > 0:
+                location = getattr(locations[0], "location", "")
+        if location != "":
+            fname = "%s-%s" % (fname, location)
         now = datetime.datetime.now()
         fname = "%s-%s.%s.%s %s%s.json" % (fname, now.year, ("%s" % now.month).zfill(2), ("%s" % now.day).zfill(2), ("%s" % now.hour).zfill(2), ("%s" % now.minute).zfill(2))
         headers = {

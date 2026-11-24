@@ -49,7 +49,9 @@ class ExportModel(GenericTask):
         super().__init__(rc_job)
         self.export_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername,self.rc_job.export_filename)
 
-        if self.rc_job.filetype != "rcproj":
+        if self.rc_job.filetype == "rcproj":
+            self.output_model_path = self.export_model_path
+        else:
             self.output_model_path = os.path.join(self.rc_job.workingdir, self.rc_job.export_foldername, self.rc_job.export_filename.replace(" ","_" if self.rc_job.filetype not in ["3mf","stl", "stl_printready" ] else " "))
 
 

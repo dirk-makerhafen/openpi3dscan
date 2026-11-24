@@ -8,6 +8,17 @@ import shutil
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 storage_dir = "/home/openpi3dscan/shots"
 
+
+def remove_path(path):
+    """Remove a file or directory without involving a shell."""
+    try:
+        if os.path.islink(path) or os.path.isfile(path):
+            os.remove(path)
+        elif os.path.isdir(path):
+            shutil.rmtree(path)
+    except Exception as e:
+        print("failed to remove '%s': %s" % (path, e))
+
 class Installer():
     def __init__(self):
         self.device_id = None
@@ -163,7 +174,7 @@ class Installer():
             while free < min_disk_free and len(shots) > 0:
                 for i in range(10):
                     if len(shots) == 0: break
-                    os.system("rm -r '%s'" % shots[0])
+                    remove_path(shots[0])
                     del shots[0]
                 free = shutil.disk_usage("/")[2] / 1024 / 1024
 

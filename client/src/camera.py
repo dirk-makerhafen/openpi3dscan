@@ -35,6 +35,17 @@ def clear_memory():
     gc.collect()
 
 
+def remove_path(path):
+    """Remove a file or directory without involving a shell."""
+    try:
+        if os.path.islink(path) or os.path.isfile(path):
+            os.remove(path)
+        elif os.path.isdir(path):
+            shutil.rmtree(path)
+    except Exception as e:
+        print("failed to remove '%s': %s" % (path, e))
+
+
 class Frame():
     def __init__(self,  timestamp, buffer, framesize):
         self.timestamp = timestamp
@@ -414,7 +425,8 @@ class Camera():
                 self.quality = quality
             self.last_usage = time.time()
             self.check_autopll()
-            frame = [frame for frame in self.port.capture(nr_of_frames=1)][0]
+            frames = list(self.port.capture(nr_of_frames=1))
+            frame = frames[0] if len(frames) > 0 else None
         finally:
             self.cameralock.release()
 
@@ -448,6 +460,8 @@ class Camera():
 
     def get_avg_rgb(self):
         image = self.get_preview(framesize= (800, 600))
+        if image is None:
+            return None
         image = Image.open(BytesIO(image))
         image = image.crop((375, 250, 425, 350))
         image = np.array(image, dtype=np.uint8)
@@ -467,7 +481,10 @@ class Camera():
             self.quality = quality
             self.check_autopll()
 
-            frames = [frame for frame in self.port.capture(timestamps=timestamps, use_pll=True)]
+            frames = list(self.port.capture(timestamps=timestamps, use_pll=True))
+            if len(frames) < 2:
+                print("camera returned %d frames, expected 2" % len(frames))
+            frames = (frames + [None, None])[:2]
 
             path = "%s/%s/" % (storage_dir, shot_id)
             if frames[0] is not None:
@@ -525,7 +542,7 @@ class Camera():
             while free < min_disk_free and len(shots) > 0:
                 for i in range(30):
                     if len(shots) == 0: break
-                    os.system("rm -r '%s'" % shots[0])
+                    remove_path(shots[0])
                     del shots[0]
                 free = shutil.disk_usage("/")[2] / 1024 / 1024
 
@@ -545,6 +562,8 @@ class Camera():
             for i in range(10):
                 time.sleep(1)
                 rgb = self.get_avg_rgb()
+                if rgb is None:
+                    continue
                 diff_r = ( 1.0 / rgb[1] ) * rgb[0]
                 diff_b = ( 1.0 / rgb[1] ) * rgb[2]
                 if abs(1 - diff_r) > 0.3 and abs(1 - diff_b) > 0.3: # to large, adjust
@@ -890,7 +909,10 @@ class CameraAPI():
         return json.dumps([float(g) for g in self.camera.awb_gains ])
 
     def get_avg_rgb(self):
-        return json.dumps(self.camera.get_avg_rgb())
+        rgb = self.camera.get_avg_rgb()
+        if rgb is None:
+            return HTTPResponse(status=503)
+        return json.dumps(rgb)
 
     def shots_list(self):
         shots = []
@@ -925,10 +947,13 @@ class CameraAPI():
         return static_file(filepath, root=storage_dir)
 
     def delete_shot(self, shot_id):
-        p = os.path.join(storage_dir, shot_id)
+        root = os.path.realpath(storage_dir)
+        p = os.path.realpath(os.path.join(root, shot_id))
+        if not p.startswith(root + os.sep):
+            return HTTPResponse(status=400)
         if not os.path.exists(p):
             return HTTPResponse(status=404)
-        os.system("rm -r '%s'" % p)
+        remove_path(p)
 
 if __name__ == "__main__":
     cam = Camera()

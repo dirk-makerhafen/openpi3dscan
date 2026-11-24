@@ -114,6 +114,9 @@ class CalibrationData(GenericTask):
             cnt += 1
         if first_time_calibration is True:
             positions = [data["Position"] for data in cam_data if "Position" in data]
+            if len(positions) == 0:
+                self.log.append("No camera positions in XMP data, skipping center alignment")
+                return cnt
             c_x = (max([x[0] for x in positions]) + min([x[0] for x in positions])) / 2
             c_y = (max([x[1] for x in positions]) + min([x[1] for x in positions])) / 2
             c_z = (max([x[2] for x in positions]) + min([x[2] for x in positions])) / 2

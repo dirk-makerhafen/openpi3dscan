@@ -13,6 +13,28 @@ def wait(min_time=20, max_time=60):
     if NOWAIT is False:
         time.sleep(random.randint(min_time, max_time))
 
+
+def kill_stale_listener(force=False):
+    """Kill leftover listen.py processes from older installations."""
+    import signal
+    import subprocess
+    try:
+        out = subprocess.check_output(["pgrep", "-f", "listen.py"], stderr=subprocess.DEVNULL)
+    except Exception:
+        return
+    for value in out.decode().split():
+        try:
+            pid = int(value)
+        except ValueError:
+            continue
+        if pid == os.getpid():
+            continue
+        try:
+            os.kill(pid, signal.SIGKILL if force else signal.SIGTERM)
+        except Exception:
+            pass
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "install":
         from src.install import Installer
@@ -37,13 +59,13 @@ if __name__ == "__main__":
         wait(60, 90)
 
     if NOWAIT is False:
-        os.system("ps ax | grep -i listen.py | cut -d? -f1 | cut -dp -f1 | xargs sudo kill")
+        kill_stale_listener()
         os.system("sudo /etc/init.d/apache2 stop")
         os.system("sudo /etc/init.d/triggerhappy stop")
         os.system("sudo /etc/init.d/cron stop")
         os.system("sudo /etc/init.d/rsyslog stop")
         os.system("sudo service rsyslog stop")
-        os.system("ps ax | grep -i listen.py | cut -d? -f1 | cut -dp -f1 | xargs sudo kill -9")
+        kill_stale_listener(force=True)
         os.system("sudo /etc/init.d/chrony restart")
         wait(5, 10)
         os.system("sudo sh -c 'sync ; echo 3 > /proc/sys/vm/drop_caches'") # free some memory

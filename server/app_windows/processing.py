@@ -262,13 +262,14 @@ class Processing(Observable):
             time.sleep(2)
 
     def get_unprocessed_models(self, server_ip):
-        data = {}
         try:
             d = requests.get("http://%s/realityCaptureProcess" % server_ip).text
             data = json.loads(d)
         except Exception as e:
             print(e)
-            data["models"] = []
+            data = {}
+        if not isinstance(data, dict) or not isinstance(data.get("models"), list):
+            data = {"models": []}
         if len(data["models"]) > 0:
             print("%s unprocessed models received from server" % len(data["models"]))
         return data

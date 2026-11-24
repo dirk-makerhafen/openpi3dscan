@@ -11,7 +11,7 @@ from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsDropbox import SettingsDropbox
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2026.11.24-22:32"
+VERSION = "2026.11.24-22:42"
 CLEANUP_DELETE_PERCENT_MAX = 50
 
 class Settings(Observable):

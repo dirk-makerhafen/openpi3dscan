@@ -12,3 +12,4 @@ blob_storage
 foo.py
 db.py
 rc_rebase.spec
+.DS_Store

@@ -11,7 +11,7 @@ from app.settings.settingsWireless import SettingsWireless
 from app.settings.settingsDropbox import SettingsDropbox
 from app.settings.settingsRealityCapture import SettingsRealityCapture
 
-VERSION = "2024.02.23-12:20"
+VERSION = "2026.11.24-22:05"
 
 class Settings(Observable):
     def __init__(self, devicesInstance):
@@ -31,6 +31,7 @@ class Settings(Observable):
         self.locked = False
         self.password = ""
         self.primary_disk = ""
+        self.cleanup_delete_percent = 20
         self.load()
 
 
@@ -49,6 +50,7 @@ class Settings(Observable):
             "locked"           : self.locked,
             "password"         : self.password,
             "primary_disk"     : self.primary_disk,
+            "cleanup_delete_percent": self.cleanup_delete_percent,
         }
 
     def save(self):
@@ -107,12 +109,24 @@ class Settings(Observable):
             self.primary_disk = data["primary_disk"]
         except:
             pass
+        try:
+            self.cleanup_delete_percent = int(data["cleanup_delete_percent"])
+        except:
+            pass
 
         self.save()
         self.notify_observers()
 
     def set_primary_disk(self, disk_uuid):
         self.primary_disk = disk_uuid
+        self.save()
+        self.notify_observers()
+
+    def set_cleanup_delete_percent(self, value):
+        try:
+            self.cleanup_delete_percent = max(1, min(int(value), 100))
+        except:
+            return
         self.save()
         self.notify_observers()
 

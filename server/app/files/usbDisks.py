@@ -1,8 +1,10 @@
+import os
 import subprocess
 import threading
 import time
 from pyhtmlgui import Observable, ObservableList
 from app.files.usbDisk import UsbDisk
+from app.files.shots import ShotsInstance
 from app.settings.settings import SettingsInstance
 
 class UsbDisks(Observable):
@@ -27,6 +29,34 @@ class UsbDisks(Observable):
     def set_status(self, status):
         self.status = status
         self.notify_observers()
+
+    @property
+    def primary_disk(self):
+        return self.get_disk_by_uid(SettingsInstance().primary_disk)
+
+    def _active_primary_path(self):
+        disk = self.primary_disk
+        if disk is None or disk.status != "Active":
+            return None
+        path = os.path.join("/shots", disk.uuid)
+        if not os.path.ismount(path):
+            return None
+        return path
+
+    def cleanup_preview(self):
+        directory = self._active_primary_path()
+        if directory is None:
+            return {"count": 0, "skipped": 0, "total": 0, "free_bytes": 0}
+        return ShotsInstance().cleanup_preview(directory)
+
+    def cleanup_old_scans(self):
+        directory = self._active_primary_path()
+        if directory is None:
+            return {"deleted": 0, "skipped": 0, "total": 0, "free_before": 0, "free_after": 0}
+        stats = ShotsInstance().cleanup_old_scans(directory)
+        self.primary_disk.load_stats()
+        self.notify_observers()
+        return stats
 
     def load(self):
         if self.load_worker is None:

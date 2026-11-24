@@ -1,12 +1,18 @@
 import glob
 import json
 import os
+import shutil
 import subprocess
 from pyhtmlgui import ObservableList
 
 from app.files.shot import Shot
 from app.settings.settings import SettingsInstance
 from app.dropbox.process import DropboxUploads
+
+# Minimum free space needed to create a shot (shown as "Failed, check disk space").
+MIN_FREE_BYTES = 10 * 1024 ** 3
+# Default share of the oldest scans removed by a manual cleanup.
+CLEANUP_DELETE_PERCENT_DEFAULT = 20
 
 
 class Shots:
@@ -40,11 +46,75 @@ class Shots:
             line = line.replace("  ", " ")
         try:
             mp, fsavail = line.split(" ")
-            if int(fsavail) < 10*1024*1024*1024:
+            if int(fsavail) < MIN_FREE_BYTES:
                 return False
         except:
             pass
         return True
+
+    @staticmethod
+    def _free_bytes(directory):
+        try:
+            return shutil.disk_usage(directory).free
+        except Exception as e:
+            print("failed to get disk space for '%s': %s" % (directory, e))
+            return 0
+
+    @staticmethod
+    def _cleanup_delete_count(total, percent=None):
+        if percent is None:
+            percent = SettingsInstance().cleanup_delete_percent
+        try:
+            percent = max(1, min(int(percent), 100))
+        except:
+            percent = CLEANUP_DELETE_PERCENT_DEFAULT
+        if total <= 1:
+            return 0
+        return min((total * percent + 99) // 100, total - 1)  # ceil, never delete the last scan
+
+    def _cleanup_shots(self, directory):
+        """All shots on a disk, oldest first."""
+        prefix = os.path.join(directory, "")
+        shots = [s for s in self.shots if s.path.startswith(prefix)]
+        shots.sort(reverse=True)  # shot ids are timestamps: newest first
+        return list(reversed(shots))
+
+    def cleanup_preview(self, directory=None, percent=None):
+        directory = directory or self.path
+        shots = self._cleanup_shots(directory)
+        deletable = [s for s in shots if s.can_delete]
+        return {
+            "count": min(self._cleanup_delete_count(len(shots), percent), len(deletable)),
+            "skipped": len(shots) - len(deletable),
+            "total": len(shots),
+            "free_bytes": self._free_bytes(directory),
+        }
+
+    def cleanup_old_scans(self, directory=None, percent=None):
+        """Delete the configured percentage of the oldest scans on a disk.
+
+        Shots that are busy (syncing or publishing a public dropbox folder)
+        are skipped, and the last remaining scan is never deleted.
+        """
+        directory = directory or self.path
+        shots = self._cleanup_shots(directory)
+        deletable = [s for s in shots if s.can_delete]
+        to_delete = deletable[:self._cleanup_delete_count(len(shots), percent)]
+        free_before = self._free_bytes(directory)
+        deleted = 0
+        for shot in to_delete:
+            try:
+                self.delete(shot)
+                deleted += 1
+            except Exception as e:
+                print("failed to delete shot '%s': %s" % (shot.shot_id, e))
+        return {
+            "deleted": deleted,
+            "skipped": len(shots) - len(deletable),
+            "total": len(shots),
+            "free_before": free_before,
+            "free_after": self._free_bytes(directory),
+        }
 
     def create(self, shot_id, name):
         if self.path_avail() is False:

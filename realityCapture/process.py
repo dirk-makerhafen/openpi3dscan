@@ -8,6 +8,8 @@ import re, glob
 
 from PIL import Image
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 import time
 import glob
 import socket
@@ -636,7 +638,7 @@ class RealityCapture():
         options.add_argument("--disable-web-security")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--allow-file-access-from-files")
-        browser = webdriver.Chrome(executable_path=os.path.join(SCRIPT_DIR,"chromedriver.exe"), options=options)
+        browser = webdriver.Chrome(service=Service(os.path.join(SCRIPT_DIR, "chromedriver.exe")), options=options)
         browser.set_window_position(0, 0)
         browser.set_window_size(1200, 1200)
             
@@ -833,19 +835,19 @@ class WebAPI():
                 time.sleep(10)
 
     def ensure_login(self):
-        browser = webdriver.Chrome(executable_path=os.path.join(SCRIPT_DIR, "chromedriver.exe"))
+        browser = webdriver.Chrome(service=Service(os.path.join(SCRIPT_DIR, "chromedriver.exe")))
         browser.get("https://www.capturingreality.com/My")
         time.sleep(2)
         try:
-            browser.find_element_by_class_name('epic-login').click()
+            browser.find_element(By.CLASS_NAME, 'epic-login').click()
             time.sleep(5)
         except:
             pass
 
         while True:
-            pagesource = browser.getPageSource()
-            if pagesource.contains('Account Summary'):
-                if pagesource.contains('Your PPI balance is'):   # PPI account, check balance
+            pagesource = browser.page_source
+            if 'Account Summary' in pagesource:
+                if 'Your PPI balance is' in pagesource:   # PPI account, check balance
                     balance = 0
                     try:
                         balance = float(pagesource.split('Your current balance is ')[1].split("PPI")[0])

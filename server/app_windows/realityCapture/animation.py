@@ -63,7 +63,7 @@ class Animation(GenericTask):
         options.add_argument("--disable-dev-shm-usage")
         service = Service(ExternalFilesInstance().chromedriver_exe)
         service.creationflags = CREATE_NO_WINDOW
-        browser = webdriver.Chrome(executable_path=ExternalFilesInstance().chromedriver_exe, options=options, service=service)
+        browser = webdriver.Chrome(options=options, service=service)
         browser.set_window_position(0, 0)
         if self.rc_job.filetype == "holobox":
             browser.set_window_size(2160, 3840)
